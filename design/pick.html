@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>learn-ai · Logo 与 Slogan 候选</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  body { padding-bottom: 60px; }
+  .pk { max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px; }
+  .pk h1 { font-size: 24px; margin-bottom: 6px; }
+  .pk > p { color: var(--text-3); font-size: 13.5px; margin: 0 0 34px; }
+  .pk h2 { font-size: 13px; letter-spacing: .06em; color: var(--accent); margin: 40px 0 14px; }
+
+  .sl { display: grid; gap: 10px; }
+  .sl-row {
+    display: grid; grid-template-columns: 30px 1fr auto; gap: 16px; align-items: center;
+    padding: 14px 18px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg-elev);
+  }
+  .sl-row .k { font: 600 12px var(--mono); color: var(--text-3); }
+  .sl-row .s { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .sl-row .why { font-size: 12px; color: var(--text-3); text-align: right; max-width: 22em; }
+
+  .lg { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .lg-card { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg-elev); overflow: hidden; }
+  .lg-art { height: 92px; display: grid; place-items: center; background: var(--bg-sunken); }
+  .lg-art svg { color: var(--accent); }
+  .lg-bar { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-top: 1px solid var(--line-soft); }
+  .lg-bar svg { color: var(--accent); width: 26px; height: 18px; flex: none; }
+  .lg-bar .bn { font-weight: 700; letter-spacing: -.02em; font-size: 15px; }
+  .lg-foot { display: flex; gap: 10px; padding: 8px 14px 12px; }
+  .lg-foot .k { font: 600 12px var(--mono); color: var(--text-3); flex: none; }
+  .lg-foot .t { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="pk">
+  <h1>Logo 与 Slogan 候选</h1>
+  <p>主题「跟上 AI 时代」。选定后告诉我编号，我改进站点里。</p>
+
+  <h2>SLOGAN</h2>
+  <div class="sl" id="slogans"></div>
+
+  <h2>LOGO</h2>
+  <div class="lg" id="logos"></div>
+</div>
+
+<script>
+const SLOGANS = [
+  ['S1', '一篇一篇，跟上 AI 时代', '和「读透一件，留下一份」同一个骨架，但把「跟上 AI 时代」摆到台面上。节奏最稳'],
+  ['S2', '跟上 AI 时代的笨办法', '不喊口号，反着说。笨办法 = 一篇篇读论文，气质最贴这个站'],
+  ['S3', '追不上速度，就追清楚脉络', '承认追不上，是这个站真正的立场。最有观点，也最长'],
+  ['S4', '读懂一点，就跟上一点', '把「跟上」拆成可执行的量，最温和'],
+  ['S5', '跟上 AI 时代，从读懂一篇论文开始', '最直白，SEO 友好，但也最像广告语'],
+  ['S6', '把 AI 时代读成一条线', '呼应编年史那条走线，和视觉语言咬得最紧'],
+];
+document.getElementById('slogans').innerHTML = SLOGANS.map(([k, s, why]) =>
+  `<div class="sl-row"><span class="k">${k}</span><span class="s">${s}</span><span class="why">${why}</span></div>`).join('');
+
+/* 六个 logo 候选，统一 34×22 视窗、2px 描边，都用 currentColor */
+const LOGOS = [
+  ['L1', '追赶：虚线在前，实线追上',
+   `<path d="M1 15h7l4-4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3" opacity=".45"/>
+    <path d="M2 20h7l5-5h5l4-4h9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="30" cy="11" r="2.6" fill="currentColor"/>`],
+  ['L2', '爬升：三级台阶走线，末端焊盘',
+   `<path d="M2 19h6v-5h6V9h6V4h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="30" cy="4" r="3" fill="var(--bg-elev)" stroke="currentColor" stroke-width="2"/>`],
+  ['L3', '快进：两道走线 + 前进箭头',
+   `<path d="M2 8h13M2 15h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M19 4l8 7.5-8 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="4" cy="8" r="2.4" fill="currentColor"/>`],
+  ['L4', '走线：45° 走线接两个焊盘（现用）',
+   `<path d="M2 16h5l5-5h5l4-4h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="7" cy="16" r="3" fill="var(--bg-elev)" stroke="currentColor" stroke-width="2"/>
+    <circle cx="26" cy="7" r="3" fill="var(--bg-elev)" stroke="currentColor" stroke-width="2"/>`],
+  ['L5', '分叉：走线分出三条并行输出',
+   `<path d="M2 15h8l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M16 9h15M18 14h13M20 19h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="4" cy="15" r="2.6" fill="currentColor"/>`],
+  ['L6', '刻度：时间轴与走在最前的那个点',
+   `<path d="M2 16h30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M6 16v-4M13 16v-6M20 16v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+    <path d="M20 12l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="28" cy="5" r="3.2" fill="var(--bg-elev)" stroke="currentColor" stroke-width="2"/>`],
+];
+document.getElementById('logos').innerHTML = LOGOS.map(([k, t, body]) => {
+  const svg = (w, h) => `<svg viewBox="0 0 34 22" width="${w}" height="${h}" fill="none">${body}</svg>`;
+  return `<div class="lg-card">
+    <div class="lg-art">${svg(102, 66)}</div>
+    <div class="lg-bar">${svg(26, 18)}<span class="bn">learn-ai</span></div>
+    <div class="lg-foot"><span class="k">${k}</span><span class="t">${t}</span></div>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>

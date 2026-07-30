@@ -1,0 +1,36 @@
+{
+  "id": "ep117-paper-journey",
+  "kind": "podcast",
+  "title": "开源一段论文探索之旅",
+  "subtitle": "模型范式、Infra 和数据、语言、多模态的完整变迁史",
+  "topics": ["AI 基础", "论文", "编年史"],
+  "date": "2025-10",
+  "studied": "2026-07",
+  "summary": "张小珺Jùn｜商业访谈录 EP117，谢青池用 4 小时 22 分讲了 36 篇论文。这里是逐段精校的文字稿、可跳播的四条编年史，以及 36 篇论文与相关人物、资料的完整索引。",
+  "source": {
+    "name": "张小珺Jùn｜商业访谈录 EP117",
+    "url": "https://www.xiaoyuzhoufm.com/episode/68ff9d1b083a71a4eb86c52c"
+  },
+  "guest": "谢青池",
+  "host": "张小珺",
+  "media": {
+    "audio": "https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/ludOBUWHSc2Y_GA47pSOwlGC8JPS.m4a",
+    "duration": 15757,
+    "cover": "https://image.xyzcdn.net/Fnuyt9PQDQx0I0wlErG3ZHcW9Gpu.png?imageMogr2/thumbnail/160x160",
+    "video": "https://www.bilibili.com/video/BV1pkyqBxEdB/"
+  },
+  "slides": 51,
+  "modules": [
+    { "type": "transcript", "src": "transcript.md", "label": "文稿" },
+    { "type": "chronicle", "src": "chronicle.json", "label": "编年史" },
+    { "type": "resources", "src": "index.md", "label": "资料" }
+  ],
+  "download": {
+    "name": "资料包.zip",
+    "files": [
+      { "src": "transcript.md", "as": "精校稿.md" },
+      { "src": "index.md", "as": "资料索引.md" },
+      { "src": "assets/AI演义-36篇论文.pdf", "as": "AI演义-36篇论文.pdf" }
+    ]
+  }
+}

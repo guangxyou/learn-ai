@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+.claude/
+
+# 工作现场：414 MB 视频 + 184 MB 论文 PDF + ASR 原始返回
+# 成品已经规整进 content/，这里只留在本地做归档
+00_论文探索之旅/
+
+# 个人工作笔记，不发布
+Idea.txt
