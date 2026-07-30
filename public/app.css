@@ -112,8 +112,6 @@ code { font: 12.5px var(--mono); background: var(--bg-sunken); padding: 1px 4px;
   padding: 4px 10px; border-radius: var(--r-sm); display: flex; align-items: center; gap: 5px;
 }
 .output b { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
-.entry.ghost { border-style: dashed; box-shadow: none; opacity: .72; }
-.entry.ghost:hover { transform: none; }
 
 /* ---------------- 详情页头 ---------------- */
 .ep-head { padding: 32px 0 22px; }

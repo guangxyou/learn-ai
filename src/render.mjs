@@ -68,15 +68,6 @@ export function renderList({ base, entries, site }) {
 <main class="wrap">
   <div class="entries">
 ${cards}
-    <div class="entry ghost">
-      <div class="entry-when">——</div>
-      <div>
-        <div class="topics"><span class="topic">占位</span></div>
-        <h2>下一个条目<em> — 列表随读透的东西一条条长</em></h2>
-        <p class="desc">条目不限于播客：一门课、一本书、一个专题的连续论文，都是一条。
-        详情页由模块拼装，模块清单写在条目的 <code>entry.json</code> 里，所以每条可以长得不一样。</p>
-      </div>
-    </div>
   </div>
 </main>
 
