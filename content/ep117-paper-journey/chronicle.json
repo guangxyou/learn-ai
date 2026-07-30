@@ -1,0 +1,240 @@
+[
+  {
+    "id": "paradigm",
+    "name": "模型的范式变迁",
+    "slide": 8,
+    "nodes": [
+      {
+        "date": "2004.08",
+        "name": "Brook",
+        "sub": "用 GPU 进行计算",
+        "paper": "1"
+      },
+      {
+        "date": "2012.10",
+        "name": "AlexNet",
+        "sub": "深度学习的开端",
+        "paper": "2"
+      },
+      {
+        "date": "2014.09",
+        "name": "Attention & seq2seq",
+        "sub": "对序列建模",
+        "paper": "3a"
+      },
+      {
+        "date": "2015.03",
+        "name": "蒸馏",
+        "sub": "模型能被学习吗？",
+        "paper": "4"
+      },
+      {
+        "date": "2015.12",
+        "name": "ResNet",
+        "sub": "比深更深",
+        "paper": "5"
+      },
+      {
+        "date": "2017.06",
+        "name": "Transformer",
+        "sub": "拉开一个时代的序幕",
+        "paper": "6"
+      },
+      {
+        "date": "2017.01",
+        "name": "MoE",
+        "sub": "现代 MoE 的开端",
+        "paper": "8"
+      },
+      {
+        "date": "2017.10",
+        "name": "AlphaGo Zero",
+        "sub": "强化学习的突破",
+        "paper": "7"
+      },
+      {
+        "date": "2021.06",
+        "name": "LoRA",
+        "sub": "那个我们每天都在用的东西",
+        "paper": "10"
+      },
+      {
+        "date": "2022.01",
+        "name": "CoT",
+        "sub": "Prompt Engineering 的奠基之作",
+        "paper": "9"
+      },
+      {
+        "date": "2022.10",
+        "name": "ReAct",
+        "sub": "Agent 从理论到落地",
+        "paper": "11"
+      }
+    ]
+  },
+  {
+    "id": "infra",
+    "name": "Infra 与数据的变迁",
+    "slide": 26,
+    "nodes": [
+      {
+        "date": "2019.10",
+        "name": "ZeRO",
+        "sub": "大规模 GPU 并行",
+        "paper": "13"
+      },
+      {
+        "date": "2020.01",
+        "name": "Scaling Law",
+        "sub": "上帝的指挥棒",
+        "paper": "14"
+      },
+      {
+        "date": "2022.03",
+        "name": "Chinchilla",
+        "sub": "上帝的指挥棒（下）",
+        "paper": "15"
+      },
+      {
+        "date": "2022.10",
+        "name": "LAION-5B",
+        "sub": "开源社区的英雄主义",
+        "paper": "16"
+      },
+      {
+        "date": "2023.06",
+        "name": "The RefinedWeb",
+        "sub": "互联网数据也很够用",
+        "paper": "17"
+      },
+      {
+        "date": "2024.02",
+        "name": "MegaScale",
+        "sub": "万卡 GPU 集群训练",
+        "paper": "18"
+      },
+      {
+        "date": "2019.03",
+        "name": "The Bitter Lesson",
+        "sub": "过去 70 年的教训",
+        "paper": "12"
+      }
+    ]
+  },
+  {
+    "id": "lm",
+    "name": "语言模型的发展",
+    "slide": 32,
+    "nodes": [
+      {
+        "date": "2013.01",
+        "name": "Word2Vec",
+        "sub": "用机器学习将单词向量化",
+        "paper": "19"
+      },
+      {
+        "date": "2016.09",
+        "name": "Google Translate",
+        "sub": "神经网络大规模线上部署",
+        "paper": "20"
+      },
+      {
+        "date": "2018.06",
+        "name": "GPT-1",
+        "sub": "它来了",
+        "paper": "21"
+      },
+      {
+        "date": "2018.10",
+        "name": "BERT",
+        "sub": "曾经的王",
+        "paper": "22"
+      },
+      {
+        "date": "2019.02",
+        "name": "GPT-2",
+        "sub": "是时候告别微调了",
+        "paper": "23"
+      },
+      {
+        "date": "2020.05",
+        "name": "GPT-3",
+        "sub": "ChatGPT 来临前夜",
+        "paper": "24"
+      },
+      {
+        "date": "2022.03",
+        "name": "InstructGPT",
+        "sub": "给 LLM 以文明",
+        "paper": "25"
+      },
+      {
+        "date": "2024.11",
+        "name": "Tulu 3",
+        "sub": "后训练的开源",
+        "paper": "26"
+      }
+    ]
+  },
+  {
+    "id": "mm",
+    "name": "多模态模型的发展",
+    "slide": 41,
+    "nodes": [
+      {
+        "date": "2014.06",
+        "name": "DeepVideo",
+        "sub": "深度学习进入视频领域",
+        "paper": "27"
+      },
+      {
+        "date": "2014.06",
+        "name": "双流网络",
+        "sub": "Karén 和牛津登场",
+        "paper": "28"
+      },
+      {
+        "date": "2014.06",
+        "name": "GAN",
+        "sub": "图像生成的序章",
+        "paper": "29"
+      },
+      {
+        "date": "2015.03",
+        "name": "Diffusion",
+        "sub": "在 GAN 的阴影下悄然成长",
+        "paper": "30"
+      },
+      {
+        "date": "2020.06",
+        "name": "DDPM",
+        "sub": "重回图像舞台的中央",
+        "paper": "31"
+      },
+      {
+        "date": "2020.10",
+        "name": "ViT",
+        "sub": "当图像遇到 Transformer",
+        "paper": "32"
+      },
+      {
+        "date": "2021.03",
+        "name": "CLIP",
+        "sub": "文生图的奠基石",
+        "paper": "33"
+      },
+      {
+        "date": "2021.12",
+        "name": "Stable Diffusion",
+        "sub": "在潜空间里生成",
+        "paper": "34"
+      },
+      {
+        "date": "2022.12",
+        "name": "DiT",
+        "sub": "人们期待一个融合的未来",
+        "paper": "35"
+      }
+    ]
+  }
+]
