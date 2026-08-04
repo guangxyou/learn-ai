@@ -41,11 +41,12 @@ export function parseTranscript(md, speakers) {
 
   for (const raw of md.split('\n')) {
     const s = raw.trimEnd();
+    // 正文从第一个 `## ` 开始：在那之前的一级标题是文档标题，还有 frontmatter
     if (!started) {
-      if (s.startsWith('## ') || s.startsWith('# Part')) started = true;
+      if (s.startsWith('## ')) started = true;
       else continue;
     }
-    if (s.startsWith('# Part')) { part = s.slice(2).trim(); continue; }
+    if (/^# /.test(s)) { part = s.slice(2).trim(); continue; }   // 其后的一级标题 = 分卷
     if (s.startsWith('## ')) {
       cur = { title: s.slice(3).trim().replace(/\\/g, ''), part, turns: [] };
       sections.push(cur);
