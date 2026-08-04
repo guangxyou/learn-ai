@@ -9,3 +9,7 @@ dist/
 
 # 个人工作笔记，不发布
 Idea.txt
+
+# 素材工作现场（含几百 MB 视频），不进仓库
+01_Transformer/
+02_Attention/

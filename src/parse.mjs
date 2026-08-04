@@ -31,13 +31,15 @@ export function inline(s) {
 
 /* ══════════════ 精校稿 → 大纲 + 分块正文 ══════════════ */
 
-const TURN = /^\*\*(张小珺|谢青池)\*\*〔(\d{2}:\d{2}:\d{2})〕(.*)$/;
 const LI = /^(?:-|\*)\s+(.*)$/;
 const OLI = /^\d+\.\s+(.*)$/;
 
 export function parseTranscript(md, speakers) {
+  // 说话人来自条目声明，不写死 —— 每期的对谈双方都不一样
+  const TURN = new RegExp(
+    `^\\*\\*(${speakers.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\*\\*〔(\\d{2}:\\d{2}:\\d{2})〕(.*)$`);
   const sections = [];
-  let cur = null, part = null, started = false;
+  let cur = null, part = null, started = false, pendingPart = false;
 
   for (const raw of md.split('\n')) {
     const s = raw.trimEnd();
@@ -46,13 +48,23 @@ export function parseTranscript(md, speakers) {
       if (s.startsWith('## ')) started = true;
       else continue;
     }
-    if (/^# /.test(s)) { part = s.slice(2).trim(); continue; }   // 其后的一级标题 = 分卷
+    if (/^# /.test(s)) { part = s.slice(2).trim(); pendingPart = true; continue; }  // 一级标题 = 分卷
     if (s.startsWith('## ')) {
       cur = { title: s.slice(3).trim().replace(/\\/g, ''), part, turns: [] };
       sections.push(cur);
+      pendingPart = false;
       continue;
     }
-    if (!s || s === '---' || s.startsWith('>') || !cur) continue;
+    if (!s || s === '---' || s.startsWith('>')) continue;
+    // 分卷底下直接就是正文、没有 `## ` 小节时，把分卷本身当成一节，
+    // 否则这些段落会被并到上一节里，标题也就丢了
+    if (pendingPart) {
+      cur = { title: part, part: null, turns: [] };
+      sections.push(cur);
+      pendingPart = false;
+      part = null;
+    }
+    if (!cur) continue;
 
     const m = TURN.exec(s);
     if (m && speakers.includes(m[1])) {
