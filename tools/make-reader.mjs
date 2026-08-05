@@ -51,11 +51,14 @@ const vbytes = (await stat(join(vdir, mp4))).size;
 const lastT = Math.max(...sections.flatMap((s) => s.turns.map((t) => t.t)));
 
 /* ---- 正文 ---- */
-const blk = (b) =>
-  b.k === 'h3' ? `<h3>${inline(b.v)}</h3>`
-  : b.k === 'ul' ? `<ul>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`
-  : b.k === 'ol' ? `<ol>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ol>`
-  : `<p>${inline(b.v)}</p>`;
+const blk = (b) => {
+  if (b.k === 'img') return `<figure class="fig"><img src="${b.v.src}" alt="${esc(b.v.alt)}" loading="lazy">`
+    + `<figcaption>${esc(b.v.alt)}${b.v.cite ? `<span class="cite">${esc(b.v.cite)}</span>` : ''}</figcaption></figure>`;
+  if (b.k === 'h3') return `<h3>${inline(b.v)}</h3>`;
+  if (b.k === 'ul') return `<ul>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`;
+  if (b.k === 'ol') return `<ol>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ol>`;
+  return `<p>${inline(b.v)}</p>`;
+};
 
 let doc = '', toc = '', part = null;
 sections.forEach((sec, i) => {
@@ -67,8 +70,9 @@ sections.forEach((sec, i) => {
   doc += `<h2 id="s${i}">${esc(sec.title)}</h2>`;
   toc += `<button class="toc-i" data-s="${i}"><span class="t">${hms(sec.t)}</span><span>${esc(sec.title)}</span></button>`;
   for (const tn of sec.turns) {
-    doc += `<div class="turn" data-t="${tn.t}">`
-      + `<button class="ts" data-seek="${tn.t}" title="跳到 ${hms(tn.t)}">${tn.spk ? hms(tn.t) : ''}</button>`
+    const anchored = tn.spk || tn.cont;
+    doc += `<div class="turn${tn.cont ? ' cont' : ''}" data-t="${tn.t}">`
+      + `<button class="ts" data-seek="${tn.t}" title="跳到 ${hms(tn.t)}">${anchored ? hms(tn.t) : ''}</button>`
       + `<div class="body">${tn.spk ? `<div class="who${tn.spk === speakers[0] ? ' host' : ''}">${esc(tn.spk)}</div>` : ''}`
       + tn.b.map(blk).join('') + `</div></div>`;
   }
@@ -145,12 +149,23 @@ body.wide .stage .inner{max-width:1100px;margin:0 auto}
 body.wide .doc h2{scroll-margin-top:calc(var(--bar) + 58vh)}
 .doc h2:first-child{margin-top:0;border-top:0;padding-top:0}
 .doc h3{font-size:15px;margin:20px 0 9px;color:var(--accent-ink)}
+/* ---- 插图 ---- */
+.fig{margin:16px 0 18px;padding:0}
+.fig img{width:100%;display:block;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:zoom-in}
+.fig figcaption{margin-top:7px;font-size:12px;color:var(--t3);line-height:1.55}
+.fig .cite{display:block;margin-top:2px;font-size:11.5px;opacity:.85}
+.lightbox{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:24px;
+  background:rgba(20,22,26,.86);cursor:zoom-out}
+.lightbox.on{display:grid}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px;background:#fff}
 .doc ul,.doc ol{margin:9px 0 13px;padding-left:1.4em}
 .doc li{margin:0 0 7px}
 .part{display:flex;align-items:center;gap:12px;margin:58px 0 4px;font-size:12px;font-weight:650;
   letter-spacing:.06em;color:var(--accent);scroll-margin-top:calc(var(--bar) + 16px)}
 .part::after{content:"";flex:1;height:1px;background:var(--accent-line)}
 .turn{display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;margin:0 0 20px}
+/* 同一个人续说、只换了时间码的段落：贴近上一段，别读成换人了 */
+.turn.cont{margin-top:-8px}
 .ts{font:11.5px var(--mono);color:var(--t3);text-align:right;padding-top:5px;align-self:start;
   font-variant-numeric:tabular-nums}
 .ts:hover{color:var(--accent)}
@@ -245,6 +260,12 @@ try{
   if(localStorage.getItem(KEY+':wide'))$('#wide').click();
 }catch{}
 
+/* 插图点开看大图 */
+const LB=document.createElement('div');LB.className='lightbox';LB.innerHTML='<img alt="">';
+document.body.appendChild(LB);
+$$('.fig img').forEach(im=>im.onclick=()=>{LB.querySelector('img').src=im.src;LB.classList.add('on')});
+LB.onclick=()=>LB.classList.remove('on');
+
 /* 目录 */
 $('#toc-btn').onclick=()=>$('#toc').classList.add('on');
 $('#toc-x').onclick=()=>$('#toc').classList.remove('on');
@@ -265,7 +286,7 @@ addEventListener('keydown',e=>{
   if(e.key===' '){e.preventDefault();V.paused?V.play():V.pause()}
   if(e.key==='ArrowLeft'){e.preventDefault();V.currentTime-=15}
   if(e.key==='ArrowRight'){e.preventDefault();V.currentTime+=30}
-  if(e.key==='Escape')$('#toc').classList.remove('on');
+  if(e.key==='Escape'){$('#toc').classList.remove('on');LB.classList.remove('on')}
 });
 
 const I={play:'<svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 2.8c0-.6.7-1 1.2-.7l7 5.2c.4.3.4.9 0 1.2l-7 5.2c-.5.4-1.2 0-1.2-.6V2.8z"/></svg>',

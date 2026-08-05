@@ -71,8 +71,19 @@ export function parseTranscript(md, speakers) {
       cur.turns.push({ spk: m[1], t: t2s(m[2]), b: [{ k: 'p', v: m[3].trim() }] });
       continue;
     }
+    // 同一个人继续说、只另起一个时间码的段落：`〔00:36:48〕正文`。
+    // 它也是一个跳转锚点，不能当普通段落，否则时间码会以原文形式漏到页面上。
+    const c = /^〔(\d{2}:\d{2}:\d{2})〕(.*)$/.exec(s);
+    if (c) {
+      cur.turns.push({ spk: '', cont: true, t: t2s(c[1]), b: [{ k: 'p', v: c[2].trim() }] });
+      continue;
+    }
     if (!cur.turns.length) cur.turns.push({ spk: '', t: 0, b: [] });
     const b = cur.turns[cur.turns.length - 1].b;
+
+    // 插图：`![说明](路径 "出处")` 独占一行
+    const im = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/.exec(s);
+    if (im) { b.push({ k: 'img', v: { src: im[2], alt: im[1], cite: im[3] || '' } }); continue; }
 
     if (s.startsWith('### ')) b.push({ k: 'h3', v: s.slice(4).trim() });
     else if (LI.test(s)) {
@@ -86,9 +97,10 @@ export function parseTranscript(md, speakers) {
 
   for (const sec of sections) sec.t = sec.turns.find((x) => x.t)?.t ?? 0;
 
+  // 字数只算正文，插图不计入
   const chars = sections.reduce((n, sec) => n + sec.turns.reduce((m, t) =>
-    m + t.b.reduce((k, b) => k + (Array.isArray(b.v) ? b.v : [b.v])
-      .reduce((z, x) => z + plain(x).length, 0), 0), 0), 0);
+    m + t.b.reduce((k, b) => k + (b.k === 'img' ? 0 : (Array.isArray(b.v) ? b.v : [b.v])
+      .reduce((z, x) => z + plain(x).length, 0)), 0), 0), 0);
   const turns = sections.reduce((n, s) => n + s.turns.length, 0);
 
   return { sections, chars, turns };

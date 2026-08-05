@@ -207,6 +207,7 @@ code { font: 12.5px var(--mono); background: var(--bg-sunken); padding: 1px 4px;
 .turn-who.host { color: var(--accent); }
 .turn-body > p { margin: 0 0 12px; }
 .turn-body > *:last-child { margin-bottom: 0; }
+.turn.cont { margin-top: -8px; }   /* 同一个人续说、只换时间码的段落 */
 .turn.cur .turn-body { background: var(--accent-soft); box-shadow: -10px 0 0 0 var(--accent-soft), 10px 0 0 0 var(--accent-soft); border-radius: 2px; }
 .turn.cur .turn-t { color: var(--accent); font-weight: 600; }
 .doc[data-font="serif"] .turn-body { font-family: var(--serif); }

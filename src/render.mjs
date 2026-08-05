@@ -78,6 +78,8 @@ ${cards}
 
 /* ---------------- 文稿 ---------------- */
 function block(b) {
+  if (b.k === 'img') return `<figure class="fig"><img src="${b.v.src}" alt="${esc(b.v.alt)}" loading="lazy">`
+    + `<figcaption>${esc(b.v.alt)}${b.v.cite ? `<span class="cite">${esc(b.v.cite)}</span>` : ''}</figcaption></figure>`;
   if (b.k === 'h3') return `<h3>${inline(b.v)}</h3>`;
   if (b.k === 'ul') return `<ul>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`;
   if (b.k === 'ol') return `<ol>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ol>`;
@@ -96,8 +98,8 @@ function transcriptHTML(sections, host) {
     ol += `<button class="ol-item" data-s="${si}"><span class="t">${hms(sec.t)}</span><span>${esc(sec.title)}</span></button>`;
     for (const tn of sec.turns) {
       const who = tn.spk ? `<div class="turn-who${tn.spk === host ? ' host' : ''}">${esc(tn.spk)}</div>` : '';
-      doc += `<div class="turn" data-t="${tn.t}">`
-        + `<button class="turn-t mono" data-seek="${tn.t}" title="跳到 ${hms(tn.t)}">${tn.spk ? hms(tn.t) : ''}</button>`
+      doc += `<div class="turn${tn.cont ? ' cont' : ''}" data-t="${tn.t}">`
+        + `<button class="turn-t mono" data-seek="${tn.t}" title="跳到 ${hms(tn.t)}">${tn.spk || tn.cont ? hms(tn.t) : ''}</button>`
         + `<div class="turn-body">${who}${tn.b.map(block).join('')}</div></div>`;
     }
   });
