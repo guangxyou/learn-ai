@@ -321,8 +321,12 @@ const player = {
 };
 
 /* ---------------- 启动 ---------------- */
+// 一处初始化失败不该把整页拖死（少一个按钮 ≠ 白页），逐个隔离
+const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[init] ' + name, e); } };
+
 if ($('#doc')) {
-  initReader(); initResources(); initTabs(); initReadProgress(); player.init();
+  safe('reader', initReader); safe('resources', initResources); safe('tabs', initTabs);
+  safe('progress', initReadProgress); safe('player', () => player.init());
   $$('[data-mode]').forEach((b) => (b.onclick = () => {
     CH.mode = b.dataset.mode;
     $$('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', x === b));

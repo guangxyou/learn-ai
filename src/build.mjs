@@ -6,10 +6,11 @@
 import { readFile, writeFile, mkdir, rm, cp, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseTranscript, parseIndex } from './parse.mjs';
-import { renderList, renderEntry } from './render.mjs';
+import { renderList, renderEntry, setAssetVersion } from './render.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = process.env.BASE_PATH ?? '/learn-ai';
@@ -24,6 +25,13 @@ async function build() {
   await rm(DIST, { recursive: true, force: true });
   await mkdir(j(DIST, 'assets'), { recursive: true });
   await mkdir(j(DIST, 'download'), { recursive: true });
+
+  // assets 是固定文件名 + nginx 7 天长缓存，页面引用必须带内容哈希，
+  // 否则改完发布，回头客拿到的是「新 HTML + 旧 JS」——2026-08-06 就这么白过一次页
+  const assetHash = createHash('sha256');
+  for (const f of ['app.css', 'app.js']) assetHash.update(await readFile(j(ROOT, 'public', f)));
+  const VER = assetHash.digest('hex').slice(0, 8);
+  setAssetVersion(VER);
 
   const ids = (await readdir(j(ROOT, 'content'), { withFileTypes: true }))
     .filter((d) => d.isDirectory()).map((d) => d.name);
