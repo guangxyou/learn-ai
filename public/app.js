@@ -79,7 +79,6 @@ function initTabs() {
 
 /* ---------------- 文稿 ---------------- */
 function initReader() {
-  const doc = $('#doc');
   $$('.ol-item').forEach((b) => (b.onclick = () => {
     $('#toc-sheet').classList.remove('on');
     $('#s' + b.dataset.s).scrollIntoView({ block: 'start' });
@@ -87,22 +86,6 @@ function initReader() {
   $$('#doc .turn-t').forEach((b) => (b.onclick = () => player.seek(+b.dataset.seek, true)));
   $('#toc-btn').onclick = () => $('#toc-sheet').classList.add('on');
   $('#toc-x').onclick = () => $('#toc-sheet').classList.remove('on');
-
-  $$('#reader-bar [data-set]').forEach((b) => (b.onclick = () => {
-    const [k, v] = b.dataset.set.split(':');
-    doc.dataset[k] = v;
-    $$(`#reader-bar [data-set^="${k}:"]`).forEach((x) => x.setAttribute('aria-pressed', x === b));
-    try { localStorage.setItem('reader-' + k, v); } catch {}
-  }));
-  ['font', 'size', 'ts'].forEach((k) => {
-    let v; try { v = localStorage.getItem('reader-' + k); } catch {}
-    if (v) $(`#reader-bar [data-set="${k}:${v}"]`)?.click();
-  });
-  $('#follow').onclick = (ev) => {
-    player.follow = !player.follow;
-    ev.currentTarget.setAttribute('aria-pressed', player.follow);
-    ev.currentTarget.textContent = player.follow ? '跟随中' : '不跟随';
-  };
 }
 
 /* ---------------- 资料 ---------------- */
