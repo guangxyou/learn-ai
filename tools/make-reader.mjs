@@ -110,7 +110,9 @@ code{font:12.5px var(--mono);background:var(--sunken);padding:1px 4px;border-rad
 .bar .seg,.bar>.chip{flex:none}
 .bar .seg button{white-space:nowrap}
 /* 三篇论文原文 = 这期的「课件」，跟着视频放 */
-.papers{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.papers{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 26px;padding-bottom:16px;
+  border-bottom:1px solid var(--line-soft)}
+.papers .t{font-size:12px;color:var(--t3);margin-right:2px}
 .chip{padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--t2);
   background:var(--elev);white-space:nowrap}
 .chip:hover{border-color:var(--accent-line);color:var(--text)}
@@ -129,17 +131,15 @@ body.wide .wrap{grid-template-columns:minmax(0,1fr);gap:0}
 body.wide .stage{order:-1;position:sticky;top:var(--bar);margin:-24px -24px 22px;padding:14px 24px 12px;
   background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--line);z-index:50}
-body.wide .stage video{max-height:56vh}
-.stage video{width:100%;display:block;border-radius:12px;background:#000;box-shadow:0 4px 18px rgba(20,22,26,.12)}
+.stage video{width:100%;aspect-ratio:16/9;height:auto;display:block;border-radius:12px;
+  background:#000;box-shadow:0 4px 18px rgba(20,22,26,.12)}
+/* 宽屏 / 窄屏都用高度反推宽度，避免 max-height 让 16:9 的画面左右留黑边 */
+body.wide .stage video{max-height:56vh;width:auto;max-width:100%;margin:0 auto}
 body.wide .stage .inner{max-width:1100px;margin:0 auto}
-.now{font-size:12.5px;color:var(--t3);margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 播放控制交给 <video controls> 原生那一条，这里只留「现在讲到哪」和跟随开关 */
+.nowbar{display:flex;align-items:center;gap:12px;margin-top:10px}
+.now{flex:1;min-width:0;font-size:12.5px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .now b{color:var(--text);font-weight:600}
-.ctrl{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.ctrl .k{width:38px;height:32px;border-radius:6px;color:var(--t2);display:grid;place-items:center}
-.ctrl .k:hover{background:var(--hover);color:var(--text)}
-.ctrl .pp{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center}
-.ctrl .pp:hover{background:var(--accent-ink)}
-.ctrl .time{font:12px var(--mono);color:var(--t3);font-variant-numeric:tabular-nums;margin-left:2px}
 .miss{padding:20px;border:1px dashed var(--line);border-radius:12px;color:var(--t2);font-size:13px;line-height:1.7}
 
 /* ---- 文稿 ---- */
@@ -200,7 +200,7 @@ body.wide .doc h2{scroll-margin-top:calc(var(--bar) + 58vh)}
   .stage{order:-1;position:sticky;top:var(--bar);margin:-16px -16px 18px;padding:12px 16px 10px;
     background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px);
     border-bottom:1px solid var(--line);z-index:50}
-  .stage video{max-height:42vh}
+  .stage video{max-height:42vh;width:auto;max-width:100%;margin:0 auto}
   .doc h2{scroll-margin-top:calc(var(--bar) + 46vh)}
   .bar .sub{display:none}
   .turn{grid-template-columns:minmax(0,1fr);gap:3px}
@@ -224,7 +224,6 @@ $$('[data-seek]').forEach(b=>b.onclick=()=>seek(+b.dataset.seek));
 function sync(){
   if(!V) return;
   const t=V.currentTime-off;
-  $('#time').textContent=hms(V.currentTime)+' / '+hms(V.duration||${Math.round(vbytes && lastT ? lastT + 40 : 0)});
   let lo=0,hi=turns.length-1,k=0;
   while(lo<=hi){const m=lo+hi>>1; if(turns[m].t<=t){k=m;lo=m+1}else hi=m-1}
   if(k===idx) return;
@@ -239,15 +238,9 @@ function sync(){
   }
 }
 V?.addEventListener('timeupdate',sync);
-V?.addEventListener('loadedmetadata',()=>{ $('#time').textContent=hms(0)+' / '+hms(V.duration); sync(); });
+V?.addEventListener('loadedmetadata',sync);
 
 /* 控件 */
-$('#pp').onclick=()=>V&&(V.paused?V.play():V.pause());
-V?.addEventListener('play',()=>$('#pp').innerHTML=I.pause);
-V?.addEventListener('pause',()=>$('#pp').innerHTML=I.play);
-$('#b15').onclick=()=>V&&(V.currentTime-=15);
-$('#f30').onclick=()=>V&&(V.currentTime+=30);
-$('#rate').onclick=e=>{const r=[1,1.25,1.5,1.75,2],n=r[(r.indexOf(V.playbackRate)+1)%r.length];V.playbackRate=n;e.currentTarget.textContent=n+'×'};
 $('#follow').onclick=e=>{follow=!follow;e.currentTarget.setAttribute('aria-pressed',follow);e.currentTarget.textContent=follow?'跟随中':'不跟随'};
 $('#wide').onclick=e=>{const w=!document.body.classList.contains('wide');document.body.classList.toggle('wide',w);
   e.currentTarget.setAttribute('aria-pressed',w);try{localStorage.setItem(KEY+':wide',w?'1':'')}catch{}};
@@ -271,14 +264,6 @@ $('#toc-btn').onclick=()=>$('#toc').classList.add('on');
 $('#toc-x').onclick=()=>$('#toc').classList.remove('on');
 $$('.toc-i').forEach(b=>b.onclick=()=>{$('#toc').classList.remove('on');$('#s'+b.dataset.s).scrollIntoView({block:'start'})});
 
-/* 记住看到哪 */
-addEventListener('beforeunload',()=>{try{if(V&&V.currentTime>10)localStorage.setItem(KEY+':t',V.currentTime)}catch{}});
-try{
-  const t=+localStorage.getItem(KEY+':t');
-  if(t>10&&V){ const r=$('#resume'); r.hidden=false;
-    r.querySelector('b').textContent=hms(t);
-    r.querySelector('button').onclick=()=>{seek(t-off,false);r.hidden=true}; }
-}catch{}
 
 /* 键盘 */
 addEventListener('keydown',e=>{
@@ -289,11 +274,6 @@ addEventListener('keydown',e=>{
   if(e.key==='Escape'){$('#toc').classList.remove('on');LB.classList.remove('on')}
 });
 
-const I={play:'<svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 2.8c0-.6.7-1 1.2-.7l7 5.2c.4.3.4.9 0 1.2l-7 5.2c-.5.4-1.2 0-1.2-.6V2.8z"/></svg>',
-  pause:'<svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="2.5" width="3" height="11" rx="1"/><rect x="9" y="2.5" width="3" height="11" rx="1"/></svg>',
-  b15:'<svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.4 8.6A7.2 7.2 0 1 1 3.8 14" stroke-linecap="round"/><path d="M3.2 4.2v4.6h4.6" stroke-linecap="round" stroke-linejoin="round"/><text x="11" y="14.6" font-size="7.4" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">15</text></svg>',
-  f30:'<svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.6 8.6A7.2 7.2 0 1 0 18.2 14" stroke-linecap="round"/><path d="M18.8 4.2v4.6h-4.6" stroke-linecap="round" stroke-linejoin="round"/><text x="11" y="14.6" font-size="7.4" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">30</text></svg>'};
-$('#pp').innerHTML=I.play; $('#b15').innerHTML=I.b15; $('#f30').innerHTML=I.f30;
 sync();
 `;
 
@@ -313,30 +293,23 @@ const html = `<!DOCTYPE html>
   <span class="seg"><button data-set="size:s">小</button><button data-set="size:m" aria-pressed="true">中</button><button data-set="size:l">大</button></span>
   <span class="seg"><button data-set="font:sans" aria-pressed="true">黑</button><button data-set="font:serif">宋</button></span>
   <span class="seg"><button data-set="ts:on" aria-pressed="true">时间码</button><button data-set="ts:off">隐藏</button></span>
-  <button class="chip" id="follow" aria-pressed="true">跟随中</button>
   <button class="chip" id="wide">宽屏</button>
   <button class="chip" id="toc-btn">目录</button>
 </header>
 
 <div class="wrap">
-  <article class="doc" id="doc" data-font="sans" data-size="m" data-ts="on">${doc}</article>
+  <div>
+    ${links.length ? `<div class="papers"><span class="t">这一期的「课件」</span>${links.map((l) =>
+      `<a href="${l.u}" target="_blank" rel="noreferrer" class="chip">${esc(l.t)} ↗</a>`).join('')}</div>` : ''}
+    <article class="doc" id="doc" data-font="sans" data-size="m" data-ts="on">${doc}</article>
+  </div>
 
   <aside class="stage">
     <div class="inner">
       <video id="v" src="${vsrc}" controls preload="metadata" playsinline></video>
-      <div id="resume" hidden style="margin-top:10px;font-size:12.5px;color:var(--t2)">
-        上次看到 <b class="mono"></b> —— <button class="chip" style="padding:2px 9px">接着看</button>
-      </div>
-      <div class="now" id="now">点左边任意时间码，视频跳到那一秒</div>
-      <div class="ctrl">
-        <button class="k" id="b15" aria-label="后退 15 秒"></button>
-        <button class="pp" id="pp" aria-label="播放 / 暂停"></button>
-        <button class="k" id="f30" aria-label="前进 30 秒"></button>
-        <button class="chip" id="rate">1×</button>
-        <span class="time" id="time">00:00:00</span>
-      </div>
-      ${links.length ? `<div class="papers">${links.map((l) =>
-        `<a href="${l.u}" target="_blank" rel="noreferrer" class="chip">${esc(l.t)} ↗</a>`).join('')}</div>` : ''}
+      <div class="nowbar">
+        <span class="now" id="now">点文稿里任意时间码，视频跳到那一秒</span>
+            </div>
     </div>
   </aside>
 </div>
