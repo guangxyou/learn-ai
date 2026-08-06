@@ -224,22 +224,16 @@ export function renderEntry({ base, site, entry, sections, chars, turns, papers,
     <div class="reader">
       <aside class="outline"><h4>大纲</h4><div id="outline-list">${ol}</div></aside>
       <div>
-        <div class="reader-bar" id="reader-bar">
-          <span>字号</span>
-          <span class="seg"><button data-set="size:s">小</button><button data-set="size:m" aria-pressed="true">中</button><button data-set="size:l">大</button></span>
-          <span>字体</span>
-          <span class="seg"><button data-set="font:sans" aria-pressed="true">黑</button><button data-set="font:serif">宋</button></span>
-          <span>时间码</span>
-          <span class="seg"><button data-set="ts:on" aria-pressed="true">显示</button><button data-set="ts:off">隐藏</button></span>
-          <span class="grow"></span>
-          <span class="seg only-mobile"><button id="toc-btn">目录</button></span>
-          <span class="seg"><button id="follow" aria-pressed="true">跟随中</button></span>
+        <!-- 阅读设置（字号 / 字体 / 时间码 / 跟随）已去掉：正文固定一套排版，播放时始终跟随。
+             这条只剩窄屏用的目录入口 —— 桌面端左侧有大纲，用不上。 -->
+        <div class="reader-bar only-mobile" id="reader-bar">
+          <span class="seg"><button id="toc-btn">目录</button></span>
         </div>
         <div class="toc-sheet" id="toc-sheet">
           <div class="h"><b>大纲 · ${sections.length} 节</b><button class="icon-btn" id="toc-x">×</button></div>
           <div id="toc-list">${ol}</div>
         </div>
-        <article class="doc" id="doc" data-font="sans" data-size="m" data-ts="on">${doc}</article>
+        <article class="doc" id="doc">${doc}</article>
       </div>
     </div>
   </section>
