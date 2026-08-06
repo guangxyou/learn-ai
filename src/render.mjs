@@ -8,6 +8,12 @@ export const hms = (s) => {
 };
 const wan = (n) => (n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : String(n));
 
+/* 资源版本号。assets/app.css|js 文件名固定，nginx 给它们挂了 7 天长缓存，
+   而 HTML 是 no-cache —— 于是改完发布，浏览器会拿「新 HTML + 旧 JS」跑，直接白页。
+   构建时把内容哈希写进 URL：内容没变还是同一个 URL（照样命中缓存），一变就换 URL。 */
+let VER = '';
+export function setAssetVersion(v) { VER = v ? `?v=${v}` : ''; }
+
 /* logo：追赶 —— 虚线走在前面，实线从后面追上来 */
 const LOGO = `<svg class="logo" viewBox="0 0 34 22" fill="none" aria-hidden="true">
   <path d="M1 15h7l4-4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -32,7 +38,7 @@ function layout({ base, title, desc, canonical, body, jsonld, bodyClass = '' }) 
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${canonical}">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="${base}/assets/app.css">
+<link rel="stylesheet" href="${base}/assets/app.css${VER}">
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ''}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>
@@ -71,7 +77,7 @@ ${cards}
   </div>
 </main>
 
-<script src="${base}/assets/app.js" defer></script>`,
+<script src="${base}/assets/app.js${VER}" defer></script>`,
     bodyClass: 'no-player',
   });
 }
@@ -271,6 +277,6 @@ export function renderEntry({ base, site, entry, sections, chars, turns, papers,
 </div>
 
 <script>window.LA=${JSON.stringify(boot)}</script>
-<script src="${base}/assets/app.js" defer></script>`,
+<script src="${base}/assets/app.js${VER}" defer></script>`,
   });
 }
