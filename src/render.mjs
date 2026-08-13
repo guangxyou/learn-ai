@@ -51,7 +51,10 @@ ${body}
 /* ---------------- 列表页 ---------------- */
 export function renderList({ base, entries, site }) {
   const cards = entries.map((e) => {
-    const outputs = [['文稿', wan(e.chars) + '字'], ['论文', e.papers + ' 篇'], ['PPT', e.slides + ' 页']];
+    // 每种条目产出的东西不一样：播客是文稿/论文/PPT，论文精读是全文/批注/插图。
+    // 条目自己在 entry.json 里声明，列表页不猜。
+    const outputs = e.outputs
+      ?? [['文稿', wan(e.chars) + '字'], ['论文', e.papers + ' 篇'], ['PPT', e.slides + ' 页']];
     return `<a class="entry" href="${base}/${e.id}/">
     <div class="entry-when">${e.studied.replace('-', '.')}</div>
     <div>
