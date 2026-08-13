@@ -21,6 +21,38 @@ const SITE = {
 const DIST = join(ROOT, 'dist');
 const j = (...p) => join(...p);
 
+
+/** 论文精读条目：整页由 tools/make-paper.mjs 生成，自包含，不走 render.mjs 的模板。
+ *
+ *  page.html 是**提交进仓库的成品** —— 素材工作现场（01_Transformer/，几百 MB）不进仓库，
+ *  服务器上只有 content/，直接发这一份。本地源文件还在时先重新生成一遍，
+ *  这样页面一变 git 就是脏的，deploy-remote.sh 会逼着先提交，线上不会落后于本地。
+ *
+ *  页面里跟环境有关的两处（返回链接、canonical）写成占位符，发布时才替换。 */
+async function buildPaper({ dir, id, entry, base, dist }) {
+  const page = j(dir, entry.page);
+  if (entry.build && existsSync(j(ROOT, entry.build.requires))) {
+    execFileSync('node', [entry.build.tool, ...entry.build.args, '--out', page,
+      '--home', '__HOME__', '--canonical', '__CANONICAL__',
+      '--title', `${entry.title} · ${entry.subtitle}`, '--desc', entry.summary],
+      { cwd: ROOT, stdio: 'inherit' });
+  } else {
+    console.log(`[build] ${id} · 没有本地素材，直接用仓库里的 ${entry.page}`);
+  }
+
+  const html = (await readFile(page, 'utf8'))
+    .replaceAll('__HOME__', `${base}/`)
+    .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`);
+  await mkdir(j(dist, id), { recursive: true });
+  await writeFile(j(dist, id, 'index.html'), html, 'utf8');
+
+  const n = (re) => (html.match(re) || []).length;
+  const notes = n(/<div class="nt" data-n=/g);
+  const figs = n(/<svg viewBox/g) + n(/<figure class="poster"/g);
+  console.log(`[build] ${id} · ${notes} 条批注 / ${figs} 张图 / ${(html.length / 1048576).toFixed(1)} MB`);
+  return { ...entry, outputs: [['论文全文', '1 篇'], ['批注', `${notes} 条`], ['插图', `${figs} 张`]] };
+}
+
 async function build() {
   await rm(DIST, { recursive: true, force: true });
   await mkdir(j(DIST, 'assets'), { recursive: true });
@@ -40,6 +72,7 @@ async function build() {
   for (const id of ids) {
     const dir = j(ROOT, 'content', id);
     const entry = JSON.parse(await readFile(j(dir, 'entry.json'), 'utf8'));
+    if (entry.kind === 'paper') { entries.push(await buildPaper({ dir, id, entry, base: BASE, dist: DIST })); continue; }
     const chronicle = JSON.parse(await readFile(j(dir, 'chronicle.json'), 'utf8'));
     const { sections, chars, turns } = parseTranscript(
       await readFile(j(dir, 'transcript.md'), 'utf8'), [entry.host, entry.guest]);

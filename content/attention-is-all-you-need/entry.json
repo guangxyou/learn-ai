@@ -1,0 +1,36 @@
+{
+  "id": "attention-is-all-you-need",
+  "kind": "paper",
+  "title": "逐字、逐句理解 Transformer",
+  "subtitle": "《Attention Is All You Need》全文精读",
+  "topics": [
+    "AI 基础",
+    "论文",
+    "Transformer"
+  ],
+  "date": "2017-06",
+  "studied": "2026-08",
+  "summary": "把论文全文一句一句读完：读不动的地方就地写批注，公式、维度、当年的写法今天变成了什么，都摊开画出来。开头两张全景图，一张铺开整个架构，一张把「I love you.」从进模型到出结果的形状变化走完。",
+  "source": {
+    "name": "Attention Is All You Need · NeurIPS 2017",
+    "url": "https://arxiv.org/abs/1706.03762"
+  },
+  "build": {
+    "note": "page.html 是提交进仓库的成品；源文件在本地 01_Transformer/（不进仓库）。源文件在时，构建会先重新生成它。",
+    "tool": "tools/make-paper.mjs",
+    "requires": "01_Transformer/paper-src.html",
+    "args": [
+      "--src",
+      "01_Transformer/paper-src.html",
+      "--notes",
+      "01_Transformer/notes.json",
+      "--keys",
+      "01_Transformer/keys.json",
+      "--refnotes",
+      "01_Transformer/refnotes.json",
+      "--posters",
+      "01_Transformer/figures/attention-is-all-you-need.svg,01_Transformer/figures/transformer-shape-walkthrough.svg"
+    ]
+  },
+  "page": "page.html"
+}
