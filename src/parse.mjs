@@ -19,14 +19,18 @@ export function plain(s) {
     .replace(/\*\*|\*|`/g, '');
 }
 
-/** 行内 markdown → HTML */
+/** 行内 markdown → HTML。
+ *  正文中间的〔时间码〕转成可点的跳转按钮 —— 逐字稿里时间码都在段首、由 parseTranscript
+ *  先吃掉了，走不到这儿；详录体则大量把时间码嵌在句子和表格里，靠这里变成锚点。 */
 export function inline(s) {
   return esc(s)
     .replace(/\\([*_`[\]()#.!-])/g, '$1')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>')
     .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
     .replace(/(^|[^*\w])\*([^*]+)\*(?![*\w])/g, '$1<i>$2</i>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/〔(\d{2}:\d{2}:\d{2})〕/g,
+      (_, t) => `<button class="tsi" data-seek="${t2s(t)}" title="跳到 ${t}">${t}</button>`);
 }
 
 /* ══════════════ 精校稿 → 大纲 + 分块正文 ══════════════ */
@@ -34,12 +38,19 @@ export function inline(s) {
 const LI = /^(?:-|\*)\s+(.*)$/;
 const OLI = /^\d+\.\s+(.*)$/;
 
+/** 往当前小节最后一个 turn 里塞一个块；还没有 turn 就先开一个无锚点的 */
+function pushBlock(cur, block) {
+  if (!cur) return;
+  if (!cur.turns.length) cur.turns.push({ spk: '', t: 0, b: [] });
+  cur.turns[cur.turns.length - 1].b.push(block);
+}
+
 export function parseTranscript(md, speakers) {
   // 说话人来自条目声明，不写死 —— 每期的对谈双方都不一样
   const TURN = new RegExp(
     `^\\*\\*(${speakers.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\*\\*〔(\\d{2}:\\d{2}:\\d{2})〕(.*)$`);
   const sections = [];
-  let cur = null, part = null, started = false, pendingPart = false;
+  let cur = null, part = null, partTime = null, started = false, pendingPart = false, fence = null;
 
   for (const raw of md.split('\n')) {
     const s = raw.trimEnd();
@@ -48,21 +59,42 @@ export function parseTranscript(md, speakers) {
       if (s.startsWith('## ')) started = true;
       else continue;
     }
-    if (/^# /.test(s)) { part = s.slice(2).trim(); pendingPart = true; continue; }  // 一级标题 = 分卷
+
+    // 代码块：整块原样收走，里面的 #、|、> 都不能当 markdown 解
+    if (fence !== null) {
+      if (/^```/.test(s)) { pushBlock(cur, { k: 'code', v: fence.join('\n') }); fence = null; }
+      else fence.push(raw);
+      continue;
+    }
+    if (/^```/.test(s) && cur) { fence = []; continue; }
+
+    // 一级标题 = 分卷。分卷底下没有 `## ` 时它自己会被当成一节，所以时间码也要在这儿摘掉
+    if (/^# /.test(s)) {
+      const p = s.slice(2).trim();
+      const pt = /〔(\d{2}:\d{2}:\d{2})〕\s*$/.exec(p);
+      part = pt ? p.slice(0, pt.index).trim() : p;
+      partTime = pt ? t2s(pt[1]) : null;
+      pendingPart = true;
+      continue;
+    }
     if (s.startsWith('## ')) {
-      cur = { title: s.slice(3).trim().replace(/\\/g, ''), part, turns: [] };
+      // 详录体的小节标题自带时间码：`## 标题〔00:03:49〕`，摘出来当这一节的锚点
+      const t = s.slice(3).trim().replace(/\\/g, '');
+      const ht = /〔(\d{2}:\d{2}:\d{2})〕\s*$/.exec(t);
+      cur = { title: ht ? t.slice(0, ht.index).trim() : t, hTime: ht ? t2s(ht[1]) : null, part, turns: [] };
       sections.push(cur);
       pendingPart = false;
       continue;
     }
-    if (!s || s === '---' || s.startsWith('>')) continue;
+    if (!s || s === '---') continue;
     // 分卷底下直接就是正文、没有 `## ` 小节时，把分卷本身当成一节，
     // 否则这些段落会被并到上一节里，标题也就丢了
     if (pendingPart) {
-      cur = { title: part, part: null, turns: [] };
+      cur = { title: part, hTime: partTime, part: null, turns: [] };
       sections.push(cur);
       pendingPart = false;
       part = null;
+      partTime = null;
     }
     if (!cur) continue;
 
@@ -85,6 +117,29 @@ export function parseTranscript(md, speakers) {
     const im = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/.exec(s);
     if (im) { b.push({ k: 'img', v: { src: im[2], alt: im[1], cite: im[3] || '' } }); continue; }
 
+    // 表格：连续的 `|…|` 行并成一块，`|---|` 那行只用来认表头
+    if (s.startsWith('|')) {
+      const cells = s.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+      if (cells.every((c) => /^:?-{2,}:?$/.test(c))) {
+        if (b.length && b[b.length - 1].k === 'table') b[b.length - 1].v.head = true;
+        continue;
+      }
+      if (!b.length || b[b.length - 1].k !== 'table') b.push({ k: 'table', v: { head: false, rows: [] } });
+      b[b.length - 1].v.rows.push(cells);
+      continue;
+    }
+
+    // 引用块：`> 正文`，`> [!NOTE]` 这种提示头单独标出来
+    if (s.startsWith('>')) {
+      const q = s.replace(/^>\s?/, '');
+      const note = /^\[!(\w+)\]/.exec(q);
+      if (!b.length || b[b.length - 1].k !== 'quote') b.push({ k: 'quote', v: { note: '', lines: [] } });
+      const qv = b[b.length - 1].v;
+      if (note) qv.note = note[1];
+      else if (q.trim()) qv.lines.push(q.trim());
+      continue;
+    }
+
     if (s.startsWith('### ')) b.push({ k: 'h3', v: s.slice(4).trim() });
     else if (LI.test(s)) {
       if (!b.length || b[b.length - 1].k !== 'ul') b.push({ k: 'ul', v: [] });
@@ -95,12 +150,19 @@ export function parseTranscript(md, speakers) {
     } else b.push({ k: 'p', v: s.trim() });
   }
 
-  for (const sec of sections) sec.t = sec.turns.find((x) => x.t)?.t ?? 0;
+  // 小节锚点：标题自带的时间码优先，其次是节内第一个带时间码的段落
+  for (const sec of sections) sec.t = sec.hTime ?? (sec.turns.find((x) => x.t)?.t ?? 0);
 
   // 字数只算正文，插图不计入
+  const textOf = (b) => {
+    if (b.k === 'img') return [];
+    if (b.k === 'table') return b.v.rows.flat();
+    if (b.k === 'quote') return b.v.lines;
+    if (b.k === 'code') return [b.v];
+    return Array.isArray(b.v) ? b.v : [b.v];
+  };
   const chars = sections.reduce((n, sec) => n + sec.turns.reduce((m, t) =>
-    m + t.b.reduce((k, b) => k + (b.k === 'img' ? 0 : (Array.isArray(b.v) ? b.v : [b.v])
-      .reduce((z, x) => z + plain(x).length, 0)), 0), 0), 0);
+    m + t.b.reduce((k, b) => k + textOf(b).reduce((z, x) => z + plain(x).length, 0), 0), 0), 0);
   const turns = sections.reduce((n, s) => n + s.turns.length, 0);
 
   return { sections, chars, turns };
