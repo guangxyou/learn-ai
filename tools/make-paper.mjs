@@ -40,7 +40,10 @@ function rotateDataURI(uri) {
   try {
     try { execFileSync('magick', [inF, '-rotate', '90', outF], { stdio: 'ignore' }); }
     catch { execFileSync('sips', ['-r', '90', inF, '--out', outF], { stdio: 'ignore' }); }
-  } catch { console.warn('  ! 转图失败，保持原样（装一下 imagemagick 或在 macOS 上跑）'); return uri; }
+  } catch {
+    // 悄悄返回原图 = 出一版附录图歪着的页面，还看不出来。宁可让构建停下。
+    throw new Error('转图失败：装一下 imagemagick，或在 macOS 上跑（有 sips）');
+  }
   const out = `data:image/${m[1]};base64,${readFileSync(outF).toString('base64')}`;
   rmSync(inF, { force: true }); rmSync(outF, { force: true });
   return out;

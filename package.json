@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "description": "一篇一篇，跟上 AI 时代 —— 深度读透过的东西，留成能交付的一页",
-  "engines": { "node": ">=18.18" },
+  "engines": {
+    "node": ">=18.18"
+  },
   "scripts": {
-    "build": "node src/build.mjs",
-    "dev": "BASE_PATH= node src/build.mjs && python3 -m http.server 8188 --directory dist"
+    "build": "PAPER_REBUILD=1 node src/build.mjs",
+    "dev": "PAPER_REBUILD=1 BASE_PATH= node src/build.mjs && python3 -m http.server 8188 --directory dist"
   }
 }

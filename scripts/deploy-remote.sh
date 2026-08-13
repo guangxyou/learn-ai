@@ -35,9 +35,13 @@ if "${SSH[@]}" "cd $REMOTE_DIR && timeout 150 git fetch -q origin $BRANCH && git
   echo "[deploy] git 拉取成功"
 else
   echo "[deploy] git 拉取超时，改用 rsync 推送同一份工作区"
+  # --filter=':- .gitignore' 让 rsync 照着 .gitignore 走 —— 素材工作现场（几百 MB 视频、
+  # 论文源文件）不进仓库，也就不该推到服务器。2026-08-13 漏了这一条，
+  # 967 MB 素材被推上去，服务器还照着它现场重新生成了页面。
   rsync -az --delete --timeout=120 -e "ssh -o BatchMode=yes -i $IDENTITY_FILE" \
+    --filter=':- .gitignore' \
     --exclude '.git' --exclude 'dist' --exclude 'node_modules' \
-    --exclude '00_论文探索之旅' --exclude '.claude' --exclude '.DS_Store' \
+    --exclude '.claude' --exclude '.DS_Store' \
     ./ "$SERVER:$REMOTE_DIR/"
 fi
 
