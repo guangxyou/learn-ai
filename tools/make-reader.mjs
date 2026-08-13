@@ -46,8 +46,9 @@ const showLinks = allLinks.filter(isShow);
 const paperLinks = allLinks.filter((l) => !isShow(l));
 
 /* ---- 说话人：frontmatter 的「对谈：A × B」 ---- */
+/* 取到 3 位：EP102 除了对谈双方，主播还单独念了开场和结尾，少认一个她那两段就掉成普通段落 */
 const spk = [...head.matchAll(/\*\*([一-龥A-Za-z·]{2,12})\*\*(?=（)/g)].map((m) => m[1]);
-const speakers = [...new Set(spk)].slice(0, 2);
+const speakers = [...new Set(spk)].slice(0, 3);
 if (speakers.length < 2) throw new Error('没能从 frontmatter 认出两位说话人：' + JSON.stringify(spk));
 
 const { sections, chars, turns } = parseTranscript(md, speakers);
@@ -63,7 +64,8 @@ const msrc = (isVideo ? 'video/' : 'audio/') + encodeURIComponent(mp4 ?? m4a);
 const mbytes = (await stat(join(dir, isVideo ? 'video' : 'audio', mp4 ?? m4a))).size;
 /* 音频页的封面：有就用，没有就不画那块 */
 const cover = isVideo ? null : await pick('raw', /^cover\.(png|jpg|jpeg|webp)$/i);
-const lastT = Math.max(...sections.flatMap((s) => s.turns.map((t) => t.t)));
+/* 详录体的锚点在小节标题上（sec.t），逐字稿的在每段发言上（turn.t），两边都要算进来 */
+const lastT = Math.max(...sections.flatMap((s) => [s.t, ...s.turns.map((t) => t.t)]));
 
 /* ---- 正文 ---- */
 const blk = (b) => {
@@ -72,6 +74,17 @@ const blk = (b) => {
   if (b.k === 'h3') return `<h3>${inline(b.v)}</h3>`;
   if (b.k === 'ul') return `<ul>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`;
   if (b.k === 'ol') return `<ol>${b.v.map((x) => `<li>${inline(x)}</li>`).join('')}</ol>`;
+  if (b.k === 'code') return `<pre class="code">${esc(b.v)}</pre>`;
+  if (b.k === 'quote') return `<blockquote class="quote${b.v.note ? ' note' : ''}">`
+    + b.v.lines.map((x) => `<p>${inline(x)}</p>`).join('') + `</blockquote>`;
+  if (b.k === 'table') {
+    const [h, ...rest] = b.v.rows;
+    const tr = (cs, tag) => `<tr>${cs.map((c) => `<${tag}>${inline(c)}</${tag}>`).join('')}</tr>`;
+    return `<div class="tw"><table>`
+      + (b.v.head ? `<thead>${tr(h, 'th')}</thead><tbody>${rest.map((r) => tr(r, 'td')).join('')}</tbody>`
+        : `<tbody>${b.v.rows.map((r) => tr(r, 'td')).join('')}</tbody>`)
+      + `</table></div>`;
+  }
   return `<p>${inline(b.v)}</p>`;
 };
 
@@ -83,12 +96,19 @@ sections.forEach((sec, i) => {
     toc += `<div class="toc-part">${esc(part)}</div>`;
     outline += `<div class="ol-part">${esc(part)}</div>`;
   }
-  doc += `<h2 id="s${i}">${esc(sec.title)}</h2>`;
+  // 标题自带时间码的（详录体）：标题本身就是跳转锚点，也是跟随高亮的单位
+  // data-title 存不带时间码的标题：h2 里挂了时间码按钮，textContent 会把它一起读进来
+  doc += `<h2 id="s${i}" data-title="${esc(sec.title)}"${sec.hTime != null ? ` class="anch" data-t="${sec.t}" data-anchor` : ''}>`
+    + esc(sec.title)
+    + (sec.hTime != null ? `<button class="ts-h" data-seek="${sec.t}" title="跳到 ${hms(sec.t)}">${hms(sec.t)}</button>` : '')
+    + `</h2>`;
   toc += `<button class="toc-i" data-s="${i}"><span class="t">${hms(sec.t)}</span><span>${esc(sec.title)}</span></button>`;
   outline += `<button class="ol-item" data-s="${i}"><span class="t">${hms(sec.t)}</span><span>${esc(sec.title)}</span></button>`;
   for (const tn of sec.turns) {
     const anchored = tn.spk || tn.cont;
-    doc += `<div class="turn${tn.cont ? ' cont' : ''}" data-t="${tn.t}">`
+    // 详录体里成段的正文没有自己的时间码，就不画左边那条时间码槽
+    if (!anchored && sec.hTime != null) { doc += `<div class="prose">${tn.b.map(blk).join('')}</div>`; continue; }
+    doc += `<div class="turn${tn.cont ? ' cont' : ''}" data-t="${tn.t}"${anchored ? ' data-anchor' : ''}>`
       + `<button class="ts" data-seek="${tn.t}" title="跳到 ${hms(tn.t)}">${anchored ? hms(tn.t) : ''}</button>`
       + `<div class="body">${tn.spk ? `<div class="who${tn.spk === speakers[0] ? ' host' : ''}">${esc(tn.spk)}</div>` : ''}`
       + tn.b.map(blk).join('') + `</div></div>`;
@@ -227,6 +247,42 @@ body.audio .doc h2{scroll-margin-top:calc(var(--bar) + 96px)}
 .lightbox img{max-width:100%;max-height:100%;border-radius:8px;background:#fff}
 .doc ul,.doc ol{margin:9px 0 13px;padding-left:1.4em}
 .doc li{margin:0 0 7px}
+
+/* ---- 详录体：成段的正文，没有左边那条时间码槽 ---- */
+.prose{font-size:16px;line-height:1.85;margin:0 0 18px}
+.prose>p{margin:0 0 12px}
+.prose>*:last-child{margin-bottom:0}
+/* 小节标题右边挂的时间码 */
+.ts-h{margin-left:10px;font:11.5px var(--mono);color:var(--t3);font-weight:400;
+  padding:2px 7px;border:1px solid var(--line);border-radius:999px;vertical-align:2px;
+  font-variant-numeric:tabular-nums}
+.ts-h:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+.doc h2.cur{color:var(--accent)}
+.doc h2.cur .ts-h{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+/* 正文里嵌在句子中间的时间码 */
+.tsi{font:11.5px var(--mono);color:var(--t3);padding:1px 5px;border-radius:4px;
+  background:var(--sunken);vertical-align:1px;font-variant-numeric:tabular-nums}
+.tsi:hover{background:var(--accent-soft);color:var(--accent-ink)}
+
+/* ---- 表格 ---- */
+.tw{overflow-x:auto;margin:14px 0 18px;border:1px solid var(--line);border-radius:8px;background:var(--elev)}
+.tw table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.6}
+.tw th,.tw td{padding:9px 13px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line-soft)}
+.tw th{background:var(--sunken);font-weight:650;font-size:13px;white-space:nowrap}
+.tw tr:last-child td{border-bottom:0}
+.tw td:first-child{white-space:nowrap}
+.tw td:first-child:has(b){white-space:normal}
+
+/* ---- 引用块 ---- */
+.quote{margin:14px 0 18px;padding:12px 16px;border-left:3px solid var(--accent-line);
+  background:var(--sunken);border-radius:0 8px 8px 0;font-size:15px;line-height:1.8}
+.quote>p{margin:0 0 9px}
+.quote>p:last-child{margin-bottom:0}
+.quote.note{border-left-color:var(--accent);background:var(--accent-soft)}
+
+/* ---- 代码块 / ASCII 图 ---- */
+.code{margin:14px 0 18px;padding:14px 16px;overflow-x:auto;background:var(--sunken);
+  border:1px solid var(--line);border-radius:8px;font:12.5px/1.7 var(--mono);white-space:pre}
 .part{display:flex;align-items:center;gap:12px;margin:58px 0 4px;font-size:12px;font-weight:650;
   letter-spacing:.06em;color:var(--accent);scroll-margin-top:calc(var(--bar) + 16px)}
 .part::after{content:"";flex:1;height:1px;background:var(--accent-line)}
@@ -275,7 +331,8 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const pad=n=>String(n).padStart(2,'0');
 const hms=s=>{s=Math.max(0,Math.floor(s));return pad(s/3600|0)+':'+pad(s%3600/60|0)+':'+pad(s%60)};
 const V=$('#v'), KEY='reader:${basename(dir)}';
-const turns=$$('.turn').map(el=>({el,t:+el.dataset.t}));
+/* 跟随的单位：逐字稿是每一段发言，详录体是每一个带时间码的小节标题 —— 都打了 data-anchor */
+const turns=$$('#doc [data-anchor]').map(el=>({el,t:+el.dataset.t})).sort((a,b)=>a.t-b.t);
 const heads=$$('#doc h2');
 const off=0;
 let idx=-1;
@@ -286,16 +343,17 @@ $$('[data-seek]').forEach(b=>b.onclick=()=>seek(+b.dataset.seek));
 
 /* 视频 → 高亮 + 跟随 */
 function sync(){
-  if(!V) return;
+  if(!V||!turns.length) return;
   const t=V.currentTime-off;
   let lo=0,hi=turns.length-1,k=0;
   while(lo<=hi){const m=lo+hi>>1; if(turns[m].t<=t){k=m;lo=m+1}else hi=m-1}
   if(k===idx) return;
   turns[idx]?.el.classList.remove('cur');
   idx=k; const el=turns[k].el; el.classList.add('cur');
-  const h=heads.filter(x=>x.compareDocumentPosition(el)&4).pop();
+  /* 详录体里锚点自己就是 h2，compareDocumentPosition 认不出「自己在自己前面」，得单独带上 */
+  const h=heads.filter(x=>x===el||(x.compareDocumentPosition(el)&4)).pop();
   // 视频页这行是独立的一句，要「当前 ·」；音频页它跟在播放器的标题后面，只留分隔点
-  if(h){ $('#now').innerHTML=${isVideo ? "'当前 · '" : "'· '"}+'<b>'+h.textContent+'</b>';
+  if(h){ $('#now').innerHTML=${isVideo ? "'当前 · '" : "'· '"}+'<b>'+(h.dataset.title||h.textContent)+'</b>';
          $$('.toc-i,.ol-item').forEach(b=>b.classList.toggle('cur','s'+b.dataset.s===h.id));
          // 侧边大纲跟着滚，别让当前节跑出可视区
          const cur=$('.ol-item.cur');
