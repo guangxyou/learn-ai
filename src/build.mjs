@@ -50,7 +50,7 @@ async function buildPaper({ dir, id, entry, base, dist }) {
 
   const n = (re) => (html.match(re) || []).length;
   const notes = n(/<div class="nt" data-n=/g);
-  const figs = n(/<svg viewBox/g) + n(/<figure class="poster"/g);
+  const figs = n(/<svg viewBox/g) + n(/<figure class="poster/g);
   console.log(`[build] ${id} · ${notes} 条批注 / ${figs} 张图 / ${(html.length / 1048576).toFixed(1)} MB`);
   return { ...entry, outputs: [['论文全文', '1 篇'], ['批注', `${notes} 条`], ['插图', `${figs} 张`]] };
 }

@@ -29,7 +29,7 @@
       "--refnotes",
       "01_Transformer/refnotes.json",
       "--posters",
-      "01_Transformer/figures/attention-is-all-you-need.svg,01_Transformer/figures/transformer-shape-walkthrough.svg"
+      "01_Transformer/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式,01_Transformer/figures/transformer-shape-walkthrough.svg#维度变化"
     ]
   },
   "page": "page.html"

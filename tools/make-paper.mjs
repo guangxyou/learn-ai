@@ -520,15 +520,23 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
   flushTail(null);
   flush();
 
-  // 全景图放最前面：先看地图，再逐句读
+  // 全景图放最前面：先看地图，再逐句读。
+  // 两张一上一下堆着太占版面，做成 tab —— 一次只看一张，切换在原地发生。
   if (posters.length) {
+    const tabs = posters.map((pg, i) =>
+      `<button class="ptab${i ? '' : ' on'}" type="button" role="tab" data-p="${i + 1}"`
+      + ` aria-selected="${i ? 'false' : 'true'}" aria-controls="map-${i + 1}">${esc(pg.label)}</button>`).join('');
     const figs = posters.map((pg, i) =>
-      `<figure class="poster" id="map-${i + 1}"><div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div>`
+      `<figure class="poster${i ? '' : ' on'}" id="map-${i + 1}" role="tabpanel">`
+      + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div>`
       + `<figcaption>${esc(pg.title)}</figcaption></figure>`).join('');
     parts.unshift(`<h2 class="ph area" id="smap">两张全景图<span class="n">${posters.length} 张</span></h2>`
       + `<p class="area-note">读之前先看一眼地图：一张铺开整个架构与每处细节的公式，`
-      + `一张把「I love you.」从进模型到出结果的形状变化走完。窄屏可以横向拖动。</p>${figs}`);
+      + `一张把「I love you.」从进模型到出结果的形状变化走完。</p>`
+      + `<div class="pmap"><div class="ptabs" role="tablist">${tabs}`
+      + `<span class="phint">图很大，可以横向拖动</span></div>${figs}</div>`);
     secs.unshift({ id: 'smap', num: '', text: '两张全景图', level: 1 });
+    posters.forEach((pg, i) => secs.splice(1 + i, 0, { id: `map-${i + 1}`, num: '', text: pg.label, level: 2 }));
   }
 
   // 预备：读正文之前补的底子
@@ -652,6 +660,14 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   <div class="paper">${body}</div>
 </div>
 
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+  <div class="sheet-grab"></div>
+  <div class="sheet-hd"><span class="num"></span><span class="qt" id="sheet-t"></span>
+    <span class="tag"></span><button class="sheet-x" type="button" aria-label="关闭">×</button></div>
+  <div class="sheet-bd"></div>
+</div>
+
 <script>
 (function(){
   // 刷新后的落点交给浏览器（现在布局稳定了，恢复得准）。
@@ -671,6 +687,60 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   });},{rootMargin:'-130px 0px -70% 0px'});
   document.querySelectorAll('.ph').forEach(function(h){io.observe(h);});
 
+  /* ---- 全景图 tab ---- */
+  var pmap=document.querySelector('.pmap');
+  function showPoster(n){
+    if(!pmap)return;
+    pmap.querySelectorAll('.ptab').forEach(function(b){
+      var on=b.dataset.p===String(n);
+      b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
+    });
+    pmap.querySelectorAll('.poster').forEach(function(f){
+      f.classList.toggle('on',f.id==='map-'+n);
+    });
+  }
+  if(pmap)pmap.addEventListener('click',function(e){
+    var b=e.target.closest('.ptab'); if(b)showPoster(b.dataset.p);
+  });
+  // 目录里点某一张，先切到它再滚过去
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#map-"]'); if(a)showPoster(a.getAttribute('href').slice(5));
+  });
+  if(/^#map-\d/.test(location.hash))showPoster(location.hash.slice(5));
+
+  /* ---- 手机：批注从底部推上来 ---- */
+  var sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim');
+  var phone=matchMedia('(max-width:859px)');
+  function sheetOn(){ return sheet.classList.contains('on'); }
+  function closeSheet(){
+    sheet.classList.remove('on'); scrim.classList.remove('on');
+    document.body.classList.remove('sheet-open');
+    document.querySelectorAll('mark.on').forEach(function(m){m.classList.remove('on');});
+  }
+  function openSheet(nt){
+    var q=nt.querySelector('.nt-q');
+    sheet.querySelector('.num').textContent=q.querySelector('.num').textContent;
+    sheet.querySelector('.num').style.background=getComputedStyle(q.querySelector('.num')).backgroundColor;
+    sheet.querySelector('.num').style.color=getComputedStyle(q.querySelector('.num')).color;
+    sheet.querySelector('.qt').textContent=q.querySelector('.qt').textContent;
+    sheet.querySelector('.tag').textContent=q.querySelector('.tag').textContent;
+    // 图是按卡片宽度画的，这里整段克隆过来，尺寸交给 CSS
+    sheet.querySelector('.sheet-bd').innerHTML=nt.querySelector('.nt-a').innerHTML;
+    sheet.querySelector('.sheet-bd').scrollTop=0;
+    sheet.classList.add('on'); scrim.classList.add('on');
+    document.body.classList.add('sheet-open');
+  }
+  scrim.addEventListener('click',closeSheet);
+  sheet.querySelector('.sheet-x').addEventListener('click',closeSheet);
+  addEventListener('keydown',function(e){ if(e.key==='Escape'&&sheetOn())closeSheet(); });
+  // 往下一拖就关
+  var y0=null;
+  sheet.addEventListener('touchstart',function(e){ y0=e.touches[0].clientY; },{passive:true});
+  sheet.addEventListener('touchend',function(e){
+    if(y0!==null&&e.changedTouches[0].clientY-y0>70&&sheet.querySelector('.sheet-bd').scrollTop<=0)closeSheet();
+    y0=null;
+  },{passive:true});
+
   function openNote(nt,on){
     nt.classList.toggle('open',on); nt.classList.toggle('on',on);
     var mk=document.querySelector('mark[data-n="'+nt.dataset.n+'"]');
@@ -681,6 +751,10 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     var mk=e.target.closest('mark[data-n]');
     if(mk){
       var nt=document.querySelector('.nt[data-n="'+mk.dataset.n+'"]');
+      if(nt&&phone.matches&&!document.body.classList.contains('notes-inline')){
+        document.querySelectorAll('mark.on').forEach(function(m){m.classList.remove('on');});
+        mk.classList.add('on'); openSheet(nt); e.preventDefault(); return;
+      }
       if(nt){
         var was=nt.classList.contains('open');
         document.querySelectorAll('.nt.open').forEach(function(n){if(n!==nt)openNote(n,false);});
@@ -703,6 +777,9 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     if(fn)fn(on);
   });}
   sw(document.getElementById('sw-all'),null,function(on){
+    // 手机上默认不在正文里插卡片，展开全部就等于把它们摊回来
+    document.body.classList.toggle('notes-inline',on);
+    if(on&&sheetOn())closeSheet();
     document.querySelectorAll('.nt').forEach(function(n){openNote(n,on);});
   });
   // 隐藏批注：连高亮和段落底色一起收掉，页面回到一份干净的论文
@@ -710,6 +787,8 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     var all=document.getElementById('sw-all');
     all.disabled=on; all.style.opacity=on?.4:1;
     if(on){document.querySelectorAll('.nt').forEach(function(n){openNote(n,false);});
+      document.body.classList.remove('notes-inline');
+      if(sheetOn())closeSheet();
       all.setAttribute('aria-pressed','false');}
   });
 })();
@@ -763,11 +842,25 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .sw[aria-pressed="true"] i{background:var(--accent)}
 .sw[aria-pressed="true"] i::after{transform:translateX(11px)}
 .bar .sp{margin-left:auto;font-size:12.5px;color:var(--text-3)}
-.main{display:grid;gap:34px;padding-top:26px}
+/* 单列时也要显式写 minmax(0,1fr)：不写的话隐式列按 max-content 撑，
+   正文里任何一个宽块（全景图、表格）都会把整页顶出横向滚动条 */
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:34px;padding-top:26px}
 @media(min-width:1000px){.main{grid-template-columns:210px minmax(0,1fr)}}
-/* 全景图：1560 宽的大图，撑出正文栏，居中缩放；窄屏就横向拖 */
-.poster{margin:20px 0 26px}
-.poster .pbox{width:100vw;margin-left:calc(50% - 50vw);overflow-x:auto;overscroll-behavior-x:contain}
+/* 全景图：1560 宽的大图，撑出正文栏，居中缩放；窄屏就横向拖。
+   两张做成 tab，一次只显示一张 —— 堆在一起太占版面，也看不出它们是并列的两张地图 */
+.pmap{margin:14px 0 26px}
+.ptabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.ptab{font:inherit;font-size:13px;color:var(--text-2);background:var(--bg-elev);cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px}
+.ptab:hover{background:var(--bg-hover);color:var(--text)}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.phint{font-size:11.5px;color:var(--text-3);margin-left:auto}
+.poster{display:none;margin:0}
+.poster.on{display:block}
+/* 大图要比正文栏宽，但不能用 100vw 那套居中出血 —— 正文栏不在视口中间（左边还有目录），
+   算出来会整体右偏、把页面顶出横向滚动条。改成向左借用目录那一栏的宽度，边界确定 */
+.poster .pbox{overflow-x:auto;overscroll-behavior-x:contain}
+@media(min-width:1000px){.poster .pbox{width:calc(100% + 244px);margin-left:-244px}}
 .poster .pin{width:min(1440px,100%);min-width:1040px;margin:0 auto;padding:0 16px}
 .poster svg{display:block;width:100%;height:auto}
 .poster figcaption{margin-top:10px;text-align:center;font-size:12.5px;color:var(--text-3)}
@@ -807,7 +900,11 @@ html{overflow-anchor:none}
 /* 标题批注复用正文两栏，但标题不能再套全页级的减宽；卡片与 h3 顶部对齐。 */
 .hblk>.ph{max-width:none;grid-column:1}
 .hblk>.side{padding-top:26px}}
-.pp{margin:0;font:16px/1.78 var(--serif);color:#1B1E24;padding:6px 0 6px 22px;border-left:2px solid transparent}
+.pp{margin:0;font:16px/1.78 var(--serif);color:#1B1E24;padding:6px 0 6px 22px;
+  border-left:2px solid transparent;overflow-wrap:break-word}
+/* 论文里那条 tensor2tensor 长网址一个断点都没有，break-word 也断不开（它不改最小内容宽度）。
+   只给链接开 anywhere：手机上不这么做，整页就被这一行顶出横向滚动条 */
+.pp a.ltx_url,.nt-a a,.sheet-bd a{overflow-wrap:anywhere}
 .blk.hot .pp{border-left-color:var(--accent-line);background:linear-gradient(90deg,rgba(230,244,241,.5),transparent 60%)}
 /* itemize：原件的 • 在 <li> 上，段落被单拎出来后就丢了，这里补回去 */
 .blk.li .pp{position:relative;padding-left:52px}
@@ -903,7 +1000,7 @@ figcaption,.ltx_caption{margin-top:12px;font:13px/1.65 var(--serif);color:var(--
 .nt-q .qt{font-weight:600;color:var(--text)}
 .nt-q .tag{flex:none;font-size:10.5px;color:var(--text-3);border:1px solid var(--line);border-radius:var(--r-full);padding:0 7px;margin-top:2px}
 .nt-q .tag.basic{color:var(--warn);border-color:#EBD9B4;background:var(--warn-soft)}
-.nt-a{display:none;padding:10px 11px 12px 36px;font-size:13px;line-height:1.7;color:var(--text-2);border-top:1px solid var(--line-soft)}
+.nt-a{display:none;overflow-wrap:break-word;padding:10px 11px 12px 36px;font-size:13px;line-height:1.7;color:var(--text-2);border-top:1px solid var(--line-soft)}
 .nt.open .nt-a{display:block}
 .nt-a p{margin:0 0 8px}.nt-a b{color:var(--text)}
 .nt-a ul{margin:0 0 8px;padding-left:1.1em}.nt-a li{margin-bottom:4px}
@@ -952,6 +1049,43 @@ body.no-notes .blk{grid-template-columns:minmax(0,1fr)}
 @media(max-width:999px){.ep-head h1{font-size:22px}.pp{font-size:15.5px;padding-left:16px}.dot{display:none}
 .front,.ph,.eqbox,.floatbox,.refs{max-width:none;margin-left:16px}
 .arow{gap:14px}.side{padding-top:2px;margin:0 0 14px 16px}}
+
+/* ── 手机 ──
+   批注卡片插在段落之间，一屏能塞下的正文就没几行了 —— 61 条批注会把文章切成碎片。
+   所以 860 以下换一种给法：正文保持干净，点高亮从底部推上来一张卡。
+   想一次看完的，顶部「展开全部批注」仍然把卡片摊回正文里。 */
+@media(max-width:859px){
+  .wrap{padding:0 14px}
+  .side{display:none}
+  body.notes-inline .side{display:flex}
+  .pp{font-size:16px;line-height:1.8;padding-left:12px}
+  .front,.ph,.eqbox,.floatbox,.refs{margin-left:0}
+  .ep-head h1{font-size:20px}
+  .bar .swbox{width:100%}
+  .sheet-open{position:fixed;width:100%;overflow:hidden}
+}
+/* 抽屉本身不限屏宽 —— 桌面端用不到，但样式留着，窗口一窄就能接上 */
+.scrim{position:fixed;inset:0;background:rgba(20,22,26,.38);opacity:0;pointer-events:none;
+  transition:opacity .18s;z-index:60}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--bg-elev);
+  border-radius:16px 16px 0 0;box-shadow:0 -8px 32px rgba(20,22,26,.18);
+  transform:translateY(102%);transition:transform .22s cubic-bezier(.32,.72,0,1);
+  max-height:82vh;display:flex;flex-direction:column}
+.sheet.on{transform:none}
+.sheet-grab{flex:none;width:38px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 4px}
+.sheet-hd{flex:none;display:flex;gap:9px;align-items:flex-start;padding:6px 16px 10px;
+  border-bottom:1px solid var(--line-soft)}
+.sheet-hd .num{flex:none;width:19px;height:19px;border-radius:5px;background:var(--mk);color:#8A6512;
+  font:11px/19px var(--mono);text-align:center}
+.sheet-hd .qt{flex:1;font-size:14.5px;font-weight:650;color:var(--text);line-height:1.45}
+.sheet-hd .tag{flex:none;font-size:11px;color:var(--text-3);border:1px solid var(--line);
+  border-radius:var(--r-full);padding:1px 8px}
+.sheet-x{flex:none;font:inherit;font-size:20px;line-height:1;color:var(--text-3);background:none;
+  border:0;cursor:pointer;padding:0 2px}
+.sheet-bd{overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 26px;overflow-wrap:break-word;
+  font-size:14.5px;line-height:1.75;color:var(--text-2)}
+.sheet-bd svg{display:block;width:100%;height:auto;margin:4px 0 10px}
 `;
 
 /* ══════════════════ 主流程 ══════════════════ */
@@ -991,10 +1125,11 @@ if (keys.length) {
 const refnotes = o.refnotes && existsSync(o.refnotes) ? JSON.parse(readFileSync(o.refnotes, 'utf8')) : {};
 
 // 全景图：--posters a.svg,b.svg，标题直接取图里的 .h1
-const posters = (o.posters || '').split(',').filter(Boolean).map((f) => {
+const posters = (o.posters || '').split(',').filter(Boolean).map((spec) => {
+  const [f, label] = spec.split('#');            // 路径#tab 上的短标签
   const svg = readFileSync(f.trim(), 'utf8');
   const title = strip((/class="h1"[^>]*>([\s\S]*?)<\/text>/.exec(svg) || [, basename(f)])[1]);
-  return { svg, title };
+  return { svg, title, label: (label || title).trim() };
 });
 if (posters.length) console.log(`· 全景图 ${posters.length} 张：${posters.map((p) => p.title).join(' / ')}`);
 
