@@ -520,24 +520,6 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
   flushTail(null);
   flush();
 
-  // 全景图放最前面：先看地图，再逐句读。
-  // 两张一上一下堆着太占版面，做成 tab —— 一次只看一张，切换在原地发生。
-  if (posters.length) {
-    const tabs = posters.map((pg, i) =>
-      `<button class="ptab${i ? '' : ' on'}" type="button" role="tab" data-p="${i + 1}"`
-      + ` aria-selected="${i ? 'false' : 'true'}" aria-controls="map-${i + 1}">${esc(pg.label)}</button>`).join('');
-    const figs = posters.map((pg, i) =>
-      `<figure class="poster${i ? '' : ' on'}" id="map-${i + 1}" role="tabpanel">`
-      + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div>`
-      + `<figcaption>${esc(pg.title)}</figcaption></figure>`).join('');
-    parts.unshift(`<h2 class="ph area" id="smap">两张全景图<span class="n">${posters.length} 张</span></h2>`
-      + `<p class="area-note">读之前先看一眼地图：一张铺开整个架构与每处细节的公式，`
-      + `一张把「I love you.」从进模型到出结果的形状变化走完。</p>`
-      + `<div class="pmap"><div class="ptabs" role="tablist">${tabs}`
-      + `<span class="phint">图很大，可以横向拖动</span></div>${figs}</div>`);
-    secs.unshift({ id: 'smap', num: '', text: '两张全景图', level: 1 });
-    posters.forEach((pg, i) => secs.splice(1 + i, 0, { id: `map-${i + 1}`, num: '', text: pg.label, level: 2 }));
-  }
 
   // 预备：读正文之前补的底子
   if (extra.预备.length) {
@@ -570,7 +552,14 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
     ['图表', doc.items.filter((i) => i.kind === 'float').length],
     ['公式', doc.items.filter((i) => i.kind === 'eq').length], ['参考文献', doc.refs.length]];
 
-  return shell(parts.join('\n'), toc, stats, doc.title, o.home || '#');
+  // 全景图不进正文 —— 它有 1560 宽，跟正文抢版面就会压到目录上。
+  // 单独成两个视图，跟论文一起挂在顶部的三个 tab 下，各自占满整幅。
+  const views = posters.map((pg, i) =>
+    `<div class="mapview" id="view-map-${i + 1}"><p class="area-note">${esc(pg.note)}</p>`
+    + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div>`
+    + `<p class="pcap">${esc(pg.title)}<span class="phint">图很大，可以横向拖动</span></p></div>`).join('');
+
+  return shell(parts.join('\n'), toc, stats, doc.title, o.home || '#', posters, views);
 }
 
 /** 一条参考文献：可展开，里面是简述 + 本文引用它的原句 */
@@ -623,7 +612,7 @@ function blk(b) {
   </div>`;
 }
 
-function shell(body, toc, stats, paperTitle, home = '#') {
+function shell(body, toc, stats, paperTitle, home = '#', posters = [], views = '') {
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -644,6 +633,11 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 </section></div>
 
 <div class="bar"><div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
+    ${posters.map((pg, i) =>
+      `<button class="tb" type="button" role="tab" data-v="map-${i + 1}" aria-selected="false">${esc(pg.label)}</button>`).join('')}
+  </div>
   <div class="legend">
     ${Object.entries(KINDS).map(([k, v]) =>
       `<span class="lg" title="${esc(v.desc)}"><i style="background:${v.c};border-color:${v.ln}"></i>${k}</span>`).join('')}
@@ -658,6 +652,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 <div class="wrap main">
   <aside class="toc"><h4>论文目录</h4><div>${toc}</div></aside>
   <div class="paper">${body}</div>
+  ${views}
 </div>
 
 <div class="scrim" id="scrim"></div>
@@ -687,26 +682,24 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   });},{rootMargin:'-130px 0px -70% 0px'});
   document.querySelectorAll('.ph').forEach(function(h){io.observe(h);});
 
-  /* ---- 全景图 tab ---- */
-  var pmap=document.querySelector('.pmap');
-  function showPoster(n){
-    if(!pmap)return;
-    pmap.querySelectorAll('.ptab').forEach(function(b){
-      var on=b.dataset.p===String(n);
-      b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
+  /* ---- 顶部三个视图：论文 / 两张全景图 ---- */
+  var view='paper', scrollAt={};
+  function showView(v){
+    if(v===view)return;
+    scrollAt[view]=scrollY;                      // 切走前记住位置，切回来还在原处
+    view=v; document.body.dataset.view=v;
+    document.querySelectorAll('.tb').forEach(function(b){
+      var on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
     });
-    pmap.querySelectorAll('.poster').forEach(function(f){
-      f.classList.toggle('on',f.id==='map-'+n);
-    });
+    void document.documentElement.scrollHeight;   // 先让新视图排完版，否则位置会被旧高度截掉
+    scrollTo(0,scrollAt[v]||0);
   }
-  if(pmap)pmap.addEventListener('click',function(e){
-    var b=e.target.closest('.ptab'); if(b)showPoster(b.dataset.p);
-  });
-  // 目录里点某一张，先切到它再滚过去
+  document.body.dataset.view='paper';
   document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href^="#map-"]'); if(a)showPoster(a.getAttribute('href').slice(5));
+    var b=e.target.closest('.tb'); if(b){showView(b.dataset.v);return;}
+    var a=e.target.closest('a[href^="#map-"]'); if(a){showView(a.getAttribute('href').slice(1));}
   });
-  if(/^#map-\d/.test(location.hash))showPoster(location.hash.slice(5));
+  if(/^#map-\d/.test(location.hash))showView(location.hash.slice(1));
 
   /* ---- 手机：批注从底部推上来 ---- */
   var sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim');
@@ -846,24 +839,25 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
    正文里任何一个宽块（全景图、表格）都会把整页顶出横向滚动条 */
 .main{display:grid;grid-template-columns:minmax(0,1fr);gap:34px;padding-top:26px}
 @media(min-width:1000px){.main{grid-template-columns:210px minmax(0,1fr)}}
-/* 全景图：1560 宽的大图，撑出正文栏，居中缩放；窄屏就横向拖。
-   两张做成 tab，一次只显示一张 —— 堆在一起太占版面，也看不出它们是并列的两张地图 */
-.pmap{margin:14px 0 26px}
-.ptabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.ptab{font:inherit;font-size:13px;color:var(--text-2);background:var(--bg-elev);cursor:pointer;
-  border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px}
-.ptab:hover{background:var(--bg-hover);color:var(--text)}
-.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.phint{font-size:11.5px;color:var(--text-3);margin-left:auto}
-.poster{display:none;margin:0}
-.poster.on{display:block}
-/* 大图要比正文栏宽，但不能用 100vw 那套居中出血 —— 正文栏不在视口中间（左边还有目录），
-   算出来会整体右偏、把页面顶出横向滚动条。改成向左借用目录那一栏的宽度，边界确定 */
-.poster .pbox{overflow-x:auto;overscroll-behavior-x:contain}
-@media(min-width:1000px){.poster .pbox{width:calc(100% + 244px);margin-left:-244px}}
-.poster .pin{width:min(1440px,100%);min-width:1040px;margin:0 auto;padding:0 16px}
-.poster svg{display:block;width:100%;height:auto}
-.poster figcaption{margin-top:10px;text-align:center;font-size:12.5px;color:var(--text-3)}
+/* 顶部三个 tab：论文 / 两张全景图。图有 1560 宽，跟正文并排就会压到目录上，
+   所以不并排 —— 切到图，正文和目录一起收起，整幅让给图 */
+.tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tb{font:inherit;font-size:13px;color:var(--text-2);background:var(--bg-elev);cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.mapview{display:none;padding-top:2px}
+.mapview .pbox{overflow-x:auto;overscroll-behavior-x:contain}
+.mapview .pin{min-width:1040px}
+.mapview svg{display:block;width:100%;height:auto}
+.mapview .pcap{display:flex;gap:12px;align-items:baseline;margin:12px 0 0;
+  font-size:12.5px;color:var(--text-3)}
+.phint{margin-left:auto;white-space:nowrap}
+body[data-view="map-1"] #view-map-1,body[data-view="map-2"] #view-map-2{display:block}
+/* 看图时正文、目录、批注开关都收起来 */
+body[data-view^="map"] .toc,body[data-view^="map"] .paper,
+body[data-view^="map"] .legend,body[data-view^="map"] .swbox{display:none}
+body[data-view^="map"] .main{grid-template-columns:minmax(0,1fr)}
 .toc{display:none}
 @media(min-width:1000px){.toc{display:block;position:sticky;top:calc(var(--topbar-h) + 54px);align-self:start;max-height:calc(100vh - 150px);overflow:auto}}
 .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
@@ -1061,7 +1055,12 @@ body.no-notes .blk{grid-template-columns:minmax(0,1fr)}
   .pp{font-size:16px;line-height:1.8;padding-left:12px}
   .front,.ph,.eqbox,.floatbox,.refs{margin-left:0}
   .ep-head h1{font-size:20px}
-  .bar .swbox{width:100%}
+  .bar .wrap{padding:8px 14px;gap:8px}
+  /* 顶栏在手机上是钉住的，三行就吃掉一屏的六分之一。
+     颜色图例让位 —— 每条批注自己带分类标签，不看图例也认得出 */
+  .legend{display:none}
+  .swbox{margin-left:0}
+  .sw{font-size:12px;padding:4px 10px}
   .sheet-open{position:fixed;width:100%;overflow:hidden}
 }
 /* 抽屉本身不限屏宽 —— 桌面端用不到，但样式留着，窗口一窄就能接上 */
@@ -1126,10 +1125,10 @@ const refnotes = o.refnotes && existsSync(o.refnotes) ? JSON.parse(readFileSync(
 
 // 全景图：--posters a.svg,b.svg，标题直接取图里的 .h1
 const posters = (o.posters || '').split(',').filter(Boolean).map((spec) => {
-  const [f, label] = spec.split('#');            // 路径#tab 上的短标签
+  const [f, label, note] = spec.split('#');      // 路径#tab 标签#一句话说明
   const svg = readFileSync(f.trim(), 'utf8');
   const title = strip((/class="h1"[^>]*>([\s\S]*?)<\/text>/.exec(svg) || [, basename(f)])[1]);
-  return { svg, title, label: (label || title).trim() };
+  return { svg, title, label: (label || title).trim(), note: (note || '').trim() };
 });
 if (posters.length) console.log(`· 全景图 ${posters.length} 张：${posters.map((p) => p.title).join(' / ')}`);
 
