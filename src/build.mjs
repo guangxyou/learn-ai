@@ -31,13 +31,15 @@ const j = (...p) => join(...p);
  *  页面里跟环境有关的两处（返回链接、canonical）写成占位符，发布时才替换。 */
 async function buildPaper({ dir, id, entry, base, dist }) {
   const page = j(dir, entry.page);
-  if (entry.build && existsSync(j(ROOT, entry.build.requires))) {
+  // 只有本地（npm run build 带 PAPER_REBUILD=1）才重新生成。
+  // 服务器上一律发仓库里的成品 —— 那边没有 ImageMagick，现场生成会把附录三张图转不正。
+  if (process.env.PAPER_REBUILD && entry.build && existsSync(j(ROOT, entry.build.requires))) {
     execFileSync('node', [entry.build.tool, ...entry.build.args, '--out', page,
       '--home', '__HOME__', '--canonical', '__CANONICAL__',
       '--title', `${entry.title} · ${entry.subtitle}`, '--desc', entry.summary],
       { cwd: ROOT, stdio: 'inherit' });
   } else {
-    console.log(`[build] ${id} · 没有本地素材，直接用仓库里的 ${entry.page}`);
+    console.log(`[build] ${id} · 用仓库里的成品 ${entry.page}`);
   }
 
   const html = (await readFile(page, 'utf8'))
