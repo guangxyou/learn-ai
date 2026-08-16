@@ -766,23 +766,15 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   var sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim');
   var phone=matchMedia('(max-width:859px)');
   function sheetOn(){ return sheet.classList.contains('on'); }
-  /* 锁背景用的是 body{position:fixed}，而 body 一脱离文档流，浏览器的滚动位置就归零 ——
-     点一条批注，页面唰地弹回开头。所以把当前位置搬到 top 上（负值），视觉上原地不动；
-     关掉时先撤 fixed 再滚回去，顺序反了同样会弹。 */
-  var lockY=0;
-  function lockPage(){
-    lockY=scrollY;
-    document.body.style.top=(-lockY)+'px';
-    document.body.classList.add('sheet-open');
-  }
-  function unlockPage(){
-    document.body.classList.remove('sheet-open');
-    document.body.style.top='';
-    scrollTo(0,lockY);
-  }
+  /* 背景不动，靠的是「什么都不改」：正文始终在文档流里，一个像素都不重排。
+     滚动只是被拦住 —— 遮罩上 touch-action:none 挡手势，这里再挡一次滚轮
+     （窄窗口用鼠标的情况），抽屉内部由 overscroll-behavior:contain 兜住。
+     之前那版给 body 加 position:fixed + top:-scrollY，位置是对的，但 body
+     进出文档流各触发一次整页重排，开一下关一下就闪两下。 */
+  function eatWheel(e){ e.preventDefault(); }
   function closeSheet(){
     sheet.classList.remove('on'); scrim.classList.remove('on');
-    unlockPage();
+    scrim.removeEventListener('wheel',eatWheel);
     document.querySelectorAll('mark.on').forEach(function(m){m.classList.remove('on');});
   }
   function openSheet(nt){
@@ -796,7 +788,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     sheet.querySelector('.sheet-bd').innerHTML=nt.querySelector('.nt-a').innerHTML;
     sheet.querySelector('.sheet-bd').scrollTop=0;
     sheet.classList.add('on'); scrim.classList.add('on');
-    lockPage();
+    scrim.addEventListener('wheel',eatWheel,{passive:false});
   }
   scrim.addEventListener('click',closeSheet);
   sheet.querySelector('.sheet-x').addEventListener('click',closeSheet);
@@ -1146,21 +1138,23 @@ body.no-notes .legend{display:none}
   .legend{display:none}
   .swbox{margin-left:0}
   .sw{font-size:12px;padding:4px 10px}
-  /* top 由 JS 写成 -scrollY，不然一 fixed 就跳回页首 */
-  .sheet-open{position:fixed;left:0;width:100%;overflow:hidden}
 }
-/* 抽屉本身不限屏宽 —— 桌面端用不到，但样式留着，窗口一窄就能接上 */
+/* 抽屉本身不限屏宽 —— 桌面端用不到，但样式留着，窗口一窄就能接上。
+   背景怎么定住：**什么都不改**。之前给 body 加 position:fixed，body 一脱离
+   文档流布局就重算一遍，开一次关一次闪两下。现在正文原地不动，只是拦住
+   滚动手势 —— 遮罩上 touch-action:none（配一个 wheel 拦截给窄窗口的鼠标），
+   抽屉里 overscroll-behavior:contain 不让滚动链传到底下的正文。 */
 .scrim{position:fixed;inset:0;background:rgba(20,22,26,.38);opacity:0;pointer-events:none;
-  transition:opacity .18s;z-index:60}
+  transition:opacity .18s;z-index:60;touch-action:none}
 .scrim.on{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--bg-elev);
   border-radius:16px 16px 0 0;box-shadow:0 -8px 32px rgba(20,22,26,.18);
   transform:translateY(102%);transition:transform .22s cubic-bezier(.32,.72,0,1);
-  max-height:82vh;display:flex;flex-direction:column}
+  max-height:82vh;display:flex;flex-direction:column;overscroll-behavior:contain}
 .sheet.on{transform:none}
-.sheet-grab{flex:none;width:38px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 4px}
+.sheet-grab{flex:none;width:38px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 4px;touch-action:none}
 .sheet-hd{flex:none;display:flex;gap:9px;align-items:flex-start;padding:6px 16px 10px;
-  border-bottom:1px solid var(--line-soft)}
+  border-bottom:1px solid var(--line-soft);touch-action:none}
 .sheet-hd .num{flex:none;width:19px;height:19px;border-radius:5px;background:var(--mk);color:#8A6512;
   font:11px/19px var(--mono);text-align:center}
 .sheet-hd .qt{flex:1;font-size:14.5px;font-weight:650;color:var(--text);line-height:1.45}
@@ -1168,7 +1162,7 @@ body.no-notes .legend{display:none}
   border-radius:var(--r-full);padding:1px 8px}
 .sheet-x{flex:none;font:inherit;font-size:20px;line-height:1;color:var(--text-3);background:none;
   border:0;cursor:pointer;padding:0 2px}
-.sheet-bd{overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 26px;overflow-wrap:break-word;
+.sheet-bd{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:12px 16px 26px;overflow-wrap:break-word;
   font-size:14.5px;line-height:1.75;color:var(--text-2)}
 .sheet-bd svg{display:block;width:100%;height:auto;margin:4px 0 10px}
 `;
