@@ -1,0 +1,4 @@
+[
+ "the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output",
+ "significantly more parallelization"
+]

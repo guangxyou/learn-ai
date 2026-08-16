@@ -1,0 +1,527 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 1890" width="1560" height="1890" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.6;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.6}
+  .boxline{fill:none;stroke:#14161A;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.6}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.6}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:28px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .xxs{font-size:9.5px;fill:#868D98}
+  .tiny{font-size:9px;fill:#868D98}
+  .aside{font-size:8px;fill:#AEB3BA}
+  .mi{font-family:'Times New Roman',Times,serif;font-style:italic}
+  .sb{font-size:8.5px}
+  .shp{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
+  .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:9px;fill:#868D98}
+  .b{font-weight:600}
+  .bgs{fill:#0F766E}
+  .bgst{font-size:10px;font-weight:700;fill:#fff}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTeal{fill:#0F766E}.cTealD{fill:#0B5750}.cAmber{fill:#B45309}.cAmberD{fill:#8A4008}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="al" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#B9B3A8"/></marker>
+</defs>
+
+<rect width="1560" height="1890" fill="#FBFAF8"/>
+
+<!-- ================= HEADER ================= -->
+<text x="40" y="48" class="h1">示例 —— 把 “I love you.” 翻译成「我爱你。」</text>
+<text x="40" y="76" class="sm">中间是完整架构，两侧 ① – ⑧ 按数据流从输入到输出依次展开。形状与超参按论文 base 模型：<tspan class="mi">N</tspan> = 6，<tspan class="mi">d</tspan><tspan class="mi sb" baseline-shift="-20%">model</tspan> = 512，<tspan class="mi">h</tspan> = 8，<tspan class="mi">d</tspan><tspan class="mi sb" baseline-shift="-20%">k</tspan> = <tspan class="mi">d</tspan><tspan class="mi sb" baseline-shift="-20%">v</tspan> = 64，<tspan class="mi">d</tspan><tspan class="mi sb" baseline-shift="-20%">ff</tspan> = 2048。</text>
+<line x1="40" y1="94" x2="1520" y2="94" class="thin"/>
+
+<!-- ================= 例子条 ================= -->
+<rect x="40" y="108" width="1480" height="110" rx="12" class="panel"/>
+<text x="60" y="132" class="ph">例子：把 “I love you.” 翻译成「我爱你。」</text>
+
+<text x="60" y="164" class="xs">源句 → 编码器</text>
+<rect x="200" y="146" width="62" height="26" rx="4" class="soft"/><text x="231" y="164" class="xxs cMut" text-anchor="middle">I</text>
+<rect x="270" y="146" width="62" height="26" rx="4" class="soft"/><text x="301" y="164" class="xxs cMut" text-anchor="middle">love</text>
+<rect x="340" y="146" width="62" height="26" rx="4" class="soft"/><text x="371" y="164" class="xxs cMut" text-anchor="middle">you</text>
+<rect x="410" y="146" width="62" height="26" rx="4" class="soft"/><text x="441" y="164" class="xxs cMut" text-anchor="middle">.</text>
+<text x="490" y="164" class="shpHi">n = 4</text>
+
+<text x="60" y="200" class="xs">右移一位 → 解码器</text>
+<rect x="200" y="182" width="62" height="26" rx="4" class="acc"/><text x="231" y="200" class="xxs cTealD" text-anchor="middle">&lt;bos&gt;</text>
+<rect x="270" y="182" width="62" height="26" rx="4" class="acc"/><text x="301" y="200" class="xxs cTealD" text-anchor="middle">我</text>
+<rect x="340" y="182" width="62" height="26" rx="4" class="acc"/><text x="371" y="200" class="xxs cTealD" text-anchor="middle">爱</text>
+<rect x="410" y="182" width="62" height="26" rx="4" class="acc"/><text x="441" y="200" class="xxs cTealD" text-anchor="middle">你</text>
+<rect x="480" y="182" width="62" height="26" rx="4" class="acc"/><text x="511" y="200" class="xxs cTealD" text-anchor="middle">。</text>
+<text x="560" y="200" class="shpHi">m = 5</text>
+
+<text x="700" y="150" class="xs"><tspan class="cInk b">每个位置只做一件事</tspan>：拿已经看到的词，预测下一个词。</text>
+<text x="700" y="172" class="xs">喂 &lt;bos&gt; 要吐「我」，喂到「我」要吐「爱」，一路到喂「。」要吐 &lt;eos&gt;。</text>
+<text x="700" y="194" class="xs"><tspan class="cInk b">n ≠ m 是故意选的</tspan>：源句 4 个 token，解码器输入 5 个，所以 ⑥ 交叉注意力的分数矩阵是 <tspan class="shpW">5 × 4</tspan> —— 行数来自目标句，列数来自源句。</text>
+
+<!-- ================================================================ -->
+<!-- ==================== 中间：架构 ================================ -->
+<!-- ================================================================ -->
+<text x="670" y="292" class="tiny" text-anchor="middle">源句 4 个 token</text>
+<text x="890" y="292" class="tiny" text-anchor="middle">目标句 5 个 token</text>
+
+<rect x="590" y="302" width="160" height="36" rx="4" class="soft"/>
+<text x="670" y="324" class="xs cMut" text-anchor="middle">Input Embedding</text>
+<rect x="810" y="302" width="160" height="36" rx="4" class="soft"/>
+<text x="890" y="324" class="xs cMut" text-anchor="middle">Output Embedding</text>
+<path d="M670 338 v17" class="ink" marker-end="url(#a)"/>
+<path d="M890 338 v17" class="ink" marker-end="url(#a)"/>
+
+<circle cx="670" cy="368" r="11" class="box"/><path d="M663 368 h14 M670 361 v14" class="ink"/>
+<circle cx="890" cy="368" r="11" class="box"/><path d="M883 368 h14 M890 361 v14" class="ink"/>
+<text x="686" y="366" class="tiny">位置编码 PE</text>
+<text x="906" y="366" class="tiny">位置编码 PE</text>
+<path d="M670 379 v25" class="ink" marker-end="url(#a)"/>
+<path d="M890 379 v25" class="ink" marker-end="url(#a)"/>
+
+<rect x="582" y="406" width="176" height="222" rx="8" class="dash"/>
+<rect x="802" y="406" width="176" height="334" rx="8" class="dash"/>
+<text x="752" y="402" class="tiny" text-anchor="end">× 6 层</text>
+<text x="972" y="402" class="tiny" text-anchor="end">× 6 层</text>
+
+<rect x="590" y="420" width="160" height="44" rx="4" class="acc"/>
+<text x="670" y="447" class="cTealD" text-anchor="middle" font-size="10.5">Multi-Head Self-Attention</text>
+<rect x="810" y="420" width="160" height="44" rx="4" class="acc"/>
+<text x="890" y="440" class="cTealD" text-anchor="middle" font-size="10.5">Masked Multi-Head</text>
+<text x="890" y="455" class="cTealD" text-anchor="middle" font-size="10.5">Self-Attention</text>
+<path d="M670 464 v14" class="ink" marker-end="url(#a)"/>
+<path d="M890 464 v14" class="ink" marker-end="url(#a)"/>
+
+<rect x="590" y="480" width="160" height="28" rx="4" class="soft"/>
+<text x="670" y="498" class="xs cMut" text-anchor="middle">Add &amp; Norm</text>
+<rect x="810" y="480" width="160" height="28" rx="4" class="soft"/>
+<text x="890" y="498" class="xs cMut" text-anchor="middle">Add &amp; Norm</text>
+<path d="M670 508 v14" class="ink" marker-end="url(#a)"/>
+<path d="M890 508 v14" class="ink" marker-end="url(#a)"/>
+
+<rect x="590" y="524" width="160" height="44" rx="4" class="warm"/>
+<text x="670" y="551" class="cAmberD" text-anchor="middle" font-size="10.5">Feed Forward Network</text>
+<rect x="810" y="524" width="160" height="52" rx="4" class="acc"/>
+<text x="890" y="546" class="cTealD" text-anchor="middle" font-size="10.5">Encoder-Decoder Attention</text>
+<text x="890" y="562" class="tiny cTeal" text-anchor="middle">Q 来自本层，K / V 来自编码器</text>
+<path d="M670 568 v14" class="ink" marker-end="url(#a)"/>
+<path d="M890 576 v14" class="ink" marker-end="url(#a)"/>
+
+<rect x="590" y="584" width="160" height="28" rx="4" class="soft"/>
+<text x="670" y="602" class="xs cMut" text-anchor="middle">Add &amp; Norm</text>
+<rect x="810" y="592" width="160" height="28" rx="4" class="soft"/>
+<text x="890" y="610" class="xs cMut" text-anchor="middle">Add &amp; Norm</text>
+<path d="M890 620 v14" class="ink" marker-end="url(#a)"/>
+
+<rect x="810" y="636" width="160" height="44" rx="4" class="warm"/>
+<text x="890" y="663" class="cAmberD" text-anchor="middle" font-size="10.5">Feed Forward Network</text>
+<path d="M890 680 v14" class="ink" marker-end="url(#a)"/>
+<rect x="810" y="696" width="160" height="28" rx="4" class="soft"/>
+<text x="890" y="714" class="xs cMut" text-anchor="middle">Add &amp; Norm</text>
+
+<path d="M670 612 v50" class="ink" marker-end="url(#a)"/>
+<rect x="590" y="664" width="160" height="42" rx="4" fill="#E6F4F1" stroke="#0F766E" stroke-width="1.6"/>
+<text x="670" y="682" class="cTealD" text-anchor="middle" font-size="10.5">Encoder Output</text>
+<text x="670" y="696" class="shpHi" text-anchor="middle">(4, 512)</text>
+<path d="M750 685 H 780 V 550 H 796" class="tdash" marker-end="url(#at)"/>
+
+<path d="M890 724 v48" class="ink" marker-end="url(#a)"/>
+<rect x="810" y="774" width="160" height="34" rx="4" class="soft"/>
+<text x="890" y="795" class="xs cMut" text-anchor="middle">Linear</text>
+<path d="M890 808 v14" class="ink" marker-end="url(#a)"/>
+<rect x="810" y="824" width="160" height="34" rx="4" class="soft"/>
+<text x="890" y="845" class="xs cMut" text-anchor="middle">Softmax</text>
+<path d="M890 858 v16" class="ink" marker-end="url(#a)"/>
+<text x="890" y="894" class="xs cTeal" text-anchor="middle">下一个 token 的概率</text>
+<text x="890" y="908" class="shpW" text-anchor="middle">(5, 37000)</text>
+
+<!-- ========================= 引出线 =============================== -->
+<!-- 引出线止步于虚线「× 6 层」框外沿（左 582 / 右 978），不扎进去；
+     框外的那几根才走到盒子边上（左 586 / 右 974） -->
+<path d="M470 308 H 500 V 320 H 586" class="lead" marker-end="url(#al)"/>
+<path d="M470 470 H 512 V 442 H 576" class="lead" marker-end="url(#al)"/>
+<path d="M470 788 H 524 V 546 H 576" class="lead" marker-end="url(#al)"/>
+<path d="M470 876 H 536 V 685 H 586" class="lead" marker-end="url(#al)"/>
+<path d="M1090 308 H 1060 V 320 H 974" class="lead" marker-end="url(#al)"/>
+<path d="M1090 446 H 1048 V 442 H 984" class="lead" marker-end="url(#al)"/>
+<path d="M1090 578 H 1036 V 550 H 984" class="lead" marker-end="url(#al)"/>
+<path d="M1090 720 H 1024 V 791 H 974" class="lead" marker-end="url(#al)"/>
+
+<!-- ①–⑧：编号与主图一致。画在引出线之后，让引出线终止在编号上 -->
+<circle cx="552" cy="320" r="11" class="bgs"/><text x="552" y="324" class="bgst" text-anchor="middle">1</text>
+<circle cx="552" cy="368" r="11" class="bgs"/><text x="552" y="372" class="bgst" text-anchor="middle">2</text>
+<circle cx="552" cy="442" r="11" class="bgs"/><text x="552" y="446" class="bgst" text-anchor="middle">3</text>
+<circle cx="552" cy="546" r="11" class="bgs"/><text x="552" y="550" class="bgst" text-anchor="middle">7</text>
+<circle cx="1008" cy="442" r="11" class="bgs"/><text x="1008" y="446" class="bgst" text-anchor="middle">4</text>
+<circle cx="1008" cy="494" r="11" class="bgs"/><text x="1008" y="498" class="bgst" text-anchor="middle">5</text>
+<circle cx="1008" cy="550" r="11" class="bgs"/><text x="1008" y="554" class="bgst" text-anchor="middle">6</text>
+<circle cx="1008" cy="791" r="11" class="bgs"/><text x="1008" y="795" class="bgst" text-anchor="middle">8</text>
+
+<!-- ================================================================ -->
+<!-- ==================== 左：编码器 ================================ -->
+<!-- ================================================================ -->
+<rect x="40" y="250" width="430" height="750" rx="12" class="panel"/>
+<text x="60" y="276" class="ph">编码器：跟着 “I love you .” 这四行走</text>
+
+<text x="60" y="308" class="sm b">①② 查表，再加上位置</text>
+<line x1="60" y1="314" x2="450" y2="314" class="thin"/>
+<text x="60" y="332" class="xs">每个词先变成 id，id 去 37000 × 512 的表里查出一行：</text>
+<text x="60" y="354" class="num">I</text><text x="118" y="354" class="num">40</text><text x="168" y="354" class="numS">[ 0.21, −0.04, 0.33, …, 0.11 ]</text>
+<text x="60" y="374" class="num">love</text><text x="118" y="374" class="num">1892</text><text x="168" y="374" class="numS">[ −0.15, 0.28, 0.02, …, −0.07 ]</text>
+<text x="60" y="394" class="num">you</text><text x="118" y="394" class="num">258</text><text x="168" y="394" class="numS">[ 0.09, 0.41, −0.19, …, 0.24 ]</text>
+<text x="60" y="414" class="num">.</text><text x="118" y="414" class="num">5</text><text x="168" y="414" class="numS">[ 0.02, −0.11, 0.07, …, 0.30 ]</text>
+<text x="60" y="438" class="xs">再逐元素加上位置编码（详见 A）。四行，每行 512 个数。</text><text x="450" y="438" class="shpHi" text-anchor="end">(4, 512)</text>
+
+<text x="60" y="470" class="sm b">③ 投影出 Q、K、V，再分给 8 个头</text>
+<line x1="60" y1="476" x2="450" y2="476" class="thin"/>
+<text x="60" y="494" class="xs">四行先各乘三个 512 × 512 的矩阵，得到 Q、K、V。</text><text x="308" y="494" class="aside">（实际工程实现）</text><text x="450" y="494" class="shp" text-anchor="end">(4, 512)</text>
+<text x="60" y="512" class="xs">这三个矩阵各自是 8 个 512 × 64 并排拼成的 ——</text>
+<text x="60" y="530" class="xs">所以投影出来的 512 列，每 64 列正好归一个头：</text>
+<g transform="translate(60,538)">
+  <rect x="0" y="0" width="320" height="15" rx="3" class="soft"/>
+  <rect x="0" y="0" width="40" height="15" fill="#0F766E" opacity=".5"/>
+  <path d="M40 0 v15 M80 0 v15 M120 0 v15 M160 0 v15 M200 0 v15 M240 0 v15 M280 0 v15" stroke="#fff" stroke-width="1" fill="none"/>
+  <rect x="0" y="0" width="320" height="15" rx="3" fill="none" stroke="#C8C3BA" stroke-width="1.2"/>
+</g>
+<text x="60" y="568" class="xs">↑ 第 1 个头的那 64 列。切的是投影结果，不是词向量。</text>
+<text x="60" y="586" class="xs">读作：8 个头 · 每头 4 行 · 每行 64 个数。</text><text x="450" y="586" class="shpHi" text-anchor="end">(8, 4, 64)</text>
+
+<text x="60" y="608" class="sm b">④ 打分：每个头算出一张 4 × 4 的表</text>
+<line x1="60" y1="614" x2="450" y2="614" class="thin"/>
+<text x="60" y="632" class="xs">第 i 行第 j 列 = 第 i 行的 q 点乘第 j 行的 k，</text><text x="450" y="632" class="shpW" text-anchor="end">(8, 4, 4)</text>
+<text x="60" y="650" class="xs">再除以 √64 = 8，然后每行做一次 softmax。</text>
+<text x="60" y="668" class="xs">「love」那行算出来是 0.21 / 0.55 / 0.19 / 0.05，详见 B。</text>
+<text x="60" y="690" class="xs">照这张表把四行加权求和，8 段拼回 512，过 W<tspan class="sb" baseline-shift="40%">O</tspan>。</text><text x="450" y="690" class="shpHi" text-anchor="end">(4, 512)</text>
+
+<text x="60" y="718" class="sm b">⑤ 残差 + LayerNorm：每个子层出来都走一遍</text>
+<line x1="60" y1="724" x2="450" y2="724" class="thin"/>
+<text x="60" y="742" class="xs">把进子层之前的那四行原样加回来，</text>
+<text x="60" y="760" class="xs">再把每一行的 512 个数归一到均值 0、方差 1，乘 γ 加 β。</text><text x="450" y="760" class="shp" text-anchor="end">(4, 512)</text>
+
+<text x="60" y="788" class="sm b">⑦ FFN：四行各走各的</text>
+<line x1="60" y1="794" x2="450" y2="794" class="thin"/>
+<text x="60" y="812" class="xs">这一步四行互不相干，每行单独走 512 → 2048 → 512。</text>
+<text x="60" y="830" class="xs">中间先升维到 2048，是全程最宽的一步，</text><text x="450" y="830" class="shpW" text-anchor="end">(4, 2048)</text>
+<text x="60" y="848" class="xs">再降维回 512，然后走一遍 ⑤。</text><text x="450" y="848" class="shpHi" text-anchor="end">(4, 512)</text>
+
+<text x="60" y="876" class="sm b">⑧ 堆够 6 层，交给解码器</text>
+<line x1="60" y1="882" x2="450" y2="882" class="thin"/>
+<text x="60" y="900" class="xs">③ 到 ⑦ 这一整块再走 5 遍，四行始终是四行。</text>
+<text x="60" y="918" class="xs cTealD b">第 6 层出来的这四行 = memory，送去 ⑥ 当 K、V。</text><text x="450" y="918" class="shpHi" text-anchor="end">(4, 512)</text>
+
+<text x="60" y="948" class="xs">这四行到此只是被重新表示了一遍：词还是那四个词，</text>
+<text x="60" y="966" class="xs">但每一行都已经掺进了另外三行的信息。</text>
+
+<!-- ================================================================ -->
+<!-- ==================== 右：解码器 ================================ -->
+<!-- ================================================================ -->
+<rect x="1090" y="250" width="430" height="750" rx="12" class="panel"/>
+<text x="1110" y="276" class="ph">解码器：跟着「&lt;bos&gt; 我 爱 你 。」这五行走</text>
+
+<text x="1110" y="308" class="sm b">①② 输入是答案右移一位</text>
+<line x1="1110" y1="314" x2="1500" y2="314" class="thin"/>
+<text x="1110" y="332" class="xs">把「我爱你。」整体右挪一格，前面补 &lt;bos&gt;：</text>
+<text x="1110" y="354" class="num">&lt;bos&gt;</text><text x="1190" y="354" class="num">我</text><text x="1250" y="354" class="num">爱</text><text x="1310" y="354" class="num">你</text><text x="1370" y="354" class="num">。</text>
+<text x="1110" y="372" class="numS">id 1</text><text x="1190" y="372" class="numS">2761</text><text x="1250" y="372" class="numS">843</text><text x="1310" y="372" class="numS">1904</text><text x="1370" y="372" class="numS">6</text>
+<text x="1110" y="396" class="xs">同样查表、加位置编码，得到五行。</text><text x="1500" y="396" class="shpHi" text-anchor="end">(5, 512)</text>
+
+<text x="1110" y="446" class="sm b">④ 自注意力：每一行只能看自己和左边</text>
+<line x1="1110" y1="452" x2="1500" y2="452" class="thin"/>
+<text x="1110" y="470" class="xs">五行互相打分得到 5 × 5，还没轮到的格子填 −∞：</text><text x="1500" y="470" class="shpW" text-anchor="end">(8, 5, 5)</text>
+<text x="1197" y="486" class="tiny" text-anchor="middle">&lt;bos&gt;</text>
+<text x="1231" y="486" class="tiny" text-anchor="middle">我</text>
+<text x="1265" y="486" class="tiny" text-anchor="middle">爱</text>
+<text x="1299" y="486" class="tiny" text-anchor="middle">你</text>
+<text x="1333" y="486" class="tiny" text-anchor="middle">。</text>
+<g transform="translate(1180,492)">
+  <rect x="0" y="0" width="170" height="80" class="box"/>
+  <rect x="0" y="0" width="34" height="16" fill="#0F766E" opacity=".70"/>
+  <rect x="34" y="0" width="136" height="16" fill="#EDEAE4"/>
+  <rect x="0" y="16" width="34" height="16" fill="#0F766E" opacity=".32"/>
+  <rect x="34" y="16" width="34" height="16" fill="#0F766E" opacity=".44"/>
+  <rect x="68" y="16" width="102" height="16" fill="#EDEAE4"/>
+  <rect x="0" y="32" width="34" height="16" fill="#0F766E" opacity=".17"/>
+  <rect x="34" y="32" width="34" height="16" fill="#0F766E" opacity=".27"/>
+  <rect x="68" y="32" width="34" height="16" fill="#0F766E" opacity=".34"/>
+  <rect x="102" y="32" width="68" height="16" fill="#EDEAE4"/>
+  <rect x="0" y="48" width="34" height="16" fill="#0F766E" opacity=".12"/>
+  <rect x="34" y="48" width="34" height="16" fill="#0F766E" opacity=".18"/>
+  <rect x="68" y="48" width="34" height="16" fill="#0F766E" opacity=".24"/>
+  <rect x="102" y="48" width="34" height="16" fill="#0F766E" opacity=".26"/>
+  <rect x="136" y="48" width="34" height="16" fill="#EDEAE4"/>
+  <rect x="0" y="64" width="34" height="16" fill="#0F766E" opacity=".09"/>
+  <rect x="34" y="64" width="34" height="16" fill="#0F766E" opacity=".14"/>
+  <rect x="68" y="64" width="34" height="16" fill="#0F766E" opacity=".18"/>
+  <rect x="102" y="64" width="34" height="16" fill="#0F766E" opacity=".21"/>
+  <rect x="136" y="64" width="34" height="16" fill="#0F766E" opacity=".21"/>
+  <path d="M34 0 v80 M68 0 v80 M102 0 v80 M136 0 v80 M0 16 h170 M0 32 h170 M0 48 h170 M0 64 h170" stroke="#fff" stroke-width=".8" fill="none"/>
+  <rect x="0" y="0" width="170" height="80" class="boxline"/>
+</g>
+<text x="1175" y="504" class="tiny" text-anchor="end">&lt;bos&gt;</text>
+<text x="1175" y="520" class="tiny" text-anchor="end">我</text>
+<text x="1175" y="536" class="tiny" text-anchor="end">爱</text>
+<text x="1175" y="552" class="tiny" text-anchor="end">你</text>
+<text x="1175" y="568" class="tiny" text-anchor="end">。</text>
+<text x="1197" y="504" class="num" text-anchor="middle">1.00</text><text x="1231" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1265" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="520" class="num" text-anchor="middle">0.42</text><text x="1231" y="520" class="num" text-anchor="middle">0.58</text><text x="1265" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="536" class="num" text-anchor="middle">0.21</text><text x="1231" y="536" class="num" text-anchor="middle">0.35</text><text x="1265" y="536" class="num" text-anchor="middle">0.44</text><text x="1299" y="536" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="536" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="552" class="num" text-anchor="middle">0.14</text><text x="1231" y="552" class="num" text-anchor="middle">0.22</text><text x="1265" y="552" class="num" text-anchor="middle">0.31</text><text x="1299" y="552" class="num" text-anchor="middle">0.33</text><text x="1333" y="552" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="568" class="num" text-anchor="middle">0.10</text><text x="1231" y="568" class="num" text-anchor="middle">0.16</text><text x="1265" y="568" class="num" text-anchor="middle">0.22</text><text x="1299" y="568" class="num" text-anchor="middle">0.26</text><text x="1333" y="568" class="num" text-anchor="middle">0.26</text>
+<text x="1110" y="590" class="xs">softmax 之后灰格就是 0，每行的权重只落在左边。</text>
+
+<text x="1110" y="622" class="sm b">⑥ 交叉注意力：拿五行去问那四行</text>
+<line x1="1110" y1="628" x2="1500" y2="628" class="thin"/>
+<text x="1110" y="646" class="xs">Q 来自解码器这五行，K、V 来自编码器那四行。</text>
+<text x="1110" y="664" class="xs cAmber b">五行 × 四列 = 一张 5 × 4 的表，是长方形。</text><text x="1500" y="664" class="shpW" text-anchor="end">(8, 5, 4)</text>
+<text x="1110" y="682" class="xs">「我」把 71% 给了 “I”，「爱」给了 “love”，详见 C。</text>
+<text x="1110" y="700" class="xs">照这张表混完，行数回到五行。</text><text x="1500" y="700" class="shpHi" text-anchor="end">(5, 512)</text>
+<text x="1110" y="718" class="xs">解码器三个子层 ④⑥⑦ 出来之后，同样各走一遍 ⑤。</text>
+
+<text x="1110" y="746" class="sm b">⑦⑧ 每一行变成 37000 个概率</text>
+<line x1="1110" y1="752" x2="1500" y2="752" class="thin"/>
+<text x="1110" y="770" class="xs">FFN 一行一行走 512 → 2048 → 512，堆够 6 层。</text><text x="1500" y="770" class="shp" text-anchor="end">(5, 512)</text>
+<text x="1110" y="788" class="xs">最后五行各过一次 Linear（512 × 37000）再 softmax：</text><text x="1500" y="788" class="shpW" text-anchor="end">(5, 37000)</text>
+<text x="1110" y="812" class="numS">1  &lt;bos&gt; → 「我」0.79</text><text x="1310" y="812" class="numS">4  「你」 → 「。」0.66</text>
+<text x="1110" y="830" class="numS">2  「我」 → 「爱」0.83</text><text x="1310" y="830" class="numS">5  「。」 → &lt;eos&gt; 0.91</text>
+<text x="1110" y="848" class="numS">3  「爱」 → 「你」0.74</text>
+
+<text x="1110" y="868" class="xs cTealD b">每行取概率最大的词接起来：我 / 爱 / 你 / 。 / &lt;eos&gt;，</text>
+<text x="1110" y="886" class="xs">正好是目标句加上结束符 —— 这一遍前向就走完了。</text>
+
+<text x="1110" y="914" class="xs">训练时五行一次都算，一句话就学到五步。</text>
+<text x="1110" y="938" class="xs">推理时不能这样：先只喂 &lt;bos&gt; 得到「我」，再把「我」</text>
+<text x="1110" y="956" class="xs">接回输入算第二步，一个词一个词往外吐，直到出 &lt;eos&gt;。</text>
+<text x="1110" y="982" class="xs">整张表详见 D。</text>
+
+<!-- ================================================================ -->
+<!-- ============== 具体数字：形状里到底装了什么 ==================== -->
+<!-- ================================================================ -->
+<text x="40" y="1076" class="ph">形状里到底装了什么 —— 四个关键张量逐个拆开</text>
+<text x="440" y="1076" class="xs">下面四块的<tspan class="cAmber b">数值都是示意</tspan>，用来说明张量里装的是什么；真实数值取决于训练好的模型和具体词表。</text>
+
+<!-- (a) token → id → 向量 -->
+<rect x="40" y="1090" width="350" height="330" rx="12" class="panel"/>
+<text x="60" y="1116" class="sm b">A · 那 512 个数从哪来</text>
+<text x="60" y="1136" class="xs">「I」这一行是两份加出来的，来路完全不同。</text>
+<line x1="60" y1="1148" x2="370" y2="1148" class="thin"/>
+<text x="60" y="1168" class="xs cInk b">embedding：查表得到，训练学出来的</text>
+<text x="60" y="1188" class="numS">id 40 → [ 0.21, −0.04, 0.33, …, 0.11 ]</text>
+<text x="60" y="1208" class="xs">换一份训练语料，这 512 个数就全变了；</text>
+<text x="60" y="1226" class="xs">它们编码的是「I 大概是什么意思」。</text>
+<text x="60" y="1254" class="xs cInk b">位置编码 PE：按公式算出来的</text>
+<text x="60" y="1274" class="numS">pos = 0 → [ 0.00, 1.00, 0.00, 1.00, …, 0.00, 1.00 ]</text>
+<text x="60" y="1292" class="numS">pos = 1 → [ 0.84, 0.54, 0.82, 0.57, …, 0.00, 1.00 ]</text>
+<text x="60" y="1312" class="xs">偶数位放 sin、奇数位放 cos，把 pos 代进公式</text>
+<text x="60" y="1330" class="xs">就能算出这一行 —— 不训练，换哪个模型都一样。</text>
+<line x1="60" y1="1350" x2="370" y2="1350" class="thin"/>
+<text x="60" y="1372" class="xs">两者逐元素相加，「I」这一行就同时带着</text>
+<text x="60" y="1390" class="xs">「是什么意思」和「排在第 0 位」。</text>
+<text x="60" y="1408" class="xs">加法不改变形状，还是 <tspan class="shpHi">(4, 512)</tspan>。</text>
+
+<!-- (b) 自注意力权重 -->
+<rect x="410" y="1090" width="350" height="330" rx="12" class="panel"/>
+<text x="430" y="1116" class="sm b">B · 一次注意力：从点积算到权重</text>
+<text x="430" y="1136" class="xs">拿「love」这一行、第 1 个头，一步一步走完。</text>
+<line x1="430" y1="1148" x2="740" y2="1148" class="thin"/>
+<text x="430" y="1166" class="xs">点积：q 和 k 各 64 个数，对位相乘再求和</text>
+<text x="430" y="1182" class="numS">q(love)·k(I) = 0.31×0.12 + (−0.08)×0.44 + … = 3.7</text>
+<text x="430" y="1200" class="xs">四个 k 各算一次，再统一除以 √64 = 8：</text>
+<text x="430" y="1216" class="numS">[ 3.7, 11.4, 2.7, −7.2 ] → [ 0.46, 1.42, 0.34, −0.90 ]</text>
+<text x="430" y="1234" class="xs">这一行做一次 softmax，得到加起来 = 1 的权重：</text>
+<text x="430" y="1250" class="numS cTealD">[ 0.21, 0.55, 0.19, 0.05 ]</text>
+<text x="430" y="1268" class="xs">再拿这四个数给四行 V 加权求和，就是新的「love」。</text>
+<line x1="430" y1="1286" x2="740" y2="1286" class="thin"/>
+<text x="430" y="1304" class="xs">四行各算一遍 = 这张表，行是 q、列是 k：</text><text x="740" y="1304" class="shpW" text-anchor="end">(8, 4, 4)</text>
+<text x="490" y="1322" class="tiny" text-anchor="middle">I</text>
+<text x="550" y="1322" class="tiny" text-anchor="middle">love</text>
+<text x="610" y="1322" class="tiny" text-anchor="middle">you</text>
+<text x="670" y="1322" class="tiny" text-anchor="middle">.</text>
+<g transform="translate(460,1328)">
+  <rect x="0" y="0" width="240" height="80" class="box"/>
+  <rect x="0" y="0" width="60" height="20" fill="#0F766E" opacity=".62"/>
+  <rect x="60" y="0" width="60" height="20" fill="#0F766E" opacity=".18"/>
+  <rect x="120" y="0" width="60" height="20" fill="#0F766E" opacity=".14"/>
+  <rect x="180" y="0" width="60" height="20" fill="#0F766E" opacity=".06"/>
+  <rect x="0" y="20" width="60" height="20" fill="#0F766E" opacity=".21"/>
+  <rect x="60" y="20" width="60" height="20" fill="#0F766E" opacity=".55"/>
+  <rect x="120" y="20" width="60" height="20" fill="#0F766E" opacity=".19"/>
+  <rect x="180" y="20" width="60" height="20" fill="#0F766E" opacity=".05"/>
+  <rect x="0" y="40" width="60" height="20" fill="#0F766E" opacity=".16"/>
+  <rect x="60" y="40" width="60" height="20" fill="#0F766E" opacity=".31"/>
+  <rect x="120" y="40" width="60" height="20" fill="#0F766E" opacity=".48"/>
+  <rect x="180" y="40" width="60" height="20" fill="#0F766E" opacity=".05"/>
+  <rect x="0" y="60" width="60" height="20" fill="#0F766E" opacity=".24"/>
+  <rect x="60" y="60" width="60" height="20" fill="#0F766E" opacity=".22"/>
+  <rect x="120" y="60" width="60" height="20" fill="#0F766E" opacity=".19"/>
+  <rect x="180" y="60" width="60" height="20" fill="#0F766E" opacity=".35"/>
+  <path d="M60 0 v80 M120 0 v80 M180 0 v80 M0 20 h240 M0 40 h240 M0 60 h240" stroke="#fff" stroke-width=".8" fill="none"/>
+  <rect x="0" y="0" width="240" height="80" class="boxline"/>
+</g>
+<text x="455" y="1342" class="tiny" text-anchor="end">I</text>
+<text x="455" y="1362" class="tiny" text-anchor="end">love</text>
+<text x="455" y="1382" class="tiny" text-anchor="end">you</text>
+<text x="455" y="1402" class="tiny" text-anchor="end">.</text>
+<text x="490" y="1342" class="num" text-anchor="middle">0.62</text><text x="550" y="1342" class="num" text-anchor="middle">0.18</text><text x="610" y="1342" class="num" text-anchor="middle">0.14</text><text x="670" y="1342" class="num" text-anchor="middle">0.06</text>
+<text x="490" y="1362" class="num" text-anchor="middle">0.21</text><text x="550" y="1362" class="num" text-anchor="middle">0.55</text><text x="610" y="1362" class="num" text-anchor="middle">0.19</text><text x="670" y="1362" class="num" text-anchor="middle">0.05</text>
+<text x="490" y="1382" class="num" text-anchor="middle">0.16</text><text x="550" y="1382" class="num" text-anchor="middle">0.31</text><text x="610" y="1382" class="num" text-anchor="middle">0.48</text><text x="670" y="1382" class="num" text-anchor="middle">0.05</text>
+<text x="490" y="1402" class="num" text-anchor="middle">0.24</text><text x="550" y="1402" class="num" text-anchor="middle">0.22</text><text x="610" y="1402" class="num" text-anchor="middle">0.19</text><text x="670" y="1402" class="num" text-anchor="middle">0.35</text>
+
+<!-- (c) 交叉注意力 -->
+<rect x="780" y="1090" width="350" height="330" rx="12" class="panel"/>
+<text x="800" y="1116" class="sm b">C · 交叉注意力：那张 5 × 4 的对齐表</text>
+<text x="800" y="1136" class="xs">行是目标位置，列是源位置。行和为 1，列和不是。</text>
+<text x="860" y="1162" class="tiny" text-anchor="middle">I</text>
+<text x="920" y="1162" class="tiny" text-anchor="middle">love</text>
+<text x="980" y="1162" class="tiny" text-anchor="middle">you</text>
+<text x="1040" y="1162" class="tiny" text-anchor="middle">.</text>
+<g transform="translate(830,1168)">
+  <rect x="0" y="0" width="240" height="130" class="box"/>
+  <rect x="0" y="0" width="60" height="26" fill="#0F766E" opacity=".31"/>
+  <rect x="60" y="0" width="60" height="26" fill="#0F766E" opacity=".28"/>
+  <rect x="120" y="0" width="60" height="26" fill="#0F766E" opacity=".29"/>
+  <rect x="180" y="0" width="60" height="26" fill="#0F766E" opacity=".12"/>
+  <rect x="0" y="26" width="60" height="26" fill="#0F766E" opacity=".71"/>
+  <rect x="60" y="26" width="60" height="26" fill="#0F766E" opacity=".12"/>
+  <rect x="120" y="26" width="60" height="26" fill="#0F766E" opacity=".13"/>
+  <rect x="180" y="26" width="60" height="26" fill="#0F766E" opacity=".04"/>
+  <rect x="0" y="52" width="60" height="26" fill="#0F766E" opacity=".14"/>
+  <rect x="60" y="52" width="60" height="26" fill="#0F766E" opacity=".68"/>
+  <rect x="120" y="52" width="60" height="26" fill="#0F766E" opacity=".15"/>
+  <rect x="180" y="52" width="60" height="26" fill="#0F766E" opacity=".03"/>
+  <rect x="0" y="78" width="60" height="26" fill="#0F766E" opacity=".11"/>
+  <rect x="60" y="78" width="60" height="26" fill="#0F766E" opacity=".16"/>
+  <rect x="120" y="78" width="60" height="26" fill="#0F766E" opacity=".69"/>
+  <rect x="180" y="78" width="60" height="26" fill="#0F766E" opacity=".04"/>
+  <rect x="0" y="104" width="60" height="26" fill="#0F766E" opacity=".08"/>
+  <rect x="60" y="104" width="60" height="26" fill="#0F766E" opacity=".09"/>
+  <rect x="120" y="104" width="60" height="26" fill="#0F766E" opacity=".11"/>
+  <rect x="180" y="104" width="60" height="26" fill="#0F766E" opacity=".72"/>
+  <path d="M60 0 v130 M120 0 v130 M180 0 v130 M0 26 h240 M0 52 h240 M0 78 h240 M0 104 h240" stroke="#fff" stroke-width=".8" fill="none"/>
+  <rect x="0" y="0" width="240" height="130" class="boxline"/>
+</g>
+<text x="825" y="1187" class="tiny" text-anchor="end">&lt;bos&gt;</text>
+<text x="825" y="1213" class="tiny" text-anchor="end">我</text>
+<text x="825" y="1239" class="tiny" text-anchor="end">爱</text>
+<text x="825" y="1265" class="tiny" text-anchor="end">你</text>
+<text x="825" y="1291" class="tiny" text-anchor="end">。</text>
+<text x="860" y="1187" class="num" text-anchor="middle">0.31</text><text x="920" y="1187" class="num" text-anchor="middle">0.28</text><text x="980" y="1187" class="num" text-anchor="middle">0.29</text><text x="1040" y="1187" class="num" text-anchor="middle">0.12</text>
+<text x="860" y="1213" class="num" text-anchor="middle">0.71</text><text x="920" y="1213" class="num" text-anchor="middle">0.12</text><text x="980" y="1213" class="num" text-anchor="middle">0.13</text><text x="1040" y="1213" class="num" text-anchor="middle">0.04</text>
+<text x="860" y="1239" class="num" text-anchor="middle">0.14</text><text x="920" y="1239" class="num" text-anchor="middle">0.68</text><text x="980" y="1239" class="num" text-anchor="middle">0.15</text><text x="1040" y="1239" class="num" text-anchor="middle">0.03</text>
+<text x="860" y="1265" class="num" text-anchor="middle">0.11</text><text x="920" y="1265" class="num" text-anchor="middle">0.16</text><text x="980" y="1265" class="num" text-anchor="middle">0.69</text><text x="1040" y="1265" class="num" text-anchor="middle">0.04</text>
+<text x="860" y="1291" class="num" text-anchor="middle">0.08</text><text x="920" y="1291" class="num" text-anchor="middle">0.09</text><text x="980" y="1291" class="num" text-anchor="middle">0.11</text><text x="1040" y="1291" class="num" text-anchor="middle">0.72</text>
+<text x="800" y="1324" class="xs">「我」把 71% 的注意力给了 “I”，「爱」给了 “love”，</text>
+<text x="800" y="1342" class="xs">「你」给了 “you” —— 这就是翻译里说的对齐。</text>
+<text x="800" y="1368" class="xs">没人标注过这个对应关系，它是训练自己长出来的。</text>
+<text x="800" y="1394" class="xs">5 行 4 列：行数是目标句长度，列数是源句长度，</text>
+<text x="800" y="1412" class="xs">两者没有必须相等的理由。整体是 <tspan class="shpW">(8, 5, 4)</tspan>。</text>
+
+<!-- (d) 输出分布 -->
+<rect x="1150" y="1090" width="370" height="330" rx="12" class="panel"/>
+<text x="1170" y="1116" class="sm b">D · 最后那个 (5, 37000) 是什么</text>
+<text x="1170" y="1136" class="xs">每一行是一个位置上、整个词表的概率分布。</text>
+<text x="1170" y="1162" class="xs cInk b">第 2 行：输入是「我」，要预测下一个词</text>
+<rect x="1170" y="1174" width="330" height="26" rx="3" fill="#E6F4F1"/>
+<text x="1180" y="1192" class="num cTealD">爱</text>
+<rect x="1240" y="1180" width="182" height="14" rx="2" fill="#0F766E" opacity=".72"/>
+<text x="1500" y="1192" class="num cTealD" text-anchor="end">0.83</text>
+<text x="1180" y="1218" class="num">喜欢</text>
+<rect x="1240" y="1206" width="20" height="14" rx="2" fill="#0F766E" opacity=".38"/>
+<text x="1500" y="1218" class="num" text-anchor="end">0.09</text>
+<text x="1180" y="1242" class="num">爱着</text>
+<rect x="1240" y="1230" width="7" height="14" rx="2" fill="#0F766E" opacity=".30"/>
+<text x="1500" y="1242" class="num" text-anchor="end">0.03</text>
+<text x="1180" y="1266" class="num">恋</text>
+<rect x="1240" y="1254" width="3" height="14" rx="2" fill="#0F766E" opacity=".24"/>
+<text x="1500" y="1266" class="num" text-anchor="end">0.01</text>
+<text x="1180" y="1290" class="numS">其余 36996 个</text>
+<rect x="1240" y="1278" width="9" height="14" rx="2" fill="#868D98" opacity=".35"/>
+<text x="1500" y="1290" class="num" text-anchor="end">0.04</text>
+<line x1="1170" y1="1306" x2="1500" y2="1306" class="thin"/>
+<text x="1170" y="1326" class="xs">这 37000 个数加起来等于 1。</text>
+<text x="1170" y="1352" class="xs">训练时拿这一行和真实答案「爱」算交叉熵；</text>
+<text x="1170" y="1370" class="xs">推理时按分布采样，或者直接取最大的那个。</text>
+<text x="1170" y="1396" class="xs">整张表 5 × 37000 = <tspan class="shpW">18.5 万个数</tspan>，</text>
+<text x="1170" y="1414" class="xs">是全图最大的张量 —— 比任何一个权重矩阵都大。</text>
+
+<!-- ================================================================ -->
+<!-- ==================== 多头拆合 / 要点 =========================== -->
+<!-- ================================================================ -->
+<rect x="40" y="1440" width="720" height="320" rx="12" class="panel"/>
+<text x="60" y="1466" class="ph">多头是怎么算的：8 个 512 × 64 = 一个 512 × 512</text>
+<text x="60" y="1486" class="xs">论文里 8 个头各有一套投影矩阵；代码里拼成一个大矩阵乘一次。两条路算出来完全一样。</text>
+
+<text x="60" y="1514" class="sm b">论文写法（3.2.2）</text>
+<text x="60" y="1534" class="xs">每个头一套自己的 W<tspan class="sb" baseline-shift="-20%">i</tspan>，形状 512 × 64。<tspan class="mi">X</tspan> 乘它直接得到 <tspan class="shpHi">(4, 64)</tspan>，8 个头乘 8 次，最后 concat 起来。</text>
+
+<text x="60" y="1562" class="sm b">工程写法（各框架的实际做法）</text>
+<text x="60" y="1582" class="xs">8 个 512 × 64 并排拼成一个 512 × 512，<tspan class="mi">X</tspan> 只乘一次得到 <tspan class="shp">(4, 512)</tspan>，再 reshape + 转置切成 8 段。</text>
+<text x="60" y="1602" class="xs">之所以等价，是分块矩阵乘法：<tspan class="mi">X</tspan> · [ W<tspan class="sb" baseline-shift="-20%">1</tspan> | W<tspan class="sb" baseline-shift="-20%">2</tspan> | … | W<tspan class="sb" baseline-shift="-20%">8</tspan> ] = [ <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">1</tspan> | <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">2</tspan> | … | <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">8</tspan> ]。</text>
+<text x="60" y="1622" class="xs">8 次小矩阵乘每次都要单独启动、单次规模又太小，合成一次大的更快 —— 但<tspan class="cAmber b">切的始终是投影结果，不是词向量</tspan>。</text>
+
+<text x="60" y="1654" class="sm b">拆头（投影之后、打分之前）</text>
+<rect x="60" y="1664" width="110" height="32" rx="4" class="soft"/>
+<text x="115" y="1685" class="shp" text-anchor="middle">(4, 512)</text>
+<path d="M176 1680 H 204" class="ink" marker-end="url(#a)"/>
+<text x="190" y="1673" class="tiny" text-anchor="middle">reshape</text>
+<rect x="210" y="1664" width="110" height="32" rx="4" class="soft"/>
+<text x="265" y="1685" class="shp" text-anchor="middle">(4, 8, 64)</text>
+<path d="M326 1680 H 354" class="ink" marker-end="url(#a)"/>
+<text x="340" y="1673" class="tiny" text-anchor="middle">转置</text>
+<rect x="360" y="1664" width="110" height="32" rx="4" class="acc"/>
+<text x="415" y="1685" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
+
+<text x="60" y="1718" class="sm b">合头（打分之后、过 W<tspan class="sb" baseline-shift="40%">O</tspan> 之前）</text>
+<rect x="60" y="1726" width="110" height="32" rx="4" class="acc"/>
+<text x="115" y="1747" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
+<path d="M176 1742 H 204" class="ink" marker-end="url(#a)"/>
+<text x="190" y="1735" class="tiny" text-anchor="middle">转置</text>
+<rect x="210" y="1726" width="110" height="32" rx="4" class="soft"/>
+<text x="265" y="1747" class="shp" text-anchor="middle">(4, 8, 64)</text>
+<path d="M326 1742 H 354" class="ink" marker-end="url(#a)"/>
+<text x="340" y="1735" class="tiny" text-anchor="middle">reshape</text>
+<rect x="360" y="1726" width="110" height="32" rx="4" class="soft"/>
+<text x="415" y="1747" class="shp" text-anchor="middle">(4, 512)</text>
+
+<text x="500" y="1670" class="xs">· 元素个数从头到尾没变：</text>
+<text x="512" y="1688" class="xs">4 × 512 = 4 × 8 × 64 = 2048 个数。</text>
+<text x="500" y="1712" class="xs">· reshape 和转置都是零参数操作，</text>
+<text x="512" y="1730" class="xs">参数全在四个 512 × 512 里。</text>
+<text x="500" y="1754" class="xs">· 过完 W<tspan class="sb" baseline-shift="40%">O</tspan>，8 个头的结果才混在一起。</text>
+
+<rect x="780" y="1440" width="740" height="320" rx="12" class="panel"/>
+<text x="800" y="1466" class="ph">四个容易搞混的地方</text>
+
+<text x="800" y="1494" class="xs">① <tspan class="cInk b">全程只有两处形状会变。</tspan>一处是注意力里的分数矩阵，一处是 FFN 中间那层 2048。</text>
+<text x="816" y="1512" class="xs">其余每一步都是（序列长度, 512），一路不变。</text>
+
+<text x="800" y="1542" class="xs">② <tspan class="cInk b">交叉注意力的分数矩阵不是方阵。</tspan>它是 (m, n) = <tspan class="shpW">(5, 4)</tspan>：行是目标位置，列是源位置。</text>
+<text x="816" y="1560" class="xs">这张 5 × 4 的表，就是 C 里画的那张对齐表。</text>
+
+<text x="800" y="1590" class="xs">③ <tspan class="cInk b">n² 就是从分数矩阵来的。</tspan>自注意力的分数是 (n, n) 或 (m, m)，序列长一倍它就大四倍。</text>
+<text x="816" y="1608" class="xs">而权重矩阵的形状跟序列长度<tspan class="cAmber b">完全无关</tspan> —— 句子变长，参数量一个也不多。</text>
+
+<text x="800" y="1638" class="xs">④ <tspan class="cInk b">「切成 8 段」切的不是词向量。</tspan>是 <tspan class="mi">X</tspan> 乘完 512 × 512 之后的结果，才按列切给 8 个头。</text>
+<text x="816" y="1656" class="xs">词向量本身从头到尾没有被拆开过 —— 详见左边那块。</text>
+
+<line x1="800" y1="1678" x2="1500" y2="1678" class="thin"/>
+<text x="800" y="1698" class="xs">推理时形状还会再变一次：第 t 步输入是 (t, 512)，分数 (8, t, t)，但只有最后一行有用。</text>
+<text x="800" y="1716" class="xs">前 t−1 个位置的 K、V 每步都被重算 —— KV cache 就是把它们存下来，让每步只算新的一行：</text>
+<text x="800" y="1734" class="xs">Q <tspan class="shpHi">(8, 1, 64)</tspan> × K<tspan class="sb" baseline-shift="40%">T</tspan> <tspan class="shpHi">(8, 64, t)</tspan> → <tspan class="shpHi">(8, 1, t)</tspan>，每步的计算量从 t² 降回 t。</text>
+
+<!-- ================================================================ -->
+<line x1="40" y1="1790" x2="1520" y2="1790" class="thin"/>
+<text x="40" y="1812" class="xs">形状怎么读：括号里有几个数，就是这个张量有几个轴，<tspan class="cInk b">不是固定三个</tspan>。由外到内数：<tspan class="shp">(4, 512)</tspan> 是 4 行、每行 512 个数；<tspan class="shpHi">(8, 4, 64)</tspan> 是 8 个头、每头 4 行、每行 64 个数；<tspan class="shpW">(8, 4, 4)</tspan> 是 8 个头、每头一张 4 × 4 的表 —— 同一个数字换个位置就是另一回事。</text>
+<text x="40" y="1830" class="xs">读法：左右两列从上往下就是一次完整前向，虚线箭头指向它在中间架构上的位置。<tspan class="shpHi">青色</tspan>表示这一步形状变了，<tspan class="shpW">橙色</tspan>表示这个形状值得特别留意，灰色表示形状没变；真实代码里最外层还有一个 batch 轴，本图一律省略。</text>
+<text x="40" y="1848" class="xs">说明：token id、向量值、注意力权重、输出概率都是示意数值，用来说明张量里装的是什么；真实数值取决于训练好的模型和具体词表。</text>
+<text x="40" y="1866" class="xs">出处：“Attention Is All You Need”, NeurIPS 2017 (arXiv:1706.03762)。形状按论文 base 模型推导；词表大小取 EN-DE 的 37000。</text>
+</svg>
