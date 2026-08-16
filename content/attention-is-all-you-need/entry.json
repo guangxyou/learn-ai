@@ -16,20 +16,20 @@
     "url": "https://arxiv.org/abs/1706.03762"
   },
   "build": {
-    "note": "page.html 是提交进仓库的成品；源文件在本地 01_Transformer/（不进仓库）。源文件在时，构建会先重新生成它。",
+    "note": "page.html 是提交进仓库的成品，批注、全景图这些源就在同一个文件夹里。只有论文原文（paper-src.html，ar5iv 版）留在本地素材目录、不进仓库 —— 它在时构建会先重新生成 page.html，不在就直接发成品。",
     "tool": "tools/make-paper.mjs",
     "requires": "01_Transformer/paper-src.html",
     "args": [
       "--src",
       "01_Transformer/paper-src.html",
       "--notes",
-      "01_Transformer/notes.json",
+      "content/attention-is-all-you-need/notes.json",
       "--keys",
-      "01_Transformer/keys.json",
+      "content/attention-is-all-you-need/keys.json",
       "--refnotes",
-      "01_Transformer/refnotes.json",
+      "content/attention-is-all-you-need/refnotes.json",
       "--posters",
-      "01_Transformer/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,01_Transformer/figures/transformer-shape-walkthrough.svg#示例#"
+      "content/attention-is-all-you-need/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,content/attention-is-all-you-need/figures/transformer-shape-walkthrough.svg#示例#"
     ]
   },
   "page": "page.html"
