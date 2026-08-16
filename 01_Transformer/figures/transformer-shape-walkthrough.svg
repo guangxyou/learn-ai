@@ -68,7 +68,7 @@
 
 <text x="700" y="150" class="xs"><tspan class="cInk b">每个位置只做一件事</tspan>：拿已经看到的词，预测下一个词。</text>
 <text x="700" y="172" class="xs">喂 &lt;bos&gt; 要吐「我」，喂到「我」要吐「爱」，一路到喂「。」要吐 &lt;eos&gt;。</text>
-<text x="700" y="194" class="xs"><tspan class="cInk b">n ≠ m 是故意选的</tspan>：源句 4 个 token，解码器输入 5 个，所以 ⑥ 交叉注意力的分数矩阵是 <tspan class="shpW">5 × 4</tspan> —— 行数来自目标句，列数来自源句。</text>
+<text x="700" y="194" class="xs"><tspan class="cInk b">n ≠ m 是故意选的</tspan>：源句 4 个 token，解码器输入 5 个，所以 ⑥ 交叉注意力算出的矩阵是 <tspan class="shpW">5 × 4</tspan> —— 行数来自目标句，列数来自源句。</text>
 
 <!-- ================================================================ -->
 <!-- ==================== 中间：架构 ================================ -->
@@ -197,7 +197,7 @@
 <text x="60" y="568" class="xs">↑ 第 1 个头的那 64 列。切的是投影结果，不是词向量。</text>
 <text x="60" y="586" class="xs">读作：8 个头 · 每头 4 行 · 每行 64 个数。</text><text x="450" y="586" class="shpHi" text-anchor="end">(8, 4, 64)</text>
 
-<text x="60" y="608" class="sm b">④ 打分：每个头算出一张 4 × 4 的分数矩阵</text>
+<text x="60" y="608" class="sm b">④ 打分：每个头算出一张 4 × 4 的注意力矩阵</text>
 <line x1="60" y1="614" x2="450" y2="614" class="thin"/>
 <text x="60" y="632" class="xs">第 i 行第 j 列 = 第 i 行的 q 点乘第 j 行的 k，</text><text x="450" y="632" class="shpW" text-anchor="end">(8, 4, 4)</text>
 <text x="60" y="650" class="xs">再除以 √64 = 8，然后每行做一次 softmax。</text>
@@ -238,7 +238,7 @@
 
 <text x="1110" y="446" class="sm b">④ 自注意力：每一行只能看自己和左边</text>
 <line x1="1110" y1="452" x2="1500" y2="452" class="thin"/>
-<text x="1110" y="470" class="xs">五行互相打分，分数矩阵 5 × 5，还没轮到的填 −∞：</text><text x="1500" y="470" class="shpW" text-anchor="end">(8, 5, 5)</text>
+<text x="1110" y="470" class="xs">五行互相打分，注意力矩阵 5 × 5，还没轮到的填 −∞：</text><text x="1500" y="470" class="shpW" text-anchor="end">(8, 5, 5)</text>
 <text x="1197" y="486" class="tiny" text-anchor="middle">&lt;bos&gt;</text>
 <text x="1231" y="486" class="tiny" text-anchor="middle">我</text>
 <text x="1265" y="486" class="tiny" text-anchor="middle">爱</text>
@@ -449,10 +449,10 @@
 <text x="1500" y="1290" class="num" text-anchor="end">0.04</text>
 <line x1="1170" y1="1306" x2="1500" y2="1306" class="thin"/>
 <text x="1170" y="1326" class="xs">这 37000 个数加起来等于 1。</text>
-<text x="1170" y="1352" class="xs">训练时只用「爱」那一格：损失 = −log 0.83（交叉熵）；</text>
-<text x="1170" y="1370" class="xs">推理时按分布采样，或者直接取最大的那个。</text>
-<text x="1170" y="1396" class="xs">整张表 5 × 37000 = <tspan class="shpW">18.5 万个数</tspan>，</text>
-<text x="1170" y="1414" class="xs">是前向里最大的中间结果 —— 比 FFN 中间那层还大 18 倍。</text>
+<text x="1170" y="1352" class="xs">训练时只用「爱」那一格：损失 = −log 0.83 = 0.19。</text>
+<text x="1170" y="1370" class="xs">猜得越准，这一格越接近 1，损失越接近 0 —— 这就是交叉熵。</text>
+<text x="1170" y="1388" class="xs">其余 36999 格不单独进损失，只通过 softmax 的分母影响它。</text>
+<text x="1170" y="1408" class="xs">推理时按这个分布采样，或者直接取最大的那个（贪心）。</text>
 
 <!-- ================================================================ -->
 <!-- ==================== 多头拆合 / 要点 =========================== -->
@@ -502,20 +502,20 @@
 <rect x="780" y="1440" width="740" height="320" rx="12" class="panel"/>
 <text x="800" y="1466" class="ph">四个容易搞混的地方</text>
 
-<text x="800" y="1494" class="xs">① <tspan class="cInk b">全程只有两处形状会变。</tspan>一处是注意力里的分数矩阵，一处是 FFN 中间那层 2048。</text>
+<text x="800" y="1494" class="xs">① <tspan class="cInk b">全程只有两处形状会变。</tspan>一处是注意力矩阵，一处是 FFN 中间那层 2048。</text>
 <text x="816" y="1512" class="xs">其余每一步都是（序列长度, 512），一路不变。</text>
 
-<text x="800" y="1542" class="xs">② <tspan class="cInk b">交叉注意力的分数矩阵不是方阵。</tspan>它是 (m, n) = <tspan class="shpW">(5, 4)</tspan>：行是目标位置，列是源位置。</text>
+<text x="800" y="1542" class="xs">② <tspan class="cInk b">交叉注意力算出的矩阵不是方阵。</tspan>它是 (m, n) = <tspan class="shpW">(5, 4)</tspan>：行是目标位置，列是源位置。</text>
 <text x="816" y="1560" class="xs">这张 5 × 4 的表，就是 C 里画的那张对齐表。</text>
 
-<text x="800" y="1590" class="xs">③ <tspan class="cInk b">n² 就是从分数矩阵来的。</tspan>自注意力的分数是 (n, n) 或 (m, m)，序列长一倍它就大四倍。</text>
+<text x="800" y="1590" class="xs">③ <tspan class="cInk b">n² 就是从注意力矩阵来的。</tspan>自注意力算出的是 (n, n) 或 (m, m)，序列长一倍它就大四倍。</text>
 <text x="816" y="1608" class="xs">而权重矩阵的形状跟序列长度<tspan class="cAmber b">完全无关</tspan> —— 句子变长，参数量一个也不多。</text>
 
 <text x="800" y="1638" class="xs">④ <tspan class="cInk b">「切成 8 段」切的不是词向量。</tspan>是 <tspan class="mi">X</tspan> 乘完 512 × 512 之后的结果，才按列切给 8 个头。</text>
 <text x="816" y="1656" class="xs">词向量本身从头到尾没有被拆开过 —— 详见左边那块。</text>
 
 <line x1="800" y1="1678" x2="1500" y2="1678" class="thin"/>
-<text x="800" y="1698" class="xs">推理时形状还会再变一次：第 t 步输入是 (t, 512)，分数 (8, t, t)，但只有最后一行有用。</text>
+<text x="800" y="1698" class="xs">推理时形状还会再变一次：第 t 步输入是 (t, 512)，注意力矩阵 (8, t, t)，但只有最后一行有用。</text>
 <text x="800" y="1716" class="xs">前 t−1 个位置的 K、V 每步都被重算 —— KV cache 就是把它们存下来，让每步只算新的一行：</text>
 <text x="800" y="1734" class="xs">Q <tspan class="shpHi">(8, 1, 64)</tspan> × K<tspan class="sb" baseline-shift="40%">T</tspan> <tspan class="shpHi">(8, 64, t)</tspan> → <tspan class="shpHi">(8, 1, t)</tspan>，每步的计算量从 t² 降回 t。</text>
 
