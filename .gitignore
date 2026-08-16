@@ -11,6 +11,21 @@ dist/
 Idea.txt
 
 # 素材工作现场（含几百 MB 视频），不进仓库
-01_Transformer/
 02_Attention/
 0x_多模态/
+
+# 01_Transformer/ 同上，但放行几份「只此一份」的源：
+# 手画的两张全景图、66 条批注的 JSON、构建要用的两个小配置、动手前的两份工作笔记。
+# 成品页里只有它们渲染之后的样子 —— 源丢了，就只能从 1.3 MB 的 HTML 里往外抠。
+# 其余一律不进：paper-src.html（ar5iv 能重下）、notes-raw/pool/final（中间产物）、
+# raw/（完整对话记录）、versions/、paper-assets/、阅读.html（生成物）。
+01_Transformer/*
+!01_Transformer/00-资料搜集.md
+!01_Transformer/01-交互方案.md
+!01_Transformer/keys.json
+!01_Transformer/notes.json
+!01_Transformer/refnotes.json
+!01_Transformer/figures/
+01_Transformer/figures/*
+!01_Transformer/figures/attention-is-all-you-need.svg
+!01_Transformer/figures/transformer-shape-walkthrough.svg
