@@ -6,7 +6,7 @@ export const hms = (s) => {
   s = Math.max(0, Math.floor(s));
   return `${pad((s / 3600) | 0)}:${pad(((s % 3600) / 60) | 0)}:${pad(s % 60)}`;
 };
-const wan = (n) => (n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : String(n));
+export const wan = (n) => (n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : String(n));
 
 /* 资源版本号。assets/app.css|js 文件名固定，nginx 给它们挂了 7 天长缓存，
    而 HTML 是 no-cache —— 于是改完发布，浏览器会拿「新 HTML + 旧 JS」跑，直接白页。
@@ -51,8 +51,10 @@ ${body}
 /* ---------------- 列表页 ---------------- */
 export function renderList({ base, entries, site }) {
   const cards = entries.map((e) => {
-    // 每种条目产出的东西不一样：播客是文稿/论文/PPT，论文精读是全文/批注/插图。
+    // 每种条目产出的东西不一样：播客是文稿/论文/PPT，论文精读是批注/字数/插图。
     // 条目自己在 entry.json 里声明，列表页不猜。
+    // 两种写法：['文稿','4.9 万字'] 渲染成「文稿 4.9 万字」，数在后；
+    // 直接给一段字符串就照原样放进去，留给「66 条批注」这种数在前的。
     const outputs = e.outputs
       ?? [['文稿', wan(e.chars) + '字'], ['论文', e.papers + ' 篇'], ['PPT', e.slides + ' 页']];
     return `<a class="entry" href="${base}/${e.id}/">
@@ -61,7 +63,8 @@ export function renderList({ base, entries, site }) {
       <div class="topics">${e.topics.map((t) => `<span class="topic">${esc(t)}</span>`).join('')}</div>
       <h2>${esc(e.title)}<em> — ${esc(e.subtitle)}</em></h2>
       <p class="desc">${esc(e.summary)}</p>
-      <div class="outputs">${outputs.map(([k, v]) => `<span class="output">${k} <b>${v}</b></span>`).join('')}</div>
+      <div class="outputs">${outputs.map((o) =>
+        `<span class="output">${Array.isArray(o) ? `${o[0]} <b>${o[1]}</b>` : o}</span>`).join('')}</div>
     </div>
   </a>`;
   }).join('\n');

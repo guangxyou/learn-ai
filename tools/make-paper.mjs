@@ -68,6 +68,7 @@ const strip = (s) => s.replace(/<[^>]+>/g, ' ').replace(/[\u200B\u2060\uFEFF]/g,
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
 const norm = (s) => strip(s).replace(/[“”"']/g, '"');
+const wan = (n) => (n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : String(n));   // 跟站点其它页同一个写法
 
 function args() {
   const a = process.argv.slice(2), o = {};
@@ -171,11 +172,17 @@ function parse(src) {
 /** 页首的全景图：整张外部 SVG 塞进页面。
  *  它自带 <style> 和 marker id —— 不隔离的话 .ph、.box 这些类会串到正文，
  *  两张图的 marker id 还会互相覆盖。所以：选择器限定到自己，id 加前缀，宽高交给 CSS。 */
+/** 海报自己留了天头，页面上方又已经有大标题和 tab —— 两份叠一起，图上方就空出一大条。
+ *  嵌进页面时把 viewBox 上沿抬一截，源文件单独打开还是原来的留白。 */
+const POSTER_TRIM = 16;
+
 function poster(svg, i) {
   const scope = `pg${i}`;
   svg = svg.replace(/<\?xml[\s\S]*?\?>/g, '').replace(/<!--[\s\S]*?-->/g, '').trim();
   svg = svg.replace(/<svg\b([^>]*)>/, (m, a) =>
-    `<svg${a.replace(/\s(?:width|height)="[^"]*"/g, '')} class="${scope}">`);
+    `<svg${a.replace(/\s(?:width|height)="[^"]*"/g, '')
+            .replace(/viewBox="0 0 (\d+) (\d+)"/,
+              (_, w, h) => `viewBox="0 ${POSTER_TRIM} ${w} ${h - POSTER_TRIM}"`)} class="${scope}">`);
   for (const id of [...new Set([...svg.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]))]) {
     svg = svg.replace(new RegExp(`\\sid="${id}"`, 'g'), ` id="${scope}-${id}"`)
              .replace(new RegExp(`url\\(#${id}\\)`, 'g'), `url(#${scope}-${id})`);
@@ -548,18 +555,27 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
   const toc = secs.map((s) =>
     `<a href="#${s.id}" data-ol="${s.id}" class="${s.level > 1 ? 'sub' : ''}">${s.num ? esc(s.num) + ' ' : ''}${esc(s.text)}</a>`).join('');
 
-  const stats = [['卡点', notes.length], ['行内', notes.length - loose.length], ['段落', doc.items.filter((i) => i.kind === 'p').length],
-    ['图表', doc.items.filter((i) => i.kind === 'float').length],
-    ['公式', doc.items.filter((i) => i.kind === 'eq').length], ['参考文献', doc.refs.length]];
+  /** 标题底下那行数：全从批注本身数出来，改一条批注它就跟着变，不会和正文对不上。
+   *  字数只算人写的话 —— 整段 <svg> 先剔掉，图里的坐标轴标签、图例不该算进字数。
+   *  data-chars 留给 src/build.mjs：列表页的卡片直接读它，两处数字只有这一个来源。 */
+  //  strip() 把每个标签换成一个空格，用来数字数会虚高（<b>、<span class="m"> 这类行内标签满篇都是），
+  //  所以这里标签直接去掉不留空 —— 数的是读者眼睛看得到的那些字符。
+  const words = (h) => String(h || '').replace(/<svg\b[\s\S]*?<\/svg>/gi, '').replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ').replace(/&[a-z]+;|&#\d+;/gi, 'x').replace(/\s+/g, ' ').trim().length;
+  const chars = notes.reduce((n, x) => n + words(x.q) + words(x.a), 0);
+  const figs = notes.reduce((n, x) => n + (String(x.a || '').match(/<svg\b/gi) || []).length, 0);
+  const meta = `<div class="ep-meta" data-chars="${chars}">` + [
+    [notes.length, ' 条批注'], [wan(chars), '字'], [figs, ' 张插图'],
+  ].map(([n, k]) => `<span><b>${n}</b>${k}</span>`).join('') + '</div>';
 
   // 全景图不进正文 —— 它有 1560 宽，跟正文抢版面就会压到目录上。
   // 单独成两个视图，跟论文一起挂在顶部的三个 tab 下，各自占满整幅。
   const views = posters.map((pg, i) =>
-    `<div class="mapview" id="view-map-${i + 1}"><p class="area-note">${esc(pg.note)}</p>`
-    + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div>`
-    + `<p class="pcap">${esc(pg.title)}<span class="phint">图很大，可以横向拖动</span></p></div>`).join('');
+    `<div class="mapview" id="view-map-${i + 1}">`
+    + (pg.note ? `<p class="area-note">${esc(pg.note)}</p>` : '')
+    + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div></div>`).join('');
 
-  return shell(parts.join('\n'), toc, stats, doc.title, o.home || '#', posters, views);
+  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters, views);
 }
 
 /** 一条参考文献：可展开，里面是简述 + 本文引用它的原句 */
@@ -612,7 +628,7 @@ function blk(b) {
   </div>`;
 }
 
-function shell(body, toc, stats, paperTitle, home = '#', posters = [], views = '') {
+function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '') {
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -630,6 +646,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
       <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">arXiv:1706.03762 ↗</a></span>
   </div>
   <h1>逐字、逐句理解 Transformer</h1>
+  ${meta}
 </section></div>
 
 <div class="bar"><div class="wrap">
@@ -683,11 +700,13 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   document.querySelectorAll('.ph').forEach(function(h){io.observe(h);});
 
   /* ---- 顶部三个视图：论文 / 两张全景图 ---- */
-  var view='paper', scrollAt={};
+  var view='paper', scrollAt={}, VKEY='aiayn-view';
+  var mem={ get:function(){try{return sessionStorage.getItem(VKEY)}catch(e){return null}},
+            set:function(v){try{sessionStorage.setItem(VKEY,v)}catch(e){}} };
   function showView(v){
     if(v===view)return;
     scrollAt[view]=scrollY;                      // 切走前记住位置，切回来还在原处
-    view=v; document.body.dataset.view=v;
+    view=v; document.body.dataset.view=v; mem.set(v);
     document.querySelectorAll('.tb').forEach(function(b){
       var on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
     });
@@ -695,6 +714,9 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     scrollTo(0,scrollAt[v]||0);
   }
   document.body.dataset.view='paper';
+  // 刷新之后停在原来那个 tab —— 只记在本次会话里，重新打开还是从论文开始
+  var saved=mem.get();
+  if(saved&&saved!=='paper'&&document.getElementById('view-'+saved))showView(saved);
   document.addEventListener('click',function(e){
     var b=e.target.closest('.tb'); if(b){showView(b.dataset.v);return;}
     var a=e.target.closest('a[href^="#map-"]'); if(a){showView(a.getAttribute('href').slice(1));}
@@ -809,14 +831,14 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .topbar .wrap{height:100%;display:flex;align-items:center;gap:14px}
 .back{color:var(--text-2);font-size:13px}
 .src-flag{margin-left:auto;font-size:12px;color:var(--text-3);border:1px solid var(--line);background:var(--bg-elev);padding:3px 9px;border-radius:var(--r-full)}
-.ep-head{padding:30px 0 18px;max-width:900px}
+.ep-head{padding:30px 0 8px;max-width:900px}
 .ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
 .ep-kicker .topic{background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
 .ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
 .ep-head h1 em{display:block;font-style:normal;font-size:16.5px;font-weight:400;color:var(--text-2);margin-top:8px}
-.ep-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:15px;font-size:13px;color:var(--text-2)}
-.ep-meta b{font-weight:650;color:var(--text)}
-.bar{position:sticky;top:var(--topbar-h);z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:16px}
+.ep-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:13px;font-size:13px;color:var(--text-3)}
+.ep-meta b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.bar{position:sticky;top:var(--topbar-h);z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
 .bar .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 24px}
 .swbox{margin-left:auto;display:flex;gap:9px}
 /* 图例：四类批注各一色，外加划重点的波浪线 */
@@ -846,7 +868,7 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
   border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
 .tb:hover{background:var(--bg-hover);color:var(--text)}
 .tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.mapview{display:none;padding-top:2px}
+.mapview{display:none}
 .mapview .pbox{overflow-x:auto;overscroll-behavior-x:contain}
 .mapview .pin{min-width:1040px}
 .mapview svg{display:block;width:100%;height:auto}
@@ -857,7 +879,8 @@ body[data-view="map-1"] #view-map-1,body[data-view="map-2"] #view-map-2{display:
 /* 看图时正文、目录、批注开关都收起来 */
 body[data-view^="map"] .toc,body[data-view^="map"] .paper,
 body[data-view^="map"] .legend,body[data-view^="map"] .swbox{display:none}
-body[data-view^="map"] .main{grid-template-columns:minmax(0,1fr)}
+/* 正文要 26px 的天头，图不要 —— 图自己已经有一圈留白，两份叠起来就空出一条 */
+body[data-view^="map"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px}
 .toc{display:none}
 @media(min-width:1000px){.toc{display:block;position:sticky;top:calc(var(--topbar-h) + 54px);align-self:start;max-height:calc(100vh - 150px);overflow:auto}}
 .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
@@ -994,7 +1017,8 @@ figcaption,.ltx_caption{margin-top:12px;font:13px/1.65 var(--serif);color:var(--
 .nt-q .qt{font-weight:600;color:var(--text)}
 .nt-q .tag{flex:none;font-size:10.5px;color:var(--text-3);border:1px solid var(--line);border-radius:var(--r-full);padding:0 7px;margin-top:2px}
 .nt-q .tag.basic{color:var(--warn);border-color:#EBD9B4;background:var(--warn-soft)}
-.nt-a{display:none;overflow-wrap:break-word;padding:10px 11px 12px 36px;font-size:13px;line-height:1.7;color:var(--text-2);border-top:1px solid var(--line-soft)}
+.nt-a{display:none;overflow-wrap:break-word;padding:10px 11px 12px 36px;font-size:13px;line-height:1.7;color:var(--text-2);border-top:1px solid var(--line-soft);
+  }
 .nt.open .nt-a{display:block}
 .nt-a p{margin:0 0 8px}.nt-a b{color:var(--text)}
 .nt-a ul{margin:0 0 8px;padding-left:1.1em}.nt-a li{margin-bottom:4px}
@@ -1039,13 +1063,17 @@ body.no-notes .side,body.no-notes .dot,body.no-notes .nblock{display:none}
 body.no-notes mark{background:none;border-bottom:0;cursor:auto}
 body.no-notes mark>sup{display:none}
 body.no-notes .blk.hot .pp{border-left-color:transparent;background:none}
-body.no-notes .blk{grid-template-columns:minmax(0,1fr)}
+/* 隐藏批注只收内容，不动版面 —— 两栏网格保持原样，正文宽度不跟着变；
+   划重点的波浪线也一起收掉，回到一份干净的论文 */
+body.no-notes .key{background:none;padding-bottom:0}
+/* 批注全收起来之后，那排颜色图例（含划重点）也就没有对应物了，一起收掉 */
+body.no-notes .legend{display:none}
 @media(max-width:999px){.ep-head h1{font-size:22px}.pp{font-size:15.5px;padding-left:16px}.dot{display:none}
 .front,.ph,.eqbox,.floatbox,.refs{max-width:none;margin-left:16px}
 .arow{gap:14px}.side{padding-top:2px;margin:0 0 14px 16px}}
 
 /* ── 手机 ──
-   批注卡片插在段落之间，一屏能塞下的正文就没几行了 —— 61 条批注会把文章切成碎片。
+   批注卡片插在段落之间，一屏能塞下的正文就没几行了 —— 66 条批注会把文章切成碎片。
    所以 860 以下换一种给法：正文保持干净，点高亮从底部推上来一张卡。
    想一次看完的，顶部「展开全部批注」仍然把卡片摊回正文里。 */
 @media(max-width:859px){
@@ -1055,6 +1083,7 @@ body.no-notes .blk{grid-template-columns:minmax(0,1fr)}
   .pp{font-size:16px;line-height:1.8;padding-left:12px}
   .front,.ph,.eqbox,.floatbox,.refs{margin-left:0}
   .ep-head h1{font-size:20px}
+  .ep-meta{gap:5px 14px;margin-top:11px;font-size:12px}
   .bar .wrap{padding:8px 14px;gap:8px}
   /* 顶栏在手机上是钉住的，三行就吃掉一屏的六分之一。
      颜色图例让位 —— 每条批注自己带分类标签，不看图例也认得出 */
