@@ -197,7 +197,7 @@
 <text x="60" y="568" class="xs">↑ 第 1 个头的那 64 列。切的是投影结果，不是词向量。</text>
 <text x="60" y="586" class="xs">读作：8 个头 · 每头 4 行 · 每行 64 个数。</text><text x="450" y="586" class="shpHi" text-anchor="end">(8, 4, 64)</text>
 
-<text x="60" y="608" class="sm b">④ 打分：每个头算出一张 4 × 4 的表</text>
+<text x="60" y="608" class="sm b">④ 打分：每个头算出一张 4 × 4 的分数矩阵</text>
 <line x1="60" y1="614" x2="450" y2="614" class="thin"/>
 <text x="60" y="632" class="xs">第 i 行第 j 列 = 第 i 行的 q 点乘第 j 行的 k，</text><text x="450" y="632" class="shpW" text-anchor="end">(8, 4, 4)</text>
 <text x="60" y="650" class="xs">再除以 √64 = 8，然后每行做一次 softmax。</text>
@@ -238,7 +238,7 @@
 
 <text x="1110" y="446" class="sm b">④ 自注意力：每一行只能看自己和左边</text>
 <line x1="1110" y1="452" x2="1500" y2="452" class="thin"/>
-<text x="1110" y="470" class="xs">五行互相打分得到 5 × 5，还没轮到的格子填 −∞：</text><text x="1500" y="470" class="shpW" text-anchor="end">(8, 5, 5)</text>
+<text x="1110" y="470" class="xs">五行互相打分，分数矩阵 5 × 5，还没轮到的填 −∞：</text><text x="1500" y="470" class="shpW" text-anchor="end">(8, 5, 5)</text>
 <text x="1197" y="486" class="tiny" text-anchor="middle">&lt;bos&gt;</text>
 <text x="1231" y="486" class="tiny" text-anchor="middle">我</text>
 <text x="1265" y="486" class="tiny" text-anchor="middle">爱</text>
@@ -444,12 +444,12 @@
 <text x="1180" y="1266" class="num">恋</text>
 <rect x="1240" y="1254" width="3" height="14" rx="2" fill="#0F766E" opacity=".24"/>
 <text x="1500" y="1266" class="num" text-anchor="end">0.01</text>
-<text x="1180" y="1290" class="numS">其余 36996 个</text>
+<text x="1180" y="1290" class="numS">其余 36996</text>
 <rect x="1240" y="1278" width="9" height="14" rx="2" fill="#868D98" opacity=".35"/>
 <text x="1500" y="1290" class="num" text-anchor="end">0.04</text>
 <line x1="1170" y1="1306" x2="1500" y2="1306" class="thin"/>
 <text x="1170" y="1326" class="xs">这 37000 个数加起来等于 1。</text>
-<text x="1170" y="1352" class="xs">训练时只看「爱」那一格：概率越低，罚得越重（交叉熵）；</text>
+<text x="1170" y="1352" class="xs">训练时只用「爱」那一格：损失 = −log 0.83（交叉熵）；</text>
 <text x="1170" y="1370" class="xs">推理时按分布采样，或者直接取最大的那个。</text>
 <text x="1170" y="1396" class="xs">整张表 5 × 37000 = <tspan class="shpW">18.5 万个数</tspan>，</text>
 <text x="1170" y="1414" class="xs">是前向里最大的中间结果 —— 比 FFN 中间那层还大 18 倍。</text>
