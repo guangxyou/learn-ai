@@ -3,6 +3,15 @@ dist/
 .DS_Store
 .claude/
 
+# 只发产物和造产物的代码。设计原型、技术方案、批注生产流水线（依赖不进仓库的
+# 原始对话和候选池，没有那些输入也跑不起来）都留在本地。
+design/
+技术方案.md
+tools/extract-notes.mjs
+tools/clean-notes.mjs
+tools/make-triage.mjs
+tools/make-reader.mjs
+
 # 工作现场：414 MB 视频 + 184 MB 论文 PDF + ASR 原始返回
 # 成品已经规整进 content/，这里只留在本地做归档
 00_论文探索之旅/
@@ -14,14 +23,13 @@ Idea.txt
 02_Attention/
 0x_多模态/
 
-# 01_Transformer/ 同上，但放行几份「只此一份」的源：
-# 手画的两张全景图、66 条批注的 JSON、构建要用的两个小配置、动手前的两份工作笔记。
-# 成品页里只有它们渲染之后的样子 —— 源丢了，就只能从 1.3 MB 的 HTML 里往外抠。
-# 其余一律不进：paper-src.html（ar5iv 能重下）、notes-raw/pool/final（中间产物）、
-# raw/（完整对话记录）、versions/、paper-assets/、阅读.html（生成物）。
+# 01_Transformer/ 同上，但放行几份「只此一份」的源：手画的两张全景图、
+# 66 条批注的 JSON、构建要用的两个小配置。成品页里只有它们渲染之后的样子 ——
+# 源丢了，就只能从 1.3 MB 的 HTML 里往外抠。
+# 其余一律不进：资料搜集与交互方案（工作笔记）、paper-src.html（ar5iv 能重下）、
+# notes-raw/pool/final（中间产物）、raw/（完整对话记录）、versions/、
+# paper-assets/、figures/export/（导出的大图）、阅读.html（生成物）。
 01_Transformer/*
-!01_Transformer/00-资料搜集.md
-!01_Transformer/01-交互方案.md
 !01_Transformer/keys.json
 !01_Transformer/notes.json
 !01_Transformer/refnotes.json
