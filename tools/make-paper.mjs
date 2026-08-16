@@ -682,6 +682,43 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 
 <script>
 (function(){
+  /* 埋点 —— 跟站点其它页打同一个 /analytics（产品 learn_ai），
+     visitor_id 复用同一个 localStorage 键 la-vid，不然 UV 会把同一个人数两遍。
+     这一页是自包含的、不引 assets/app.js，所以这段是照着它抄过来的一份。
+     不引第三方脚本、不放 cookie。 */
+  var TRACK_URL='/analytics/api/events';
+  var VID=(function(){
+    try{
+      var v=localStorage.getItem('la-vid');
+      if(!v){ v=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now().toString(36));
+              localStorage.setItem('la-vid',v); }
+      return v;
+    }catch(e){ return ''; }        // 隐私模式下取不到就退回服务端的 hash(ip|ua)
+  })();
+  function track(event,extra){
+    try{
+      var d={product:'learn_ai',event:event,visitor_id:VID,
+             path:location.pathname,referrer:document.referrer};
+      for(var k in extra)d[k]=extra[k];
+      var body=JSON.stringify(d);
+      if(navigator.sendBeacon)navigator.sendBeacon(TRACK_URL,new Blob([body],{type:'application/json'}));
+      else fetch(TRACK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:body,keepalive:true});
+    }catch(e){ /* 统计失败不能影响页面 */ }
+  }
+  track('page_view');
+
+  /* 阅读进度：25/50/75/100 各打一次 —— 一篇论文全文摊在这儿，
+     光看 PV 分不出「点进来就走」和「真读完了」。 */
+  (function(){
+    var doc=document.querySelector('.paper'), hit={};
+    if(!doc)return;
+    addEventListener('scroll',function(){
+      var r=doc.getBoundingClientRect();
+      var seen=Math.min(1,Math.max(0,(innerHeight-r.top)/r.height))*100;
+      [25,50,75,100].forEach(function(m){ if(seen>=m&&!hit[m]){ hit[m]=1; track('read_progress',{detail:m+'%'}); } });
+    },{passive:true});
+  })();
+
   // 刷新后的落点交给浏览器（现在布局稳定了，恢复得准）。
   // 只处理带 #锚点 的情况：图片解码完布局会再变一次，所以 load 之后补一帧。
   function place(){
@@ -705,8 +742,10 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
             set:function(v){try{sessionStorage.setItem(VKEY,v)}catch(e){}} };
   function showView(v){
     if(v===view)return;
+    // 抽屉开着时 body 是 fixed 的，scrollY 恒为 0 —— 先关掉，记下来的位置才是真的
+    if(typeof sheet!=='undefined'&&sheet&&sheetOn())closeSheet();
     scrollAt[view]=scrollY;                      // 切走前记住位置，切回来还在原处
-    view=v; document.body.dataset.view=v; mem.set(v);
+    view=v; document.body.dataset.view=v; mem.set(v); track('tab_view',{detail:v});
     document.querySelectorAll('.tb').forEach(function(b){
       var on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
     });
@@ -727,9 +766,23 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   var sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim');
   var phone=matchMedia('(max-width:859px)');
   function sheetOn(){ return sheet.classList.contains('on'); }
+  /* 锁背景用的是 body{position:fixed}，而 body 一脱离文档流，浏览器的滚动位置就归零 ——
+     点一条批注，页面唰地弹回开头。所以把当前位置搬到 top 上（负值），视觉上原地不动；
+     关掉时先撤 fixed 再滚回去，顺序反了同样会弹。 */
+  var lockY=0;
+  function lockPage(){
+    lockY=scrollY;
+    document.body.style.top=(-lockY)+'px';
+    document.body.classList.add('sheet-open');
+  }
+  function unlockPage(){
+    document.body.classList.remove('sheet-open');
+    document.body.style.top='';
+    scrollTo(0,lockY);
+  }
   function closeSheet(){
     sheet.classList.remove('on'); scrim.classList.remove('on');
-    document.body.classList.remove('sheet-open');
+    unlockPage();
     document.querySelectorAll('mark.on').forEach(function(m){m.classList.remove('on');});
   }
   function openSheet(nt){
@@ -743,7 +796,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     sheet.querySelector('.sheet-bd').innerHTML=nt.querySelector('.nt-a').innerHTML;
     sheet.querySelector('.sheet-bd').scrollTop=0;
     sheet.classList.add('on'); scrim.classList.add('on');
-    document.body.classList.add('sheet-open');
+    lockPage();
   }
   scrim.addEventListener('click',closeSheet);
   sheet.querySelector('.sheet-x').addEventListener('click',closeSheet);
@@ -768,12 +821,15 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
       var nt=document.querySelector('.nt[data-n="'+mk.dataset.n+'"]');
       if(nt&&phone.matches&&!document.body.classList.contains('notes-inline')){
         document.querySelectorAll('mark.on').forEach(function(m){m.classList.remove('on');});
-        mk.classList.add('on'); openSheet(nt); e.preventDefault(); return;
+        mk.classList.add('on'); openSheet(nt); track('note_open',{detail:nt.dataset.n});
+        e.preventDefault(); return;
       }
       if(nt){
         var was=nt.classList.contains('open');
         document.querySelectorAll('.nt.open').forEach(function(n){if(n!==nt)openNote(n,false);});
         openNote(nt,!was);
+        // 只记从正文点开的那一次；「展开全部批注」会一口气调 66 次 openNote，不能算
+        if(!was)track('note_open',{detail:nt.dataset.n});
         if(!was)nt.scrollIntoView({block:'nearest'});
       }
       e.preventDefault(); return;
@@ -1090,7 +1146,8 @@ body.no-notes .legend{display:none}
   .legend{display:none}
   .swbox{margin-left:0}
   .sw{font-size:12px;padding:4px 10px}
-  .sheet-open{position:fixed;width:100%;overflow:hidden}
+  /* top 由 JS 写成 -scrollY，不然一 fixed 就跳回页首 */
+  .sheet-open{position:fixed;left:0;width:100%;overflow:hidden}
 }
 /* 抽屉本身不限屏宽 —— 桌面端用不到，但样式留着，窗口一窄就能接上 */
 .scrim{position:fixed;inset:0;background:rgba(20,22,26,.38);opacity:0;pointer-events:none;
