@@ -24,6 +24,7 @@
   .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
   .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
   .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .numC{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:9px;fill:#4E5560}
   .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:9px;fill:#868D98}
   .b{font-weight:600}
   .bgs{fill:#0F766E}
@@ -211,7 +212,7 @@
 <text x="60" y="788" class="sm b">⑦ FFN：四行各走各的</text>
 <line x1="60" y1="794" x2="450" y2="794" class="thin"/>
 <text x="60" y="812" class="xs">这一步四行互不相干，每行单独走 512 → 2048 → 512。</text>
-<text x="60" y="830" class="xs">中间先升维到 2048，是全程最宽的一步，</text><text x="450" y="830" class="shpW" text-anchor="end">(4, 2048)</text>
+<text x="60" y="830" class="xs">中间先升维到 2048，是输出层之前最宽的一步，</text><text x="450" y="830" class="shpW" text-anchor="end">(4, 2048)</text>
 <text x="60" y="848" class="xs">再降维回 512，然后走一遍 ⑤。</text><text x="450" y="848" class="shpHi" text-anchor="end">(4, 512)</text>
 
 <text x="60" y="876" class="sm b">⑧ 堆够 6 层，交给解码器</text>
@@ -272,11 +273,11 @@
 <text x="1175" y="536" class="tiny" text-anchor="end">爱</text>
 <text x="1175" y="552" class="tiny" text-anchor="end">你</text>
 <text x="1175" y="568" class="tiny" text-anchor="end">。</text>
-<text x="1197" y="504" class="num" text-anchor="middle">1.00</text><text x="1231" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1265" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="504" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
-<text x="1197" y="520" class="num" text-anchor="middle">0.42</text><text x="1231" y="520" class="num" text-anchor="middle">0.58</text><text x="1265" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="520" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
-<text x="1197" y="536" class="num" text-anchor="middle">0.21</text><text x="1231" y="536" class="num" text-anchor="middle">0.35</text><text x="1265" y="536" class="num" text-anchor="middle">0.44</text><text x="1299" y="536" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="536" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
-<text x="1197" y="552" class="num" text-anchor="middle">0.14</text><text x="1231" y="552" class="num" text-anchor="middle">0.22</text><text x="1265" y="552" class="num" text-anchor="middle">0.31</text><text x="1299" y="552" class="num" text-anchor="middle">0.33</text><text x="1333" y="552" class="num" text-anchor="middle" fill="#C8C3BA">−∞</text>
-<text x="1197" y="568" class="num" text-anchor="middle">0.10</text><text x="1231" y="568" class="num" text-anchor="middle">0.16</text><text x="1265" y="568" class="num" text-anchor="middle">0.22</text><text x="1299" y="568" class="num" text-anchor="middle">0.26</text><text x="1333" y="568" class="num" text-anchor="middle">0.26</text>
+<text x="1197" y="504" class="numC" text-anchor="middle">1.00</text><text x="1231" y="504" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1265" y="504" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="504" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="504" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="520" class="numC" text-anchor="middle">0.42</text><text x="1231" y="520" class="numC" text-anchor="middle">0.58</text><text x="1265" y="520" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1299" y="520" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="520" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="536" class="numC" text-anchor="middle">0.21</text><text x="1231" y="536" class="numC" text-anchor="middle">0.35</text><text x="1265" y="536" class="numC" text-anchor="middle">0.44</text><text x="1299" y="536" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text><text x="1333" y="536" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="552" class="numC" text-anchor="middle">0.14</text><text x="1231" y="552" class="numC" text-anchor="middle">0.22</text><text x="1265" y="552" class="numC" text-anchor="middle">0.31</text><text x="1299" y="552" class="numC" text-anchor="middle">0.33</text><text x="1333" y="552" class="numC" text-anchor="middle" fill="#C8C3BA">−∞</text>
+<text x="1197" y="568" class="numC" text-anchor="middle">0.10</text><text x="1231" y="568" class="numC" text-anchor="middle">0.16</text><text x="1265" y="568" class="numC" text-anchor="middle">0.22</text><text x="1299" y="568" class="numC" text-anchor="middle">0.26</text><text x="1333" y="568" class="numC" text-anchor="middle">0.26</text>
 <text x="1110" y="590" class="xs">softmax 之后灰格就是 0，每行的权重只落在左边。</text>
 
 <text x="1110" y="622" class="sm b">⑥ 交叉注意力：拿五行去问那四行</text>
@@ -448,10 +449,10 @@
 <text x="1500" y="1290" class="num" text-anchor="end">0.04</text>
 <line x1="1170" y1="1306" x2="1500" y2="1306" class="thin"/>
 <text x="1170" y="1326" class="xs">这 37000 个数加起来等于 1。</text>
-<text x="1170" y="1352" class="xs">训练时拿这一行和真实答案「爱」算交叉熵；</text>
+<text x="1170" y="1352" class="xs">训练时只看「爱」那一格：概率越低，罚得越重（交叉熵）；</text>
 <text x="1170" y="1370" class="xs">推理时按分布采样，或者直接取最大的那个。</text>
 <text x="1170" y="1396" class="xs">整张表 5 × 37000 = <tspan class="shpW">18.5 万个数</tspan>，</text>
-<text x="1170" y="1414" class="xs">是全图最大的张量 —— 比任何一个权重矩阵都大。</text>
+<text x="1170" y="1414" class="xs">是前向里最大的中间结果 —— 比 FFN 中间那层还大 18 倍。</text>
 
 <!-- ================================================================ -->
 <!-- ==================== 多头拆合 / 要点 =========================== -->
@@ -468,35 +469,35 @@
 <text x="60" y="1602" class="xs">之所以等价，是分块矩阵乘法：<tspan class="mi">X</tspan> · [ W<tspan class="sb" baseline-shift="-20%">1</tspan> | W<tspan class="sb" baseline-shift="-20%">2</tspan> | … | W<tspan class="sb" baseline-shift="-20%">8</tspan> ] = [ <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">1</tspan> | <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">2</tspan> | … | <tspan class="mi">X</tspan>W<tspan class="sb" baseline-shift="-20%">8</tspan> ]。</text>
 <text x="60" y="1622" class="xs">8 次小矩阵乘每次都要单独启动、单次规模又太小，合成一次大的更快 —— 但<tspan class="cAmber b">切的始终是投影结果，不是词向量</tspan>。</text>
 
-<text x="60" y="1654" class="sm b">拆头（投影之后、打分之前）</text>
-<rect x="60" y="1664" width="110" height="32" rx="4" class="soft"/>
-<text x="115" y="1685" class="shp" text-anchor="middle">(4, 512)</text>
-<path d="M176 1680 H 204" class="ink" marker-end="url(#a)"/>
-<text x="190" y="1673" class="tiny" text-anchor="middle">reshape</text>
-<rect x="210" y="1664" width="110" height="32" rx="4" class="soft"/>
-<text x="265" y="1685" class="shp" text-anchor="middle">(4, 8, 64)</text>
-<path d="M326 1680 H 354" class="ink" marker-end="url(#a)"/>
-<text x="340" y="1673" class="tiny" text-anchor="middle">转置</text>
-<rect x="360" y="1664" width="110" height="32" rx="4" class="acc"/>
-<text x="415" y="1685" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
+<text x="60" y="1646" class="sm b">拆头（投影之后、打分之前）</text>
+<rect x="60" y="1656" width="110" height="32" rx="4" class="soft"/>
+<text x="115" y="1677" class="shp" text-anchor="middle">(4, 512)</text>
+<path d="M176 1672 H 204" class="ink" marker-end="url(#a)"/>
+<text x="190" y="1665" class="tiny" text-anchor="middle">reshape</text>
+<rect x="210" y="1656" width="110" height="32" rx="4" class="soft"/>
+<text x="265" y="1677" class="shp" text-anchor="middle">(4, 8, 64)</text>
+<path d="M326 1672 H 354" class="ink" marker-end="url(#a)"/>
+<text x="340" y="1665" class="tiny" text-anchor="middle">转置</text>
+<rect x="360" y="1656" width="110" height="32" rx="4" class="acc"/>
+<text x="415" y="1677" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
 
-<text x="60" y="1718" class="sm b">合头（打分之后、过 W<tspan class="sb" baseline-shift="40%">O</tspan> 之前）</text>
-<rect x="60" y="1726" width="110" height="32" rx="4" class="acc"/>
-<text x="115" y="1747" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
-<path d="M176 1742 H 204" class="ink" marker-end="url(#a)"/>
-<text x="190" y="1735" class="tiny" text-anchor="middle">转置</text>
-<rect x="210" y="1726" width="110" height="32" rx="4" class="soft"/>
-<text x="265" y="1747" class="shp" text-anchor="middle">(4, 8, 64)</text>
-<path d="M326 1742 H 354" class="ink" marker-end="url(#a)"/>
-<text x="340" y="1735" class="tiny" text-anchor="middle">reshape</text>
-<rect x="360" y="1726" width="110" height="32" rx="4" class="soft"/>
-<text x="415" y="1747" class="shp" text-anchor="middle">(4, 512)</text>
+<text x="60" y="1704" class="sm b">合头（打分之后、过 W<tspan class="sb" baseline-shift="40%">O</tspan> 之前）</text>
+<rect x="60" y="1714" width="110" height="32" rx="4" class="acc"/>
+<text x="115" y="1735" class="shpHi" text-anchor="middle">(8, 4, 64)</text>
+<path d="M176 1730 H 204" class="ink" marker-end="url(#a)"/>
+<text x="190" y="1723" class="tiny" text-anchor="middle">转置</text>
+<rect x="210" y="1714" width="110" height="32" rx="4" class="soft"/>
+<text x="265" y="1735" class="shp" text-anchor="middle">(4, 8, 64)</text>
+<path d="M326 1730 H 354" class="ink" marker-end="url(#a)"/>
+<text x="340" y="1723" class="tiny" text-anchor="middle">reshape</text>
+<rect x="360" y="1714" width="110" height="32" rx="4" class="soft"/>
+<text x="415" y="1735" class="shp" text-anchor="middle">(4, 512)</text>
 
-<text x="500" y="1670" class="xs">· 元素个数从头到尾没变：</text>
-<text x="512" y="1688" class="xs">4 × 512 = 4 × 8 × 64 = 2048 个数。</text>
-<text x="500" y="1712" class="xs">· reshape 和转置都是零参数操作，</text>
-<text x="512" y="1730" class="xs">参数全在四个 512 × 512 里。</text>
-<text x="500" y="1754" class="xs">· 过完 W<tspan class="sb" baseline-shift="40%">O</tspan>，8 个头的结果才混在一起。</text>
+<text x="500" y="1660" class="xs">· 元素个数从头到尾没变：</text>
+<text x="512" y="1678" class="xs">4 × 512 = 4 × 8 × 64 = 2048 个数。</text>
+<text x="500" y="1702" class="xs">· reshape 和转置都是零参数操作，</text>
+<text x="512" y="1720" class="xs">参数全在四个 512 × 512 里。</text>
+<text x="500" y="1744" class="xs">· 过完 W<tspan class="sb" baseline-shift="40%">O</tspan>，8 个头的结果才混在一起。</text>
 
 <rect x="780" y="1440" width="740" height="320" rx="12" class="panel"/>
 <text x="800" y="1466" class="ph">四个容易搞混的地方</text>
