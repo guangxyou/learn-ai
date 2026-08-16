@@ -1,6 +1,6 @@
 /**
  * 内容解析：Markdown 素材 → 结构化数据。
- * 规则与 design/extract.py 一致（原型先在 Python 里跑通，这里是直译）。
+ * 规则先在本地原型的 Python 版里跑通，这里是直译（原型不进仓库）。
  */
 
 export const t2s = (ts) => {
