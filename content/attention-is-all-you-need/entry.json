@@ -29,7 +29,7 @@
       "--refnotes",
       "01_Transformer/refnotes.json",
       "--posters",
-      "01_Transformer/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#一张图铺开整个架构：每个模块怎么算、公式长什么样、张量什么形状，右侧还有训练配置和 Table 1 的对照。,01_Transformer/figures/transformer-shape-walkthrough.svg#维度变化#把「I love you.」翻成「我爱你。」，从 token 进模型到概率出结果，每一步的形状变化走一遍。"
+      "01_Transformer/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,01_Transformer/figures/transformer-shape-walkthrough.svg#示例#"
     ]
   },
   "page": "page.html"
