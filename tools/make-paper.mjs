@@ -881,7 +881,8 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .src-flag{margin-left:auto;font-size:12px;color:var(--text-3);border:1px solid var(--line);background:var(--bg-elev);padding:3px 9px;border-radius:var(--r-full)}
 .ep-head{padding:30px 0 8px;max-width:900px}
 .ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
-.ep-kicker .topic{background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+/* flex:none —— 不然窄屏上后半段挤过来，药丸会被压得从「论文」中间断成两行 */
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
 .ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
 .ep-head h1 em{display:block;font-style:normal;font-size:16.5px;font-weight:400;color:var(--text-2);margin-top:8px}
 .ep-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:13px;font-size:13px;color:var(--text-3)}
@@ -1131,6 +1132,8 @@ body.no-notes .legend{display:none}
   .pp{font-size:16px;line-height:1.8;padding-left:12px}
   .front,.ph,.eqbox,.floatbox,.refs{margin-left:0}
   .ep-head h1{font-size:20px}
+  /* 出处那行在手机上要折两行，药丸跟着居中会飘到中间，顶对齐才像个标签 */
+  .ep-kicker{align-items:flex-start;gap:8px}
   .ep-meta{gap:5px 14px;margin-top:11px;font-size:12px}
   .bar .wrap{padding:8px 14px;gap:8px}
   /* 顶栏在手机上是钉住的，三行就吃掉一屏的六分之一。
