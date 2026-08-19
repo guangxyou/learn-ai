@@ -565,7 +565,8 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
   const chars = notes.reduce((n, x) => n + words(x.q) + words(x.a), 0);
   const figs = notes.reduce((n, x) => n + (String(x.a || '').match(/<svg\b/gi) || []).length, 0);
   const meta = `<div class="ep-meta" data-chars="${chars}">` + [
-    [notes.length, ' 条批注'], [wan(chars), '字'], [figs, ' 张插图'],
+    // 「万字」整个留在常规体里，别让粗细断在词中间
+    [notes.length, ' 条批注'], [wan(chars).split(' ')[0], ' ' + (wan(chars).split(' ')[1] || '') + '字'], [figs, ' 张插图'],
   ].map(([n, k]) => `<span><b>${n}</b>${k}</span>`).join('') + '</div>';
 
   // 全景图不进正文 —— 它有 1560 宽，跟正文抢版面就会压到目录上。

@@ -55,8 +55,10 @@ async function buildPaper({ dir, id, entry, base, dist }) {
   // 这里只把它读出来 —— 卡片上的数和页面标题下那行数，同一个来源。
   const chars = +(html.match(/class="ep-meta" data-chars="(\d+)"/) || [, 0])[1];
   console.log(`[build] ${id} · ${notes} 条批注 / ${chars} 字 / ${figs} 张图 / ${(html.length / 1048576).toFixed(1)} MB`);
-  // 跟页面标题下那行同一个写法：数在前，量词在后
-  return { ...entry, outputs: [`<b>${notes}</b> 条批注`, `<b>${wan(chars)}</b>字`, `<b>${figs}</b> 张插图`] };
+  // 跟页面标题下那行同一个写法：数在前，量词在后。
+  // 「万字」要整个留在常规体里 —— 断成 <b>3.1 万</b>字，粗细变化落在词中间，看着像空了一格。
+  const w = wan(chars).split(' ');                 // ['3.1','万'] 或 ['8500']
+  return { ...entry, outputs: [`<b>${notes}</b> 条批注`, `<b>${w[0]}</b> ${w[1] || ''}字`, `<b>${figs}</b> 张插图`] };
 }
 
 async function build() {
