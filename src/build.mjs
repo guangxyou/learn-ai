@@ -44,9 +44,13 @@ async function buildPaper({ dir, id, entry, base, dist }) {
 
   const html = (await readFile(page, 'utf8'))
     .replaceAll('__HOME__', `${base}/`)
-    .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`);
+    .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`)
+    .replaceAll('__ASSETS__', `${base}/${id}/assets`);
   await mkdir(j(dist, id), { recursive: true });
   await writeFile(j(dist, id, 'index.html'), html, 'utf8');
+
+  // 页里的图能内联的都内联了，只有资源 tab 那批截图是外链 —— 整个 assets/ 原样带过去
+  if (existsSync(j(dir, 'assets'))) await cp(j(dir, 'assets'), j(dist, id, 'assets'), { recursive: true });
 
   const n = (re) => (html.match(re) || []).length;
   const notes = n(/<div class="nt" data-n=/g);

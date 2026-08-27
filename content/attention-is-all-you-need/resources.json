@@ -1,0 +1,89 @@
+{
+  "note": "读这篇论文时看过、并且值得回头再看的外部材料。播放器点了才会加载，章节点一下直接跳到那一段。视频用 B 站的官方双语版（国内能打开），标题指回 YouTube 原片。",
+  "videos": [
+    {
+      "title": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
+      "zh": "先把整台机器摆出来：从「预测下一个词」一路讲到 embedding、unembedding 和 softmax 温度",
+      "yt": "wjZofJX0v4M",
+      "bv": "BV13z421U7cs",
+      "date": "2024-04-02",
+      "article": "https://www.3blue1brown.com/lessons/gpt/",
+      "chapters": [
+        ["0:00", "Predict, sample, repeat"],
+        ["3:03", "Inside a transformer"],
+        ["6:36", "Chapter layout"],
+        ["7:20", "The premise of Deep Learning"],
+        ["12:27", "Word embeddings"],
+        ["18:25", "Embeddings beyond words"],
+        ["20:22", "Unembedding"],
+        ["22:22", "Softmax with temperature"],
+        ["26:03", "Up next"]
+      ],
+      "shots": [
+        ["00-transformer-00-components", "Transformer", "components"],
+        ["00-transformer-01-attention-and-mlp-layers", "Transformer", "attention and mlp layers"],
+        ["01-embedding-00-vocabe", "Embedding", "vocab"],
+        ["01-embedding-01-words-embedding-to-vectors", "Embedding", "words embedding to vectors"],
+        ["01-embedding-02-queen-king-women-man", "Embedding", "queen = king + women − man"],
+        ["04-unembedding-00-only-the-last-vector-used-for-predict-next-token", "Unembedding", "only the last vector used for predict next token"],
+        ["04-unembedding-01-unembedding-matrix", "Unembedding", "unembedding matrix"],
+        ["04-unembedding-02-softmax-with-temperature", "Unembedding", "softmax with temperature"],
+        ["05-gpt-3-total-weights", "GPT-3", "total weights"]
+      ]
+    },
+    {
+      "title": "Attention in transformers, step-by-step | Deep Learning Chapter 6",
+      "zh": "这一集就是本文第 3 节：注意力模式怎么来的，mask、value、多头、输出矩阵挨个拆",
+      "yt": "eMlx5fFNoYc",
+      "bv": "BV1TZ421j7Ke",
+      "date": "2024-04-07",
+      "article": "https://www.3blue1brown.com/lessons/attention",
+      "chapters": [
+        ["0:00", "Recap on embeddings"],
+        ["1:39", "Motivating examples"],
+        ["4:29", "The attention pattern"],
+        ["11:08", "Masking"],
+        ["12:42", "Context size"],
+        ["13:10", "Values"],
+        ["15:44", "Counting parameters"],
+        ["18:21", "Cross-attention"],
+        ["19:19", "Multiple heads"],
+        ["22:16", "The output matrix"],
+        ["23:19", "Going deeper"],
+        ["24:54", "Ending"]
+      ],
+      "shots": [
+        ["02-attention-00-query-key-value-matrix", "Attention", "query key value matrix"],
+        ["02-attention-01-dot-product-mesure-how-well-two-vectors-align", "Attention", "dot product measures how well two vectors align"],
+        ["02-attention-02-query-and-key-dot-product", "Attention", "query and key dot product"],
+        ["02-attention-03-softmax-dot-product-result", "Attention", "softmax dot product result"],
+        ["02-attention-04-how-softmax", "Attention", "how softmax"],
+        ["02-attention-05-multiply-value", "Attention", "multiply value"],
+        ["02-attention-06-add-changes-to-embeddings", "Attention", "add changes to embeddings"],
+        ["02-attention-07-multi-headed-attention", "Attention", "multi-headed attention"],
+        ["02-attention-08-multi-headed-attention", "Attention", "multi-headed attention"]
+      ]
+    },
+    {
+      "title": "How might LLMs store facts | Deep Learning Chapter 7",
+      "zh": "论文里一句话带过的 FFN，这一集单独讲：事实可能就存在这两层里",
+      "yt": "9-Jl0dxWQs8",
+      "bv": "BV1aTxMehEjK",
+      "date": "2024-08-31",
+      "article": "https://www.3blue1brown.com/lessons/mlp/",
+      "chapters": [
+        ["0:00", "Where facts in LLMs live"],
+        ["2:15", "Quick refresher on transformers"],
+        ["4:39", "Assumptions for our toy example"],
+        ["6:07", "Inside a multilayer perceptron"],
+        ["15:38", "Counting parameters"],
+        ["17:04", "Superposition"],
+        ["21:37", "Up next"]
+      ],
+      "shots": [
+        ["03-mlp-00-one-token", "MLP", "one token"],
+        ["03-mlp-01-token-parallel-computing", "MLP", "token parallel computing"]
+      ]
+    }
+  ]
+}

@@ -441,7 +441,7 @@ function wrapText(html, text, open, close, pre) {
 
 /* ══════════════════ 三、出页面 ══════════════════ */
 
-function render(doc, notes, loose, refnotes = {}, posters = []) {
+function render(doc, notes, loose, refnotes = {}, posters = [], res = null) {
   const secs = [];
   const parts = [];
 
@@ -576,7 +576,49 @@ function render(doc, notes, loose, refnotes = {}, posters = []) {
     + (pg.note ? `<p class="area-note">${esc(pg.note)}</p>` : '')
     + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div></div>`).join('');
 
-  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters, views);
+  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters, views + resView(res), !!res);
+}
+
+/** 资源 tab：站外的视频、文章。内容全在 content/<条目>/resources.json 里，
+ *  这里只负责摆版。播放器主源用 B 站官方双语版 —— 国内直连 0.2s，YouTube 从国内
+ *  打不开，嵌了也只是个灰框；标题仍然指回 YouTube 原片当出处。
+ *  仍然不预加载：进页面谁都不碰，封面用自己截的图，点了才现建 iframe。
+ *  章节跳转靠重建 iframe 带 t=秒数（B 站和 YouTube 都认这个参数）—— 换 IFrame
+ *  Player API 能做到不重新缓冲，但得引第三方脚本，这一页不引。
+ *  时间戳两边通用：B 站官方那版简介里带的就是同一份时间轴，核对过。 */
+function resView(res) {
+  if (!res) return '';
+  const secs = (t) => t.split(':').reduce((a, b) => a * 60 + +b, 0);
+  const card = (v) => {
+    const chaps = v.chapters.map(([t, label]) =>
+      `<li><button type="button" class="vch" data-t="${secs(t)}"><b>${t}</b>${esc(label)}</button></li>`).join('');
+    const shots = (v.shots || []).map(([f, g, cap]) =>
+      `<figure class="shot"><img src="__ASSETS__/3b1b/${f}-t.jpg" data-full="__ASSETS__/3b1b/${f}.jpg"`
+      + ` alt="${esc(cap)}" loading="lazy" decoding="async">`
+      + `<figcaption><i>${esc(g)}</i>${esc(cap)}</figcaption></figure>`).join('');
+    const cover = v.shots && v.shots.length ? `__ASSETS__/3b1b/${v.shots[0][0]}-t.jpg` : '';
+    return `<article class="vcard" data-yt="${esc(v.yt)}"${v.bv ? ` data-bv="${esc(v.bv)}"` : ''}>
+      <div class="vhd">
+        <h4><a href="https://www.youtube.com/watch?v=${esc(v.yt)}" target="_blank" rel="noreferrer">${esc(v.title)} ↗</a></h4>
+        ${v.zh ? `<p class="vzh">${esc(v.zh)}</p>` : ''}
+        <p class="vmeta"><span class="vsrc">3Blue1Brown</span><time>${esc(v.date)}</time>
+          <a href="${esc(v.article)}" target="_blank" rel="noreferrer">配套文章 ↗</a>
+          ${v.bv ? `<a href="https://www.bilibili.com/video/${esc(v.bv)}" target="_blank" rel="noreferrer">B 站官方双语 ↗</a>` : ''}</p>
+      </div>
+      <div class="vbody">
+        <div class="vwrap"><button class="vplay" type="button" aria-label="加载并播放"
+          ${cover ? `style="background-image:url(${cover})"` : ''}><span class="vtri"></span>
+          <span class="vlab">点这里才会去加载${v.bv ? ' B 站播放器' : ' YouTube'}</span></button></div>
+        <ol class="vchap">${chaps}</ol>
+      </div>
+      ${shots ? `<details class="vshots"><summary>看的时候截的 ${v.shots.length} 张<span>点开看大图</span></summary>
+        <div class="shots">${shots}</div></details>` : ''}
+    </article>`;
+  };
+  return `<div class="resview" id="view-res">
+    ${res.note ? `<p class="area-note">${esc(res.note)}</p>` : ''}
+    <section class="res-sec"><h3 class="res-h">视频<span>3Blue1Brown · Neural networks</span></h3>
+    ${(res.videos || []).map(card).join('')}</section></div>`;
 }
 
 /** 一条参考文献：可展开，里面是简述 + 本文引用它的原句 */
@@ -629,7 +671,7 @@ function blk(b) {
   </div>`;
 }
 
-function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '') {
+function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false) {
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -655,6 +697,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
     ${posters.map((pg, i) =>
       `<button class="tb" type="button" role="tab" data-v="map-${i + 1}" aria-selected="false">${esc(pg.label)}</button>`).join('')}
+    ${hasRes ? `<button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>` : ''}
   </div>
   <div class="legend">
     ${Object.entries(KINDS).map(([k, v]) =>
@@ -672,6 +715,8 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   <div class="paper">${body}</div>
   ${views}
 </div>
+
+<div class="lb" id="lightbox"><figure><img alt=""><figcaption></figcaption></figure></div>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
@@ -747,6 +792,9 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     if(typeof sheet!=='undefined'&&sheet&&sheetOn())closeSheet();
     scrollAt[view]=scrollY;                      // 切走前记住位置，切回来还在原处
     view=v; document.body.dataset.view=v; mem.set(v); track('tab_view',{detail:v});
+    document.querySelectorAll('.mapview,.resview').forEach(function(el){
+      el.classList.toggle('on', el.id==='view-'+v);
+    });
     document.querySelectorAll('.tb').forEach(function(b){
       var on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on));
     });
@@ -762,6 +810,48 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     var a=e.target.closest('a[href^="#map-"]'); if(a){showView(a.getAttribute('href').slice(1));}
   });
   if(/^#map-\d/.test(location.hash))showView(location.hash.slice(1));
+
+  /* ---- 资源 tab：iframe 点了才建，章节按钮直接跳到那一秒 ---- */
+  document.querySelectorAll('.vcard').forEach(function(card){
+    var bv=card.dataset.bv, id=card.dataset.yt, wrap=card.querySelector('.vwrap');
+    function play(t){
+      var f=wrap.querySelector('iframe');
+      if(!f){
+        f=document.createElement('iframe');
+        f.allow='accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture';
+        f.setAttribute('allowfullscreen',''); f.setAttribute('title',bv?'哔哩哔哩':'YouTube');
+        f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        f.setAttribute('scrolling','no'); f.setAttribute('frameborder','0');
+        wrap.innerHTML=''; wrap.appendChild(f);
+      }
+      f.src = bv
+        ? 'https://player.bilibili.com/player.html?bvid='+bv+'&p=1&autoplay=1&high_quality=1&danmaku=0&t='+(t||0)
+        : 'https://www.youtube-nocookie.com/embed/'+id+'?rel=0&autoplay=1&start='+(t||0);
+      track('res_play',{detail:(bv||id)+'@'+(t||0)});
+    }
+    var btn=card.querySelector('.vplay');
+    if(btn)btn.addEventListener('click',function(){play(0);});
+    card.querySelectorAll('.vch').forEach(function(b){
+      b.addEventListener('click',function(){
+        play(+b.dataset.t);
+        card.querySelectorAll('.vch').forEach(function(x){x.classList.toggle('on',x===b);});
+      });
+    });
+  });
+
+  /* ---- 截图灯箱 ---- */
+  var lb=document.getElementById('lightbox');
+  if(lb){
+    document.addEventListener('click',function(e){
+      var im=e.target.closest('.shot img');
+      if(im){ var big=lb.querySelector('img');
+              big.src=im.dataset.full; big.alt=im.alt;
+              lb.querySelector('figcaption').textContent=im.alt;
+              lb.classList.add('on'); track('res_shot',{detail:im.dataset.full.split('/').pop()}); return; }
+      if(lb.classList.contains('on'))lb.classList.remove('on');
+    });
+    addEventListener('keydown',function(e){ if(e.key==='Escape')lb.classList.remove('on'); });
+  }
 
   /* ---- 手机：批注从底部推上来 ---- */
   var sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim');
@@ -925,12 +1015,80 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .mapview .pcap{display:flex;gap:12px;align-items:baseline;margin:12px 0 0;
   font-size:12.5px;color:var(--text-3)}
 .phint{margin-left:auto;white-space:nowrap}
-body[data-view="map-1"] #view-map-1,body[data-view="map-2"] #view-map-2{display:block}
-/* 看图时正文、目录、批注开关都收起来 */
+/* 哪个视图显示，交给 JS 打的 .on —— tab 是按数据生成的，这里不写死几张图 */
+.mapview.on,.resview.on{display:block}
+/* 看图 / 看资源时正文、目录、批注开关都收起来 */
 body[data-view^="map"] .toc,body[data-view^="map"] .paper,
-body[data-view^="map"] .legend,body[data-view^="map"] .swbox{display:none}
+body[data-view^="map"] .legend,body[data-view^="map"] .swbox,
+body[data-view="res"] .toc,body[data-view="res"] .paper,
+body[data-view="res"] .legend,body[data-view="res"] .swbox{display:none}
 /* 正文要 26px 的天头，图不要 —— 图自己已经有一圈留白，两份叠起来就空出一条 */
-body[data-view^="map"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px}
+body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px}
+
+/* ══ 资源 tab ══ */
+.resview{display:none}
+.resview .area-note{margin:0 0 20px;max-width:760px}
+.res-sec{max-width:1040px}
+.res-h{font-size:13px;color:var(--text-3);font-weight:600;letter-spacing:.04em;
+  display:flex;align-items:baseline;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.res-h span{font-weight:400;font-size:12px;color:var(--text-3)}
+.vcard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);
+  padding:18px 20px;margin-top:18px}
+.vhd h4{font-size:16px;line-height:1.4}
+.vhd h4 a:hover{color:var(--accent)}
+.vzh{margin:7px 0 0;font-size:13.5px;color:var(--text-2);line-height:1.6}
+.vmeta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:9px 0 0;
+  font-size:12.5px;color:var(--text-3)}
+.vmeta .vsrc{background:var(--accent-soft);color:var(--accent-ink);font-weight:600;
+  padding:2px 9px;border-radius:var(--r-full)}
+.vmeta time{font-variant-numeric:tabular-nums}
+.vmeta a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.vmeta a:hover{color:var(--accent);border-color:var(--accent-line)}
+.vbody{display:grid;gap:16px;margin-top:15px}
+@media(min-width:820px){.vbody{grid-template-columns:minmax(0,1.35fr) minmax(240px,1fr)}}
+.vwrap{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;
+  background:var(--bg-sunken);border:1px solid var(--line)}
+.vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vplay{position:absolute;inset:0;width:100%;height:100%;padding:0;cursor:pointer;
+  background-size:cover;background-position:center;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px}
+.vplay::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.45);transition:background .15s}
+.vplay:hover::before{background:rgba(20,22,26,.32)}
+.vtri{position:relative;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.94);
+  box-shadow:0 2px 12px rgba(20,22,26,.3)}
+.vtri::after{content:"";position:absolute;top:50%;left:52%;transform:translate(-50%,-50%);
+  border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.vlab{position:relative;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.vchap{margin:0;padding:0;list-style:none;max-height:min(46vh,320px);overflow:auto;
+  overscroll-behavior:contain;border:1px solid var(--line-soft);border-radius:var(--r-sm)}
+.vchap li+li{border-top:1px solid var(--line-soft)}
+.vchap button{display:flex;gap:10px;width:100%;padding:7px 11px;font-size:12.5px;
+  color:var(--text-2);line-height:1.45}
+.vchap button b{flex:none;font:12px/1.45 var(--mono);color:var(--accent);font-weight:600;
+  font-variant-numeric:tabular-nums}
+.vchap button:hover{background:var(--bg-hover);color:var(--text)}
+.vchap button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.vchap button.on b{color:var(--accent-ink)}
+.vshots{margin-top:15px;border-top:1px solid var(--line-soft);padding-top:12px}
+.vshots summary{cursor:pointer;font-size:12.5px;color:var(--text-2);display:flex;gap:8px;align-items:baseline}
+.vshots summary span{font-size:11.5px;color:var(--text-3)}
+.vshots summary:hover{color:var(--accent)}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;
+  border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:var(--bg-sunken)}
+.shot img:hover{border-color:var(--accent-line)}
+/* 缩略图统一裁成一个比例，这一排的说明才在同一条线上；点开是没裁过的原图 */
+.shot figcaption{margin-top:5px;text-align:left;font-size:11.5px;color:var(--text-3);line-height:1.45}
+.shot figcaption i{display:block;font-style:normal;font-size:10.5px;color:var(--accent);
+  letter-spacing:.03em;font-weight:600}
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.86);display:none;
+  align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;
+  flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:12.5px;color:rgba(255,255,255,.78);text-align:center}
 .toc{display:none}
 @media(min-width:1000px){.toc{display:block;position:sticky;top:calc(var(--topbar-h) + 54px);align-self:start;max-height:calc(100vh - 150px);overflow:auto}}
 .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
@@ -1216,7 +1374,12 @@ const posters = (o.posters || '').split(',').filter(Boolean).map((spec) => {
 });
 if (posters.length) console.log(`· 全景图 ${posters.length} 张：${posters.map((p) => p.title).join(' / ')}`);
 
-const html = render(doc, notes, loose, refnotes, posters);
+// 资源 tab：--res resources.json（视频 / 文章），没有就不出这个 tab
+const res = o.res && existsSync(o.res) ? JSON.parse(readFileSync(o.res, 'utf8')) : null;
+if (res) console.log(`· 资源 ${res.videos.length} 个视频，`
+  + `${res.videos.reduce((n, v) => n + (v.shots || []).length, 0)} 张截图`);
+
+const html = render(doc, notes, loose, refnotes, posters, res);
 mkdirSync(dirname(o.out), { recursive: true });
 writeFileSync(o.out, html);
 console.log(`✓ ${o.out}（${(html.length / 1024 / 1024).toFixed(1)} MB）`);

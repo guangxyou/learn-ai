@@ -29,7 +29,9 @@
       "--refnotes",
       "content/attention-is-all-you-need/refnotes.json",
       "--posters",
-      "content/attention-is-all-you-need/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,content/attention-is-all-you-need/figures/transformer-shape-walkthrough.svg#示例#"
+      "content/attention-is-all-you-need/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,content/attention-is-all-you-need/figures/attention-shapes.svg#形状#,content/attention-is-all-you-need/figures/transformer-shape-walkthrough.svg#示例#",
+      "--res",
+      "content/attention-is-all-you-need/resources.json"
     ]
   },
   "page": "page.html"
