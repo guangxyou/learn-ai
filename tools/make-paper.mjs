@@ -607,11 +607,10 @@ function resView(res) {
       </div>
       <div class="vbody">
         <div class="vwrap"><button class="vplay" type="button" aria-label="加载并播放"
-          ${cover ? `style="background-image:url(${cover})"` : ''}><span class="vtri"></span>
-          <span class="vlab">点这里才会去加载${v.bv ? ' B 站播放器' : ' YouTube'}</span></button></div>
+          ${cover ? `style="background-image:url(${cover})"` : ''}><span class="vtri"></span></button></div>
         <ol class="vchap">${chaps}</ol>
       </div>
-      ${shots ? `<details class="vshots"><summary>看的时候截的 ${v.shots.length} 张<span>点开看大图</span></summary>
+      ${shots ? `<details class="vshots"><summary>相关截图<span>点开看大图</span></summary>
         <div class="shots">${shots}</div></details>` : ''}
     </article>`;
   };
@@ -1028,7 +1027,7 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
 /* ══ 资源 tab ══ */
 .resview{display:none}
 .resview .area-note{margin:0 0 20px;max-width:760px}
-.res-sec{max-width:1040px}
+.res-sec{max-width:1040px;margin-top:10px}
 .res-h{font-size:13px;color:var(--text-3);font-weight:600;letter-spacing:.04em;
   display:flex;align-items:baseline;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
 .res-h span{font-weight:400;font-size:12px;color:var(--text-3)}
@@ -1050,15 +1049,14 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
   background:var(--bg-sunken);border:1px solid var(--line)}
 .vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vplay{position:absolute;inset:0;width:100%;height:100%;padding:0;cursor:pointer;
-  background-size:cover;background-position:center;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:12px}
+  background-size:cover;background-position:center;display:flex;
+  align-items:center;justify-content:center}
 .vplay::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.45);transition:background .15s}
 .vplay:hover::before{background:rgba(20,22,26,.32)}
 .vtri{position:relative;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.94);
   box-shadow:0 2px 12px rgba(20,22,26,.3)}
 .vtri::after{content:"";position:absolute;top:50%;left:52%;transform:translate(-50%,-50%);
   border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
-.vlab{position:relative;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .vchap{margin:0;padding:0;list-style:none;max-height:min(46vh,320px);overflow:auto;
   overscroll-behavior:contain;border:1px solid var(--line-soft);border-radius:var(--r-sm)}
 .vchap li+li{border-top:1px solid var(--line-soft)}
