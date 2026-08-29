@@ -250,7 +250,7 @@
     },
     {
       "title": "Visualizing transformers and attention | Talk for TNG Big Tech Day '24",
-      "zh": "Grant Sanderson 在 TNG Big Tech Day '24 上的演讲，一小时把 Transformer 从头讲到尾，重点在注意力那一段，内容和上面三集有重叠。B 站没有搬运，只有 YouTube 原片。",
+      "zh": "Grant Sanderson 在 TNG Big Tech Day '24 上的演讲，一小时把 Transformer 从头讲到尾，重点在注意力那一段，内容和上面三集有重叠。",
       "yt": "KJtZARuO3JY",
       "author": "Grant Sanderson",
       "date": "2024-11-20",
@@ -320,7 +320,6 @@
           "Q&A"
         ]
       ],
-      "chapnote": "章节是把评论区那份逐条时间轴合并过的，原版更细",
       "shots": [
         [
           "06-talk-00-why-not-just-break-it-to-characters",
