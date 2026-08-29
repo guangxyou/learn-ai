@@ -2,86 +2,346 @@
   "videos": [
     {
       "title": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
-      "zh": "先把整台机器摆出来：从「预测下一个词」一路讲到 embedding、unembedding 和 softmax 温度",
+      "zh": "讲 GPT 这类模型的整体结构：token 怎么变成向量，最后一层怎么把向量变回下一个词的概率分布，以及 softmax 的温度参数是什么。",
       "yt": "wjZofJX0v4M",
       "bv": "BV13z421U7cs",
       "date": "2024-04-02",
       "article": "https://www.3blue1brown.com/lessons/gpt/",
       "chapters": [
-        ["0:00", "Predict, sample, repeat"],
-        ["3:03", "Inside a transformer"],
-        ["6:36", "Chapter layout"],
-        ["7:20", "The premise of Deep Learning"],
-        ["12:27", "Word embeddings"],
-        ["18:25", "Embeddings beyond words"],
-        ["20:22", "Unembedding"],
-        ["22:22", "Softmax with temperature"],
-        ["26:03", "Up next"]
+        [
+          "0:00",
+          "Predict, sample, repeat"
+        ],
+        [
+          "3:03",
+          "Inside a transformer"
+        ],
+        [
+          "6:36",
+          "Chapter layout"
+        ],
+        [
+          "7:20",
+          "The premise of Deep Learning"
+        ],
+        [
+          "12:27",
+          "Word embeddings"
+        ],
+        [
+          "18:25",
+          "Embeddings beyond words"
+        ],
+        [
+          "20:22",
+          "Unembedding"
+        ],
+        [
+          "22:22",
+          "Softmax with temperature"
+        ],
+        [
+          "26:03",
+          "Up next"
+        ]
       ],
       "shots": [
-        ["00-transformer-00-components", "Transformer", "components"],
-        ["00-transformer-01-attention-and-mlp-layers", "Transformer", "attention and mlp layers"],
-        ["01-embedding-00-vocabe", "Embedding", "vocab"],
-        ["01-embedding-01-words-embedding-to-vectors", "Embedding", "words embedding to vectors"],
-        ["01-embedding-02-queen-king-women-man", "Embedding", "queen = king + women − man"],
-        ["04-unembedding-00-only-the-last-vector-used-for-predict-next-token", "Unembedding", "only the last vector used for predict next token"],
-        ["04-unembedding-01-unembedding-matrix", "Unembedding", "unembedding matrix"],
-        ["04-unembedding-02-softmax-with-temperature", "Unembedding", "softmax with temperature"],
-        ["05-gpt-3-total-weights", "GPT-3", "total weights"]
+        [
+          "00-transformer-00-components",
+          "Transformer",
+          "components"
+        ],
+        [
+          "00-transformer-01-attention-and-mlp-layers",
+          "Transformer",
+          "attention and mlp layers"
+        ],
+        [
+          "01-embedding-00-vocabe",
+          "Embedding",
+          "vocab"
+        ],
+        [
+          "01-embedding-01-words-embedding-to-vectors",
+          "Embedding",
+          "words embedding to vectors"
+        ],
+        [
+          "01-embedding-02-queen-king-women-man",
+          "Embedding",
+          "queen = king + women − man"
+        ],
+        [
+          "04-unembedding-00-only-the-last-vector-used-for-predict-next-token",
+          "Unembedding",
+          "only the last vector used for predict next token"
+        ],
+        [
+          "04-unembedding-01-unembedding-matrix",
+          "Unembedding",
+          "unembedding matrix"
+        ],
+        [
+          "04-unembedding-02-softmax-with-temperature",
+          "Unembedding",
+          "softmax with temperature"
+        ],
+        [
+          "05-gpt-3-total-weights",
+          "GPT-3",
+          "total weights"
+        ]
       ]
     },
     {
       "title": "Attention in transformers, step-by-step | Deep Learning Chapter 6",
-      "zh": "这一集就是本文第 3 节：注意力模式怎么来的，mask、value、多头、输出矩阵挨个拆",
+      "zh": "讲注意力机制本身：注意力模式是怎么算出来的，以及掩码、值矩阵、参数量、交叉注意力、多头和输出矩阵。",
       "yt": "eMlx5fFNoYc",
       "bv": "BV1TZ421j7Ke",
       "date": "2024-04-07",
       "article": "https://www.3blue1brown.com/lessons/attention",
       "chapters": [
-        ["0:00", "Recap on embeddings"],
-        ["1:39", "Motivating examples"],
-        ["4:29", "The attention pattern"],
-        ["11:08", "Masking"],
-        ["12:42", "Context size"],
-        ["13:10", "Values"],
-        ["15:44", "Counting parameters"],
-        ["18:21", "Cross-attention"],
-        ["19:19", "Multiple heads"],
-        ["22:16", "The output matrix"],
-        ["23:19", "Going deeper"],
-        ["24:54", "Ending"]
+        [
+          "0:00",
+          "Recap on embeddings"
+        ],
+        [
+          "1:39",
+          "Motivating examples"
+        ],
+        [
+          "4:29",
+          "The attention pattern"
+        ],
+        [
+          "11:08",
+          "Masking"
+        ],
+        [
+          "12:42",
+          "Context size"
+        ],
+        [
+          "13:10",
+          "Values"
+        ],
+        [
+          "15:44",
+          "Counting parameters"
+        ],
+        [
+          "18:21",
+          "Cross-attention"
+        ],
+        [
+          "19:19",
+          "Multiple heads"
+        ],
+        [
+          "22:16",
+          "The output matrix"
+        ],
+        [
+          "23:19",
+          "Going deeper"
+        ],
+        [
+          "24:54",
+          "Ending"
+        ]
       ],
       "shots": [
-        ["02-attention-00-query-key-value-matrix", "Attention", "query key value matrix"],
-        ["02-attention-01-dot-product-mesure-how-well-two-vectors-align", "Attention", "dot product measures how well two vectors align"],
-        ["02-attention-02-query-and-key-dot-product", "Attention", "query and key dot product"],
-        ["02-attention-03-softmax-dot-product-result", "Attention", "softmax dot product result"],
-        ["02-attention-04-how-softmax", "Attention", "how softmax"],
-        ["02-attention-05-multiply-value", "Attention", "multiply value"],
-        ["02-attention-06-add-changes-to-embeddings", "Attention", "add changes to embeddings"],
-        ["02-attention-07-multi-headed-attention", "Attention", "multi-headed attention"],
-        ["02-attention-08-multi-headed-attention", "Attention", "multi-headed attention"]
+        [
+          "02-attention-00-query-key-value-matrix",
+          "Attention",
+          "query key value matrix"
+        ],
+        [
+          "02-attention-01-dot-product-mesure-how-well-two-vectors-align",
+          "Attention",
+          "dot product measures how well two vectors align"
+        ],
+        [
+          "02-attention-02-query-and-key-dot-product",
+          "Attention",
+          "query and key dot product"
+        ],
+        [
+          "02-attention-03-softmax-dot-product-result",
+          "Attention",
+          "softmax dot product result"
+        ],
+        [
+          "02-attention-04-how-softmax",
+          "Attention",
+          "how softmax"
+        ],
+        [
+          "02-attention-05-multiply-value",
+          "Attention",
+          "multiply value"
+        ],
+        [
+          "02-attention-06-add-changes-to-embeddings",
+          "Attention",
+          "add changes to embeddings"
+        ],
+        [
+          "02-attention-07-multi-headed-attention",
+          "Attention",
+          "multi-headed attention"
+        ],
+        [
+          "02-attention-08-multi-headed-attention",
+          "Attention",
+          "multi-headed attention"
+        ]
       ]
     },
     {
       "title": "How might LLMs store facts | Deep Learning Chapter 7",
-      "zh": "论文里一句话带过的 FFN，这一集单独讲：事实可能就存在这两层里",
+      "zh": "讲 Transformer 里的 MLP（前馈）子层，以及事实可能以什么形式存在这些参数里，最后讲到叠加（superposition）。",
       "yt": "9-Jl0dxWQs8",
       "bv": "BV1aTxMehEjK",
       "date": "2024-08-31",
       "article": "https://www.3blue1brown.com/lessons/mlp/",
       "chapters": [
-        ["0:00", "Where facts in LLMs live"],
-        ["2:15", "Quick refresher on transformers"],
-        ["4:39", "Assumptions for our toy example"],
-        ["6:07", "Inside a multilayer perceptron"],
-        ["15:38", "Counting parameters"],
-        ["17:04", "Superposition"],
-        ["21:37", "Up next"]
+        [
+          "0:00",
+          "Where facts in LLMs live"
+        ],
+        [
+          "2:15",
+          "Quick refresher on transformers"
+        ],
+        [
+          "4:39",
+          "Assumptions for our toy example"
+        ],
+        [
+          "6:07",
+          "Inside a multilayer perceptron"
+        ],
+        [
+          "15:38",
+          "Counting parameters"
+        ],
+        [
+          "17:04",
+          "Superposition"
+        ],
+        [
+          "21:37",
+          "Up next"
+        ]
       ],
       "shots": [
-        ["03-mlp-00-one-token", "MLP", "one token"],
-        ["03-mlp-01-token-parallel-computing", "MLP", "token parallel computing"]
+        [
+          "03-mlp-00-one-token",
+          "MLP",
+          "one token"
+        ],
+        [
+          "03-mlp-01-token-parallel-computing",
+          "MLP",
+          "token parallel computing"
+        ]
+      ]
+    },
+    {
+      "title": "Visualizing transformers and attention | Talk for TNG Big Tech Day '24",
+      "zh": "Grant Sanderson 在 TNG Big Tech Day '24 上的演讲，一小时把 Transformer 从头讲到尾，重点在注意力那一段，内容和上面三集有重叠。B 站没有搬运，只有 YouTube 原片。",
+      "yt": "KJtZARuO3JY",
+      "author": "Grant Sanderson",
+      "date": "2024-11-20",
+      "chapters": [
+        [
+          "0:52",
+          "The 2017 transformer paper"
+        ],
+        [
+          "3:04",
+          "What a chatbot is actually doing"
+        ],
+        [
+          "4:25",
+          "Tokenization and embeddings"
+        ],
+        [
+          "6:08",
+          "Attention and MLP sublayers, stacked over and over"
+        ],
+        [
+          "11:35",
+          "Training and the cost function"
+        ],
+        [
+          "13:31",
+          "Word vectors: similar words cluster together"
+        ],
+        [
+          "19:13",
+          "How many near-orthogonal directions fit in high dimensions"
+        ],
+        [
+          "22:20",
+          "Attention: context nudges the word vector"
+        ],
+        [
+          "24:42",
+          "Query, key and value matrices"
+        ],
+        [
+          "29:25",
+          "Dot products, the attention matrix, softmax"
+        ],
+        [
+          "35:33",
+          "Masking the lower triangle"
+        ],
+        [
+          "38:27",
+          "Character vs subword vs word tokenization"
+        ],
+        [
+          "39:35",
+          "The value matrix"
+        ],
+        [
+          "43:16",
+          "From single-head to multi-headed attention"
+        ],
+        [
+          "46:20",
+          "Why transformers work so well"
+        ],
+        [
+          "49:29",
+          "Q&A"
+        ]
+      ],
+      "chapnote": "章节是把评论区那份逐条时间轴合并过的，原版更细",
+      "shots": [
+        [
+          "06-talk-00-why-not-just-break-it-to-characters",
+          "Tokenization",
+          "why not just break it into characters — 上下文会二次方地膨胀"
+        ],
+        [
+          "06-talk-01-why-not-just-break-it-to-characters",
+          "Tokenization",
+          "why not just break it into characters — token 得能承载语义"
+        ],
+        [
+          "06-talk-02-learning-motivation",
+          "Closing",
+          "最能激励我去学一样东西的……"
+        ],
+        [
+          "06-talk-03-learning-motivation",
+          "Closing",
+          "……是「我真的会把它搞懂」这个承诺"
+        ]
       ]
     }
   ]

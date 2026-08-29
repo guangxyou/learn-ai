@@ -601,14 +601,15 @@ function resView(res) {
       <div class="vhd">
         <h4><a href="https://www.youtube.com/watch?v=${esc(v.yt)}" target="_blank" rel="noreferrer">${esc(v.title)} ↗</a></h4>
         ${v.zh ? `<p class="vzh">${esc(v.zh)}</p>` : ''}
-        <p class="vmeta"><span class="vsrc">3Blue1Brown</span><time>${esc(v.date)}</time>
-          <a href="${esc(v.article)}" target="_blank" rel="noreferrer">配套文章 ↗</a>
+        <p class="vmeta"><span class="vsrc">${esc(v.author || '3Blue1Brown')}</span><time>${esc(v.date)}</time>
+          ${v.article ? `<a href="${esc(v.article)}" target="_blank" rel="noreferrer">配套文章 ↗</a>` : ''}
           ${v.bv ? `<a href="https://www.bilibili.com/video/${esc(v.bv)}" target="_blank" rel="noreferrer">B 站官方双语 ↗</a>` : ''}</p>
       </div>
       <div class="vbody">
         <div class="vwrap"><button class="vplay" type="button" aria-label="加载并播放"
           ${cover ? `style="background-image:url(${cover})"` : ''}><span class="vtri"></span></button></div>
-        <ol class="vchap">${chaps}</ol>
+        <div class="vchapbox"><ol class="vchap">${chaps}</ol>
+          ${v.chapnote ? `<p class="vchapnote">${esc(v.chapnote)}</p>` : ''}</div>
       </div>
       ${shots ? `<details class="vshots"><summary>相关截图<span>点开看大图</span></summary>
         <div class="shots">${shots}</div></details>` : ''}
@@ -616,7 +617,7 @@ function resView(res) {
   };
   return `<div class="resview" id="view-res">
     ${res.note ? `<p class="area-note">${esc(res.note)}</p>` : ''}
-    <section class="res-sec"><h3 class="res-h">视频<span>3Blue1Brown · Neural networks</span></h3>
+    <section class="res-sec"><h3 class="res-h">视频</h3>
     ${(res.videos || []).map(card).join('')}</section></div>`;
 }
 
@@ -715,7 +716,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   ${views}
 </div>
 
-<div class="lb" id="lightbox"><figure><img alt=""><figcaption></figcaption></figure></div>
+<div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
@@ -838,18 +839,37 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     });
   });
 
-  /* ---- 截图灯箱 ---- */
+  /* ---- 截图灯箱：左右可切，切的范围是同一个视频下面那一组 ---- */
   var lb=document.getElementById('lightbox');
   if(lb){
+    var lbList=[], lbAt=-1;
+    function lbShow(i){
+      if(!lbList.length)return;
+      lbAt=(i+lbList.length)%lbList.length;
+      var im=lbList[lbAt], big=lb.querySelector('img');
+      big.src=im.dataset.full; big.alt=im.alt;
+      lb.querySelector('figcaption').textContent=
+        im.alt+(lbList.length>1?'　·　'+(lbAt+1)+' / '+lbList.length:'');
+      lb.querySelectorAll('.lb-nav').forEach(function(b){ b.hidden=lbList.length<2; });
+      track('res_shot',{detail:im.dataset.full.split('/').pop()});
+    }
     document.addEventListener('click',function(e){
       var im=e.target.closest('.shot img');
-      if(im){ var big=lb.querySelector('img');
-              big.src=im.dataset.full; big.alt=im.alt;
-              lb.querySelector('figcaption').textContent=im.alt;
-              lb.classList.add('on'); track('res_shot',{detail:im.dataset.full.split('/').pop()}); return; }
-      if(lb.classList.contains('on'))lb.classList.remove('on');
+      if(im){
+        lbList=[].slice.call(im.closest('.shots').querySelectorAll('img'));
+        lb.classList.add('on'); lbShow(lbList.indexOf(im)); return;
+      }
+      if(!lb.classList.contains('on'))return;
+      var nav=e.target.closest('.lb-nav');
+      if(nav){ lbShow(lbAt+(nav.classList.contains('lb-next')?1:-1)); return; }
+      lb.classList.remove('on');                       // 点图外任何地方都关
     });
-    addEventListener('keydown',function(e){ if(e.key==='Escape')lb.classList.remove('on'); });
+    addEventListener('keydown',function(e){
+      if(!lb.classList.contains('on'))return;
+      if(e.key==='Escape'){ lb.classList.remove('on'); }
+      else if(e.key==='ArrowRight'){ e.preventDefault(); lbShow(lbAt+1); }
+      else if(e.key==='ArrowLeft'){ e.preventDefault(); lbShow(lbAt-1); }
+    });
   }
 
   /* ---- 手机：批注从底部推上来 ---- */
@@ -1057,6 +1077,7 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
   box-shadow:0 2px 12px rgba(20,22,26,.3)}
 .vtri::after{content:"";position:absolute;top:50%;left:52%;transform:translate(-50%,-50%);
   border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.vchapnote{margin:7px 2px 0;font-size:11px;color:var(--text-3);line-height:1.5}
 .vchap{margin:0;padding:0;list-style:none;max-height:min(46vh,320px);overflow:auto;
   overscroll-behavior:contain;border:1px solid var(--line-soft);border-radius:var(--r-sm)}
 .vchap li+li{border-top:1px solid var(--line-soft)}
@@ -1087,6 +1108,13 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
   flex-direction:column;gap:10px;align-items:center}
 .lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
 .lb figcaption{font-size:12.5px;color:rgba(255,255,255,.78);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;flex:none;
+  border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+@media(max-width:640px){.lb-nav{width:38px;height:38px;font-size:22px}.lb-prev{left:6px}.lb-next{right:6px}}
 .toc{display:none}
 @media(min-width:1000px){.toc{display:block;position:sticky;top:calc(var(--topbar-h) + 54px);align-self:start;max-height:calc(100vh - 150px);overflow:auto}}
 .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
