@@ -608,8 +608,7 @@ function resView(res) {
       <div class="vbody">
         <div class="vwrap"><button class="vplay" type="button" aria-label="加载并播放"
           ${cover ? `style="background-image:url(${cover})"` : ''}><span class="vtri"></span></button></div>
-        <div class="vchapbox"><ol class="vchap">${chaps}</ol>
-          ${v.chapnote ? `<p class="vchapnote">${esc(v.chapnote)}</p>` : ''}</div>
+        <ol class="vchap">${chaps}</ol>
       </div>
       ${shots ? `<details class="vshots"><summary>相关截图<span>点开看大图</span></summary>
         <div class="shots">${shots}</div></details>` : ''}
@@ -617,8 +616,7 @@ function resView(res) {
   };
   return `<div class="resview" id="view-res">
     ${res.note ? `<p class="area-note">${esc(res.note)}</p>` : ''}
-    <section class="res-sec"><h3 class="res-h">视频</h3>
-    ${(res.videos || []).map(card).join('')}</section></div>`;
+    <section class="res-sec">${(res.videos || []).map(card).join('')}</section></div>`;
 }
 
 /** 一条参考文献：可展开，里面是简述 + 本文引用它的原句 */
@@ -1047,12 +1045,10 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
 /* ══ 资源 tab ══ */
 .resview{display:none}
 .resview .area-note{margin:0 0 20px;max-width:760px}
-.res-sec{max-width:1040px;margin-top:10px}
-.res-h{font-size:13px;color:var(--text-3);font-weight:600;letter-spacing:.04em;
-  display:flex;align-items:baseline;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.res-h span{font-weight:400;font-size:12px;color:var(--text-3)}
+.res-sec{max-width:1040px}
 .vcard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);
-  padding:18px 20px;margin-top:18px}
+  padding:18px 20px}
+.vcard+.vcard{margin-top:18px}
 .vhd h4{font-size:16px;line-height:1.4}
 .vhd h4 a:hover{color:var(--accent)}
 .vzh{margin:7px 0 0;font-size:13.5px;color:var(--text-2);line-height:1.6}
@@ -1077,7 +1073,6 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
   box-shadow:0 2px 12px rgba(20,22,26,.3)}
 .vtri::after{content:"";position:absolute;top:50%;left:52%;transform:translate(-50%,-50%);
   border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
-.vchapnote{margin:7px 2px 0;font-size:11px;color:var(--text-3);line-height:1.5}
 .vchap{margin:0;padding:0;list-style:none;max-height:min(46vh,320px);overflow:auto;
   overscroll-behavior:contain;border:1px solid var(--line-soft);border-radius:var(--r-sm)}
 .vchap li+li{border-top:1px solid var(--line-soft)}
