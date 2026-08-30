@@ -1,4 +1,27 @@
 {
+  "tools": [
+    {
+      "title": "Transformer Explainer",
+      "url": "https://poloclub.github.io/transformer-explainer/",
+      "by": "Georgia Tech · Polo Club",
+      "note": "首次打开要下 600 MB 权重",
+      "zh": "浏览器里跑着一个真的 GPT-2 small。输入自己的句子，能看着它一层层算下去：Q、K、V 怎么投影出来，注意力矩阵长什么样，MLP 和残差接在哪，最后 softmax 出下一个词的概率。温度、top-k、top-p 当场就能拖。",
+      "links": [
+        [
+          "论文 ↗",
+          "https://dl.acm.org/doi/10.1145/3772318.3791725"
+        ],
+        [
+          "GitHub ↗",
+          "https://github.com/poloclub/transformer-explainer"
+        ],
+        [
+          "作者的演示视频 ↗",
+          "https://www.youtube.com/watch?v=ECR4oAwocjs"
+        ]
+      ]
+    }
+  ],
   "videos": [
     {
       "title": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",

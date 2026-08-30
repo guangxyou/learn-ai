@@ -614,9 +614,18 @@ function resView(res) {
         <div class="shots">${shots}</div></details>` : ''}
     </article>`;
   };
-  return `<div class="resview" id="view-res">
-    ${res.note ? `<p class="area-note">${esc(res.note)}</p>` : ''}
-    <section class="res-sec">${(res.videos || []).map(card).join('')}</section></div>`;
+  const link = (t) => `<article class="vcard rcard">
+      <h4><a href="${esc(t.url)}" target="_blank" rel="noreferrer">${esc(t.title)} ↗</a></h4>
+      ${t.zh ? `<p class="vzh">${esc(t.zh)}</p>` : ''}
+      <p class="vmeta"><span class="vsrc">${esc(t.by)}</span>${t.note ? `<span>${esc(t.note)}</span>` : ''}
+        ${(t.links || []).map(([n, u]) =>
+          `<a href="${esc(u)}" target="_blank" rel="noreferrer">${esc(n)}</a>`).join('')}</p>
+    </article>`;
+  const groups = [];
+  if ((res.tools || []).length) groups.push(['工具', res.tools.map(link).join('')]);
+  if ((res.videos || []).length) groups.push(['视频', res.videos.map(card).join('')]);
+  return `<div class="resview" id="view-res">${groups.map(([t, html]) =>
+    `<section class="res-sec"><h3 class="res-h">${esc(t)}</h3>${html}</section>`).join('')}</div>`;
 }
 
 /** 一条参考文献：可展开，里面是简述 + 本文引用它的原句 */
@@ -1046,6 +1055,12 @@ body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:m
 .resview{display:none}
 .resview .area-note{margin:0 0 20px;max-width:760px}
 .res-sec{max-width:1040px}
+.res-sec+.res-sec{margin-top:34px}
+.res-h{font-size:12px;color:var(--text-3);font-weight:600;letter-spacing:.06em;
+  padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--line)}
+/* 工具只是个链接引用，没有播放器也没有章节，卡片就矮一截 */
+.rcard h4{font-size:16px;line-height:1.4}
+.rcard h4 a:hover{color:var(--accent)}
 .vcard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);
   padding:18px 20px}
 .vcard+.vcard{margin-top:18px}
