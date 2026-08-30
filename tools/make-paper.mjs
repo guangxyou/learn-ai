@@ -617,7 +617,7 @@ function resView(res) {
   const link = (t) => `<article class="vcard rcard">
       <h4><a href="${esc(t.url)}" target="_blank" rel="noreferrer">${esc(t.title)} ↗</a></h4>
       ${t.zh ? `<p class="vzh">${esc(t.zh)}</p>` : ''}
-      <p class="vmeta"><span class="vsrc">${esc(t.by)}</span>${t.note ? `<span>${esc(t.note)}</span>` : ''}
+      <p class="vmeta"><span class="vsrc">${esc(t.by)}</span>
         ${(t.links || []).map(([n, u]) =>
           `<a href="${esc(u)}" target="_blank" rel="noreferrer">${esc(n)}</a>`).join('')}</p>
     </article>`;
