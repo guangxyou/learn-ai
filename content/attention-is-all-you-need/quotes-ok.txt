@@ -1,0 +1,9 @@
+# 已经翻原文人工核过的引文。校验脚本对不上，但引文本身没问题。
+# 原因写在每条上面。写进来的必须真的核过，不是拿来消警告的。
+
+# 这两条不是本文的原句，是被引用的另外两篇论文的题名。
+Searching for Activation Functions
+GLU Variants Improve Transformer
+
+# 全文用的那个例句，不是论文里的话。句点被 tokenizer 切开，所以带一个空格。
+I love you .
