@@ -61,7 +61,7 @@ batch 小的时候统计量本身就不准，batch = 1 时彻底失效，检测�
     默认 32 组。目标是在小 batch 的检测分割任务上顶替 BatchNorm</td></tr>
 </tbody></table>
 <p>这两个和 LayerNorm 一样都不看 batch。GroupNorm 的实验结论是：
-batch 大的时候略输 BatchNorm，batch 降到 2 以下时大幅胜出，因为它的精度根本不随 batch 变化。</p>
+batch 大的时候略输 BatchNorm，batch 降到 2 时大幅胜出（ResNet-50 在 ImageNet 上错误率低 10.6 个百分点），因为它的精度根本不随 batch 变化。</p>
 
 <h3>RMSNorm（2019）</h3>
 <table>
