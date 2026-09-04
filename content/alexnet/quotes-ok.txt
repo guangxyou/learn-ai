@@ -1,0 +1,7 @@
+# 已经翻原文人工核过的引文。校验脚本对不上，但引文本身没问题。
+# 原因写在每条上面。写进来的必须真的核过，不是拿来消警告的。
+
+# 论文第 6 节这句是连续的一句话，但 PDF 双栏抽取时把表 1 的图注插了进去，
+# full.txt 里成了 "…interchangeably because table 1: comparison of results on
+# ilsvrcin our experience they do not differ…"，连 ILSVRC 和 in 都粘成了一个词。
+we use validation and test error rates interchangeably because in our experience they do not differ by more than 0.1%
