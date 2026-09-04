@@ -746,6 +746,15 @@ function blk(b) {
   </div>`;
 }
 
+/** 标题结尾防孤字：中文可以在任意两字之间断行，"…论文精读" 很容易只剩 "精读"
+ *  甚至 "读" 落在第二行。把末尾一小段裹进 nowrap，保证最后一行至少有这么多字。
+ *  只影响断点，不改文字本身，也不进 <title>。 */
+function h1HTML(t, tail = 5) {
+  const s = String(t);
+  if (s.length <= tail) return esc(s);
+  return esc(s.slice(0, -tail)) + `<span class="nb">${esc(s.slice(-tail))}</span>`;
+}
+
 function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false, docs = []) {
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
@@ -763,7 +772,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     <span>《${esc(paperTitle)}》 · ${esc(o.kicker || 'NeurIPS 2017')} ·
       <a href="${esc(o.srcurl || 'https://arxiv.org/abs/1706.03762')}" target="_blank" rel="noreferrer">${esc(o.srclabel || 'arXiv:1706.03762')} ↗</a></span>
   </div>
-  <h1>${esc(o.h1 || '逐字、逐句理解 Transformer')}</h1>
+  <h1>${h1HTML(o.h1 || '逐字、逐句理解 Transformer')}</h1>
   ${meta}
 </section></div>
 
@@ -1070,7 +1079,8 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
 /* flex:none —— 不然窄屏上后半段挤过来，药丸会被压得从「论文」中间断成两行 */
 .ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
-.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0;text-wrap:balance}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+.ep-head h1 .nb{white-space:nowrap}
 .ep-head h1 em{display:block;font-style:normal;font-size:16.5px;font-weight:400;color:var(--text-2);margin-top:8px}
 .ep-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:13px;font-size:13px;color:var(--text-3)}
 .ep-meta b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
