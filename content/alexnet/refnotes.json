@@ -1,0 +1,132 @@
+{
+ "1": {
+  "venue": "SIGKDD Explorations 2007",
+  "url": "https://doi.org/10.1145/1345448.1345465",
+  "sum": "Netflix 百万美元推荐大赛的复盘。本文引它是为了说明「把多个不同模型的预测组合起来能显著降低误差」这件事在别的领域已经被反复验证过，dropout 那一节的出发点就在这里。"
+ },
+ "2": {
+  "venue": "ILSVRC 2010",
+  "url": "https://image-net.org/challenges/LSVRC/2010/",
+  "sum": "ILSVRC 第一届的赛制与结果页。表 1 里 47.1% / 28.2% 那一行的出处，也是本文主要实验选在 2010 年这一版的原因：只有这一届公开了测试集标签。"
+ },
+ "3": {
+  "venue": "Machine Learning 2001",
+  "url": "https://doi.org/10.1023/A:1010933404324",
+  "sum": "随机森林。和文献 [1] 一起被引来支持模型集成的有效性。"
+ },
+ "4": {
+  "venue": "arXiv 2012",
+  "url": "https://arxiv.org/abs/1202.2745",
+  "sum": "多列深度神经网络。同期最接近的竞争者：也用 GPU、也很深、也在多个数据集上刷到当时最好，但没有拿下 ImageNet。3.2 节说本文架构与它的 columnar CNN 相似，区别在于「我们的列不是独立的」。"
+ },
+ "5": {
+  "venue": "arXiv 2011",
+  "url": "https://arxiv.org/abs/1102.0183",
+  "sum": "高性能 GPU 神经网络。3.2 节末尾拿来对照的那个「columnar」架构就出自这一篇。"
+ },
+ "6": {
+  "venue": "CVPR 2009",
+  "url": "https://www.image-net.org/static_files/papers/imagenet_cvpr09.pdf",
+  "sum": "ImageNet 的原始论文。李飞飞团队用 WordNet 的名词层级当类别体系、用 Amazon Mechanical Turk 众包标注，建成了当时规模空前的图像数据库。没有这一篇就没有本文。"
+ },
+ "7": {
+  "venue": "ILSVRC 2012",
+  "url": "https://www.image-net.org/challenges/LSVRC/2012/",
+  "sum": "本文拿冠军的那一届。表 2 里 26.2% 的第二名（SIFT + Fisher 向量）就在这一届。"
+ },
+ "8": {
+  "venue": "CVIU 2007",
+  "url": "https://doi.org/10.1016/j.cviu.2005.09.012",
+  "sum": "Caltech-101，101 类、9146 张图，李飞飞在 ImageNet 之前做的数据集。本文开篇拿它当「以前的数据集太小」的例子之一。"
+ },
+ "9": {
+  "venue": "Caltech 技术报告 2007",
+  "url": "https://authors.library.caltech.edu/7694/",
+  "sum": "Caltech-256，把上一条扩到 256 类、30607 张图。"
+ },
+ "10": {
+  "venue": "arXiv 2012",
+  "url": "https://arxiv.org/abs/1207.0580",
+  "sum": "dropout 的原始论文，和本文同年。4.2 节整节都在用它。注意作者列表和本文高度重合，Hinton、Krizhevsky、Sutskever 都在。"
+ },
+ "11": {
+  "venue": "ICCV 2009",
+  "url": "https://doi.org/10.1109/ICCV.2009.5459469",
+  "sum": "多阶段视觉架构的系统比较。本文在 3.1 节拿它的 |tanh(x)| 划清界限（那是防过拟合，不是加速训练），又在 3.3 节说自己的归一化和它的 local contrast normalization 相似但不减均值。"
+ },
+ "12": {
+  "venue": "多伦多大学硕士论文 2009",
+  "url": "https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf",
+  "sum": "CIFAR-10 / CIFAR-100 的出处，本文一作自己的硕士工作。3.1 和 3.3 节的两处消融实验都是在 CIFAR-10 上补的旁证，因为 ImageNet 上训一次要五六天，做不起。"
+ },
+ "13": {
+  "venue": "未发表手稿 2010",
+  "url": "https://www.cs.toronto.edu/~kriz/conv-cifar10-aug2010.pdf",
+  "sum": "卷积深度置信网络在 CIFAR-10 上的实验，本文一作的前作。"
+ },
+ "14": {
+  "venue": "ESANN 2011",
+  "url": "https://www.cs.toronto.edu/~hinton/absps/esann-deep-final.pdf",
+  "sum": "用深度自编码器做基于内容的图像检索。6.1 节末尾说「把 4096 维压成短二进制码会比对原始像素做自编码好」，对照的就是这一篇。这个思路今天由向量数据库的量化方法承担。"
+ },
+ "15": {
+  "venue": "NIPS 1989",
+  "url": "https://proceedings.neurips.cc/paper_files/paper/1989/hash/53c3bce66e43be4f209556518c2fcb54-Abstract.html",
+  "sum": "LeNet 的前身，反向传播用于手写数字识别。卷积神经网络这条线的起点之一。"
+ },
+ "16": {
+  "venue": "CVPR 2004",
+  "url": "https://doi.org/10.1109/CVPR.2004.1315150",
+  "sum": "NORB 数据集与相关方法。开篇「以前的数据集太小」列的第一个例子。"
+ },
+ "17": {
+  "venue": "ISCAS 2010",
+  "url": "https://doi.org/10.1109/ISCAS.2010.5537907",
+  "sum": "卷积网络及其视觉应用的综述。3.4 节说「传统上相邻池化单元不重叠」，引的就是它和另外两篇。"
+ },
+ "18": {
+  "venue": "ICML 2009",
+  "url": "https://doi.org/10.1145/1553374.1553453",
+  "sum": "卷积深度置信网络，无监督逐层学习分层表示。第 7 节说「我们没有用无监督预训练」，针对的正是这一路做法。"
+ },
+ "19": {
+  "venue": "ECCV 2012",
+  "url": "https://inria.hal.science/hal-00722313",
+  "sum": "大规模图像分类的度量学习。第 6 节末尾在 ImageNet Fall 2009 版（10184 类）上的对照结果 78.1% / 60.9% 出自这里。"
+ },
+ "20": {
+  "venue": "ICML 2010",
+  "url": "https://www.cs.toronto.edu/~hinton/absps/reluICML.pdf",
+  "sum": "ReLU 这个名字的出处。3.1 节明写 Following Nair and Hinton [20]，所以本文不是 ReLU 的首创，而是第一次在大规模真实任务上把它的加速效果做实。"
+ },
+ "21": {
+  "venue": "PLoS Computational Biology 2008",
+  "url": "https://doi.org/10.1371/journal.pcbi.0040027",
+  "sum": "论证真实世界的物体识别为什么难，以及小数据集上的好成绩具有误导性。本文开篇引它来支持「必须换更大的数据集」。"
+ },
+ "22": {
+  "venue": "PLoS Computational Biology 2009",
+  "url": "https://doi.org/10.1371/journal.pcbi.1000579",
+  "sum": "用高通量筛选的方式搜索受生物启发的视觉表示。被归在「卷积网络这一类模型」的引用串里。"
+ },
+ "23": {
+  "venue": "IJCV 2008",
+  "url": "https://doi.org/10.1007/s11263-007-0090-8",
+  "sum": "LabelMe，网页版标注工具与数据库，几十万张带完整分割的图。和 ImageNet 一起被举为「终于有了百万量级带标注数据集」的例子。"
+ },
+ "24": {
+  "venue": "CVPR 2011",
+  "url": "https://doi.org/10.1109/CVPR.2011.5995504",
+  "sum": "高维签名压缩用于大规模图像分类，也就是 Fisher 向量那一路。表 1 里 45.7% / 25.7% 那一行，是本文出现之前公开发表的最好结果。"
+ },
+ "25": {
+  "venue": "ICDAR 2003",
+  "url": "https://doi.org/10.1109/ICDAR.2003.1227801",
+  "sum": "卷积网络用于文档图像分析的最佳实践，弹性形变增强就出自这里。4.1 节说数据增强是「最简单最常见的办法」，引的第一篇就是它。"
+ },
+ "26": {
+  "venue": "Neural Computation 2010",
+  "url": "https://doi.org/10.1162/neco.2009.10-08-881",
+  "sum": "卷积网络学习亲和图用于图像分割。同样被归在「卷积网络这一类模型」的引用串里。"
+ }
+}

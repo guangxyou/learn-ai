@@ -6,7 +6,7 @@
 我深度读透过的东西，一条一条留在这里。判断标准只有一条：
 **别人打开这一页，能不能不靠我解释就把这件事学一遍。**
 
-- [逐字、逐句理解 Transformer](https://xslaoxu.cn/learn-ai/attention-is-all-you-need/) —— 《Attention Is All You Need》全文精读
+- [逐字、逐句理解 Transformer](https://xslaoxu.cn/learn-ai/attention-is-all-you-need/) —— 《Attention Is All You Need》论文精读
 - [开源一段论文探索之旅](https://xslaoxu.cn/learn-ai/ep117-paper-journey/) —— 张小珺Jùn｜商业访谈录 EP117
 
 ## 目录
