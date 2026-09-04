@@ -474,7 +474,7 @@ body.no-notes .legend{display:none}
       <a href="https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" rel="noreferrer">papers.nips.cc ↗</a></span>
   </div>
   <h1>大放异彩的 AlexNet —— 《ImageNet Classification with Deep Convolutional Neural Networks》论文精读</h1>
-  <div class="ep-meta" data-chars="30136"><span><b>45</b> 条批注</span><span><b>3.0</b> 万字</span><span><b>14</b> 张插图</span></div>
+  <div class="ep-meta" data-chars="30432"><span><b>45</b> 条批注</span><span><b>3.0</b> 万字</span><span><b>14</b> 张插图</span></div>
 </section></div>
 
 <div class="bar"><div class="wrap">
@@ -586,7 +586,16 @@ conv1   96 × (11×11×3) + 96 = 34,944
       <button class="nt-q" type="button"><span class="num" data-k="工程对照">5</span><span class="qt">「去掉任一卷积层就变差」这个说法可信吗</span><span class="tag" data-k="工程对照">工程对照</span></button>
       <div class="nt-a"><p>这句是全篇「深度重要」的第一处主张，第 7 节还会再说一次，并给出数字：<span class="m">removing any of the middle layers results in a loss of about 2% for the top-1 performance</span>。</p>
 <p>论证方式要看清楚：<b>它比的不是「深网络 vs 浅网络」，是「完整网络 vs 完整网络去掉一层」。</b>去掉一层的同时，参数量、感受野、后续各层的输入维度全都跟着变了。所以这个消融证明的是「这个具体配置里每一层都在起作用」，不是「深度本身有普适价值」。</p>
-<p>紧接的括号是这句话真正的分量所在：<span class="m">each of which contains no more than 1% of the model's parameters</span>。卷积层加起来只占全网 3.8% 的参数，单层不超过 1.5%。<b>拿掉不到 1% 的参数，掉 2 个百分点</b>，这个比例才是论据。</p>
+<p>紧接的括号是这句话真正的分量所在：<span class="m">each of which contains no more than 1% of the model's parameters</span>。卷积层加起来只占全网 3.8% 的参数，拿掉这么点参数就掉 2 个百分点，这个比例才是论据。</p>
+<p><b>不过这个「1%」本身站不住。</b>按 3.5 节给的每层核数逐层算（完整的表在下面第 9 条），五个卷积层里有两个超过 1%：</p>
+<div class="eg">conv1     34,944   0.06%
+conv2    307,456   0.50%
+conv3    885,120   1.45%   ← 超了
+conv4    663,936   1.09%   ← 超了
+conv5    442,624   0.73%
+         --------
+五层合计 2,334,080   3.83%   （全网 60,965,224）</div>
+<p>论据的方向没变（卷积层确实只占零头），但严格说该写成「不超过 1.5%」。这是本文第几处这类小数点问题了，<b>253,440、2048、224 都是同一类</b>：结论对，中间那一步的算术没人回头核。</p>
 <p><b>三年后这句话被推到极限。</b>ResNet 把深度从 8 层做到 152 层，靠的是解决「深了反而更差」的退化问题（degradation）。所以 2012 年这句「depth seems to be important」用的是 seems，三年后才被做成可以无限加深的东西。</p></div>
     </div></div>
   </div>
