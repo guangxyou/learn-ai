@@ -28,6 +28,38 @@ import { KINDS } from './note-kinds.mjs';
  *  transform 不改变布局盒子，得靠负 margin 去凑，图注会被压住、还会莫名其妙拖出横向滚动条。
  *  真正转过的图片是竖版的，max-height、flex 这些就都按常识生效了。 */
 const ROTATE = ['Sx1.F3', 'Sx1.F4', 'Sx1.F5'];
+/** --sxs 里列出的图：源里是并列的两幅 <img>，默认上下堆着，改成左右各占一半 */
+let SXS = [];
+
+/** PNG / JPEG 的 data URI 里读出像素尺寸，读不出来就返回 null */
+function imgSize(uri) {
+  const m = /^data:image\/(\w+);base64,(.+)$/.exec(uri);
+  if (!m) return null;
+  const b = Buffer.from(m[2], 'base64');
+  if (m[1] === 'png' && b.length > 24) return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+  if (m[1] === 'jpeg' || m[1] === 'jpg') {           // 扫 SOF 段
+    for (let i = 2; i + 9 < b.length;) {
+      if (b[i] !== 0xFF) { i++; continue; }
+      const mk = b[i + 1];
+      if (mk >= 0xC0 && mk <= 0xCF && mk !== 0xC4 && mk !== 0xC8 && mk !== 0xCC)
+        return { h: b.readUInt16BE(i + 5), w: b.readUInt16BE(i + 7) };
+      i += 2 + b.readUInt16BE(i + 2);
+    }
+  }
+  return null;
+}
+
+/** 并排图：给每幅 <img> 挂上 flex:<长宽比> 1 0，宽度按长宽比分，高度就齐了 */
+function sideBySide(html) {
+  let n = 0;
+  const out = html.replace(/<img src="(data:[^"]+)"([^>]*)>/g, (all, uri, rest) => {
+    const d = imgSize(uri);
+    if (!d || !d.h) return all;
+    n++;
+    return `<img src="${uri}"${rest} style="flex:${(d.w / d.h).toFixed(4)} 1 0">`;
+  });
+  return { html: out, n };
+}
 
 /** 把 data URI 里的图转 90°（顺时针）。优先 ImageMagick，退回 macOS 自带的 sips */
 function rotateDataURI(uri) {
@@ -126,7 +158,9 @@ function parse(src) {
   // 保存下来的 HTML 属性没引号、顺序也不固定（<div id=S1.p1 class=ltx_para>），匹配要放宽
   const BLOCK = new RegExp(
     // paragraph 级也要收：Encoder: / Decoder: / Residual Dropout / Label Smoothing / Acknowledgements
-    '<h([2-6])\\b[^>]*\\bltx_title_(?:section|subsection|subsubsection|paragraph)\\b[^>]*>([\\s\\S]*?)<\\/h\\1>' +
+    // appendix 也要收：ar5iv 把附录标成 ltx_title_section，arXiv 新版 HTML 标成 ltx_title_appendix，
+    // 后者不收的话三个附录会连标题一起消失，正文却还留着 —— 比整块丢掉更难发现
+    '<h([2-6])\\b[^>]*\\bltx_title_(?:section|subsection|subsubsection|paragraph|appendix)\\b[^>]*>([\\s\\S]*?)<\\/h\\1>' +
     '|<div\\b[^>]*\\bltx_para\\b[^>]*>' +
     '|<table\\b[^>]*\\b(?:ltx_equation|ltx_equationgroup)\\b[^>]*>' +
     '|<figure\\b[^>]*\\b(ltx_figure|ltx_table)\\b[^>]*>', 'g');
@@ -135,7 +169,7 @@ function parse(src) {
     const tag = m[0];
     if (m[1]) {
       const raw = m[2];
-      const num = strip((/<span[^>]*\bltx_tag_(?:section|subsection|subsubsection)\b[^>]*>([\s\S]*?)<\/span>/.exec(raw) || [, ''])[1]);
+      const num = strip((/<span[^>]*\bltx_tag_(?:section|subsection|subsubsection|appendix)\b[^>]*>([\s\S]*?)<\/span>/.exec(raw) || [, ''])[1]);
       const text = strip(raw.replace(/<span[^>]*\bltx_tag_[\s\S]*?<\/span>/, ''));
       // 正文里的「见 3.2 节」指向 LaTeXML 的 section id，一并留个锚点，不然点了不动
       const sec = body.lastIndexOf('<section', m.index);
@@ -284,7 +318,9 @@ const EXTRA_MARKS = { 'Aidan N. Gomez': '†', 'Illia Polosukhin': '‡' };
 
 /** PDF 首页页脚的会议行。它由 NeurIPS 的样式文件在编译时注入，LaTeX 源里没有，
  *  所以 LaTeXML 版也没有 —— 照 PDF 补上，不然首页比 PDF 少一行。 */
-const VENUE = '31st Conference on Neural Information Processing Systems (NIPS 2017), Long Beach, CA, USA.';
+const VENUE_DEFAULT = '31st Conference on Neural Information Processing Systems (NIPS 2017), Long Beach, CA, USA.';
+/** 页脚会议行由 --venue 覆盖 —— AlexNet 是 NIPS 2012，Transformer 是 NIPS 2017 */
+const VENUE = () => o.venue ?? VENUE_DEFAULT;
 
 /** 作者：ltx_personname 里是「姓名 <br> 机构 <br> 邮箱」，多位作者用 & 连着，名字后面挂脚注角标 */
 function parseAuthors(src) {
@@ -311,10 +347,24 @@ function parseAuthors(src) {
 
 /** 首页页脚那段 \thanks：LaTeXML 把三条拍平成一段纯文字了，按已知的起头切回三条 */
 function parseAuthorNotes(src) {
-  const m = /<span\b[^>]*\bltx_author_notes\b[^>]*>([\s\S]*?)<\/span>/.exec(src);
-  if (!m) return [];
-  return strip(m[1]).split(/(?=Work performed while at)/)
-    .map((t, i) => ({ mark: MARKS[i] || '*', text: t.trim() })).filter((n) => n.text);
+  const i = src.search(/<span\b[^>]*\bltx_author_notes\b[^>]*>/);
+  if (i < 0) return [];
+  // sliceTag 而不是非贪婪正则：arXiv 新版这块里套着 ltx_contact / ltx_contact_name，
+  // `([\s\S]*?)<\/span>` 只截到第一个 </span>，结果就剩一个「Affiliation:」。
+  const el = sliceTag(src, i, 'span');
+  // 两种形态：ar5iv 是 per-author 的 \thanks（有角标）；
+  // arXiv 新版是全体共用的单位和邮箱（ltx_contact，不该给角标）。
+  if (/\bltx_role_(?:affiliation|email|address)\b/.test(el)) {
+    const out = [];
+    for (const m of el.matchAll(/<span\b[^>]*\bltx_contact\b[^>]*>/g)) {
+      const c = sliceTag(el, m.index, 'span');
+      const t = strip(c.replace(/<span\b[^>]*\bltx_contact_name\b[^>]*>[\s\S]*?<\/span>/, ''));
+      if (t) out.push({ mark: '', text: t });
+    }
+    return out;
+  }
+  return strip(el).split(/(?=Work performed while at)/)
+    .map((t, k) => ({ mark: MARKS[k] || '*', text: t.trim() })).filter((n) => n.text);
 }
 
 /* ══════════════════ 二、批注 ══════════════════ */
@@ -356,6 +406,9 @@ const SEC_TAIL = {
   '§2–§3.1': '3.1', '§3.2.1': '3.2.1', '§3.2.2': '3.2.2', '§3.3': '3.3',
   '§3.4–§3.5': '3.5', '§4': '4', '§5–§6.2': '6.2', '§6.3–§7': '7',
 };
+/** 上面那张表是 Transformer 那篇的候选池标签（一个标签可能跨几节）。
+ *  直接写「§3.1」这种单节号的也认 —— 后来的篇目不必再往表里加一行。 */
+const secTail = (sec) => SEC_TAIL[sec] ?? (/^§([\d.]+)$/.exec(String(sec || '')) || [])[1];
 
 /** 批注里的行内公式：把 d_model、h_t、h_(t-1) 这类写法排成正文那样的
  *  斜体变量 + 真下标。代码块（.eg）和等宽片段（.m）里的不动 —— 那儿本来就是 ASCII 对齐的。 */
@@ -441,14 +494,14 @@ function wrapText(html, text, open, close, pre) {
 
 /* ══════════════════ 三、出页面 ══════════════════ */
 
-function render(doc, notes, loose, refnotes = {}, posters = [], res = null) {
+function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs = []) {
   const secs = [];
   const parts = [];
 
   // 挂不上原句的分两拨：属于某节的落到节末，预备/岔路的另开区
   const tailOf = {}, extra = { 预备: [], 岔路: [] };
   for (const n of loose) {
-    const t = SEC_TAIL[n.sec];
+    const t = secTail(n.sec);
     if (t) (tailOf[t] ||= []).push(n);
     else if (String(n.sec).startsWith('岔路')) (extra.岔路[n.sec] ||= (extra.岔路[n.sec] = [])).push(n);
     else extra.预备.push(n);
@@ -461,7 +514,8 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null) {
     <h2 class="ptitle">${esc(doc.title)}</h2>
     <div class="agrid">${authorHTML(doc.authors)}</div>
     ${doc.fnotes.length ? `<div class="fnotes">${doc.fnotes.map((n) =>
-      `<p><sup>${n.mark}</sup>${esc(n.text)}</p>`).join('')}<p class="venue">${esc(VENUE)}</p></div>` : ''}
+      `<p>${n.mark ? `<sup>${n.mark}</sup>` : ''}${esc(n.text)}</p>`).join('')}${
+      VENUE() ? `<p class="venue">${esc(VENUE())}</p>` : ''}</div>` : ''}
   </section>`);
 
   if (doc.absBlk) {
@@ -514,7 +568,12 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null) {
         const r = rotateFigure(fh); fh = r.html;
         console.log(`  · ${it.id} 转正 ${r.n} 张图`);
       }
-      const fbox = `<div class="floatbox${ROTATE.includes(it.id) ? ' rot' : ''}">${fh}</div>`;
+      if (SXS.includes(it.id)) {
+        const r = sideBySide(fh); fh = r.html;
+        console.log(`  · ${it.id} 并排 ${r.n} 幅，宽度按长宽比分`);
+      }
+      const cls = (ROTATE.includes(it.id) ? ' rot' : '') + (SXS.includes(it.id) ? ' sxs' : '');
+      const fbox = `<div class="floatbox${cls}">${fh}</div>`;
       // 图上挂了批注，就和段落一样套进 .blk 网格 —— 卡片进右侧旁注栏，不占正文
       parts.push(it.notes
         ? `<div class="blk float hot">${fbox}<div class="side">${it.notes.map(noteCard).join('')}</div></div>`
@@ -576,7 +635,16 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null) {
     + (pg.note ? `<p class="area-note">${esc(pg.note)}</p>` : '')
     + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div></div>`).join('');
 
-  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters, views + resView(res), !!res);
+  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters,
+    views + docViews(docs) + resView(res), !!res, docs);
+}
+
+/** 独立内容 tab：整页 HTML 片段，和论文正文并列成一个 tab。
+ *  用来放不属于任何一句话的东西 —— 比赛沿革、这一篇的贡献与局限。
+ *  片段自己只写 <h2>/<p>/<table>/<svg>，版式由下面的 .docview 统一管。 */
+function docViews(docs) {
+  return docs.map((d, i) =>
+    `<div class="docview" id="view-doc-${i + 1}"><article class="doc">${d.html}</article></div>`).join('');
 }
 
 /** 资源 tab：站外的视频、文章。内容全在 content/<条目>/resources.json 里，
@@ -678,7 +746,7 @@ function blk(b) {
   </div>`;
 }
 
-function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false) {
+function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false, docs = []) {
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -692,10 +760,10 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 
 <div class="wrap"><section class="ep-head">
   <div class="ep-kicker"><span class="topic">论文</span>
-    <span>《${esc(paperTitle)}》 · NeurIPS 2017 ·
-      <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">arXiv:1706.03762 ↗</a></span>
+    <span>《${esc(paperTitle)}》 · ${esc(o.kicker || 'NeurIPS 2017')} ·
+      <a href="${esc(o.srcurl || 'https://arxiv.org/abs/1706.03762')}" target="_blank" rel="noreferrer">${esc(o.srclabel || 'arXiv:1706.03762')} ↗</a></span>
   </div>
-  <h1>逐字、逐句理解 Transformer</h1>
+  <h1>${esc(o.h1 || '逐字、逐句理解 Transformer')}</h1>
   ${meta}
 </section></div>
 
@@ -704,6 +772,8 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
     ${posters.map((pg, i) =>
       `<button class="tb" type="button" role="tab" data-v="map-${i + 1}" aria-selected="false">${esc(pg.label)}</button>`).join('')}
+    ${docs.map((d, i) =>
+      `<button class="tb" type="button" role="tab" data-v="doc-${i + 1}" aria-selected="false">${esc(d.label)}</button>`).join('')}
     ${hasRes ? `<button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>` : ''}
   </div>
   <div class="legend">
@@ -799,7 +869,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     if(typeof sheet!=='undefined'&&sheet&&sheetOn())closeSheet();
     scrollAt[view]=scrollY;                      // 切走前记住位置，切回来还在原处
     view=v; document.body.dataset.view=v; mem.set(v); track('tab_view',{detail:v});
-    document.querySelectorAll('.mapview,.resview').forEach(function(el){
+    document.querySelectorAll('.mapview,.resview,.docview').forEach(function(el){
       el.classList.toggle('on', el.id==='view-'+v);
     });
     document.querySelectorAll('.tb').forEach(function(b){
@@ -1000,7 +1070,7 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 .ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
 /* flex:none —— 不然窄屏上后半段挤过来，药丸会被压得从「论文」中间断成两行 */
 .ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
-.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0;text-wrap:balance}
 .ep-head h1 em{display:block;font-style:normal;font-size:16.5px;font-weight:400;color:var(--text-2);margin-top:8px}
 .ep-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:13px;font-size:13px;color:var(--text-3)}
 .ep-meta b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
@@ -1046,10 +1116,51 @@ h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
 /* 看图 / 看资源时正文、目录、批注开关都收起来 */
 body[data-view^="map"] .toc,body[data-view^="map"] .paper,
 body[data-view^="map"] .legend,body[data-view^="map"] .swbox,
+body[data-view^="doc"] .toc,body[data-view^="doc"] .paper,
+body[data-view^="doc"] .legend,body[data-view^="doc"] .swbox,
 body[data-view="res"] .toc,body[data-view="res"] .paper,
 body[data-view="res"] .legend,body[data-view="res"] .swbox{display:none}
 /* 正文要 26px 的天头，图不要 —— 图自己已经有一圈留白，两份叠起来就空出一条 */
-body[data-view^="map"] .main,body[data-view="res"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px}
+body[data-view^="map"] .main,body[data-view="res"] .main,
+body[data-view^="doc"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px}
+
+/* ══ 独立内容 tab ══ */
+.docview{display:none}
+.docview.on{display:block}
+.doc{max-width:760px;margin:0 auto;padding:8px 0 64px;font-size:15px;line-height:1.75;color:var(--text-2)}
+.doc>h2{margin:38px 0 4px;font-size:20px;line-height:1.35;font-weight:650;color:var(--text);letter-spacing:-.2px}
+.doc>h2:first-child{margin-top:6px}
+.doc>h3{margin:26px 0 4px;font-size:16px;font-weight:650;color:var(--text)}
+.doc>p.lede{margin:0 0 26px;font-size:15px;color:var(--text-3)}
+.doc p{margin:0 0 12px}
+.doc b{color:var(--text);font-weight:600}
+.doc ul,.doc ol{margin:0 0 14px;padding-left:1.2em}
+.doc li{margin-bottom:6px}
+.doc a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.doc hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+.doc svg{display:block;width:100%;height:auto;margin:14px 0 6px}
+.doc figure{margin:18px 0 22px}
+.doc figcaption{margin-top:6px;font-size:13px;color:var(--text-3)}
+.doc table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+.doc thead th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;
+  padding:0 10px 6px 0;border-bottom:1px solid var(--line)}
+.doc td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.doc tr:last-child td{border-bottom:0}
+.doc td.n{font-family:var(--mono);font-size:12.5px;white-space:nowrap;color:var(--text)}
+.doc .eg{margin:6px 0 16px;padding:11px 13px;background:var(--bg-sunken);border-radius:var(--r-sm);
+  font:12.5px/1.65 var(--mono);color:var(--text-2);white-space:pre;overflow-x:auto}
+.doc .callout{margin:16px 0;padding:13px 15px;background:var(--accent-soft);
+  border-radius:var(--r-md);font-size:14px;color:var(--accent-ink)}
+.doc .callout b{color:var(--accent-ink)}
+.doc .warnout{margin:16px 0;padding:13px 15px;background:var(--warn-soft);
+  border-radius:var(--r-md);font-size:14px;color:#7A3A06}
+.doc .warnout b{color:#7A3A06}
+@media (max-width:640px){
+  .doc table{display:block;overflow-x:auto;width:max-content;min-width:100%;max-width:100%}
+  .doc th,.doc td{min-width:5.5em}
+  .doc td:last-child,.doc th:last-child{min-width:12em}
+}
+@media(max-width:900px){.doc{padding:4px 0 48px}}
 
 /* ══ 资源 tab ══ */
 .resview{display:none}
@@ -1204,6 +1315,12 @@ mark[data-k="${k}"]>sup{color:${v.ink}}
 .blk.float{align-items:start}
 .blk.float .floatbox{max-width:none;margin-left:22px}   /* <figure> 的浏览器默认左右各 40px 边距，会把容器顶出滚动条 */
 .floatbox.rot{overflow:visible}
+.floatbox.sxs figure{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:center}
+.floatbox.sxs img{min-width:0;width:auto;max-width:none;max-height:none;align-self:flex-start}
+/* 源里带 ltx_fig_right 的是右幅，但它在 DOM 里排在前面，按图注的 (Left)/(Right) 摆回去 */
+.floatbox.sxs img.ltx_fig_right{order:2}
+.floatbox.sxs figcaption{flex:1 0 100%;order:3}
+@media (max-width:860px){.floatbox.sxs figure{display:block}.floatbox.sxs img{max-height:600px}}
 /* 图 1 原图 912×1344，铺满一屏还多，限高压一压；横图不受影响 */
 .floatbox img{max-width:100%;max-height:600px;width:auto;height:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:12px}
 /* 图 2 是两块并排的 panel，原件用 ltx_flex_figure 表达，这里给它真的 flex —— 竖着堆太占地方 */
@@ -1268,6 +1385,21 @@ figcaption,.ltx_caption{margin-top:12px;font:13px/1.65 var(--serif);color:var(--
 .nt-a ul{margin:0 0 8px;padding-left:1.1em}.nt-a li{margin-bottom:4px}
 /* <ol> 的浏览器默认缩进 40px，序号会比正文缩进一大截；收窄到刚好让数字左缘和正文齐平 */
 .nt-a ol{margin:0 0 8px;padding-left:1.5em}
+/* 批注里的表：旁注栏只有 296px，浏览器默认的自动布局会把每一列都压到换行，
+   「情形」这种两个字的表头都能竖着排。所以一律不折行，放不下就整表横向滚
+   —— 和批注 7 的参数表同一套。需要折行的说明列单独标 class="w"。 */
+.nt-a table{display:block;overflow-x:auto;width:max-content;min-width:100%;max-width:100%;
+  border-collapse:collapse;margin:2px 0 10px;font-size:12.5px;line-height:1.55}
+.nt-a td,.nt-a th{white-space:nowrap;vertical-align:top;text-align:left;
+  padding:5px 12px 5px 0;border-bottom:1px solid var(--line-soft)}
+.nt-a td:last-child,.nt-a th:last-child{padding-right:0}
+/* 最后一列几乎总是说明文字，默认让它折行吸收剩余宽度；中间列要折行的另标 .w */
+.nt-a td:last-child,.nt-a th:last-child{white-space:normal}
+.nt-a tr:first-child td{color:var(--text-3);font-size:11.5px}
+.nt-a tr:last-child td{border-bottom:0}
+.nt-a td.w{white-space:normal;min-width:9.5em}
+/* 整张都是数字、本来就要横向滚的表，末列也别折 —— 折了会把表头撑成三行 */
+.nt-a table.nw td:last-child,.nt-a table.nw th:last-child{white-space:nowrap}
 /* 批注里的插图：跟着旁注栏的宽度缩放 */
 .nt-a svg{display:block;width:100%;height:auto;margin:4px 0 10px}
 .mf{font-family:var(--serif);white-space:nowrap}
@@ -1399,6 +1531,7 @@ if (keys.length) {
     (zero.length ? `；这些在论文里没找到：${zero.join(' / ')}` : ''));
 }
 
+SXS = (o.sxs || '').split(',').map((x) => x.trim()).filter(Boolean);
 const refnotes = o.refnotes && existsSync(o.refnotes) ? JSON.parse(readFileSync(o.refnotes, 'utf8')) : {};
 
 // 全景图：--posters a.svg,b.svg，标题直接取图里的 .h1
@@ -1415,7 +1548,15 @@ const res = o.res && existsSync(o.res) ? JSON.parse(readFileSync(o.res, 'utf8'))
 if (res) console.log(`· 资源 ${res.videos.length} 个视频，`
   + `${res.videos.reduce((n, v) => n + (v.shots || []).length, 0)} 张截图`);
 
-const html = render(doc, notes, loose, refnotes, posters, res);
+// 独立内容 tab：--docs a.html#标签#,b.html#标签#
+const docs = (o.docs || '').split(',').filter(Boolean).map((spec) => {
+  const [f, label] = spec.split('#');
+  const html = readFileSync(f.trim(), 'utf8');
+  return { html, label: (label || basename(f, '.html')).trim() };
+});
+if (docs.length) console.log(`· 独立内容 tab ${docs.length} 个：${docs.map((d) => d.label).join(' / ')}`);
+
+const html = render(doc, notes, loose, refnotes, posters, res, docs);
 mkdirSync(dirname(o.out), { recursive: true });
 writeFileSync(o.out, html);
 console.log(`✓ ${o.out}（${(html.length / 1024 / 1024).toFixed(1)} MB）`);

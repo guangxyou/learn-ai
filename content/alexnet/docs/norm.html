@@ -1,0 +1,135 @@
+<h2>六种归一化，差别只在「跟谁一起算统计量」</h2>
+<p class="lede">形式全都是「减掉一个均值、除以一个标准差、再乘个可学习的 γ 加个 β」。
+真正的分歧只有一个：那个均值和标准差，是在哪一堆数上算的。</p>
+<svg viewBox='0 0 760 430' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='六种归一化统计维度对比图：横向是通道 C，纵向是样本 N，每一格代表一个样本的一个通道，也就是一整张 H 乘 W 的特征图。Local Response Normalization 取同一样本同一位置的相邻若干通道；BatchNorm 取同一通道跨全部样本；LayerNorm 和 RMSNorm 取同一样本的全部通道；InstanceNorm 只取同一样本的同一通道；GroupNorm 取同一样本的一组通道'><text x='0' y='13' font-size='11.5' fill='#868D98'>每格 = 一个样本的一个通道（内含整张 H×W）；横向 C，纵向 N</text><g transform='translate(0,28)'><text x='0' y='13' font-size='13' font-weight='600' fill='#14161A'>Local Response Normalization</text><text x='1' y='29' font-size='11.5' fill='#868D98'>2012　同一样本、同一位置，相邻 5 个通道</text><rect x='0' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='63' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='58' y='63' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='87' y='63' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='116' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><circle cx='42' cy='73' r='2.6' fill='#0F766E'/><circle cx='71' cy='73' r='2.6' fill='#0F766E'/><circle cx='100' cy='73' r='2.6' fill='#0F766E'/><text x='400' y='13' font-size='13' font-weight='600' fill='#14161A'>BatchNorm</text><text x='401' y='29' font-size='11.5' fill='#868D98'>2015　同一通道，跨全部样本</text><rect x='400' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='40' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='40' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='63' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='63' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='86' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='86' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='109' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='109' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><text x='0' y='145' font-size='13' font-weight='600' fill='#14161A'>LayerNorm</text><text x='1' y='161' font-size='11.5' fill='#868D98'>2016　同一样本，跨全部通道</text><rect x='0' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='29' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='58' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='87' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='116' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='145' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='0' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><text x='400' y='145' font-size='13' font-weight='600' fill='#14161A'>InstanceNorm</text><text x='401' y='161' font-size='11.5' fill='#868D98'>2016　同一样本、同一通道</text><rect x='400' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='172' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='195' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='195' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='195' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='195' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='195' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='195' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='218' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='241' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><text x='0' y='277' font-size='13' font-weight='600' fill='#14161A'>GroupNorm</text><text x='1' y='293' font-size='11.5' fill='#868D98'>2018　同一样本，跨一组通道</text><rect x='0' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='29' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='58' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='87' y='327' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='327' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='327' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='0' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='29' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='58' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='87' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='116' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='145' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><text x='400' y='277' font-size='13' font-weight='600' fill='#14161A'>RMSNorm</text><text x='401' y='293' font-size='11.5' fill='#868D98'>2019　同 LayerNorm，但不减均值</text><rect x='400' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='304' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='429' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='458' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='487' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='516' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='545' y='327' width='26' height='20' rx='2.5' fill='#CFE8DE' stroke='#0F766E' stroke-width='1.3'/><rect x='400' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='350' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='400' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='429' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='458' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='487' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='516' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/><rect x='545' y='373' width='26' height='20' rx='2.5' fill='#F2F0EB' stroke='#E3DFD8' stroke-width='1'/></g></svg>
+<p>把一个卷积层的输出想成四维张量 <b>N × C × H × W</b>（样本数 × 通道数 × 高 × 宽）。
+上图里每一格是一个样本的一个通道，也就是一整张 H×W 的特征图。选中的格子就是「一起算统计量」的那一堆。</p>
+
+<h2>每一种解决的是什么问题</h2>
+
+<h3>Local Response Normalization（本文，2012）</h3>
+<table>
+<thead><tr><th>要解决的</th><th>怎么解决</th><th>代价</th></tr></thead>
+<tbody><tr>
+<td class="w">ReLU 无上界，某个神经元可以一路涨上去，主导后面所有层</td>
+<td class="w">同一像素位置上，拿相邻 5 个通道的响应平方和当分母，把自己除小</td>
+<td class="w">k、n、α、β 四个超参全靠验证集手调，一个可学习参数都没有</td>
+</tr></tbody></table>
+<p><b>只除不减</b>，所以作者自己说叫 brightness normalization 更准确。
+换来 top-1 降 1.4%、top-5 降 1.2%。</p>
+<p><b>为什么被否掉：</b>VGG（2014）实测它在 ILSVRC 上没有提升，反而多占显存多花时间。
+更根本的问题是「相邻通道」这个前提站不住 —— 卷积核的编号是随机初始化决定的，
+第 37 号和第 38 号核之间没有任何理由该互相压制。作者自己在论文里也写了
+<span class="m">the ordering of the kernel maps is of course arbitrary</span>。</p>
+
+<h3>BatchNorm（2015）</h3>
+<table>
+<thead><tr><th>要解决的</th><th>怎么解决</th><th>代价</th></tr></thead>
+<tbody><tr>
+<td class="w">前面的层一更新，后面的层收到的输入分布就变了，学习率被迫压得很低</td>
+<td class="w">对每个通道，在整个 batch 和空间位置上算均值方差归一化，再用可学习的 γ、β 把表达力还回去</td>
+<td class="w">依赖 batch 大小；训练和推理用两套统计量；序列长度可变时没法用</td>
+</tr></tbody></table>
+<p>它是这一串里收益最大的一个：学习率能开大一个量级，初始化不再敏感，
+还自带正则化（每个样本的归一化结果取决于同批次的其他样本，相当于注入噪声），
+所以 ResNet 干脆不用 dropout 了。</p>
+<p><b>但它有一个结构性的麻烦：</b>统计量来自「同一批的其他样本」，
+这意味着<b>一个样本的输出取决于它跟谁一起进的网络</b>。</p>
+<svg viewBox='0 0 760 154' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='训练与推理的行为差异：只有 BatchNorm 在两个阶段用不同的统计量，训练时用当前 batch 的均值方差，推理时改用训练期间攒的滑动平均；LayerNorm、RMSNorm、InstanceNorm、GroupNorm 都只看当前这一个样本，两个阶段完全一致'><defs><marker id='nm' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'><path d='M0 0 L10 5 L0 10 z' fill='#AEB3BA'/></marker></defs><text x='0' y='12' font-size='11.5' font-weight='600' fill='#868D98'>训练时</text><text x='424' y='12' font-size='11.5' font-weight='600' fill='#868D98'>推理时</text><text x='0' y='46' font-size='12.5' font-weight='600' fill='#14161A'>BatchNorm</text><rect x='178' y='30' width='222' height='24' rx='4' fill='#F2F0EB' stroke='#E3DFD8'/><text x='289' y='46' text-anchor='middle' font-size='11.5' fill='#4E5560'>用当前 batch 的均值方差</text><path d='M406 42 h12' stroke='#AEB3BA' stroke-width='1.3' marker-end='url(#nm)'/><rect x='424' y='30' width='200' height='24' rx='4' fill='#FBEFDD' stroke='#E3B778' stroke-width='1.1'/><text x='524' y='46' text-anchor='middle' font-size='11.5' fill='#8A4008' font-weight='600'>用训练时攒的滑动平均</text><text x='0' y='86' font-size='12.5' font-weight='600' fill='#14161A'>LayerNorm / RMSNorm</text><rect x='178' y='70' width='222' height='24' rx='4' fill='#F2F0EB' stroke='#E3DFD8'/><text x='289' y='86' text-anchor='middle' font-size='11.5' fill='#4E5560'>用这一个样本自己的统计量</text><path d='M406 82 h12' stroke='#AEB3BA' stroke-width='1.3' marker-end='url(#nm)'/><rect x='424' y='70' width='200' height='24' rx='4' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.1'/><text x='524' y='86' text-anchor='middle' font-size='11.5' fill='#0B5750' font-weight='400'>完全一样</text><text x='0' y='126' font-size='12.5' font-weight='600' fill='#14161A'>InstanceNorm / GroupNorm</text><rect x='178' y='110' width='222' height='24' rx='4' fill='#F2F0EB' stroke='#E3DFD8'/><text x='289' y='126' text-anchor='middle' font-size='11.5' fill='#4E5560'>用这一个样本自己的统计量</text><path d='M406 122 h12' stroke='#AEB3BA' stroke-width='1.3' marker-end='url(#nm)'/><rect x='424' y='110' width='200' height='24' rx='4' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.1'/><text x='524' y='126' text-anchor='middle' font-size='11.5' fill='#0B5750' font-weight='400'>完全一样</text></svg>
+<p>推理时没有 batch，只能拿训练期间攒的滑动平均顶上。训练和推理走的是两条路。
+batch 小的时候统计量本身就不准，batch = 1 时彻底失效，检测和分割这类大分辨率任务首当其冲。</p>
+
+<h3>LayerNorm（2016）</h3>
+<table>
+<thead><tr><th>要解决的</th><th>怎么解决</th><th>代价</th></tr></thead>
+<tbody><tr>
+<td class="w">BatchNorm 依赖 batch，循环网络和变长序列上用不了</td>
+<td class="w">统计量只在<b>一个样本自己</b>的全部特征维度上算，和 batch 里其他样本无关</td>
+<td class="w">卷积网络上通常打不过 BatchNorm，因为它把所有通道混在一起算，抹掉了通道之间的差异</td>
+</tr></tbody></table>
+<p><b>关键性质是「样本独立」</b>：batch 多大都一样，batch = 1 也一样，训练和推理完全一致。
+代价是它假设一个样本内的各个特征维度可以放在一起统计，这在视觉里不太成立，在语言里反而合适。</p>
+
+<h3>InstanceNorm（2016）与 GroupNorm（2018）</h3>
+<table>
+<thead><tr><th></th><th>统计范围</th><th>为什么这么切</th></tr></thead>
+<tbody>
+<tr><td><b>InstanceNorm</b></td><td>一个样本的一个通道</td>
+    <td class="w">风格迁移里，一张图的整体对比度和色调本身就是「风格」，逐图逐通道归一化正好把它洗掉</td></tr>
+<tr><td><b>GroupNorm</b></td><td>一个样本的一组通道</td>
+    <td class="w">在 LayerNorm（全部通道一组）和 InstanceNorm（每通道一组）之间取中间值，
+    默认 32 组。目标是在小 batch 的检测分割任务上顶替 BatchNorm</td></tr>
+</tbody></table>
+<p>这两个和 LayerNorm 一样都不看 batch。GroupNorm 的实验结论是：
+batch 大的时候略输 BatchNorm，batch 降到 2 以下时大幅胜出，因为它的精度根本不随 batch 变化。</p>
+
+<h3>RMSNorm（2019）</h3>
+<table>
+<thead><tr><th>要解决的</th><th>怎么解决</th><th>代价</th></tr></thead>
+<tbody><tr>
+<td class="w">LayerNorm 每层都要算一遍均值再做减法，大模型上这部分开销不小</td>
+<td class="w">干脆不减均值，分母直接用全部特征维度的均方根，只保留可学习的 γ</td>
+<td class="w">丢掉了对平移的稳健性，理论保证比 LayerNorm 弱</td>
+</tr></tbody></table>
+<div class="callout"><b>这里有个绕回来的地方。</b>RMSNorm 的论证是：LayerNorm 的收益主要来自对<b>缩放</b>的稳健性，
+不是对<b>平移</b>的稳健性，所以减均值那一步可以省。形式上它回到了本文 Local Response Normalization 的「只除不减」。
+区别在于 <b>RMSNorm 的分母是全部特征维度的均方根、且带可学习的 γ；本文的分母是编号相邻的 5 个核，一个可学习参数都没有</b>。
+同样是只除不减，一个是想清楚了才砍掉，一个是当年碰上的。今天 LLaMA、Mistral、Qwen 用的都是 RMSNorm。</div>
+
+<h2>Transformer 为什么用 LayerNorm 而不是 BatchNorm</h2>
+<p>答案不在「哪个更好」这一层。<b>BatchNorm 有几个前提，放到序列生成这个场景里全都不成立。</b>逐条看。</p>
+
+<h3>一、序列是变长的，同一位置上的样本数不一样</h3>
+<p>BatchNorm 要在「同一通道、跨全部样本」上算统计量。搬到序列上，
+所谓通道是特征维 d，所谓样本是 batch 里的每个序列。
+但一个 batch 里句子长短不齐，短的要 padding。<b>第 5 个位置可能有 32 个真实 token，第 300 个位置只有 2 个</b>。
+在这些位置上算出来的均值方差，可靠程度天差地别，而且大量统计量是在 padding 上算的，本身就是噪声。</p>
+<p>LayerNorm 完全不碰这个问题：它只在<b>一个 token 自己的 d 个维度</b>上算，
+跟这个 batch 里有没有别的句子、有多长，没有任何关系。</p>
+
+<h3>二、推理时的行为必须和训练时一致</h3>
+<p>语言模型是自回归的，一次生成一个 token，实际部署里 batch 大小完全不可控，
+可能是 1，可能是几百，还会随着请求动态拼批。
+<b>BatchNorm 的输出会随着「同一批里还有谁」而变</b>，这在生成任务里是不能接受的：
+同一个 prompt，跟别人一起跑和单独跑，结果不一样。</p>
+<p>而且 BatchNorm 推理时要换用滑动平均统计量，训练和推理是两套行为。
+LayerNorm 两个阶段是同一个式子。</p>
+
+<h3>三、Transformer 的隐藏维度天然适合逐样本统计</h3>
+<p>d<sub>model</sub> 通常是 512 到 8192。<b>单个 token 的向量里就有几千个数，够算出稳定的均值和方差</b>，
+不需要借别的样本来凑样本量。反观卷积网络，LayerNorm 要把所有通道混在一起算，
+而不同通道检测的是完全不同的东西（边缘、颜色、纹理），混在一起统计会抹掉这种差异，
+这也是 LayerNorm 在视觉上一直打不过 BatchNorm 的原因。同一个设计，在两个领域里的处境正好相反。</p>
+
+<h3>四、训练一个模型的成本决定了不能冒险</h3>
+<p>大模型训练是一次性的长跑，中途发散代价极高。
+BatchNorm 引入的「跨样本耦合」会让梯度里混进同批次其他样本的信息，
+在数据并行、梯度累积、流水线并行这些切分方式下，还得额外做跨设备的统计量同步（SyncBatchNorm），
+通信开销和实现复杂度都上来了。<b>LayerNorm 是逐样本的，怎么切都不用同步。</b></p>
+
+<div class="callout">BatchNorm 的统计量借自同批次的其他样本。在图像分类里这笔买卖很划算：batch 大、样本等长、
+训练推理都能接受滑动平均。搬到序列生成上，同一笔交易只剩负担：变长、batch 不可控、还要求逐样本确定性。
+<b>Transformer 要的是「样本独立」这个性质，LayerNorm 只是当时手边最现成的实现。</b>
+后来换成 RMSNorm 也没什么阻力，因为真正被依赖的那条性质没变。</div>
+
+<h3>后来还动过两次</h3>
+<p><b>Pre-LN 取代 Post-LN。</b>原始 Transformer 把 LayerNorm 放在残差相加<b>之后</b>（Post-LN），
+深了之后需要 warmup 才能训起来。后来普遍改成放在子层<b>之前</b>（Pre-LN），
+残差通路上就没有归一化挡着了，warmup 可以去掉，几十上百层也能稳定训。</p>
+<p><b>LayerNorm 换成 RMSNorm。</b>见上一节，省掉减均值那一步。今天主流开源大模型基本都是
+Pre-RMSNorm 这个组合。</p>
+
+<h2>放在一起看</h2>
+<table>
+<thead><tr><th>方法</th><th>统计范围</th><th>依赖 batch</th><th>训练/推理一致</th><th>今天主要用在</th></tr></thead>
+<tbody>
+<tr><td><b>Local Response Norm</b></td><td>同一位置的相邻通道</td><td>否</td><td>是</td><td class="w">已淘汰，只在复现老模型时出现</td></tr>
+<tr><td><b>BatchNorm</b></td><td>同一通道 × N × H × W</td><td><b>是</b></td><td><b>否</b></td><td class="w">卷积网络，batch 够大的图像分类</td></tr>
+<tr><td><b>LayerNorm</b></td><td>同一样本 × C × H × W</td><td>否</td><td>是</td><td class="w">Transformer、循环网络</td></tr>
+<tr><td><b>InstanceNorm</b></td><td>同一样本同一通道</td><td>否</td><td>是</td><td class="w">风格迁移、图像生成</td></tr>
+<tr><td><b>GroupNorm</b></td><td>同一样本 × 一组通道</td><td>否</td><td>是</td><td class="w">小 batch 的检测与分割</td></tr>
+<tr><td><b>RMSNorm</b></td><td>同 LayerNorm，不减均值</td><td>否</td><td>是</td><td class="w">大语言模型</td></tr>
+</tbody></table>
+<p>竖着看这张表，<b>「依赖 batch」那一列只有 BatchNorm 是「是」</b>。
+从 2015 往后所有新提出的归一化，做的都是同一件事：
+保住 BatchNorm 的收益，同时把对 batch 的依赖去掉。</p>

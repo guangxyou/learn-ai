@@ -2,7 +2,7 @@
   "id": "attention-is-all-you-need",
   "kind": "paper",
   "title": "逐字、逐句理解 Transformer",
-  "subtitle": "《Attention Is All You Need》全文精读",
+  "subtitle": "《Attention Is All You Need》论文精读",
   "topics": [
     "AI 基础",
     "论文",
@@ -31,7 +31,9 @@
       "--posters",
       "content/attention-is-all-you-need/figures/attention-is-all-you-need.svg#架构 · 细节 · 公式#,content/attention-is-all-you-need/figures/attention-shapes.svg#形状#,content/attention-is-all-you-need/figures/transformer-shape-walkthrough.svg#示例#",
       "--res",
-      "content/attention-is-all-you-need/resources.json"
+      "content/attention-is-all-you-need/resources.json",
+      "--h1",
+      "逐字、逐句理解 Transformer —— 《Attention Is All You Need》论文精读"
     ]
   },
   "page": "page.html"

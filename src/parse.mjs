@@ -38,6 +38,16 @@ export function inline(s) {
 const LI = /^(?:-|\*)\s+(.*)$/;
 const OLI = /^\d+\.\s+(.*)$/;
 
+/** 标题上的时间码：`标题〔00:03:49〕` 或 `〔00:03:49〕标题` 都认，返回 [纯标题, 秒]。
+    两种写法是不同期整理时留下的，与显示无关，所以在这里一并吃掉，别让下游各自去猜。 */
+function splitHeadTime(t) {
+  let m = /〔(\d{2}:\d{2}:\d{2})〕\s*$/.exec(t);
+  if (m) return [t.slice(0, m.index).trim(), t2s(m[1])];
+  m = /^〔(\d{2}:\d{2}:\d{2})〕\s*/.exec(t);
+  if (m) return [t.slice(m[0].length).trim(), t2s(m[1])];
+  return [t, null];
+}
+
 /** 往当前小节最后一个 turn 里塞一个块；还没有 turn 就先开一个无锚点的 */
 function pushBlock(cur, block) {
   if (!cur) return;
@@ -70,18 +80,14 @@ export function parseTranscript(md, speakers) {
 
     // 一级标题 = 分卷。分卷底下没有 `## ` 时它自己会被当成一节，所以时间码也要在这儿摘掉
     if (/^# /.test(s)) {
-      const p = s.slice(2).trim();
-      const pt = /〔(\d{2}:\d{2}:\d{2})〕\s*$/.exec(p);
-      part = pt ? p.slice(0, pt.index).trim() : p;
-      partTime = pt ? t2s(pt[1]) : null;
+      [part, partTime] = splitHeadTime(s.slice(2).trim());
       pendingPart = true;
       continue;
     }
     if (s.startsWith('## ')) {
-      // 详录体的小节标题自带时间码：`## 标题〔00:03:49〕`，摘出来当这一节的锚点
-      const t = s.slice(3).trim().replace(/\\/g, '');
-      const ht = /〔(\d{2}:\d{2}:\d{2})〕\s*$/.exec(t);
-      cur = { title: ht ? t.slice(0, ht.index).trim() : t, hTime: ht ? t2s(ht[1]) : null, part, turns: [] };
+      // 详录体的小节标题自带时间码（`## 标题〔00:03:49〕` 或 `## 〔00:03:49〕标题`），摘出来当这一节的锚点
+      const [ht, hTime] = splitHeadTime(s.slice(3).trim().replace(/\\/g, ''));
+      cur = { title: ht, hTime, part, turns: [] };
       sections.push(cur);
       pendingPart = false;
       continue;

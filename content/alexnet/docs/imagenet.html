@@ -1,0 +1,204 @@
+<h2>ImageNet 是数据集，ILSVRC 才是竞赛</h2>
+<p class="lede">这两个词日常被混着用，但论文里分得很清楚。</p>
+<p>论文第 2 节开头这么交代：<b>ImageNet</b> 是一个超过 1500 万张、2.2 万个类别的图像数据库；
+<b>ILSVRC</b>（ImageNet Large-Scale Visual Recognition Challenge）是基于它的一个子集办的年度竞赛，
+用 1000 个类别，每类约 1000 张图。</p>
+<table>
+<thead><tr><th></th><th>类别数</th><th>图片数</th><th>拿得到吗</th></tr></thead>
+<tbody>
+<tr><td><b>ImageNet 全量</b><br><span style="color:var(--text-dim)">Fall 2011 版</span></td>
+    <td class="n">21,841</td><td class="n">14,197,122</td>
+    <td>注册后公开下载</td></tr>
+<tr><td><b>ILSVRC 训练集</b></td><td class="n">1,000</td><td class="n">1,281,167</td><td>赛前发放，含标签</td></tr>
+<tr><td><b>ILSVRC 验证集</b></td><td class="n">1,000</td><td class="n">50,000</td><td>赛前发放，含标签</td></tr>
+<tr><td><b>ILSVRC 测试集</b></td><td class="n">1,000</td><td class="n">150,000</td>
+    <td>只发图，标签扣住</td></tr>
+</tbody></table>
+<p>所以今天口语里说「在 ImageNet 上跑到多少」，绝大多数时候指的是 ILSVRC 那 1000 类的子集，不是全量。
+本文摘要里的 15.3%、表 1 里的 37.5% / 17.0%，说的都是这个子集。</p>
+
+<h3>三个集合各自干什么</h3>
+<p><b>训练集（train）</b>用来更新权重，模型每一步都在看它。
+<b>验证集（validation）</b>不参与更新，用来挑超参数和判断该在第几轮停：
+学习率降不降、dropout 留多少、哪个 checkpoint 拿去交，都看它。
+<b>测试集（test）</b>是最后的考卷，标签不公开，只能把预测结果提交到官方评测服务器换回一个分数，
+每天还限次数。这样参赛者没法拿测试集反复试，分数才有意义。</p>
+<div class="callout"><b>这三个集合和 ImageNet 全量是什么关系，得分开说。</b>
+<b>训练集是从 ImageNet 数据库里切出来的</b>：挑 1000 个 synset，把它们名下的图打包发放，
+所以它确实是全量的一个子集。<b>验证集和测试集不是。</b>那 15 万张是另外从 Flickr 等搜索引擎重新采集、
+单独标注的，没有进 ImageNet 数据库，官方还明写会把与训练数据重复的图剔掉。</div>
+
+<h2>数据集是怎么建起来的</h2>
+<p><b>发起人是李飞飞</b>，2006 年在普林斯顿开始做，2009 年以 <i>ImageNet: A Large-Scale Hierarchical Image Database</i>
+发表在 CVPR，就是本文的文献 [6]。</p>
+<p><b>骨架借自 WordNet。</b>WordNet 是普林斯顿做的英语词汇网络，把名词组织成一棵带层级的树，
+每个节点叫一个 synset（同义词集合，比如 Siberian husky 是 dog 的下位词）。
+李飞飞的做法是拿 WordNet 大约 2.2 万个名词当类别表，再去网上给每个名词收集图片。
+<b>类别体系不是自己拍脑袋定的，是借来的现成语言学结构</b>，这一步省掉了整个分类学的争论。</p>
+<p><b>标注靠 Amazon Mechanical Turk。</b>从 1.6 亿张候选图里筛，2008 年 7 月开工，2010 年 4 月完成，
+动用了 167 个国家的约 4.9 万名众包工人。这是 2010 年之前不可能做到的事，
+不是技术不够，是把这个量级的人力组织起来的方式当时还不存在。</p>
+<div class="callout"><b>为什么这件事对本文这么重要。</b>论文第 1 节的论证链条是：
+要学会认上千种物体就需要大容量模型，大容量模型必然过拟合，
+除非训练数据也大到相应的量级。<b>ImageNet 是这条链条上唯一不能由作者自己解决的一环</b>，
+它必须先存在。这也是为什么同样的网络结构放在 2009 年做不出来。</div>
+
+<h2>赛制与评分口径</h2>
+<p>ILSVRC 2010 年开办，第一届挂在 Pascal VOC Challenge 的 workshop 下面。
+2017 年办完最后一届就停了，官方的说法是这个基准已经被解决。</p>
+<p>评分用 top-1 和 top-5 两个错误率：</p>
+<svg viewBox='0 0 760 216' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='top-1 与 top-5 判分示意：模型对一张图给出五个候选并按概率排序，正确标签 leopard 排在第一位，因此这张图 top-1 和 top-5 都算对'><text x='0' y='16' font-size='12.5' font-weight='600' fill='#14161A'>一张图，模型给出 1000 类上的概率，取前五名</text><text x='560' y='16' font-size='11' fill='#868D98'>正确标签：leopard（示意，非实测）</text><rect x='190' y='40' width='142.8' height='19' rx='3' fill='#8CC9B2'/><text x='182' y='54' text-anchor='end' font-size='12.5' fill='#0B5750' font-weight='600'>1. leopard</text><text x='340.8' y='54' font-size='11.5' fill='#868D98'>0.42</text><rect x='190' y='68' width='71.4' height='19' rx='3' fill='#DCD9D2'/><text x='182' y='82' text-anchor='end' font-size='12.5' fill='#4E5560'>2. jaguar</text><text x='269.4' y='82' font-size='11.5' fill='#868D98'>0.21</text><rect x='190' y='96' width='47.6' height='19' rx='3' fill='#DCD9D2'/><text x='182' y='110' text-anchor='end' font-size='12.5' fill='#4E5560'>3. cheetah</text><text x='245.6' y='110' font-size='11.5' fill='#868D98'>0.14</text><rect x='190' y='124' width='30.6' height='19' rx='3' fill='#DCD9D2'/><text x='182' y='138' text-anchor='end' font-size='12.5' fill='#4E5560'>4. snow leopard</text><text x='228.6' y='138' font-size='11.5' fill='#868D98'>0.09</text><rect x='190' y='152' width='17' height='19' rx='3' fill='#DCD9D2'/><text x='182' y='166' text-anchor='end' font-size='12.5' fill='#4E5560'>5. Egyptian cat</text><text x='215' y='166' font-size='11.5' fill='#868D98'>0.05</text><line x1='0' y1='192' x2='760' y2='192' stroke='#EFEDE7' stroke-width='1'/><text x='0' y='210' font-size='12' fill='#0B5750'><tspan font-weight='600'>top-1 算对</tspan>：正确标签排第 1　　　<tspan font-weight='600'>top-5 算对</tspan>：正确标签落在前 5 名之内</text></svg>
+<ul>
+<li><b>top-1 错误率</b>：排第一的标签猜错了的图，占测试集的比例</li>
+<li><b>top-5 错误率</b>：正确标签<b>不在</b>前五名里的图，占测试集的比例</li>
+</ul>
+<p>所以 top-5 一定比 top-1 低。论文里 37.5% 对 17.0%，差了二十个百分点。</p>
+<p><b>为什么要有 top-5 这个口径。</b>ImageNet 的 1000 类里有大量细分品种，光狗就有 120 种；
+一张图里同时出现猫和沙发，标注却只标了一个。这种情况下要求「排第一必须对」过于苛刻，
+苛刻到无法区分模型是真不认识，还是标签本身有歧义。
+本文第 6.1 节自己就举了例子：grille 和 cherry 那两张，
+<span class="m">there is genuine ambiguity about the intended focus of the photograph</span>。</p>
+<div class="warnout"><b>今天的口径反过来了。</b>现在报 ImageNet 结果基本只报 top-1 <b>准确率</b>（越高越好），
+top-5 很少提，因为它早已挤在 1% 上下，区分不出好坏。
+看 2012 年前后的论文时要留意这个方向的翻转：<b>那时报错误率，越低越好。</b></div>
+
+<h2>历届分类冠军</h2>
+<svg viewBox='0 0 760 356' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='ILSVRC 图像分类历届冠军 top-5 错误率折线图：2010 年 NEC-UIUC 28.2%，2011 年 XRCE 25.8%，2012 年 SuperVision 也就是 AlexNet 一步降到 15.3%，此后 2013 年 Clarifai 11.7%、2014 年 GoogLeNet 6.7%、2015 年 ResNet 3.6%、2016 年 Trimps-Soushen 3.0%、2017 年 SENet 2.3%。人类基线约 5.1%，2015 年被越过'><text x='60' y='18' font-size='13' font-weight='600' fill='#14161A'>ILSVRC 图像分类冠军 top-5 错误率</text><text x='730' y='18' text-anchor='end' font-size='11' fill='#868D98'>纵轴 %，越低越好</text><line x1='60' y1='300' x2='730' y2='300' stroke='#EFEDE7' stroke-width='1'/><text x='52' y='304' text-anchor='end' font-size='11' fill='#868D98'>0</text><line x1='60' y1='213.3' x2='730' y2='213.3' stroke='#EFEDE7' stroke-width='1'/><text x='52' y='217.3' text-anchor='end' font-size='11' fill='#868D98'>10</text><line x1='60' y1='126.7' x2='730' y2='126.7' stroke='#EFEDE7' stroke-width='1'/><text x='52' y='130.7' text-anchor='end' font-size='11' fill='#868D98'>20</text><line x1='60' y1='40' x2='730' y2='40' stroke='#EFEDE7' stroke-width='1'/><text x='52' y='44' text-anchor='end' font-size='11' fill='#868D98'>30</text><line x1='60' y1='255.8' x2='730' y2='255.8' stroke='#B45309' stroke-width='1.2' stroke-dasharray='5 4'/><text x='68' y='247.8' font-size='11' fill='#B45309'>人类基线约 5.1%</text><polyline points='60,55.6 155.7,76.4 251.4,167.4 347.1,198.6 442.9,241.9 538.6,268.8 634.3,274 730,280.1' fill='none' stroke='#0F766E' stroke-width='2.4' stroke-linejoin='round'/><line x1='60' y1='40' x2='60' y2='300' stroke='#AEB3BA' stroke-width='1'/><line x1='60' y1='300' x2='730' y2='300' stroke='#AEB3BA' stroke-width='1'/><circle cx='60' cy='55.6' r='4' fill='#0F766E'/><circle cx='155.7' cy='76.4' r='4' fill='#0F766E'/><circle cx='251.4' cy='167.4' r='6' fill='#B45309'/><circle cx='347.1' cy='198.6' r='4' fill='#0F766E'/><circle cx='442.9' cy='241.9' r='4' fill='#0F766E'/><circle cx='538.6' cy='268.8' r='4' fill='#0F766E'/><circle cx='634.3' cy='274' r='4' fill='#0F766E'/><circle cx='730' cy='280.1' r='4' fill='#0F766E'/><text x='66' y='89.6' text-anchor='start' font-size='11.5' font-weight='500' fill='#0B5750'>NEC-UIUC</text><text x='66' y='105.6' text-anchor='start' font-size='11.5' fill='#868D98'>28.2%</text><text x='155.7' y='60.400000000000006' text-anchor='middle' font-size='11.5' font-weight='500' fill='#0B5750'>XRCE<tspan font-weight='400' fill='#868D98'>　25.8%</tspan></text><text x='239.4' y='189.4' text-anchor='end' font-size='13' font-weight='700' fill='#B45309'>SuperVision<tspan font-weight='400' fill='#868D98'>　15.3%</tspan></text><text x='337.1' y='220.6' text-anchor='end' font-size='11.5' font-weight='500' fill='#0B5750'>Clarifai<tspan font-weight='400' fill='#868D98'>　11.7%</tspan></text><text x='432.9' y='271.9' text-anchor='end' font-size='11.5' font-weight='500' fill='#0B5750'>GoogLeNet<tspan font-weight='400' fill='#868D98'>　6.7%</tspan></text><text x='548.6' y='286.8' text-anchor='start' font-size='11.5' font-weight='500' fill='#0B5750'>ResNet<tspan font-weight='400' fill='#868D98'>　3.6%</tspan></text><text x='60' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2010</text><text x='155.7' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2011</text><text x='251.4' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2012</text><text x='347.1' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2013</text><text x='442.9' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2014</text><text x='538.6' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2015</text><text x='634.3' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2016</text><text x='730' y='324' text-anchor='middle' font-size='12' fill='#4E5560'>2017</text><text x='730' y='340' text-anchor='end' font-size='11' fill='#868D98'>末两届未标注：2016 Trimps-Soushen 3.0%　2017 SENet 2.3%</text><text x='60' y='340' font-size='11' fill='#AEB3BA'>2016 那一届单独的分类赛道已取消，取自分类+定位赛道</text></svg>
+<table>
+<thead><tr><th>年份</th><th>冠军队伍 / 模型</th><th>top-5</th><th>核心方法</th></tr></thead>
+<tbody>
+<tr><td class="n">2010</td><td>NEC-UIUC</td><td class="n">28.2%</td><td>HOG / LBP + 编码 + SVM</td></tr>
+<tr><td class="n">2011</td><td>XRCE</td><td class="n">25.8%</td><td>Fisher 向量 + SVM</td></tr>
+<tr><td class="n">2012</td><td style="font-weight:600;color:#B45309">SuperVision</td><td class="n" style="font-weight:600;color:#B45309">15.3%</td><td>深度卷积网络 + GPU</td></tr>
+<tr><td class="n">2013</td><td>Clarifai</td><td class="n">11.7%</td><td>CNN 集成 + 反卷积可视化</td></tr>
+<tr><td class="n">2014</td><td>GoogLeNet</td><td class="n">6.7%</td><td>Inception 多尺度模块</td></tr>
+<tr><td class="n">2015</td><td>ResNet</td><td class="n">3.6%</td><td>残差连接，152 层</td></tr>
+<tr><td class="n">2016</td><td>Trimps-Soushen</td><td class="n">3%</td><td>多模型集成</td></tr>
+<tr><td class="n">2017</td><td>SENet</td><td class="n">2.3%</td><td>通道注意力</td></tr>
+</tbody></table>
+<p>压成一条线就是：<b>28.2 → 25.8 → 15.3 → 11.7 → 6.7 → 3.6 → 3.0 → 2.3</b>。
+2011 到 2012 那一步不是斜坡，是断崖。前两年人工特征路线一年只挪动两三个点，
+2012 年一年掉了十个百分点，而且此后再没有非 CNN 方案拿过冠军。</p>
+<div class="warnout"><b>2012 年那一格其实有两个数。</b>官方结果里，SuperVision 只用比赛规定训练集时是
+<b>16.4%</b>；额外用了 ImageNet Fall 2011 的数据之后是 <b>15.3%</b>。
+这两个数在本文表 2 里都能对上：「5 CNNs」那行 16.4%，「7 CNNs*」那行 15.3%，
+星号的含义正文写了，就是在 Fall 2011 全量上预训练过。对外报的冠军成绩是 15.3%。</div>
+<p><b>Fall 2011 是 ImageNet 数据库的一个版本号，不是「2011 年那届比赛」。</b>
+ImageNet 每隔一段时间放一次全量快照，命名是 Fall 2009、Spring 2010、Fall 2011 这样，
+注册研究者可以直接下整个库。本文第 6 节末尾还报了一次 Fall 2009 版上的结果，用的是同一套命名。
+所以「在 Fall 2011 全量上预训练」指的是拿 1400 万张、2.2 万类的公开数据库去训，
+用的是数据库自己的标签，和被扣住的比赛测试集标签没有关系。</p>
+<p><b>也不构成泄题。</b>上面说过，ILSVRC 的验证集和测试集是另外采集的，不在 ImageNet 数据库里，
+官方还会剔重。预训练看到的是更多类别的训练材料，不是考题。
+之所以还要把 16.4% 和 15.3% 分开报，是因为赛制按「有没有用规定训练集之外的数据」分档，
+Fall 2011 全量对 ILSVRC-2012 而言属于额外数据。</p>
+
+<h2>逐年看方法怎么变的</h2>
+
+<h3>2010：人设计特征的最后阶段</h3>
+<p>冠军 NEC-UIUC。那时还没有今天意义上的深度学习，流水线是固定的四段：</p>
+<svg viewBox='0 0 760 210' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='两条流水线对比：2010 到 2011 年的做法是图像先过人工设计的 HOG、LBP 或 SIFT 特征，再做稀疏编码或 Fisher 向量编码、池化，最后只训练一个 SVM 分类器；2012 年 AlexNet 的做法是从像素直接堆卷积层，特征本身也是学出来的'><defs><marker id='pp' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'><path d='M0 0 L10 5 L0 10 z' fill='#AEB3BA'/></marker></defs><text x='0' y='16' font-size='12.5' font-weight='600' fill='#8A4008'>2010–2011：人设计特征，机器只学分类器</text><rect x='0' y='28' width='72' height='44' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2' stroke-dasharray='5 4'/><text x='36' y='55' text-anchor='middle' font-size='12.5' fill='#4E5560'>像素</text><path d='M74 50 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='96' y='28' width='118' height='44' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2' stroke-dasharray='5 4'/><text x='155' y='46' text-anchor='middle' font-size='12.5' fill='#4E5560'>HOG / LBP / SIFT</text><text x='155' y='63' text-anchor='middle' font-size='10.5' fill='#868D98'>人工设计</text><path d='M216 50 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='238' y='28' width='140' height='44' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2' stroke-dasharray='5 4'/><text x='308' y='46' text-anchor='middle' font-size='12.5' fill='#4E5560'>稀疏编码 / Fisher 向量</text><text x='308' y='63' text-anchor='middle' font-size='10.5' fill='#868D98'>人工设计</text><path d='M380 50 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='402' y='28' width='72' height='44' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2' stroke-dasharray='5 4'/><text x='438' y='55' text-anchor='middle' font-size='12.5' fill='#4E5560'>池化</text><path d='M476 50 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='498' y='28' width='100' height='44' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='548' y='46' text-anchor='middle' font-size='12.5' fill='#0B5750'>SVM</text><text x='548' y='63' text-anchor='middle' font-size='10.5' fill='#0F766E'>唯一可训练</text><text x='0' y='118' font-size='12.5' font-weight='600' fill='#0B5750'>2012：特征和分类器一起学</text><rect x='0' y='130' width='72' height='44' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2' stroke-dasharray='5 4'/><text x='36' y='157' text-anchor='middle' font-size='12.5' fill='#4E5560'>像素</text><path d='M74 152 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='96' y='130' width='400' height='44' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='296' y='148' text-anchor='middle' font-size='12.5' fill='#0B5750'>五个卷积层 + 三个全连接层</text><text x='296' y='165' text-anchor='middle' font-size='10.5' fill='#0F766E'>这一整块的参数都由数据学出来</text><path d='M498 152 h16' stroke='#AEB3BA' stroke-width='1.4' marker-end='url(#pp)'/><rect x='520' y='130' width='100' height='44' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='570' y='157' text-anchor='middle' font-size='12.5' fill='#0B5750'>softmax</text><text x='0' y='198' font-size='11' fill='#868D98'>实线框 = 参数由数据学出来；虚线框 = 人写死的规则</text></svg>
+<p><b>HOG</b>（Histogram of Oriented Gradients，梯度方向直方图）和
+<b>LBP</b>（Local Binary Pattern，局部二值模式）都是人手设计的局部描述子：
+在图上找关键点，把每个点周围的梯度方向或明暗关系统计成一个固定长度的向量。
+<b>这些向量里的每一个数字都来自人写的公式，没有一个是学出来的。</b></p>
+<p>最后接一个 <b>SVM</b>（Support Vector Machine，支持向量机）做分类。
+SVM 做的事是：给定一堆已经提取好的特征向量，找一个把不同类别分开的最优分界面，
+而决定这个面位置的只是离它最近的那几个样本，所以叫支持向量。
+<b>它本身完全不管特征是怎么来的。</b></p>
+<p>这一时期的分工是：<b>人负责设计「看什么」，机器负责学习「怎么分」。</b>top-5 错误率 28.2%。</p>
+
+<h3>2011：Fisher 向量，同一条路走到头</h3>
+<p>冠军 XRCE（Xerox 欧洲研究中心），Sánchez 和 Perronnin 的 Fisher 向量方案，
+也就是本文表 1 第二行的 <span class="m">SIFT + FVs</span>。</p>
+<p>思路仍然是人工特征加分类器，只是中间的编码环节做得更精细：
+用一个高斯混合模型描述局部描述子的分布，再取对数似然的梯度当作整图的表示，
+维度能到十万量级。top-5 从 28.2% 降到 25.8%。</p>
+<p><b>一年只挪动 2.4 个百分点，这就是当时的天花板。</b>本文表 1 把它列为对照，
+并注明这是「本文出现之前公开发表的最好结果」（45.7% / 25.7%，比赛当届是 25.8%）。</p>
+
+<h3>2012：AlexNet，换掉的是整条流水线</h3>
+<p>冠军 SuperVision，成员是 Alex Krizhevsky、Ilya Sutskever、Geoffrey Hinton，
+论文就是本页正在读的这一篇。top-5 从 25.8% 一步降到 15.3%。</p>
+<p><b>关键不在于某个模块更好，而在于人工设计的那三段被整体删掉了。</b>
+上面那张图的下半部分就是它：从像素直接进卷积层，特征和分类器一起用同一个目标函数学出来。
+六千万个参数换掉了二十年积累的手工描述子。</p>
+<p>本文第 6.1 节的图 3 是这个论点最硬的证据：网络自己学出了方向选择性的边缘检测器和色块检测器，
+而这些正是 SIFT 当年由人手编码的东西。</p>
+<div class="callout"><b>它是三件事同时成熟的产物。</b>ImageNet 提供了数据，
+ReLU 和 dropout 让大网络训得动也不过拟合，两块 GTX 580 提供了算力。
+任缺一件都做不成，而它们恰好在 2012 年同时可用。
+这也是同年 Cireşan 那一路（多列 CNN、也用 GPU、也很深）没能拿下 ImageNet 的原因：
+缺的是把这几样凑齐并调通的工程量。</div>
+
+<h3>2013：CNN 开始统治，并且开始被看懂</h3>
+<p>冠军 Clarifai，多个 CNN 集成，11.7%。同年还有 ZFNet、OverFeat 等多支 CNN 队伍。</p>
+<p><b>ZFNet（Zeiler &amp; Fergus）比名次更重要。</b>它做的事是研究 AlexNet 为什么有效：
+用反卷积把每一层的响应投回像素空间，看网络到底学到了什么。结论是逐层递进的：</p>
+<div class="eg">第 1 层   边缘、颜色
+第 2 层   纹理、简单形状
+第 3 层   物体局部（车轮、人脸部件）
+更深层    完整物体、语义</div>
+<p>ZFNet 顺手改小了 AlexNet 的第一层（11×11 stride 4 改成 7×7 stride 2），
+因为可视化显示原来的大核学出了不少混叠的高频花纹。<b>这是「看懂了再改」的第一个例子。</b></p>
+
+<h3>2014：两条路线同时爆发</h3>
+<p>这一年出现了两个影响极大的网络，思路正好相反。</p>
+<p><b>VGG</b>（牛津，Simonyan &amp; Zisserman）走的是最朴素的路：不够强就堆深，
+从 AlexNet 的 8 层做到 16 到 19 层，而且全部改用 3×3 的小卷积核。
+两个 3×3 叠起来的感受野等于一个 5×5，但参数更少、非线性更多。7.3%，分类第二名。</p>
+<p><b>GoogLeNet</b>（Google，Szegedy 等）走的是结构设计：Inception 模块让 1×1、3×3、5×5
+和池化在同一层并行，再把结果拼起来，让网络自己决定用哪个尺度。22 层，6.7%，分类冠军。
+它还用 global average pooling 取消了巨大的全连接头，参数量从 AlexNet 的 6000 万降到几百万。</p>
+<svg viewBox='0 0 700 196' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='Inception 模块示意：输入同时送进 1×1 卷积、3×3 卷积、5×5 卷积和 3×3 池化四条并行支路，四条支路的输出在 channel 方向拼接成一个张量再往下传'><defs><marker id='ic' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'><path d='M0 0 L10 5 L0 10 z' fill='#AEB3BA'/></marker></defs><path d='M72 98 H124 V35 H176' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M72 98 H124 V77 H176' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M72 98 H124 V119 H176' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M72 98 H124 V161 H176' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M372 35 H428 V98 H476' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M372 77 H428 V98 H476' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M372 119 H428 V98 H476' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><path d='M372 161 H428 V98 H476' fill='none' stroke='#AEB3BA' stroke-width='1.3'/><rect x='176' y='18' width='196' height='34' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='274' y='40' text-anchor='middle' font-size='12.5' fill='#0B5750'>1×1 卷积</text><rect x='176' y='60' width='196' height='34' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='274' y='82' text-anchor='middle' font-size='12.5' fill='#0B5750'>3×3 卷积</text><rect x='176' y='102' width='196' height='34' rx='6' fill='#E6F4F1' stroke='#0F766E' stroke-width='1.2'/><text x='274' y='124' text-anchor='middle' font-size='12.5' fill='#0B5750'>5×5 卷积</text><rect x='176' y='144' width='196' height='34' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2'/><text x='274' y='166' text-anchor='middle' font-size='12.5' fill='#4E5560'>3×3 池化</text><rect x='0' y='81' width='72' height='34' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2'/><text x='36' y='103' text-anchor='middle' font-size='12.5' fill='#4E5560'>输入</text><rect x='476' y='81' width='76' height='34' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2'/><text x='514' y='103' text-anchor='middle' font-size='12.5' fill='#4E5560'>拼接</text><path d='M556 98 H592' fill='none' stroke='#AEB3BA' stroke-width='1.3' marker-end='url(#ic)'/><rect x='600' y='81' width='76' height='34' rx='6' fill='#F4F2EE' stroke='#D6D2C9' stroke-width='1.2'/><text x='638' y='103' text-anchor='middle' font-size='12.5' fill='#4E5560'>输出</text></svg>
+
+<h3>2015：残差连接</h3>
+<p>冠军 ResNet（微软亚洲研究院，何恺明等），152 层，3.57%，<b>首次低于人类基线</b>。</p>
+<p>它解决的问题是：网络堆到几十层之后，再加层不但没变好，训练误差反而上升。
+这不是过拟合，是优化本身出了问题。做法是给每一组层加一条恒等旁路，
+让这组层去学「相对输入的增量」而不是完整映射。</p>
+<div class="eg">原来   y = H(x)          直接学一个完整映射
+改成   y = F(x) + x      只学增量，实在学不到就退化成恒等</div>
+<p>这条旁路后来越出了视觉领域，成了几乎所有深层网络的标配结构。</p>
+
+<h3>2016–2017：结构红利见底</h3>
+<p>2016 年冠军 Trimps-Soushen，2.99%，首次低于 3%，方法是多个已有网络的集成，
+没有提出新结构，也没有发论文。<b>这本身就是一个信号：单纯换结构已经很难再有大提升。</b></p>
+<p>2017 年最后一届冠军 SENet（Squeeze-and-Excitation），2.25%。
+它的想法是：卷积网络一直在学「空间上有什么」，但没有学「哪个通道更重要」。
+SENet 给每个通道算一个权重，再逐通道缩放。<b>这实际上是很早期的通道注意力。</b></p>
+<div class="eg">通道 1   × 0.2
+通道 2   × 1.4
+通道 3   × 0.1
+  ...
+通道 512 × 0.8</div>
+<p>竞赛在这一届之后停办。</p>
+
+<h2>值得记住的是五次范式变化</h2>
+<table>
+<thead><tr><th>年份</th><th>变化</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td class="n">2012</td><td>AlexNet</td><td>特征不再由人设计，交给数据学</td></tr>
+<tr><td class="n">2014</td><td>VGG</td><td>深度本身可以持续换来精度，小核堆叠优于大核</td></tr>
+<tr><td class="n">2014</td><td>GoogLeNet</td><td>结构可以设计，多尺度并行；全连接头可以取消</td></tr>
+<tr><td class="n">2015</td><td>ResNet</td><td>恒等旁路让上百层网络真正训得动</td></tr>
+<tr><td class="n">2017</td><td>SENet</td><td>注意力进入卷积网络，通道的重要性由网络动态决定</td></tr>
+</tbody></table>
+
+<h2>一处常见的误读</h2>
+<p>「某年 ImageNet 冠军是某某网络」这个说法通常省略了任务。ILSVRC 后期同时设有分类、
+分类+定位、目标检测、视频检测、场景分类、场景解析等多个赛道，各有各的冠军。</p>
+<p>比如 2014 年，分类冠军是 GoogLeNet，而分类+定位冠军是 VGG；
+2016 年分类冠军是 Trimps-Soushen，目标检测冠军是 CUImage。
+上面那张表和那条折线，说的<b>都只是图像分类这一个赛道</b>。</p>
+<p>另一处要小心的是人类基线那条虚线。<b>约 5.1% 这个数来自 Russakovsky 等人 2015 年那篇综述</b>，
+是 Karpathy 本人在这 1000 类上受训后实测的结果，不是「人类视觉能力」的上限，
+也不适合用来论证模型已经超过人。</p>
+
+<h2>延伸</h2>
+<ul>
+<li><a href="https://www.image-net.org/" target="_blank" rel="noreferrer">image-net.org</a>　数据集与历届竞赛的官方页面</li>
+<li><a href="https://www.image-net.org/static_files/papers/imagenet_cvpr09.pdf" target="_blank" rel="noreferrer">ImageNet: A Large-Scale Hierarchical Image Database</a>　CVPR 2009，数据集的原始论文，本文的文献 [6]</li>
+<li><a href="https://arxiv.org/abs/1409.0575" target="_blank" rel="noreferrer">ImageNet Large Scale Visual Recognition Challenge</a>　Russakovsky 等 2015，讲赛制、评测口径和人类基线最细的一篇</li>
+<li><a href="https://image-net.org/challenges/LSVRC/2012/results.html" target="_blank" rel="noreferrer">ILSVRC 2012 官方结果</a>　16.4% 与 15.3% 两个数的出处</li>
+</ul>
