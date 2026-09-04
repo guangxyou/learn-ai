@@ -10,7 +10,7 @@
   ],
   "date": "2012-12",
   "studied": "2026-09",
-  "summary": "2012 年 ILSVRC 图像分类竞赛冠军，top-5 错误率 15.3%，把第二名的 26.2% 甩开了近 11 个百分点。此后再没有非卷积方案拿过这项冠军，CNN 时代从这里开始。关键技术是四件同时到位的事：ReLU 让深层网络的梯度不再衰减，dropout 和数据增强压住 6000 万参数的过拟合，两块 GTX 580 把装不下的网络拆开训，ImageNet 提供了 120 万张带标注的图。这里把全文一句一句读完，读不动的地方就地写批注，尺寸怎么算、参数堆在哪一层、两块 GPU 在哪里通信，都摊开画出来。",
+  "summary": "2012 年 ILSVRC 冠军，top-5 错误率 15.3%，比第二名低近 11 个百分点，CNN 时代从这里开始。这里把全文一句一句读完，尺寸怎么算、6000 万参数堆在哪一层、两块 GPU 在哪里通信，都摊开画出来。",
   "source": {
     "name": "ImageNet Classification with Deep Convolutional Neural Networks · NeurIPS 2012",
     "url": "https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html"
