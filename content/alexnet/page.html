@@ -483,7 +483,7 @@ body.no-notes .legend{display:none}
     <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
     <button class="tb" type="button" role="tab" data-v="map-1" aria-selected="false">架构图</button>
     <button class="tb" type="button" role="tab" data-v="doc-1" aria-selected="false">ImageNet</button><button class="tb" type="button" role="tab" data-v="doc-2" aria-selected="false">Normalization</button><button class="tb" type="button" role="tab" data-v="doc-3" aria-selected="false">贡献与局限</button>
-    
+    <button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>
   </div>
   <div class="legend">
     <span class="lg" title="一个词、一个短语、一整句在说什么"><i style="background:#FBEFC0;border-color:#DDBE6A"></i>词句</span><span class="lg" title="公式、维度、为什么这么设计"><i style="background:#E5DDF4;border-color:#B3A2DA"></i>原理</span><span class="lg" title="论文默认你会的前置知识"><i style="background:#D8EDE3;border-color:#8CC9B2"></i>基础</span><span class="lg" title="2017 年的写法，今天变成了什么"><i style="background:#F7DCE3;border-color:#DFA0B4"></i>工程对照</span>
@@ -2378,7 +2378,37 @@ Caffe 用 227 裁剪、conv1 不补边；torchvision 用 224 加 padding=2，靠
 只是每一处细节都被换掉了。第 7 节最后那句关于视频的设想
 （<span class="m">very large and deep convolutional nets on video sequences</span>）后来也兑现了，
 只是兑现的形式不是卷积网络。</div>
-</article></div>
+</article></div><div class="resview" id="view-res"><section class="res-sec"><h3 class="res-h">工具</h3><article class="vcard rcard">
+      <h4><a href="https://poloclub.github.io/cnn-explainer/" target="_blank" rel="noreferrer">CNN Explainer ↗</a></h4>
+      <p class="vzh">浏览器里跑着一个十层的卷积网络。点任何一个通道，能看到它的每一个数是由上一层哪一块乘上哪个 kernel 加出来的，卷积、ReLU、池化、softmax 四步都能逐格展开看。本文里那些 55×55×96 怎么来的，在这上面能一眼看到过程。</p>
+      <p class="vmeta"><span class="vsrc">Georgia Tech · Polo Club</span>
+        <a href="https://arxiv.org/abs/2004.15004" target="_blank" rel="noreferrer">论文 ↗</a><a href="https://github.com/poloclub/cnn-explainer" target="_blank" rel="noreferrer">GitHub ↗</a></p>
+    </article><article class="vcard rcard">
+      <h4><a href="https://code.google.com/archive/p/cuda-convnet/" target="_blank" rel="noreferrer">cuda-convnet ↗</a></h4>
+      <p class="vzh">论文脚注指的就是这份代码，手写 CUDA kernel，当年别人复现这篇基本靠它。Google Code 关站后只剩存档，能读不能提 issue。后来的 cuda-convnet2 加了多卡数据并行。</p>
+      <p class="vmeta"><span class="vsrc">Alex Krizhevsky</span>
+        <a href="https://github.com/akrizhevsky/cuda-convnet2" target="_blank" rel="noreferrer">cuda-convnet2 ↗</a><a href="https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet" target="_blank" rel="noreferrer">Caffe 的复现 ↗</a></p>
+    </article><article class="vcard rcard">
+      <h4><a href="https://karpathy.github.io/2014/09/02/what-i-learned-from-competing-against-a-convnet-on-imagenet/" target="_blank" rel="noreferrer">What I learned from competing against a ConvNet on ImageNet ↗</a></h4>
+      <p class="vzh">人类基线 5.1% 这个数就出自这里，是他自己在验证集上标了 1500 张标出来的。文章讲了这活为什么难：光狗就有 120 个品种，还有大量图片里主体本身就有歧义。ImageNet tab 里那条 5.1% 的横线是这么来的。</p>
+      <p class="vmeta"><span class="vsrc">Andrej Karpathy · 2014</span>
+        </p>
+    </article><article class="vcard rcard">
+      <h4><a href="https://cs231n.github.io/convolutional-networks/" target="_blank" rel="noreferrer">CS231n · Convolutional Networks ↗</a></h4>
+      <p class="vzh">卷积层尺寸怎么算讲得最清楚的一份讲义，输出尺寸公式、padding、stride、参数共享都有推导。本文 224 还是 227 那个争议也是这里先指出来的。</p>
+      <p class="vmeta"><span class="vsrc">Stanford CS231n</span>
+        </p>
+    </article><article class="vcard rcard">
+      <h4><a href="https://arxiv.org/abs/1404.5997" target="_blank" rel="noreferrer">One weird trick for parallelizing convolutional neural networks ↗</a></h4>
+      <p class="vzh">同一个作者两年后的短文，讲卷积层做数据并行、全连接层做模型并行。今天 torchvision 里那个 AlexNet 其实是这篇的变体（conv 通道 64/192，不是原文的 96/256），拿它对本文的结构会对不上。</p>
+      <p class="vmeta"><span class="vsrc">Alex Krizhevsky · 2014</span>
+        </p>
+    </article><article class="vcard rcard">
+      <h4><a href="https://www.image-net.org/" target="_blank" rel="noreferrer">ImageNet ↗</a></h4>
+      <p class="vzh">数据集官网。历届 ILSVRC 的赛制说明、数据规模、结果页都还挂着，本文引用的那些数可以在这儿逐年核。</p>
+      <p class="vmeta"><span class="vsrc">Princeton / Stanford</span>
+        <a href="https://www.image-net.org/challenges/LSVRC/" target="_blank" rel="noreferrer">历届竞赛 ↗</a></p>
+    </article></section></div>
 </div>
 
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
