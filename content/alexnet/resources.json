@@ -1,0 +1,70 @@
+{
+  "tools": [
+    {
+      "title": "CNN Explainer",
+      "url": "https://poloclub.github.io/cnn-explainer/",
+      "by": "Georgia Tech · Polo Club",
+      "zh": "浏览器里跑着一个十层的卷积网络。点任何一个通道，能看到它的每一个数是由上一层哪一块乘上哪个 kernel 加出来的，卷积、ReLU、池化、softmax 四步都能逐格展开看。本文里那些 55×55×96 怎么来的，在这上面能一眼看到过程。",
+      "links": [
+        [
+          "论文 ↗",
+          "https://arxiv.org/abs/2004.15004"
+        ],
+        [
+          "GitHub ↗",
+          "https://github.com/poloclub/cnn-explainer"
+        ]
+      ]
+    },
+    {
+      "title": "cuda-convnet",
+      "url": "https://code.google.com/archive/p/cuda-convnet/",
+      "by": "Alex Krizhevsky",
+      "zh": "论文脚注指的就是这份代码，手写 CUDA kernel，当年别人复现这篇基本靠它。Google Code 关站后只剩存档，能读不能提 issue。后来的 cuda-convnet2 加了多卡数据并行。",
+      "links": [
+        [
+          "cuda-convnet2 ↗",
+          "https://github.com/akrizhevsky/cuda-convnet2"
+        ],
+        [
+          "Caffe 的复现 ↗",
+          "https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet"
+        ]
+      ]
+    },
+    {
+      "title": "What I learned from competing against a ConvNet on ImageNet",
+      "url": "https://karpathy.github.io/2014/09/02/what-i-learned-from-competing-against-a-convnet-on-imagenet/",
+      "by": "Andrej Karpathy · 2014",
+      "zh": "人类基线 5.1% 这个数就出自这里，是他自己在验证集上标了 1500 张标出来的。文章讲了这活为什么难：光狗就有 120 个品种，还有大量图片里主体本身就有歧义。ImageNet tab 里那条 5.1% 的横线是这么来的。",
+      "links": []
+    },
+    {
+      "title": "CS231n · Convolutional Networks",
+      "url": "https://cs231n.github.io/convolutional-networks/",
+      "by": "Stanford CS231n",
+      "zh": "卷积层尺寸怎么算讲得最清楚的一份讲义，输出尺寸公式、padding、stride、参数共享都有推导。本文 224 还是 227 那个争议也是这里先指出来的。",
+      "links": []
+    },
+    {
+      "title": "One weird trick for parallelizing convolutional neural networks",
+      "url": "https://arxiv.org/abs/1404.5997",
+      "by": "Alex Krizhevsky · 2014",
+      "zh": "同一个作者两年后的短文，讲卷积层做数据并行、全连接层做模型并行。今天 torchvision 里那个 AlexNet 其实是这篇的变体（conv 通道 64/192，不是原文的 96/256），拿它对本文的结构会对不上。",
+      "links": []
+    },
+    {
+      "title": "ImageNet",
+      "url": "https://www.image-net.org/",
+      "by": "Princeton / Stanford",
+      "zh": "数据集官网。历届 ILSVRC 的赛制说明、数据规模、结果页都还挂着，本文引用的那些数可以在这儿逐年核。",
+      "links": [
+        [
+          "历届竞赛 ↗",
+          "https://www.image-net.org/challenges/LSVRC/"
+        ]
+      ]
+    }
+  ],
+  "videos": []
+}
