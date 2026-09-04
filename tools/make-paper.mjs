@@ -1141,6 +1141,7 @@ body[data-view^="doc"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px
 .doc svg{display:block;width:100%;height:auto;margin:14px 0 6px}
 .doc figure{margin:18px 0 22px}
 .doc figcaption{margin-top:6px;font-size:13px;color:var(--text-3)}
+.doc p.fnote{margin:-10px 0 18px;font-size:12.5px;line-height:1.6;color:var(--text-3)}
 .doc table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
 .doc thead th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;
   padding:0 10px 6px 0;border-bottom:1px solid var(--line)}

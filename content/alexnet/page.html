@@ -97,6 +97,7 @@ body[data-view^="doc"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px
 .doc svg{display:block;width:100%;height:auto;margin:14px 0 6px}
 .doc figure{margin:18px 0 22px}
 .doc figcaption{margin-top:6px;font-size:13px;color:var(--text-3)}
+.doc p.fnote{margin:-10px 0 18px;font-size:12.5px;line-height:1.6;color:var(--text-3)}
 .doc table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
 .doc thead th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;
   padding:0 10px 6px 0;border-bottom:1px solid var(--line)}
@@ -1936,11 +1937,16 @@ w ← w + v</div>
 <tr><td><b>ImageNet 全量</b><br><span style="color:var(--text-dim)">Fall 2011 版</span></td>
     <td class="n">21,841</td><td class="n">14,197,122</td>
     <td>注册后公开下载</td></tr>
-<tr><td><b>ILSVRC 训练集</b></td><td class="n">1,000</td><td class="n">1,281,167</td><td>赛前发放，含标签</td></tr>
-<tr><td><b>ILSVRC 验证集</b></td><td class="n">1,000</td><td class="n">50,000</td><td>赛前发放，含标签</td></tr>
-<tr><td><b>ILSVRC 测试集</b></td><td class="n">1,000</td><td class="n">150,000</td>
-    <td>只发图，标签扣住</td></tr>
+<tr><td><b>ILSVRC-2010</b><br><span style="color:var(--text-dim)">论文主要实验用这届</span></td>
+    <td class="n">1,000</td><td class="n">1,261,406<br>+ 5 万 + 15 万</td>
+    <td>训练与验证含标签；<b>唯一公开了测试集标签的一届</b></td></tr>
+<tr><td><b>ILSVRC-2012</b><br><span style="color:var(--text-dim)">论文参赛的那届</span></td>
+    <td class="n">1,000</td><td class="n">1,281,167<br>+ 5 万 + 10 万</td>
+    <td>测试集只发图，标签扣住</td></tr>
 </tbody></table>
+<p class="fnote">三个数依次是训练 / 验证 / 测试。两届的测试集不一样大：2010 那届验证加测试共 20 万张，
+2012 那届共 15 万张，验证都是 5 万，所以测试分别是 15 万和 10 万。
+本文第 2 节写的「150,000 testing images」说的是 2010 那届。</p>
 <p>所以今天口语里说「在 ImageNet 上跑到多少」，绝大多数时候指的是 ILSVRC 那 1000 类的子集，不是全量。
 本文摘要里的 15.3%、表 1 里的 37.5% / 17.0%，说的都是这个子集。</p>
 
@@ -1952,8 +1958,9 @@ w ← w + v</div>
 每天还限次数。这样参赛者没法拿测试集反复试，分数才有意义。</p>
 <div class="callout"><b>这三个集合和 ImageNet 全量是什么关系，得分开说。</b>
 <b>训练集是从 ImageNet 数据库里切出来的</b>：挑 1000 个 synset，把它们名下的图打包发放，
-所以它确实是全量的一个子集。<b>验证集和测试集不是。</b>那 15 万张是另外从 Flickr 等搜索引擎重新采集、
-单独标注的，没有进 ImageNet 数据库，官方还明写会把与训练数据重复的图剔掉。</div>
+所以它确实是全量的一个子集。<b>验证集和测试集不是。</b>它们是另外从 Flickr 等搜索引擎重新采集、
+单独标注的（2012 那届验证加测试共 15 万张），没有进 ImageNet 数据库，
+官方还明写会把与训练数据重复的图剔掉。</div>
 
 <h2>数据集是怎么建起来的</h2>
 <p><b>发起人是李飞飞</b>，2006 年在普林斯顿开始做，2009 年以 <i>ImageNet: A Large-Scale Hierarchical Image Database</i>
