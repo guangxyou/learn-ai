@@ -1,0 +1,48 @@
+{
+  "id": "resnet",
+  "kind": "paper",
+  "title": "ResNet",
+  "subtitle": "《Deep Residual Learning for Image Recognition》论文精读",
+  "topics": [
+    "AI 基础",
+    "论文",
+    "计算机视觉"
+  ],
+  "date": "2015-12",
+  "studied": "2026-09",
+  "summary": "2015 年 ILSVRC 图像分类冠军，top-5 错误率 3.57%，152 层是当年 VGG 的 8 倍深，计算量反而更低。这里把全文一句一句读完，退化凭什么不算过拟合、那条旁路为什么不能带参数、瓶颈块省在哪，都摊开画出来。",
+  "source": {
+    "name": "Deep Residual Learning for Image Recognition · CVPR 2016",
+    "url": "https://arxiv.org/abs/1512.03385"
+  },
+  "build": {
+    "note": "论文源直接用 arxiv.org/html/1512.03385v1 的 SingleFile 存档（LaTeXML 结构），不需要像 AlexNet 那样从 PDF 重建。",
+    "tool": "tools/make-paper.mjs",
+    "requires": "02_Before Transformer/ResNet/raw/singlefile.html",
+    "args": [
+      "--src",
+      "02_Before Transformer/ResNet/raw/singlefile.html",
+      "--notes",
+      "content/resnet/notes.json",
+      "--keys",
+      "content/resnet/keys.json",
+      "--refnotes",
+      "content/resnet/refnotes.json",
+      "--venue",
+      "",
+      "--h1",
+      "ResNet —— 《Deep Residual Learning for Image Recognition》论文精读",
+      "--kicker",
+      "CVPR 2016",
+      "--srcurl",
+      "https://arxiv.org/abs/1512.03385",
+      "--srclabel",
+      "arXiv:1512.03385",
+      "--posters",
+      "content/resnet/figures/metrics.svg#评测指标#五个任务、IoU、AP、mAP 的计算规则，以及 ImageNet 与 COCO 两种阈值口径。,content/resnet/figures/degradation.svg#退化现象#层数加上去错误率反而回头，而且训练误差也更高，所以不是过拟合。,content/resnet/figures/residual-block.svg#残差块#这一篇的全部机制都在这张图里：同样两层卷积，多一条不带参数的旁路。,content/resnet/figures/shortcut-kinds.svg#三种捷径#恒等、投影、无参数是同一个式子里的三个位置，不是三种东西。,content/resnet/figures/norm-cube.svg#归一化#Batch 和 Layer 两种归一化是在同一个立方体上切不同的方向，图像和文本各举一例。",
+      "--res",
+      "content/resnet/resources.json"
+    ]
+  },
+  "page": "page.html"
+}

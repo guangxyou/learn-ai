@@ -1,7 +1,7 @@
 {
   "id": "alexnet",
   "kind": "paper",
-  "title": "大放异彩的 AlexNet",
+  "title": "AlexNet",
   "subtitle": "《ImageNet Classification with Deep Convolutional Neural Networks》论文精读",
   "topics": [
     "AI 基础",
@@ -36,7 +36,7 @@
       "--docs",
       "content/alexnet/docs/imagenet.html#ImageNet,content/alexnet/docs/norm.html#Normalization,content/alexnet/docs/legacy.html#贡献与局限",
       "--h1",
-      "大放异彩的 AlexNet —— 《ImageNet Classification with Deep Convolutional Neural Networks》论文精读",
+      "AlexNet —— 《ImageNet Classification with Deep Convolutional Neural Networks》论文精读",
       "--kicker",
       "NeurIPS 2012",
       "--srcurl",

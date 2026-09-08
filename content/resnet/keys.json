@@ -1,0 +1,5 @@
+[
+  "with the network depth increasing, accuracy gets saturated (which might be unsurprising) and then degrades rapidly",
+  "Instead of hoping each few stacked layers directly fit a desired underlying mapping, we explicitly let these layers fit a residual mapping",
+  "Identity shortcut connections add neither extra parameter nor computational complexity"
+]

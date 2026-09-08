@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 920" width="1520" height="920" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .adash{fill:none;stroke:#B45309;stroke-width:1.4;stroke-dasharray:5 3}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule-ink{fill:none;stroke:#14161A;stroke-width:1;stroke-linecap:round}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .h1{font-size:28px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#4E5560}
+  .tiny{font-size:9.5px;fill:#868D98}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;fill:#14161A}
+  .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .shp{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
+  .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
+  .mi{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;fill:#14161A;font-variant-numeric:lining-nums}
+  .mr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;fill:#14161A;font-variant-numeric:lining-nums}
+  .b{font-weight:600}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTealD{fill:#0B5750}.cAmberD{fill:#8A4008}
+  .bgs{fill:#0F766E}.bgst{font-size:8px;font-weight:700;fill:#fff}
+  .brk{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect width="1520" height="920" fill="#FBFAF8"/>
+<rect width="1520" height="920" fill="#FBFAF8"/>
+<text x="40" y="52" class="h1">BatchNorm 和 LayerNorm：同一堆数，切的方向不一样</text>
+<text x="40" y="82" class="sm">两者做的事完全相同：挑一组数，算均值和标准差，减掉均值除以标准差，再乘 γ 加 β。分歧只有一个，「哪一组」。把张量画成立方体，分歧就是切法的分歧。</text>
+<line x1="40" y1="104" x2="1440" y2="104" class="thin"/>
+<rect x="40" y="120" width="700" height="750" rx="12" class="panel"/>
+<text x="60" y="150" class="ph">图像：(N, C, H, W)</text>
+<text x="60" y="174" class="xs">一批照片，每张有若干通道，每个通道是一整张 H×W 的图。</text>
+<text x="60" y="192" class="xs">立方体的深度方向就是那 H×W 个像素</text>
+<text x="106" y="258" class="xs b">BatchNorm</text>
+<text x="106" y="276" class="tiny">固定一个通道，扫全部照片、全部像素</text>
+<path d="M197.0 295.0 L301.0 295.0 L301.0 367.0 L197.0 367.0 Z" fill="#FAF8F5" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M140.0 334.0 L244.0 334.0 L301.0 295.0 L197.0 295.0 Z" fill="#F1EEE8" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M244.0 334.0 L244.0 406.0 L301.0 367.0 L301.0 295.0 Z" fill="#EBE7E0" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M140.0 334.0 L244.0 334.0 L244.0 406.0 L140.0 406.0 Z" fill="#FDFCFA" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M166.0 334.0 L166.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M192.0 334.0 L192.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M218.0 334.0 L218.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M140.0 358.0 L244.0 358.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M140.0 382.0 L244.0 382.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M140.0 406.0 L197.0 367.0 L197.0 295.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M197.0 367.0 L301.0 367.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M140 422 H232" class="ink" marker-end="url(#a)"/>
+<text x="186" y="438" class="tiny" text-anchor="middle">通道 C</text>
+<path d="M126 334 V396" class="ink" marker-end="url(#a)"/>
+<text x="120" y="373" class="tiny" text-anchor="end">样本 N</text>
+<path d="M252 331 L299.0 299.0" class="ink" marker-end="url(#a)"/>
+<text x="303" y="293" class="tiny">像素 H×W</text>
+<path d="M166.0 334.0 L192.0 334.0 L192.0 406.0 L166.0 406.0 Z" fill="#0F766E" fill-opacity="0.5" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M166.0 334.0 L192.0 334.0 L249.0 295.0 L223.0 295.0 Z" fill="#0F766E" fill-opacity="0.28" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M192.0 334.0 L192.0 406.0 L249.0 367.0 L249.0 295.0 Z" fill="#0F766E" fill-opacity="0.4" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<text x="106" y="460" class="numS" font-size="10" fill="#0F766E">一组 = N × H × W 个数，共 C 组</text>
+<text x="430" y="258" class="xs b">LayerNorm</text>
+<text x="430" y="276" class="tiny">固定一张照片，扫它全部通道、全部像素</text>
+<path d="M521.0 295.0 L625.0 295.0 L625.0 367.0 L521.0 367.0 Z" fill="#FAF8F5" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M464.0 334.0 L568.0 334.0 L625.0 295.0 L521.0 295.0 Z" fill="#F1EEE8" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M568.0 334.0 L568.0 406.0 L625.0 367.0 L625.0 295.0 Z" fill="#EBE7E0" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M464.0 334.0 L568.0 334.0 L568.0 406.0 L464.0 406.0 Z" fill="#FDFCFA" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M490.0 334.0 L490.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M516.0 334.0 L516.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M542.0 334.0 L542.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M464.0 358.0 L568.0 358.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M464.0 382.0 L568.0 382.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M464.0 406.0 L521.0 367.0 L521.0 295.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M521.0 367.0 L625.0 367.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M464.0 358.0 L568.0 358.0 L568.0 382.0 L464.0 382.0 Z" fill="#B45309" fill-opacity="0.5" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M464.0 358.0 L568.0 358.0 L625.0 319.0 L521.0 319.0 Z" fill="#B45309" fill-opacity="0.28" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M568.0 358.0 L568.0 382.0 L625.0 343.0 L625.0 319.0 Z" fill="#B45309" fill-opacity="0.4" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<text x="430" y="438" class="numS" font-size="10" fill="#B45309">一组 = C × H × W 个数，共 N 组</text>
+<rect x="60" y="500" width="660" height="350" rx="6" class="soft"/>
+<text x="78" y="526" class="xs b">落到具体的照片上</text>
+<text x="202" y="552" class="numS" text-anchor="middle" font-size="10">照片 1</text>
+<rect x="156" y="562" width="92" height="28" rx="3" fill="#D98B8B" fill-opacity="0.72" stroke="#0F766E" stroke-width="1.8"/>
+<text x="144" y="581" class="numS" text-anchor="end" font-size="10">R</text>
+<rect x="156" y="594" width="92" height="28" rx="3" fill="#8FBF8F" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<text x="144" y="613" class="numS" text-anchor="end" font-size="10">G</text>
+<rect x="156" y="626" width="92" height="28" rx="3" fill="#8FA8D9" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<text x="144" y="645" class="numS" text-anchor="end" font-size="10">B</text>
+<text x="308" y="552" class="numS" text-anchor="middle" font-size="10">照片 2</text>
+<rect x="262" y="562" width="92" height="28" rx="3" fill="#D98B8B" fill-opacity="0.72" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="262" y="594" width="92" height="28" rx="3" fill="#8FBF8F" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<rect x="262" y="626" width="92" height="28" rx="3" fill="#8FA8D9" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<text x="414" y="552" class="numS" text-anchor="middle" font-size="10">照片 3</text>
+<rect x="368" y="562" width="92" height="28" rx="3" fill="#D98B8B" fill-opacity="0.72" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="368" y="594" width="92" height="28" rx="3" fill="#8FBF8F" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<rect x="368" y="626" width="92" height="28" rx="3" fill="#8FA8D9" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<text x="520" y="552" class="numS" text-anchor="middle" font-size="10">照片 4</text>
+<rect x="474" y="562" width="92" height="28" rx="3" fill="#D98B8B" fill-opacity="0.72" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="474" y="594" width="92" height="28" rx="3" fill="#8FBF8F" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<rect x="474" y="626" width="92" height="28" rx="3" fill="#8FA8D9" fill-opacity="0.26" stroke="#DDD8D0" stroke-width="1"/>
+<rect x="150" y="556" width="104" height="104" rx="4" fill="none" stroke="#B45309" stroke-width="1.8" stroke-dasharray="5 3"/>
+<rect x="78" y="681" width="12" height="12" rx="2" fill="#0F766E" fill-opacity="0.5"/>
+<text x="98" y="692" class="tiny">BatchNorm：四张照片的 R 通道，全部像素合起来算一个均值方差。G、B 各算各的</text>
+<rect x="78" y="707" width="12" height="12" rx="2" fill="none" stroke="#B45309" stroke-width="1.6" stroke-dasharray="4 2.5"/>
+<text x="98" y="718" class="tiny">LayerNorm：照片 1 自己的 R、G、B 全部像素合起来算，和另外三张无关</text>
+<rect x="78" y="738" width="624" height="88" rx="5" class="warm"/>
+<text x="94" y="762" class="xs">BatchNorm 在图像上好用，因为每张照片尺寸一样、通道一样。</text>
+<text x="94" y="782" class="xs">同一个通道在每张照片上都有同样多的真实像素，统计量可靠。</text>
+<text x="94" y="804" class="tiny">ResNet、VGG 用的都是它。ImageNet 上 batch 开到 256，一组就有上千万个数。</text>
+<rect x="780" y="120" width="700" height="750" rx="12" class="panel"/>
+<text x="800" y="150" class="ph">文本：(N, T, d)</text>
+<text x="800" y="174" class="xs">一批句子，每句有若干 token，每个 token 是一个 d 维向量。</text>
+<text x="800" y="192" class="xs">立方体的深度方向是「第几个 token」</text>
+<text x="846" y="258" class="xs b">BatchNorm</text>
+<text x="846" y="276" class="tiny">固定一个特征，扫全部句子、全部位置</text>
+<path d="M937.0 295.0 L1041.0 295.0 L1041.0 367.0 L937.0 367.0 Z" fill="#FAF8F5" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M880.0 334.0 L984.0 334.0 L1041.0 295.0 L937.0 295.0 Z" fill="#F1EEE8" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M984.0 334.0 L984.0 406.0 L1041.0 367.0 L1041.0 295.0 Z" fill="#EBE7E0" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M880.0 334.0 L984.0 334.0 L984.0 406.0 L880.0 406.0 Z" fill="#FDFCFA" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M906.0 334.0 L906.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M932.0 334.0 L932.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M958.0 334.0 L958.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M880.0 358.0 L984.0 358.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M880.0 382.0 L984.0 382.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M880.0 406.0 L937.0 367.0 L937.0 295.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M937.0 367.0 L1041.0 367.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M880 422 H972" class="ink" marker-end="url(#a)"/>
+<text x="926" y="438" class="tiny" text-anchor="middle">特征 d</text>
+<path d="M866 334 V396" class="ink" marker-end="url(#a)"/>
+<text x="860" y="373" class="tiny" text-anchor="end">样本 N</text>
+<path d="M992 331 L1039.0 299.0" class="ink" marker-end="url(#a)"/>
+<text x="1043" y="293" class="tiny">位置 T</text>
+<path d="M906.0 334.0 L932.0 334.0 L932.0 406.0 L906.0 406.0 Z" fill="#0F766E" fill-opacity="0.5" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M906.0 334.0 L932.0 334.0 L989.0 295.0 L963.0 295.0 Z" fill="#0F766E" fill-opacity="0.28" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M932.0 334.0 L932.0 406.0 L989.0 367.0 L989.0 295.0 Z" fill="#0F766E" fill-opacity="0.4" stroke="#0F766E" stroke-width="1.3" stroke-linejoin="round"/>
+<text x="846" y="460" class="numS" font-size="10" fill="#0F766E">一组 = N × T 个数，共 d 组</text>
+<text x="1170" y="258" class="xs b">LayerNorm</text>
+<text x="1170" y="276" class="tiny">固定一个句子的一个位置，扫那一条特征</text>
+<path d="M1261.0 295.0 L1365.0 295.0 L1365.0 367.0 L1261.0 367.0 Z" fill="#FAF8F5" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M1204.0 334.0 L1308.0 334.0 L1365.0 295.0 L1261.0 295.0 Z" fill="#F1EEE8" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M1308.0 334.0 L1308.0 406.0 L1365.0 367.0 L1365.0 295.0 Z" fill="#EBE7E0" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M1204.0 334.0 L1308.0 334.0 L1308.0 406.0 L1204.0 406.0 Z" fill="#FDFCFA" stroke="#C8C3BA" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M1230.0 334.0 L1230.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M1256.0 334.0 L1256.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M1282.0 334.0 L1282.0 406.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M1204.0 358.0 L1308.0 358.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M1204.0 382.0 L1308.0 382.0" stroke="#C8C3BA" stroke-width="0.6"/>
+<path d="M1204.0 406.0 L1261.0 367.0 L1261.0 295.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M1261.0 367.0 L1365.0 367.0" fill="none" stroke="#C8C3BA" stroke-width="0.9" stroke-dasharray="3 3"/>
+<path d="M1204.0 358.0 L1308.0 358.0 L1308.0 382.0 L1204.0 382.0 Z" fill="#B45309" fill-opacity="0.5" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M1204.0 358.0 L1308.0 358.0 L1327.0 345.0 L1223.0 345.0 Z" fill="#B45309" fill-opacity="0.28" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="M1308.0 358.0 L1308.0 382.0 L1327.0 369.0 L1327.0 345.0 Z" fill="#B45309" fill-opacity="0.4" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round"/>
+<text x="1170" y="438" class="numS" font-size="10" fill="#B45309">一组 = d 个数，共 N × T 组</text>
+<rect x="800" y="500" width="660" height="350" rx="6" class="soft"/>
+<text x="818" y="526" class="xs b">落到具体的句子上</text>
+<text x="891" y="552" class="numS" text-anchor="middle" font-size="9.5">1</text>
+<text x="925" y="552" class="numS" text-anchor="middle" font-size="9.5">2</text>
+<text x="959" y="552" class="numS" text-anchor="middle" font-size="9.5">3</text>
+<text x="993" y="552" class="numS" text-anchor="middle" font-size="9.5">4</text>
+<text x="1027" y="552" class="numS" text-anchor="middle" font-size="9.5">5</text>
+<text x="1061" y="552" class="numS" text-anchor="middle" font-size="9.5">6</text>
+<text x="1095" y="552" class="numS" text-anchor="middle" font-size="9.5">7</text>
+<text x="1129" y="552" class="numS" text-anchor="middle" font-size="9.5">8</text>
+<rect x="876" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="910" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="944" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="978" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="1012" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="1046" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="1080" y="562" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="1114" y="562" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1129" y="577" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<text x="866" y="577" class="numS" text-anchor="end" font-size="10">句 1</text>
+<rect x="876" y="588" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="910" y="588" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="944" y="588" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="978" y="588" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="993" y="603" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1012" y="588" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1027" y="603" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1046" y="588" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#0F766E" stroke-width="1.8"/>
+<text x="1061" y="603" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1080" y="588" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1095" y="603" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1114" y="588" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1129" y="603" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<text x="866" y="603" class="numS" text-anchor="end" font-size="10">句 2</text>
+<rect x="876" y="614" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="910" y="614" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="944" y="614" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="978" y="614" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="1012" y="614" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="1046" y="614" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#0F766E" stroke-width="1.8"/>
+<text x="1061" y="629" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1080" y="614" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1095" y="629" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1114" y="614" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1129" y="629" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<text x="866" y="629" class="numS" text-anchor="end" font-size="10">句 3</text>
+<rect x="876" y="640" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="910" y="640" width="30" height="22" rx="2.5" fill="#DCE9E5" stroke="#9CC4BB" stroke-width="1"/>
+<rect x="944" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="959" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="978" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="993" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1012" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1027" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1046" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#0F766E" stroke-width="1.8"/>
+<text x="1061" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1080" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1095" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<rect x="1114" y="640" width="30" height="22" rx="2.5" fill="#F7F5F1" stroke="#E3DFD8" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="1129" y="655" class="tiny" text-anchor="middle" fill="#B9B3A8">pad</text>
+<text x="866" y="655" class="numS" text-anchor="end" font-size="10">句 4</text>
+<rect x="871" y="583" width="40" height="32" rx="4" fill="none" stroke="#B45309" stroke-width="1.8" stroke-dasharray="5 3"/>
+<rect x="818" y="689" width="12" height="12" rx="2" fill="none" stroke="#0F766E" stroke-width="1.8"/>
+<text x="838" y="700" class="tiny">BatchNorm：按位置跨句子统计。第 6 个位置只有 1 个真 token，另外三格是 padding</text>
+<rect x="818" y="715" width="12" height="12" rx="2" fill="none" stroke="#B45309" stroke-width="1.6" stroke-dasharray="4 2.5"/>
+<text x="838" y="726" class="tiny">LayerNorm：句 2 第 1 个 token 自己那 d 个数，和别的句子、别的位置无关</text>
+<rect x="818" y="746" width="624" height="88" rx="5" class="warm"/>
+<text x="834" y="770" class="xs">BatchNorm 在文本上不好用：句子长短不齐，越靠后真 token 越少。</text>
+<text x="834" y="790" class="xs">第 8 个位置全是 padding，算出来的均值方差纯粹是噪声。</text>
+<text x="834" y="812" class="tiny">推理时 batch 大小还不可控，同一个 prompt 拼批和单独跑结果会不一样。</text>
+<text x="40" y="896" class="tiny">两栏里 LayerNorm 的形状不一样：图像上它按整张照片做，切出来还是一片；Transformer 里它按 token 逐个做，切出来是一根柱子。同一个名字下的两种粒度，读代码时要看清。</text>
+<text x="1480" y="896" class="tiny" text-anchor="end">BatchNorm 见 arXiv:1502.03167，LayerNorm 见 arXiv:1607.06450</text>
+</svg>
