@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 900" width="1300" height="900" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .adash{fill:none;stroke:#B45309;stroke-width:1.4;stroke-dasharray:5 3}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule-ink{fill:none;stroke:#14161A;stroke-width:1;stroke-linecap:round}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .h1{font-size:28px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#4E5560}
+  .tiny{font-size:9.5px;fill:#868D98}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;fill:#14161A}
+  .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .shp{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
+  .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
+  .mi{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;fill:#14161A;font-variant-numeric:lining-nums}
+  .mr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;fill:#14161A;font-variant-numeric:lining-nums}
+  .b{font-weight:600}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTealD{fill:#0B5750}.cAmberD{fill:#8A4008}
+  .bgs{fill:#0F766E}.bgst{font-size:8px;font-weight:700;fill:#fff}
+  .brk{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect width="1300" height="900" fill="#FBFAF8"/>
+<rect width="1300" height="900" fill="#FBFAF8"/>
+<text x="40" y="52" class="h1">残差块 —— 把「学 H(x)」改成「学 H(x) − x」</text>
+<text x="40" y="82" class="sm">同样两层卷积，只多了一条不带参数的旁路。左右两个块的可学习参数完全一样，差别只在优化的起点：旁路让「什么都不做」变成权重取 0 就能达到的解。</text>
+<line x1="40" y1="102" x2="1260" y2="102" class="thin"/>
+<rect x="40" y="120" width="360" height="540" rx="12" class="panel"/>
+<text x="60" y="150" class="ph">普通堆叠（plain）</text>
+<text x="60" y="176" class="xs">两层直接串起来，中间没有别的通路</text>
+<text x="220" y="216" class="mi" text-anchor="middle">x</text>
+<circle cx="220" cy="228" r="3.2" fill="#14161A"/>
+<path d="M220 234 L220 256" class="ink" marker-end="url(#a)"/>
+<rect x="130" y="256" width="180" height="40" rx="5" class="acc"/>
+<text x="220" y="280.5" class="sm b" text-anchor="middle">3×3 conv, 64</text>
+<path d="M220 296 L220 330" class="ink" marker-end="url(#a)"/>
+<text x="230" y="317" class="xs">ReLU</text>
+<rect x="130" y="330" width="180" height="40" rx="5" class="acc"/>
+<text x="220" y="354.5" class="sm b" text-anchor="middle">3×3 conv, 64</text>
+<path d="M220 370 L220 404" class="ink" marker-end="url(#a)"/>
+<text x="230" y="391" class="xs">ReLU</text>
+<circle cx="220" cy="410" r="3.2" fill="#14161A"/>
+<text x="198.0" y="434.0" class="mi" font-size="17">H</text>
+<text x="211.5" y="434.0" class="mr" font-size="17">(</text>
+<text x="218.6" y="434.0" class="mi" font-size="17">x</text>
+<text x="227.5" y="434.0" class="mr" font-size="17">)</text>
+<rect x="60" y="470" width="320" height="84" rx="6" class="soft"/>
+<text x="74" y="496" class="xs">这两层要自己拟合出 H(x) 这个映射的全部。</text>
+<text x="74" y="516" class="xs">哪怕最优解就是「原样传过去」，也得靠权重</text>
+<text x="74" y="536" class="xs">凑出一个恒等映射，实测凑不出来。</text>
+<rect x="414" y="120" width="400" height="540" rx="12" class="panel"/>
+<text x="434" y="150" class="ph">残差块（residual）</text>
+<text x="434" y="176" class="xs">同样两层，旁边多一条直通线</text>
+<text x="614" y="216" class="mi" text-anchor="middle">x</text>
+<circle cx="614" cy="228" r="3.2" fill="#14161A"/>
+<path d="M614 234 L614 256" class="ink" marker-end="url(#a)"/>
+<rect x="524" y="256" width="180" height="40" rx="5" class="acc"/>
+<text x="614" y="280.5" class="sm b" text-anchor="middle">3×3 conv, 64</text>
+<path d="M614 296 L614 330" class="ink" marker-end="url(#a)"/>
+<text x="624" y="317" class="xs">ReLU</text>
+<rect x="524" y="330" width="180" height="40" rx="5" class="acc"/>
+<text x="614" y="354.5" class="sm b" text-anchor="middle">3×3 conv, 64</text>
+<path d="M614 370 L614 386" class="ink" marker-end="url(#a)"/>
+<path d="M614 228 H744 V400 H630" class="adash" marker-end="url(#aw)"/>
+<text x="752" y="250" class="xs">恒等旁路</text>
+<text x="752" y="266" class="tiny">不带参数</text>
+<circle cx="614" cy="400" r="14" fill="#FEF6E7" stroke="#B45309" stroke-width="1.6"/>
+<path d="M607.5 400 H620.5 M614 393.5 V406.5" fill="none" stroke="#B45309" stroke-width="1.8" stroke-linecap="round"/>
+<text x="590" y="404" class="xs" text-anchor="end">相加</text>
+<path d="M614 414 L614 448" class="ink" marker-end="url(#a)"/>
+<text x="624" y="435" class="xs">ReLU</text>
+<circle cx="614" cy="454" r="3.2" fill="#14161A"/>
+<text x="540.0" y="478.0" class="mi" font-size="17">H</text>
+<text x="553.5" y="478.0" class="mr" font-size="17">(</text>
+<text x="560.6" y="478.0" class="mi" font-size="17">x</text>
+<text x="569.5" y="478.0" class="mr" font-size="17">)</text>
+<text x="576.6" y="478.0" class="mr" font-size="17"> = </text>
+<text x="595.0" y="478.0" class="mi" font-size="17">F</text>
+<text x="606.8" y="478.0" class="mr" font-size="17">(</text>
+<text x="613.9" y="478.0" class="mi" font-size="17">x</text>
+<text x="622.8" y="478.0" class="mr" font-size="17">)</text>
+<text x="629.9" y="478.0" class="mr" font-size="17"> + </text>
+<text x="648.3" y="478.0" class="mi" font-size="17">x</text>
+<rect x="434" y="508" width="360" height="46" rx="6" class="warm"/>
+<text x="448" y="526" class="xs">两层要拟合的变成 F(x) = H(x) − x，只是那点差值。</text>
+<text x="448" y="544" class="xs">要恒等映射的话，把 F 推到 0 就行，这个好办。</text>
+<rect x="828" y="120" width="432" height="540" rx="12" class="panel"/>
+<text x="848" y="150" class="ph">Bottleneck（ResNet-50 / 101 / 152）</text>
+<text x="848" y="176" class="xs">三层换两层，计算量不变，进出的通道宽 4 倍</text>
+<text x="962" y="216" class="shp" font-size="11">256-d</text>
+<circle cx="978" cy="228" r="3.2" fill="#14161A"/>
+<path d="M978 234 L978 252" class="ink" marker-end="url(#a)"/>
+<rect x="888" y="252" width="180" height="40" rx="5" class="acc"/>
+<text x="978" y="270" class="sm b" text-anchor="middle">1×1 conv, 64</text>
+<text x="978" y="284" class="tiny" text-anchor="middle">把 256 通道压到 64</text>
+<text x="1134" y="276" class="tiny">压窄，后面那层才便宜</text>
+<path d="M978 292 L978 322" class="ink" marker-end="url(#a)"/>
+<text x="988" y="311" class="xs">ReLU</text>
+<rect x="888" y="322" width="180" height="40" rx="5" class="acc"/>
+<text x="978" y="340" class="sm b" text-anchor="middle">3×3 conv, 64</text>
+<text x="978" y="354" class="tiny" text-anchor="middle">真正看邻域的一层</text>
+<text x="1134" y="346" class="tiny">通道数不变，64 进 64 出</text>
+<path d="M978 362 L978 392" class="ink" marker-end="url(#a)"/>
+<text x="988" y="381" class="xs">ReLU</text>
+<rect x="888" y="392" width="180" height="40" rx="5" class="acc"/>
+<text x="978" y="410" class="sm b" text-anchor="middle">1×1 conv, 256</text>
+<text x="978" y="424" class="tiny" text-anchor="middle">再撑回 256 通道</text>
+<text x="1134" y="416" class="tiny">撑回去，才能和旁路相加</text>
+<path d="M978 432 L978 448" class="ink" marker-end="url(#a)"/>
+<path d="M978 228 H1110 V462 H994" class="adash" marker-end="url(#aw)"/>
+<circle cx="978" cy="462" r="14" fill="#FEF6E7" stroke="#B45309" stroke-width="1.6"/>
+<path d="M971.5 462 H984.5 M978 455.5 V468.5" fill="none" stroke="#B45309" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M978 476 L978 502" class="ink" marker-end="url(#a)"/>
+<text x="988" y="493" class="xs">ReLU</text>
+<text x="962" y="522" class="shp" font-size="11">256-d</text>
+<rect x="848" y="540" width="392" height="96" rx="6" class="soft"/>
+<text x="862" y="558" class="xs b">为什么说计算量不变</text>
+<text x="862" y="582" class="tiny">两层 3×3（64 进 64 出）</text>
+<text x="1018" y="582" class="numS" font-size="9.5">2 × 3·3·64·64</text>
+<text x="1224" y="582" class="numS" text-anchor="end" font-size="9.5">73,728</text>
+<text x="862" y="604" class="tiny">Bottleneck（256 进 256 出）</text>
+<text x="1018" y="604" class="numS" font-size="9.5">256·64 + 3·3·64² + 64·256</text>
+<text x="1224" y="604" class="numS" text-anchor="end" font-size="9.5">69,632</text>
+<text x="862" y="626" class="tiny">差 4,096 个参数，通道数却从 64 变成 256。</text>
+<rect x="40" y="684" width="1220" height="150" rx="12" class="panel"/>
+<text x="60" y="714" class="ph">写成式子：旁路只是一次加法</text>
+<rect x="70" y="736" width="400" height="56" rx="6" class="warm"/>
+<text x="203.4" y="770.0" class="mi" font-size="17">y</text>
+<text x="212.2" y="770.0" class="mr" font-size="17"> = </text>
+<text x="230.6" y="770.0" class="mi" font-size="17">F</text>
+<text x="242.4" y="770.0" class="mr" font-size="17">(</text>
+<text x="249.5" y="770.0" class="mi" font-size="17">x</text>
+<text x="258.4" y="770.0" class="mr" font-size="17">, {</text>
+<text x="276.7" y="770.0" class="mi" font-size="17">W</text>
+<text x="289.7" y="770.0" class="mi" font-size="11">i</text>
+<text x="295.4" y="770.0" class="mr" font-size="17">}) + </text>
+<text x="329.8" y="770.0" class="mi" font-size="17">x</text>
+<text x="70" y="812" class="xs">进出维度一样时：旁路什么都不做，不多一个参数。</text>
+<rect x="510" y="736" width="400" height="56" rx="6" class="soft"/>
+<text x="632.1" y="770.0" class="mi" font-size="17">y</text>
+<text x="641.0" y="770.0" class="mr" font-size="17"> = </text>
+<text x="659.3" y="770.0" class="mi" font-size="17">F</text>
+<text x="671.1" y="770.0" class="mr" font-size="17">(</text>
+<text x="678.3" y="770.0" class="mi" font-size="17">x</text>
+<text x="687.1" y="770.0" class="mr" font-size="17">, {</text>
+<text x="705.5" y="770.0" class="mi" font-size="17">W</text>
+<text x="718.5" y="770.0" class="mi" font-size="11">i</text>
+<text x="724.2" y="770.0" class="mr" font-size="17">}) + </text>
+<text x="758.5" y="770.0" class="mi" font-size="17">W</text>
+<text x="771.5" y="770.0" class="mi" font-size="11">s</text>
+<text x="777.3" y="770.0" class="mr" font-size="17"> </text>
+<text x="782.0" y="770.0" class="mi" font-size="17">x</text>
+<text x="510" y="812" class="xs">通道翻倍、尺寸减半那几处：旁路上加一个 1×1 卷积把形状对齐。</text>
+<rect x="950" y="724" width="288" height="92" rx="6" class="soft"/>
+<text x="966" y="745" class="xs b">论文比过三种旁路</text>
+<text x="966" y="767" class="numS" font-size="9.5">A</text>
+<text x="982" y="767" class="tiny">补零，全程零参数</text>
+<text x="1220" y="767" class="numS" text-anchor="end" font-size="9.5">25.03</text>
+<text x="966" y="785" class="numS" font-size="9.5">B</text>
+<text x="982" y="785" class="tiny">只在维度变化处投影</text>
+<text x="1220" y="785" class="numS" text-anchor="end" font-size="9.5">24.52</text>
+<text x="966" y="803" class="numS" font-size="9.5">C</text>
+<text x="982" y="803" class="tiny">每个块都投影</text>
+<text x="1220" y="803" class="numS" text-anchor="end" font-size="9.5">24.19</text>
+<text x="40" y="866" class="tiny">He, Zhang, Ren, Sun《Deep Residual Learning for Image Recognition》CVPR 2016，arXiv:1512.03385。结构按 Fig. 2 与 Fig. 5，旁路方案的 top-1 错误率按 Table 3（ResNet-34，10-crop）。</text>
+<text x="1260" y="866" class="tiny" text-anchor="end">通道数取论文 Fig. 5 的取值</text>
+</svg>

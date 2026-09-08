@@ -132,6 +132,29 @@ function sliceTag(h, i, tag) {
 
 /* ══════════════════ 一、拆来源 ══════════════════ */
 
+/** LaTeXML 给过宽/过窄的表格包一层缩放：
+ *      <div class="… ltx_transformed_outer" style="width:347.8pt;height:133.1pt;…">
+ *        <span class="ltx_transformed_inner" style="transform:translate(…) scale(k,k)">
+ *
+ *  外层那个 height 是 LaTeX 按自己的字体度量算出来的。浏览器换了字体，表格实际
+ *  渲染出来比它大（ResNet 的 Table 1 实测 351px，声明只有 177px），而 transform
+ *  不参与布局、撑不开外层 —— 表格于是直接盖到下一个浮动块上（Table 1 压 Figure 4）。
+ *
+ *  改用 zoom：它参与布局，外层会被撑开，宽高交给内容自己定。translate 是用来抵消
+ *  transform-origin 的，换成 zoom 之后不需要，一并去掉。 */
+function unscaleTables(html) {
+  const setStyle = (head, css) => head + '"' + css + '"';
+  return html
+    .replace(/(<div\b[^>]*ltx_transformed_outer[^>]*?style=)(["']?)([^"'>]*)\2/g,
+      (m, head, q, css) => setStyle(head,
+        css.replace(/(?:^|;)\s*(?:width|height|vertical-align)\s*:[^;]*/g, '').replace(/^;+/, '')))
+    .replace(/(<span\b[^>]*ltx_transformed_inner[^>]*?style=)(["']?)([^"']*?)\2(?=\s*>)/g,
+      (m, head, q, css) => {
+        const k = css.match(/scale\(\s*([\d.]+)/);
+        return setStyle(head, k ? `zoom:${k[1]}` : '');
+      });
+}
+
 function parse(src) {
   // MathML 里 <annotation> 存的是 TeX 备份，不渲染但会被 strip 成重复文本 ——
   // 「values h times」会变成「values h h times」，锚点一跨公式就对不上。先整体摘掉。
@@ -1514,7 +1537,7 @@ const o = args();
 const notes = o.notes && existsSync(o.notes) ? JSON.parse(readFileSync(o.notes, 'utf8')) : [];
 
 console.log('· 读来源…');
-const src = readFileSync(o.src, 'utf8');
+const src = unscaleTables(readFileSync(o.src, 'utf8'));
 const doc = parse(src);
 console.log(`· 标题「${doc.title}」，作者 ${doc.authors.length}，段落 ${doc.items.filter((i) => i.kind === 'p').length}，` +
   `公式 ${doc.items.filter((i) => i.kind === 'eq').length}，图表 ${doc.items.filter((i) => i.kind === 'float').length}，` +

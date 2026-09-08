@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1200" width="1440" height="1200" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .adash{fill:none;stroke:#B45309;stroke-width:1.4;stroke-dasharray:5 3}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule-ink{fill:none;stroke:#14161A;stroke-width:1;stroke-linecap:round}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .h1{font-size:28px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#4E5560}
+  .tiny{font-size:9.5px;fill:#868D98}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;fill:#14161A}
+  .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .shp{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
+  .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
+  .mi{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;fill:#14161A;font-variant-numeric:lining-nums}
+  .mr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;fill:#14161A;font-variant-numeric:lining-nums}
+  .b{font-weight:600}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTealD{fill:#0B5750}.cAmberD{fill:#8A4008}
+  .bgs{fill:#0F766E}.bgst{font-size:8px;font-weight:700;fill:#fff}
+  .brk{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect width="1440" height="1200" fill="#FBFAF8"/>
+<rect width="1440" height="1200" fill="#FBFAF8"/>
+<text x="40" y="52" class="h1">恒等捷径、投影捷径、无参数：三个词指的是同一个式子里的三个位置</text>
+<text x="40" y="82" class="sm">捷径就是那条绕过卷积层、把输入直接送到加号的线。「恒等」说的是这条线上什么都不做；「投影」说的是线上挂了一个要学的 1×1 卷积；「无参数」是前者的性质，不是第三种东西。</text>
+<line x1="40" y1="102" x2="1400" y2="102" class="thin"/>
+<rect x="40" y="120" width="680" height="400" rx="12" class="panel"/>
+<text x="60" y="150" class="ph">恒等捷径 identity shortcut　—— 论文式 (1)</text>
+<text x="380" y="192" class="mr" font-size="20" text-anchor="middle" xml:space="preserve"><tspan class="mi">y</tspan><tspan class="mr"> = </tspan><tspan class="mr">ℱ</tspan><tspan class="mr">(</tspan><tspan class="mi">x</tspan><tspan class="mr">, {</tspan><tspan class="mi">W</tspan><tspan class="mi" font-size="13" baseline-shift="-22%">i</tspan><tspan class="mr">})  +  </tspan><tspan class="mi">x</tspan></text>
+<rect x="443" y="174" width="21" height="26" rx="4" fill="none" stroke="#0F766E" stroke-width="1.6"/>
+<text x="453.5" y="222" class="tiny" text-anchor="middle" fill="#0F766E">就是这个 x</text>
+<text x="170" y="252" class="mi" font-size="17" text-anchor="middle">x</text>
+<circle cx="170" cy="264" r="3" fill="#14161A"/>
+<path d="M170 268 L170 292" class="ink" marker-end="url(#a)"/>
+<rect x="88" y="292" width="164" height="40" rx="5" class="acc"/>
+<text x="170" y="318" class="mr" font-size="16" text-anchor="middle">ℱ(x)　两三层卷积</text>
+<path d="M170 332 L170 371" class="ink" marker-end="url(#a)"/>
+<path d="M170 264 H300 V384 H185" class="adash" marker-end="url(#aw)"/>
+<text x="310" y="322" class="tiny">线上什么</text>
+<text x="310" y="336" class="tiny">都没有</text>
+<circle cx="170" cy="384" r="13" fill="#FEF6E7" stroke="#B45309" stroke-width="1.6"/>
+<path d="M164 384 H176 M170 378 V390" fill="none" stroke="#B45309" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M170 397 L170 422" class="ink" marker-end="url(#a)"/>
+<text x="170" y="440" class="mi" font-size="17" text-anchor="middle">y</text>
+<circle cx="364" cy="258" r="3" fill="#0F766E"/>
+<text x="376" y="262" class="xs"><tspan font-weight="600">identity 就是数学上的恒等函数 </tspan>f(x) = x</text>
+<circle cx="364" cy="288" r="3" fill="#0F766E"/>
+<text x="376" y="292" class="xs"><tspan font-weight="600">捷径上不做任何变换，</tspan>x 原封不动加到输出上</text>
+<circle cx="364" cy="318" r="3" fill="#0F766E"/>
+<text x="376" y="322" class="xs"><tspan font-weight="600">没有权重、没有矩阵、没有乘法，</tspan>只有一次逐元素加法</text>
+<circle cx="364" cy="348" r="3" fill="#0F766E"/>
+<text x="376" y="352" class="xs"><tspan font-weight="600">前提：</tspan>x 和 ℱ(x) 的形状必须完全一样</text>
+<circle cx="364" cy="378" r="3" fill="#0F766E"/>
+<text x="376" y="382" class="xs"><tspan font-weight="600">网络里绝大多数捷径都是这一种</tspan></text>
+<rect x="60" y="430" width="640" height="70" rx="6" class="acc"/>
+<text x="78" y="456" class="xs b">论文：introduce neither extra parameter nor computation complexity</text>
+<text x="78" y="480" class="xs">这句就是「parameter-free」的出处 —— 它形容的是恒等捷径，不是第三种捷径。</text>
+<rect x="760" y="120" width="640" height="400" rx="12" class="panel"/>
+<text x="780" y="150" class="ph">投影捷径 projection shortcut　—— 论文式 (2)</text>
+<text x="1080" y="192" class="mr" font-size="20" text-anchor="middle" xml:space="preserve"><tspan class="mi">y</tspan><tspan class="mr"> = </tspan><tspan class="mr">ℱ</tspan><tspan class="mr">(</tspan><tspan class="mi">x</tspan><tspan class="mr">, {</tspan><tspan class="mi">W</tspan><tspan class="mi" font-size="13" baseline-shift="-22%">i</tspan><tspan class="mr">})  +  </tspan><tspan class="mi">W</tspan><tspan class="mi" font-size="13" baseline-shift="-22%">s</tspan><tspan class="mi">x</tspan></text>
+<rect x="1132" y="174" width="43" height="26" rx="4" fill="none" stroke="#B45309" stroke-width="1.6"/>
+<text x="1153.5" y="222" class="tiny" text-anchor="middle" fill="#B45309">多出来的就是这个 Wₛ</text>
+<text x="870" y="252" class="mi" font-size="17" text-anchor="middle">x</text>
+<circle cx="870" cy="264" r="3" fill="#14161A"/>
+<path d="M870 268 L870 292" class="ink" marker-end="url(#a)"/>
+<rect x="788" y="292" width="164" height="40" rx="5" class="acc"/>
+<text x="870" y="318" class="mr" font-size="16" text-anchor="middle">ℱ(x)　两三层卷积</text>
+<path d="M870 332 L870 371" class="ink" marker-end="url(#a)"/>
+<path d="M870 264 H1046 V384 H885" class="adash" marker-end="url(#aw)"/>
+<rect x="1004" y="310" width="84" height="26" rx="4" class="warm"/>
+<text x="1046" y="327" class="xs b" text-anchor="middle" fill="#B45309">1×1 卷积</text>
+<circle cx="870" cy="384" r="13" fill="#FEF6E7" stroke="#B45309" stroke-width="1.6"/>
+<path d="M864 384 H876 M870 378 V390" fill="none" stroke="#B45309" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M870 397 L870 422" class="ink" marker-end="url(#a)"/>
+<text x="870" y="440" class="mi" font-size="17" text-anchor="middle">y</text>
+<circle cx="1084" cy="258" r="3" fill="#0F766E"/>
+<text x="1096" y="262" class="xs"><tspan font-weight="600">Wₛ 是一个要学的线性映射</tspan></text>
+<circle cx="1084" cy="288" r="3" fill="#0F766E"/>
+<text x="1096" y="292" class="xs"><tspan font-weight="600">卷积网络里就用 </tspan>1×1 卷积实现</text>
+<circle cx="1084" cy="318" r="3" fill="#0F766E"/>
+<text x="1096" y="322" class="xs"><tspan font-weight="600">有权重：</tspan>C_in × C_out 个，跟着训练一起更新</text>
+<circle cx="1084" cy="348" r="3" fill="#0F766E"/>
+<text x="1096" y="352" class="xs"><tspan font-weight="600">唯一作用：</tspan>把 x 的形状掰成跟 ℱ(x) 一样</text>
+<circle cx="1084" cy="378" r="3" fill="#0F766E"/>
+<text x="1096" y="382" class="xs"><tspan font-weight="600">只在形状对不上的地方才用</tspan></text>
+<rect x="780" y="430" width="600" height="70" rx="6" class="warm"/>
+<text x="798" y="456" class="xs b">论文：Wₛ is only used when matching dimensions</text>
+<text x="798" y="480" class="xs">就算形状对得上也能塞一个 Wₛ 进去，但论文实测这样不划算（见下面选项 C）。</text>
+<rect x="40" y="540" width="620" height="340" rx="12" class="panel"/>
+<text x="60" y="570" class="ph">什么时候形状会对不上</text>
+<text x="60" y="594" class="xs">ResNet-34 从 conv2_x 走进 conv3_x 的那一块，是个现成的例子</text>
+<path d="M96 634 l30 -18.6 h120 l-30 18.6 z" fill="#0F766E" opacity="0.30" stroke="#0F766E" stroke-width="1.2"/>
+<path d="M216 634 l30 -18.6 v120 l-30 18.6 z" fill="#0F766E" opacity="0.16" stroke="#0F766E" stroke-width="1.2"/>
+<rect x="96" y="634" width="120" height="120" fill="#0F766E" opacity="0.10" stroke="#0F766E" stroke-width="1.4"/>
+<text x="156" y="699" class="shp" text-anchor="middle" fill="#0F766E">56×56</text>
+<text x="156" y="780" class="xs b" text-anchor="middle">x：56×56×64</text>
+<path d="M360 664 l52 -32.24 h60 l-52 32.24 z" fill="#B45309" opacity="0.30" stroke="#B45309" stroke-width="1.2"/>
+<path d="M420 664 l52 -32.24 v60 l-52 32.24 z" fill="#B45309" opacity="0.16" stroke="#B45309" stroke-width="1.2"/>
+<rect x="360" y="664" width="60" height="60" fill="#B45309" opacity="0.10" stroke="#B45309" stroke-width="1.4"/>
+<text x="390" y="699" class="shp" text-anchor="middle" fill="#B45309">28×28</text>
+<text x="390" y="750" class="xs b" text-anchor="middle">ℱ(x)：28×28×128</text>
+<text x="286" y="700" class="mr" font-size="26" text-anchor="middle" fill="#868D98">≠</text>
+<text x="66" y="800" class="xs b">两处对不上：</text>
+<text x="66" y="822" class="tiny">通道 64 → 128，多了一倍（每进一个 stage 就翻一倍）</text>
+<text x="66" y="840" class="tiny">空间 56×56 → 28×28，被 stride 2 砍了一半</text>
+<text x="66" y="862" class="tiny">逐元素加法要求两边每个位置一一对应，形状不同就根本加不起来 —— 必须先对 x 动手。</text>
+<rect x="700" y="540" width="700" height="340" rx="12" class="panel"/>
+<text x="720" y="570" class="ph">论文试了三种补救，就是 Table 3 里的 A / B / C</text>
+<rect x="722" y="580" width="656" height="74" rx="6" class="acc"/>
+<circle cx="752" cy="610" r="14" fill="#0F766E"/>
+<text x="752" y="614.68" class="bgst" style="font-size:13px" text-anchor="middle">A</text>
+<text x="780" y="606" class="sm b">补零 zero-padding</text>
+<text x="780" y="628" class="tiny">空间隔点取样（stride 2），通道不够的部分直接补 0</text>
+<text x="1360" y="606" class="num" font-size="12" text-anchor="end" fill="#0F766E">0</text>
+<text x="1360" y="626" class="tiny" text-anchor="end">捷径带来的参数</text>
+<rect x="722" y="664" width="656" height="74" rx="6" class="warm"/>
+<circle cx="752" cy="694" r="14" fill="#B45309"/>
+<text x="752" y="698.68" class="bgst" style="font-size:13px" text-anchor="middle">B</text>
+<text x="780" y="690" class="sm b">只在维度变化处用投影</text>
+<text x="780" y="712" class="tiny">3 条捷径换成 1×1 卷积 stride 2，其余 13 条仍是恒等</text>
+<text x="1360" y="690" class="num" font-size="12" text-anchor="end" fill="#B45309">172,032</text>
+<text x="1360" y="710" class="tiny" text-anchor="end">捷径带来的参数</text>
+<rect x="722" y="748" width="656" height="74" rx="6" class="soft"/>
+<circle cx="752" cy="778" r="14" fill="#4E5560"/>
+<text x="752" y="782.68" class="bgst" style="font-size:13px" text-anchor="middle">C</text>
+<text x="780" y="774" class="sm b">所有捷径都用投影</text>
+<text x="780" y="796" class="tiny">形状本来就对得上的 13 条也塞进 1×1</text>
+<text x="1360" y="774" class="num" font-size="12" text-anchor="end" fill="#4E5560">再多 913,408</text>
+<text x="1360" y="794" class="tiny" text-anchor="end">捷径带来的参数</text>
+<text x="722" y="848" class="tiny">B 是今天所有主流实现的默认做法。论文对 C 的评价是「extra parameters introduced by many (thirteen) projection shortcuts」，</text>
+<text x="722" y="866" class="tiny">那个 thirteen 就是 16 个块减去需要变形的 3 个 —— 剩下 13 条本来是恒等的。</text>
+<rect x="40" y="900" width="780" height="250" rx="12" class="panel"/>
+<text x="60" y="930" class="ph">三种选项的实测差距（Table 3，ImageNet 验证集 10-crop）</text>
+<text x="70" y="958" class="xs b" text-anchor="start">做法</text>
+<text x="300" y="958" class="xs b" text-anchor="end">top-1</text>
+<text x="400" y="958" class="xs b" text-anchor="end">top-5</text>
+<text x="540" y="958" class="xs b" text-anchor="end">捷径参数</text>
+<text x="790" y="958" class="xs b" text-anchor="end">比上一行好</text>
+<line x1="70" y1="966" x2="790" y2="966" stroke="#C8C3BA" stroke-width="1"/>
+<text x="70" y="990" class="xs">plain-34（没有捷径）</text>
+<text x="300" y="990" class="numS" text-anchor="end">28.54</text>
+<text x="400" y="990" class="numS" text-anchor="end">10.02</text>
+<text x="540" y="990" class="numS" text-anchor="end">—</text>
+<text x="70" y="1014" class="xs" fill="#0F766E" font-weight="600">ResNet-34 A　补零</text>
+<text x="300" y="1014" class="numS" text-anchor="end" fill="#0F766E" font-weight="600">25.03</text>
+<text x="400" y="1014" class="numS" text-anchor="end" fill="#0F766E" font-weight="600">7.76</text>
+<text x="540" y="1014" class="numS" text-anchor="end" fill="#0F766E" font-weight="600">0</text>
+<text x="790" y="1014" class="num" font-size="12" text-anchor="end" fill="#0F766E">3.51</text>
+<text x="70" y="1038" class="xs">ResNet-34 B　维度变化处投影</text>
+<text x="300" y="1038" class="numS" text-anchor="end">24.52</text>
+<text x="400" y="1038" class="numS" text-anchor="end">7.46</text>
+<text x="540" y="1038" class="numS" text-anchor="end">172,032</text>
+<text x="790" y="1038" class="num" font-size="12" text-anchor="end" fill="#868D98">0.51</text>
+<text x="70" y="1062" class="xs">ResNet-34 C　全部投影</text>
+<text x="300" y="1062" class="numS" text-anchor="end">24.19</text>
+<text x="400" y="1062" class="numS" text-anchor="end">7.40</text>
+<text x="540" y="1062" class="numS" text-anchor="end">1,085,440</text>
+<text x="790" y="1062" class="num" font-size="12" text-anchor="end" fill="#868D98">0.33</text>
+<rect x="60" y="1078" width="740" height="56" rx="6" class="acc"/>
+<text x="78" y="1102" class="xs b">关键跳跃是 3.51，发生在「没有捷径 → 有捷径」这一步。</text>
+<text x="78" y="1124" class="xs">捷径换成投影只再赚 0.51 和 0.33。所以起作用的是恒等那条线，不是投影。</text>
+<rect x="860" y="900" width="540" height="250" rx="12" class="panel"/>
+<text x="880" y="930" class="ph">parameter-free 到底 free 在哪</text>
+<text x="886" y="952" class="xs b" fill="#0F766E">免的</text>
+<text x="886" y="970" class="tiny">没有 Wₛ 要学，没有乘法，反向传播时梯度原样通过</text>
+<text x="886" y="992" class="xs b" fill="#B45309">不免的</text>
+<text x="886" y="1010" class="tiny">那次逐元素加法本身：一个 56×56×64 的块要加 200,704 次</text>
+<text x="886" y="1032" class="xs b" fill="#B45309">也不免的</text>
+<text x="886" y="1050" class="tiny">x 得留在显存里等到加法那一刻，内存不是免费的</text>
+<text x="886" y="1082" class="tiny">那 200,704 次加法只占同一个块卷积乘加数的 0.087%，论文因此称它 negligible。</text>
+<rect x="880" y="1096" width="500" height="40" rx="6" class="soft"/>
+<text x="898" y="1121" class="tiny">强调无参数，是为了让 plain 与 ResNet 的对比成为受控实验：两者参数量、深度、宽度、计算量全都一样。</text>
+<text x="40" y="1180" class="tiny">式 (1)(2) 与 A/B/C 的定义按论文 3.2、3.3、4.1 节，错误率按 Table 3。捷径参数为按 ResNet-34 结构逐条算出（1×1 卷积权重，未计其后 Batch Normalization 的 2C 个参数）：B 的三条为 64→128、128→256、256→512；C 在此基础上再加 13 条同维投影，共 1,085,440。</text>
+</svg>

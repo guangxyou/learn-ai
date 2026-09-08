@@ -1,0 +1,247 @@
+{
+  "1": {
+    "venue": "IEEE TNN 1994",
+    "url": "https://doi.org/10.1109/72.279181",
+    "sum": "梯度消失/爆炸的经典论证，说的是循环网络里长程依赖为什么学不动。第 1 节开篇拿它和 [9] 一起立问题：光靠堆层数不行，第一道坎就是梯度。"
+  },
+  "2": {
+    "venue": "Oxford University Press 1995",
+    "sum": "Bishop 的《Neural Networks for Pattern Recognition》。和 [34][49] 一起被引来说明 shortcut connection 不是新东西，教科书里早就有。"
+  },
+  "3": {
+    "venue": "SIAM 2000",
+    "url": "https://doi.org/10.1137/1.9780898719505",
+    "sum": "多重网格法的教程。第 2 节用它做类比：Multigrid 把方程组拆成多个尺度上的子问题，每个子问题负责一个残差，所以「学残差比学原量容易」在数值计算里是老结论。"
+  },
+  "4": {
+    "venue": "BMVC 2011",
+    "url": "https://doi.org/10.5244/C.25.76",
+    "sum": "特征编码方法的系统评测。和 [48] 一起被引,说明 VLAD、Fisher Vector 这类浅层表示在当年确实强,残差编码的有效性有实证基础。"
+  },
+  "5": {
+    "venue": "IJCV 2010",
+    "url": "https://doi.org/10.1007/s11263-009-0275-4",
+    "sum": "PASCAL VOC 竞赛。4.3 节检测实验的两个数据集之一，表 8 报的就是 VOC 2007 / 2012 上的结果。"
+  },
+  "6": {
+    "venue": "ICCV 2015",
+    "url": "https://arxiv.org/abs/1505.01749",
+    "sum": "MR-CNN，多区域加语义分割感知的检测模型。附录 B 里的 box refinement 和 box voting 都跟着它做。"
+  },
+  "7": {
+    "venue": "ICCV 2015",
+    "url": "https://arxiv.org/abs/1504.08083",
+    "sum": "Fast R-CNN。第 1 节列在「深模型让多个视觉任务受益」那一串里，附录 B 的多尺度训练/测试也参考了它。"
+  },
+  "8": {
+    "venue": "CVPR 2014",
+    "url": "https://arxiv.org/abs/1311.2524",
+    "sum": "R-CNN，把卷积特征接到候选框上做检测的开端。附录 B 的非极大值抑制用它的 IoU 0.3 设置。"
+  },
+  "9": {
+    "venue": "AISTATS 2010",
+    "url": "https://proceedings.mlr.press/v9/glorot10a.html",
+    "sum": "Xavier 初始化。第 1 节两处引它：一次是和 [1] 一起说梯度问题，一次是和 [23][37][13] 一起说「归一化初始化已经把这个问题基本解决了」，为的是把退化现象和梯度消失划清界限。"
+  },
+  "10": {
+    "venue": "arXiv 2013",
+    "url": "https://arxiv.org/abs/1302.4389",
+    "sum": "Maxout。4.2 节 CIFAR-10 的对照方法之一，用来说明当时刷榜靠的是强正则化。"
+  },
+  "11": {
+    "venue": "CVPR 2015",
+    "url": "https://arxiv.org/abs/1412.1710",
+    "sum": "同一作者的前作，研究固定计算预算下怎么配深度和宽度。第 1 节和 [42] 一起被引，作为「加层反而更差」这个退化现象的先前报告。"
+  },
+  "12": {
+    "venue": "ECCV 2014",
+    "url": "https://arxiv.org/abs/1406.4729",
+    "sum": "SPP-net，空间金字塔池化。附录 B 用它的 single-level 版本做全图特征池化。"
+  },
+  "13": {
+    "venue": "ICCV 2015",
+    "url": "https://arxiv.org/abs/1502.01852",
+    "sum": "PReLU 与 He 初始化，同一作者。第 1 节列为「很深的模型」之一，3.4 节的初始化直接用它。"
+  },
+  "14": {
+    "venue": "arXiv 2012",
+    "url": "https://arxiv.org/abs/1207.0580",
+    "sum": "Dropout。3.4 节明说本文不用 dropout，跟 [16] 的做法走，因为 Batch Normalization 已经提供了正则化。"
+  },
+  "15": {
+    "venue": "Neural Computation 1997",
+    "url": "https://doi.org/10.1162/neco.1997.9.8.1735",
+    "sum": "LSTM。第 2 节说 highway network [42][43] 的 shortcut 是带门的，门这个机制的出处就是它。本文的恒等旁路不带门，这是关键区别。"
+  },
+  "16": {
+    "venue": "ICML 2015",
+    "url": "https://arxiv.org/abs/1502.03167",
+    "sum": "Batch Normalization。第 1 节列为「中间归一化层」，3.4 节每个卷积后都接它，也是本文不用 dropout 的理由。"
+  },
+  "17": {
+    "venue": "TPAMI 2011",
+    "url": "https://doi.org/10.1109/TPAMI.2010.57",
+    "sum": "乘积量化。第 2 节的残差论证：向量量化里编码残差向量比编码原向量更有效，这是本文动机在另一个领域的先例。"
+  },
+  "18": {
+    "venue": "TPAMI 2012",
+    "url": "https://doi.org/10.1109/TPAMI.2011.235",
+    "sum": "VLAD，把局部描述子聚合成紧凑编码。它的做法就是编码相对字典的残差向量，第 2 节拿它当直接类比。"
+  },
+  "19": {
+    "venue": "arXiv 2014",
+    "url": "https://arxiv.org/abs/1408.5093",
+    "sum": "Caffe。第 1 节强调残差网络不需要改求解器，用现成框架就能端到端训。"
+  },
+  "20": {
+    "venue": "多伦多大学技术报告 2009",
+    "url": "https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf",
+    "sum": "CIFAR-10 / CIFAR-100 的出处。第 1 节用它佐证退化现象不是 ImageNet 独有，4.2 节整节在它上面做实验，包括那个 1202 层的极端例子。"
+  },
+  "21": {
+    "venue": "NIPS 2012",
+    "url": "https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html",
+    "sum": "AlexNet。第 1 节的起点，3.4 节的训练配置（随机裁剪、水平翻转、PCA 颜色增强、10-crop 测试）大量沿用它和 VGG [41]。"
+  },
+  "22": {
+    "venue": "Neural Computation 1989",
+    "url": "https://doi.org/10.1162/neco.1989.1.4.541",
+    "sum": "LeCun 的邮政编码识别，卷积网络这条线的起点。第 1 节和 [21] 一起开题，第 1 节又和 [23][9][37] 一起说初始化。"
+  },
+  "23": {
+    "venue": "Tricks of the Trade 1998",
+    "url": "http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf",
+    "sum": "《Efficient BackProp》。第 1 节归在「归一化初始化」那一串里，讲的是怎么把输入和权重的尺度调好让 SGD 收敛。"
+  },
+  "24": {
+    "venue": "arXiv 2014",
+    "url": "https://arxiv.org/abs/1409.5185",
+    "sum": "Deeply-supervised nets，给中间层直接接辅助分类器。第 2 节和 GoogLeNet [44] 一起被列为「另一种对付梯度问题的做法」，4.2 节的数据增强也跟它。"
+  },
+  "25": {
+    "venue": "arXiv 2013",
+    "url": "https://arxiv.org/abs/1312.4400",
+    "sum": "Network in Network，1×1 卷积和 global average pooling 的出处。4.2 节 CIFAR-10 的对照方法之一。"
+  },
+  "26": {
+    "venue": "ECCV 2014",
+    "url": "https://arxiv.org/abs/1405.0312",
+    "sum": "MS COCO，80 类物体检测数据集。4.3 节和附录 A 的检测实验用它，那次比赛 ResNet 拿了检测和分割的第一。"
+  },
+  "27": {
+    "venue": "CVPR 2015",
+    "url": "https://arxiv.org/abs/1411.4038",
+    "sum": "FCN，全卷积语义分割。第 1 节列在「受益于深模型的视觉任务」那一串里。"
+  },
+  "28": {
+    "venue": "NIPS 2014",
+    "url": "https://arxiv.org/abs/1402.1869",
+    "sum": "深网络能表达多少个线性区域的理论分析。本文在 3.1 节的脚注 2 里引它，用来给「多层非线性能渐近逼近任意复杂函数」这个前提留余地：作者写的是「this hypothesis, however, is still an open question」。构建时报「正文没有引用点」，是解析器不扫脚注，不是论文漏引。"
+  },
+  "29": {
+    "venue": "ICML 2010",
+    "url": "https://www.cs.toronto.edu/~hinton/absps/reluICML.pdf",
+    "sum": "ReLU 这个名字的出处。3.2 节写残差函数 ℱ = W₂σ(W₁x) 时，σ 指的就是它。"
+  },
+  "30": {
+    "venue": "CVPR 2007",
+    "url": "https://doi.org/10.1109/CVPR.2007.383266",
+    "sum": "Fisher 核。第 2 节说 Fisher Vector 可以看成 VLAD [18] 的概率版本，两者都在编码残差。"
+  },
+  "31": {
+    "venue": "AISTATS 2012",
+    "url": "https://proceedings.mlr.press/v22/raiko12.html",
+    "sum": "用线性变换让深度学习更好训。和 [39][38][47] 一起被引：这四篇都在做「把层响应或梯度中心化」，实现方式正是 shortcut connection。"
+  },
+  "32": {
+    "venue": "NIPS 2015",
+    "url": "https://arxiv.org/abs/1506.01497",
+    "sum": "Faster R-CNN，同一批作者。4.3 节的检测实验就用它当框架，把主干从 VGG 换成 ResNet-101。"
+  },
+  "33": {
+    "venue": "arXiv 2015",
+    "url": "https://arxiv.org/abs/1504.06066",
+    "sum": "NoC，在卷积特征图上再接网络。附录 A 用它的思路解决「主干换成全卷积之后检测头放哪」的问题。"
+  },
+  "34": {
+    "venue": "Cambridge University Press 1996",
+    "url": "https://doi.org/10.1017/CBO9780511812651",
+    "sum": "Ripley 的《Pattern Recognition and Neural Networks》。和 [2][49] 一起被引，佐证 shortcut connection 的历史：早期训练多层感知机就有从输入直连输出的做法。"
+  },
+  "35": {
+    "venue": "ICLR 2015",
+    "url": "https://arxiv.org/abs/1412.6550",
+    "sum": "FitNets，用 hint 训练又深又瘦的网络。4.2 节拿它和 Highway 做参数量对比。"
+  },
+  "36": {
+    "venue": "arXiv 2014",
+    "url": "https://arxiv.org/abs/1409.0575",
+    "sum": "ILSVRC 的正式论文，Russakovsky 等。第 1 节引它指代 ImageNet 这个基准本身。"
+  },
+  "37": {
+    "venue": "arXiv 2013",
+    "url": "https://arxiv.org/abs/1312.6120",
+    "sum": "深度线性网络学习动力学的精确解，正交初始化的理论依据。第 1 节归在「归一化初始化」那一串里。"
+  },
+  "38": {
+    "venue": "技术报告 1998",
+    "sum": "Schraudolph 的因子中心化加速梯度下降。第 2 节那组「中心化」文献之一。"
+  },
+  "39": {
+    "venue": "Tricks of the Trade 1998",
+    "sum": "Schraudolph 的《Centering neural network gradient factors》。同上，第 2 节用这组文献说明：本文的旁路在结构上不是首创，新的是它承担的功能。"
+  },
+  "40": {
+    "venue": "ICLR 2014",
+    "url": "https://arxiv.org/abs/1312.6229",
+    "sum": "OverFeat，用一个卷积网络同时做识别、定位和检测。第 1 节列在图像分类突破里，附录 C 的定位任务跟它和 VGG [41] 的做法。"
+  },
+  "41": {
+    "venue": "ICLR 2015",
+    "url": "https://arxiv.org/abs/1409.1556",
+    "sum": "VGG。本文最直接的对照：VGG 靠堆 3×3 做到 19 层就到顶了，本文要回答的正是「再往下堆为什么不行」。3.4 节的训练配置也大量沿用它。"
+  },
+  "42": {
+    "venue": "arXiv 2015",
+    "url": "https://arxiv.org/abs/1505.00387",
+    "sum": "Highway Network，同期工作。第 1 节引它作为退化现象的先前报告，第 2 节详细对比：highway 的旁路带门、门关上时就退化成普通层，本文的旁路是恒等的、无参数、永不关闭。"
+  },
+  "43": {
+    "venue": "arXiv 2015",
+    "url": "https://arxiv.org/abs/1507.06228",
+    "sum": "Highway 的后续，训练极深网络。第 2 节和 [42] 一起对比，4.2 节列在 CIFAR-10 的对照行里。"
+  },
+  "44": {
+    "venue": "CVPR 2015",
+    "url": "https://arxiv.org/abs/1409.4842",
+    "sum": "GoogLeNet。第 1 节列为「很深的模型」之一，第 2 节又和 [24] 一起被引：它用辅助分类器对付梯度问题，本文认为那是绕路。"
+  },
+  "45": {
+    "venue": "TPAMI 1990",
+    "url": "https://doi.org/10.1109/34.55103",
+    "sum": "Szeliski 的层次基函数曲面插值。和 [46] 一起构成第 2 节的第二个数值计算类比：层次基预条件也是靠尺度之间的残差变量收敛得更快。"
+  },
+  "46": {
+    "venue": "SIGGRAPH 2006",
+    "sum": "Szeliski 的局部自适应层次基预条件。同上。"
+  },
+  "47": {
+    "venue": "ICONIP 2013",
+    "sum": "把随机梯度推向二阶方法，非线性里做变换。第 2 节那组「中心化」文献之一。"
+  },
+  "48": {
+    "venue": "开源库 2008",
+    "url": "https://www.vlfeat.org/",
+    "sum": "VLFeat 计算机视觉算法库。和 [4] 一起被引，指代 VLAD / Fisher Vector 那一路浅层表示的实现。"
+  },
+  "49": {
+    "venue": "Springer 1999",
+    "url": "https://doi.org/10.1007/978-1-4757-3121-7",
+    "sum": "Venables 和 Ripley 的《Modern Applied Statistics with S-PLUS》。和 [2][34] 一起被引，同样是为了说明输入直连输出这种结构在统计学教材里就有。"
+  },
+  "50": {
+    "venue": "ECCV 2014",
+    "url": "https://arxiv.org/abs/1311.2901",
+    "sum": "ZFNet，反卷积可视化。第 1 节两处引它：一次说图像分类的突破，一次说深网络天然把低/中/高层特征和分类器整合在一起。"
+  }
+}

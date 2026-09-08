@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 790" width="1300" height="790" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .adash{fill:none;stroke:#B45309;stroke-width:1.4;stroke-dasharray:5 3}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule-ink{fill:none;stroke:#14161A;stroke-width:1;stroke-linecap:round}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .h1{font-size:28px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#4E5560}
+  .tiny{font-size:9.5px;fill:#868D98}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;fill:#14161A}
+  .numS{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .shp{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .shpHi{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0F766E;font-weight:600}
+  .shpW{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#B45309;font-weight:600}
+  .mi{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;fill:#14161A;font-variant-numeric:lining-nums}
+  .mr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;fill:#14161A;font-variant-numeric:lining-nums}
+  .b{font-weight:600}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTealD{fill:#0B5750}.cAmberD{fill:#8A4008}
+  .bgs{fill:#0F766E}.bgst{font-size:8px;font-weight:700;fill:#fff}
+  .brk{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect width="1300" height="790" fill="#FBFAF8"/>
+<rect width="1300" height="790" fill="#FBFAF8"/>
+<text x="40" y="52" class="h1">退化：层数加上去，错误率反而回头</text>
+<text x="40" y="82" class="sm">不是过拟合。加深之后连训练误差都更高，说明问题出在优化，不在泛化。右边是同一件事的另一面：旁路装上以后，深度重新变成能吃的红利，一直吃到 110 层。</text>
+<line x1="40" y1="102" x2="1260" y2="102" class="thin"/>
+<rect x="40" y="120" width="600" height="420" rx="12" class="panel"/>
+<text x="60" y="150" class="ph">ImageNet：同样加到 34 层，两边走反了</text>
+<text x="60" y="176" class="xs">top-1 错误率（%，10-crop 测试）· 论文 Table 2</text>
+<line x1="110" y1="470" x2="560" y2="470" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="473.5" class="numS" text-anchor="end" font-size="9.5">24</text>
+<line x1="110" y1="414" x2="560" y2="414" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="417.5" class="numS" text-anchor="end" font-size="9.5">25</text>
+<line x1="110" y1="358" x2="560" y2="358" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="361.5" class="numS" text-anchor="end" font-size="9.5">26</text>
+<line x1="110" y1="302" x2="560" y2="302" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="305.5" class="numS" text-anchor="end" font-size="9.5">27</text>
+<line x1="110" y1="246" x2="560" y2="246" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="249.5" class="numS" text-anchor="end" font-size="9.5">28</text>
+<line x1="110" y1="190" x2="560" y2="190" stroke="#E4E0D9" stroke-width="1"/>
+<text x="102" y="193.5" class="numS" text-anchor="end" font-size="9.5">29</text>
+<line x1="110" y1="190" x2="110" y2="470" stroke="#C8C3BA" stroke-width="1.2"/>
+<text x="130" y="494" class="xs" text-anchor="middle">18 层</text>
+<text x="470" y="494" class="xs" text-anchor="middle">34 层</text>
+<path d="M130 249.35999999999993 L470 215.76000000000005" fill="none" stroke="#B45309" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M130 252.72000000000006 L470 412.31999999999994" fill="none" stroke="#0F766E" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="130" cy="249.35999999999993" r="5" fill="#B45309"/>
+<circle cx="470" cy="215.76000000000005" r="5" fill="#B45309"/>
+<circle cx="130" cy="252.72000000000006" r="5" fill="#0F766E"/>
+<circle cx="470" cy="412.31999999999994" r="5" fill="#0F766E"/>
+<text x="250" y="272" class="tiny">18 层时两者几乎一样</text>
+<text x="250" y="288" class="numS" font-size="9.5">27.94 / 27.88</text>
+<text x="486" y="211.76000000000005" class="xs b">plain</text>
+<text x="486" y="228.76000000000005" class="numS" font-size="10" fill="#B45309">28.54　更差了</text>
+<text x="486" y="408.31999999999994" class="xs b">ResNet</text>
+<text x="486" y="425.31999999999994" class="numS" font-size="10" fill="#0F766E">25.03　降 3.5</text>
+<rect x="660" y="120" width="600" height="420" rx="12" class="panel"/>
+<text x="680" y="150" class="ph">CIFAR-10：旁路装上以后，深度一直有用到 110 层</text>
+<text x="680" y="176" class="xs">错误率（%）· 论文 Table 6，横轴不按比例</text>
+<line x1="720" y1="470" x2="1230" y2="470" stroke="#E4E0D9" stroke-width="1"/>
+<text x="712" y="473.5" class="numS" text-anchor="end" font-size="9.5">6</text>
+<line x1="720" y1="376.67" x2="1230" y2="376.67" stroke="#E4E0D9" stroke-width="1"/>
+<text x="712" y="380.17" class="numS" text-anchor="end" font-size="9.5">7</text>
+<line x1="720" y1="283.34000000000003" x2="1230" y2="283.34000000000003" stroke="#E4E0D9" stroke-width="1"/>
+<text x="712" y="286.84000000000003" class="numS" text-anchor="end" font-size="9.5">8</text>
+<line x1="720" y1="190.01" x2="1230" y2="190.01" stroke="#E4E0D9" stroke-width="1"/>
+<text x="712" y="193.51" class="numS" text-anchor="end" font-size="9.5">9</text>
+<line x1="720" y1="190" x2="720" y2="470" stroke="#C8C3BA" stroke-width="1.2"/>
+<path d="M760 213.34250000000003 L835 329.0717 L910 360.8039 L985 379.46990000000005 L1060 429.8681" fill="none" stroke="#0F766E" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1060 429.8681 L1185 289.8731" fill="none" stroke="#B45309" stroke-width="2.2" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="760" cy="213.34250000000003" r="5" fill="#0F766E"/>
+<text x="760" y="494" class="xs" text-anchor="middle">20</text>
+<text x="748" y="217.34250000000003" class="numS" text-anchor="end" font-size="10" fill="#0F766E">8.75</text>
+<circle cx="835" cy="329.0717" r="5" fill="#0F766E"/>
+<text x="835" y="494" class="xs" text-anchor="middle">32</text>
+<text x="835" y="349.0717" class="numS" text-anchor="middle" font-size="10" fill="#0F766E">7.51</text>
+<circle cx="910" cy="360.8039" r="5" fill="#0F766E"/>
+<text x="910" y="494" class="xs" text-anchor="middle">44</text>
+<text x="910" y="380.8039" class="numS" text-anchor="middle" font-size="10" fill="#0F766E">7.17</text>
+<circle cx="985" cy="379.46990000000005" r="5" fill="#0F766E"/>
+<text x="985" y="494" class="xs" text-anchor="middle">56</text>
+<text x="985" y="399.46990000000005" class="numS" text-anchor="middle" font-size="10" fill="#0F766E">6.97</text>
+<circle cx="1060" cy="429.8681" r="5" fill="#0F766E"/>
+<text x="1060" y="494" class="xs" text-anchor="middle">110</text>
+<text x="1060" y="449.8681" class="numS" text-anchor="middle" font-size="10" fill="#0F766E">6.43</text>
+<circle cx="1185" cy="289.8731" r="5" fill="#B45309"/>
+<text x="1185" y="494" class="xs" text-anchor="middle">1202</text>
+<text x="1185" y="275.8731" class="numS" text-anchor="middle" font-size="10" fill="#B45309">7.93</text>
+<text x="975" y="516" class="tiny" text-anchor="middle">层数</text>
+<path d="M1185 263.8731 V247.87310000000002" class="adash"/>
+<text x="1185" y="241.87310000000002" class="tiny" text-anchor="middle">1202 层这次是过拟合</text>
+<rect x="40" y="560" width="1220" height="170" rx="12" class="panel"/>
+<text x="60" y="590" class="ph">凭什么断定是优化问题，不是过拟合</text>
+<rect x="66" y="604" width="372" height="104" rx="6" class="warm"/>
+<text x="82" y="628" class="xs b">训练误差也更高</text>
+<text x="82" y="650" class="tiny">过拟合是训练误差降、测试误差升。</text>
+<text x="82" y="667" class="tiny">这里两条一起升，</text>
+<text x="82" y="684" class="tiny">34 层 plain 的训练误差全程压不到 18 层之下。</text>
+<rect x="462" y="604" width="372" height="104" rx="6" class="warm"/>
+<text x="478" y="628" class="xs b">构造解摆在那儿</text>
+<text x="478" y="650" class="tiny">深模型完全可以照抄浅模型，</text>
+<text x="478" y="667" class="tiny">多出来的层全设成恒等映射，</text>
+<text x="478" y="684" class="tiny">训练误差不该更高。解存在，</text>
+<text x="478" y="701" class="tiny">SGD 找不到。</text>
+<rect x="858" y="604" width="372" height="104" rx="6" class="soft"/>
+<text x="874" y="628" class="xs b">梯度没有消失</text>
+<text x="874" y="650" class="tiny"></text>
+<text x="874" y="667" class="tiny">plain 网络是带 Batch Normalization 训的，</text>
+<text x="874" y="684" class="tiny">前向方差非零，反向梯度范数也实测正常，</text>
+<text x="874" y="701" class="tiny">这条路排除了。</text>
+<text x="40" y="762" class="tiny">He, Zhang, Ren, Sun《Deep Residual Learning for Image Recognition》CVPR 2016，arXiv:1512.03385。ImageNet 数据按 Table 2，CIFAR-10 按 Table 6；1202 层那点论文归因于模型对这个小数据集过大（19.4M 参数）。</text>
+</svg>

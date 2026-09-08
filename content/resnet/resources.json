@@ -1,0 +1,68 @@
+{
+  "tools": [
+    {
+      "title": "ResNet 论文逐段精读",
+      "url": "https://www.bilibili.com/video/BV1P3411y7nn/",
+      "by": "跟李沐学AI · 53 分钟",
+      "zh": "从头到尾把这篇读一遍，重点在「为什么残差好训」那段的直观解释和 Fig. 7 的读法。跟本页对照着看：他讲到哪一节，就在左边找对应的批注。",
+      "links": [["动手学深度学习 · 残差网络 ↗", "https://zh.d2l.ai/chapter_convolutional-modern/resnet.html"]]
+    },
+    {
+      "title": "deep-residual-networks · 官方代码与模型",
+      "url": "https://github.com/KaimingHe/deep-residual-networks",
+      "by": "Kaiming He · Caffe",
+      "zh": "作者本人放出来的 50 / 101 / 152 层 prototxt 和训练好的权重。想自己核对本页那些参数量和 stage 宽度，直接数这几个 prototxt 最快 —— 每个 stage 的第一块带 downsample 分支，其余没有，就是论文说的选项 B。",
+      "links": [["CVPR 2016 官方版 ↗", "https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html"], ["ILSVRC 2015 成绩 ↗", "https://image-net.org/challenges/LSVRC/2015/results"]]
+    },
+    {
+      "title": "torchvision/models/resnet.py",
+      "url": "https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py",
+      "by": "PyTorch",
+      "zh": "今天大家实际在用的那份实现，两百来行读得完。BasicBlock 和 Bottleneck 两个类对应论文 Fig. 5 的左右两半；那个 downsample 模块就是投影捷径，只在每个 stage 的第一块里非空 —— 选项 B 在代码里长这样。注意它把 stride 放在 3×3 上（所谓 v1.5），和论文原版放在第一个 1×1 上略有出入。",
+      "links": [["Bag of Tricks：后续的 ResNet-B/C/D 改法 ↗", "https://arxiv.org/abs/1812.01187"]]
+    },
+    {
+      "title": "Identity Mappings in Deep Residual Networks",
+      "url": "https://arxiv.org/abs/1603.05027",
+      "by": "He et al. · ECCV 2016",
+      "zh": "同一批作者三个月后的续作，把本文「恒等那条路不能被打断」这个直觉推到底：ReLU 和 BN 全部挪进残差分支（pre-activation），让捷径成为一条从头通到尾、完全干净的加法路径。附带一组消融，逐个试了在捷径上加缩放、门控、dropout 会坏成什么样 —— 本文第 2 节对 Highway 的判断在这里被系统验证了一遍。ResNet-1001 在 CIFAR-10 上做到 4.62%。",
+      "links": []
+    },
+    {
+      "title": "Residual Networks Behave Like Ensembles of Relatively Shallow Networks",
+      "url": "https://arxiv.org/abs/1605.06431",
+      "by": "Veit, Wilber, Belongie · NeurIPS 2016",
+      "zh": "本文只说了退化被解决，没说清为什么。这篇给了一个流行的解释：n 个残差块展开后是 2ⁿ 条长度不等的路径的集合，训练时真正贡献梯度的是其中较短的那些。证据是删掉若干个块，网络几乎不掉点 —— 换成 VGG 删一层就崩。",
+      "links": [["另一种解释：破碎梯度 ↗", "https://arxiv.org/abs/1702.08591"]]
+    },
+    {
+      "title": "Visualizing the Loss Landscape of Neural Nets",
+      "url": "https://arxiv.org/abs/1712.09913",
+      "by": "Li et al. · NeurIPS 2018",
+      "zh": "那组著名的三维曲面图就出自这里：同样深度，没有捷径的网络损失面是一片支离破碎的尖峰，加上捷径之后塌成一个平滑的碗。它给「退化是优化问题」提供了一个看得见的版本。要提醒的是这是降到二维的可视化，方向的选法会影响观感，当推测看，别当证明。",
+      "links": [["代码 ↗", "https://github.com/tomgoldstein/loss-landscape"]]
+    },
+    {
+      "title": "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour",
+      "url": "https://arxiv.org/abs/1706.02677",
+      "by": "Goyal et al. · 2017",
+      "zh": "本页那条 warmup 批注的下游。这篇把 4.2 节里那个「先用 0.01 跑 400 步」的土办法命名为 constant warmup 并引本文，然后提出线性爬坡的 gradual warmup，配合学习率随 batch 线性放大，把 batch 开到 8192 还能不掉点。今天所有框架里的 warmup 基本都是这条线下来的。",
+      "links": []
+    },
+    {
+      "title": "Netron",
+      "url": "https://netron.app",
+      "by": "Lutz Roeder",
+      "zh": "浏览器里打开模型文件就能看计算图，不用装环境。拖一个 ResNet-50 的 onnx 进去，那 16 个块、4 条带 1×1 的投影捷径、12 条空捷径，一眼能数清楚 —— 比读 prototxt 直观。",
+      "links": [["GitHub ↗", "https://github.com/lutzroeder/netron"]]
+    },
+    {
+      "title": "COCO 数据集",
+      "url": "https://cocodataset.org",
+      "by": "Microsoft · 2014",
+      "zh": "4.3 节那条赛道的主场。官网的 Explore 可以逐张翻图，直观看出它和 ImageNet 的差别：ImageNet 大多是一个物体占满画面的「肖像照」，COCO 收的是日常场景，平均每张 7.7 个目标，小物体和遮挡成堆。Evaluate 页写着 mAP@[.5:.05:.95] 的完整定义。",
+      "links": [["评测代码 cocoapi ↗", "https://github.com/cocodataset/cocoapi"]]
+    }
+  ],
+  "videos": []
+}
