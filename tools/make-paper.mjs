@@ -1181,6 +1181,11 @@ body[data-view^="doc"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px
 .doc td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
 .doc tr:last-child td{border-bottom:0}
 .doc td.n{font-family:var(--mono);font-size:12.5px;white-space:nowrap;color:var(--text)}
+/* 中文每个字之间都能断行，自动表格布局会把短标签列挤到一个字宽（「张/祥/雨」竖着排）。
+   标签列显式不折行；长文字留给其它列去折。 */
+.doc td.k{white-space:nowrap;color:var(--text)}
+.doc td .who{margin-left:8px;font-size:12.5px;color:var(--text-3)}
+.doc td .sub{display:block;margin-top:3px;font-size:13px;line-height:1.65;color:var(--text-2)}
 .doc .eg{margin:6px 0 16px;padding:11px 13px;background:var(--bg-sunken);border-radius:var(--r-sm);
   font:12.5px/1.65 var(--mono);color:var(--text-2);white-space:pre;overflow-x:auto}
 .doc .callout{margin:16px 0;padding:13px 15px;background:var(--accent-soft);
@@ -1440,7 +1445,7 @@ figcaption,.ltx_caption{margin-top:12px;font:13px/1.65 var(--serif);color:var(--
 .mf i{font-style:italic}
 .mf sub{font-size:.7em;vertical-align:sub;line-height:0}
 .mf sup{font-size:.7em;vertical-align:super;line-height:0}
-.nt-a .m{font-family:var(--mono);font-size:.9em;background:var(--bg-sunken);padding:1px 5px;border-radius:4px;
+.nt-a .m,.doc .m{font-family:var(--mono);font-size:.9em;background:var(--bg-sunken);padding:1px 5px;border-radius:4px;
   /* 别 nowrap：旁注栏才 296px 宽，多词的短语会被整体挤到下一行，上一行留一大截空白。
      换行时用 box-decoration-break 让两段各自带上圆角和底色 */
   box-decoration-break:clone;-webkit-box-decoration-break:clone}

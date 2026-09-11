@@ -18,10 +18,10 @@
   "build": {
     "note": "论文源直接用 arxiv.org/html/1512.03385v1 的 SingleFile 存档（LaTeXML 结构），不需要像 AlexNet 那样从 PDF 重建。",
     "tool": "tools/make-paper.mjs",
-    "requires": "02_Before Transformer/ResNet/raw/singlefile.html",
+    "requires": "03_ResNet/raw/singlefile.html",
     "args": [
       "--src",
-      "02_Before Transformer/ResNet/raw/singlefile.html",
+      "03_ResNet/raw/singlefile.html",
       "--notes",
       "content/resnet/notes.json",
       "--keys",
@@ -41,7 +41,9 @@
       "--posters",
       "content/resnet/figures/metrics.svg#评测指标#五个任务、IoU、AP、mAP 的计算规则，以及 ImageNet 与 COCO 两种阈值口径。,content/resnet/figures/degradation.svg#退化现象#层数加上去错误率反而回头，而且训练误差也更高，所以不是过拟合。,content/resnet/figures/residual-block.svg#残差块#这一篇的全部机制都在这张图里：同样两层卷积，多一条不带参数的旁路。,content/resnet/figures/shortcut-kinds.svg#三种捷径#恒等、投影、无参数是同一个式子里的三个位置，不是三种东西。,content/resnet/figures/norm-cube.svg#归一化#Batch 和 Layer 两种归一化是在同一个立方体上切不同的方向，图像和文本各举一例。",
       "--res",
-      "content/resnet/resources.json"
+      "content/resnet/resources.json",
+      "--docs",
+      "content/resnet/docs/legacy.html#贡献与缺陷,content/resnet/docs/kaiming.html#何恺明"
     ]
   },
   "page": "page.html"

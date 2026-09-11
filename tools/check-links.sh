@@ -9,8 +9,8 @@ set -e
 cd "$(dirname "$0")/.."
 python3 - <<'PY' > /tmp/_links.txt
 import json, io, os
-srcs = [('resnet',   '02_Before Transformer/ResNet/refnotes.json'),
-        ('resnet',   '02_Before Transformer/ResNet/resources.json'),
+srcs = [('resnet',   'content/resnet/refnotes.json'),
+        ('resnet',   'content/resnet/resources.json'),
         ('alexnet',  'content/alexnet/refnotes.json'),
         ('alexnet',  'content/alexnet/resources.json'),
         ('transformer', 'content/attention-is-all-you-need/refnotes.json'),
