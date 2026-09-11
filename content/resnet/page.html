@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ResNet · 《Deep Residual Learning for Image Recognition》论文精读</title>
-<meta name="description" content="2015 年 ILSVRC 图像分类冠军，top-5 错误率 3.57%，152 层是当年 VGG 的 8 倍深，计算量反而更低。这里把全文一句一句读完，退化凭什么不算过拟合、那条旁路为什么不能带参数、瓶颈块省在哪，都摊开画出来。">
+<meta name="description" content="把 ResNet 全文一句一句读完。">
 <link rel="canonical" href="__CANONICAL__">
 <style>
 :root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
@@ -105,6 +105,11 @@ body[data-view^="doc"] .main{grid-template-columns:minmax(0,1fr);padding-top:8px
 .doc td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
 .doc tr:last-child td{border-bottom:0}
 .doc td.n{font-family:var(--mono);font-size:12.5px;white-space:nowrap;color:var(--text)}
+/* 中文每个字之间都能断行，自动表格布局会把短标签列挤到一个字宽（「张/祥/雨」竖着排）。
+   标签列显式不折行；长文字留给其它列去折。 */
+.doc td.k{white-space:nowrap;color:var(--text)}
+.doc td .who{margin-left:8px;font-size:12.5px;color:var(--text-3)}
+.doc td .sub{display:block;margin-top:3px;font-size:13px;line-height:1.65;color:var(--text-2)}
 .doc .eg{margin:6px 0 16px;padding:11px 13px;background:var(--bg-sunken);border-radius:var(--r-sm);
   font:12.5px/1.65 var(--mono);color:var(--text-2);white-space:pre;overflow-x:auto}
 .doc .callout{margin:16px 0;padding:13px 15px;background:var(--accent-soft);
@@ -376,7 +381,7 @@ figcaption,.ltx_caption{margin-top:12px;font:13px/1.65 var(--serif);color:var(--
 .mf i{font-style:italic}
 .mf sub{font-size:.7em;vertical-align:sub;line-height:0}
 .mf sup{font-size:.7em;vertical-align:super;line-height:0}
-.nt-a .m{font-family:var(--mono);font-size:.9em;background:var(--bg-sunken);padding:1px 5px;border-radius:4px;
+.nt-a .m,.doc .m{font-family:var(--mono);font-size:.9em;background:var(--bg-sunken);padding:1px 5px;border-radius:4px;
   /* 别 nowrap：旁注栏才 296px 宽，多词的短语会被整体挤到下一行，上一行留一大截空白。
      换行时用 box-decoration-break 让两段各自带上圆角和底色 */
   box-decoration-break:clone;-webkit-box-decoration-break:clone}
@@ -483,7 +488,7 @@ body.no-notes .legend{display:none}
   <div class="tabs" role="tablist">
     <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
     <button class="tb" type="button" role="tab" data-v="map-1" aria-selected="false">评测指标</button><button class="tb" type="button" role="tab" data-v="map-2" aria-selected="false">退化现象</button><button class="tb" type="button" role="tab" data-v="map-3" aria-selected="false">残差块</button><button class="tb" type="button" role="tab" data-v="map-4" aria-selected="false">三种捷径</button><button class="tb" type="button" role="tab" data-v="map-5" aria-selected="false">归一化</button>
-    
+    <button class="tb" type="button" role="tab" data-v="doc-1" aria-selected="false">贡献与缺陷</button><button class="tb" type="button" role="tab" data-v="doc-2" aria-selected="false">何恺明</button>
     <button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>
   </div>
   <div class="legend">
@@ -4339,7 +4344,171 @@ M. D. Zeiler and R. Fergus.
 <text x="834" y="812" class="tiny">推理时 batch 大小还不可控，同一个 prompt 拼批和单独跑结果会不一样。</text>
 <text x="40" y="896" class="tiny">两栏里 LayerNorm 的形状不一样：图像上它按整张照片做，切出来还是一片；Transformer 里它按 token 逐个做，切出来是一根柱子。同一个名字下的两种粒度，读代码时要看清。</text>
 <text x="1480" y="896" class="tiny" text-anchor="end">BatchNorm 见 arXiv:1502.03167，LayerNorm 见 arXiv:1607.06450</text>
-</svg></div></div></div><div class="resview" id="view-res"><section class="res-sec"><h3 class="res-h">工具</h3><article class="vcard rcard">
+</svg></div></div></div><div class="docview" id="view-doc-1"><article class="doc"><h2>先把边界划清</h2>
+<p class="lede">旁路连接早就有，带门控的深网络旁路也比本文早七个月。这篇的新东西是一条不带参数、永远打开的旁路，以及在 ImageNet 上把一百多层做出精度收益的实证。</p>
+<table>
+<thead><tr><th>时间</th><th>工作</th><th>旁路长什么样</th></tr></thead>
+<tbody>
+<tr><td class="n">1990 年代</td><td>训练多层感知机的早期做法（本文文献 [34][49]）</td><td>在网络输入和输出之间加一层线性连接</td></tr>
+<tr><td class="n">2015-05-03</td><td>Highway Networks，Srivastava、Greff、Schmidhuber（完整版是 NeurIPS 2015 的 <i>Training Very Deep Networks</i>）</td><td>y = H(x)·T(x) + x·C(x)，论文取 C = 1 − T；T 由 x 算出，带权重</td></tr>
+<tr><td class="n">2015-12-10</td><td>本文，arXiv 首版；CVPR 2016</td><td>y = ℱ(x) + x，旁路上什么都没有</td></tr>
+</tbody></table>
+<p>两个式子差在门上。Highway 把 carry gate 设成 C = 1 − T，T 和 C 就不能同时为 1，变换路全开时旁路一定是关着的。它建议把 T 的偏置初始化成负数（原文举例 −1、−3），让网络 <span class="m">initially biased towards carry behavior</span>，这时一层的输出接近 x 本身。ℱ(x) + x 这种「输入加修正量」的形式需要 T 和 C 同时为 1，耦合之后做不到。本文的旁路没有门，x 永远原样加进来。</p>
+<p>论文第 2 节对 Highway 的判断是 <span class="m">highway networks have not demonstrated accuracy gains with extremely increased depth</span>，括号里举的是超过 100 层。Table 6 放了一组 CIFAR-10 对照：Highway 19 层 7.54%、32 层 8.80%，ResNet 110 层 6.43%。Highway 这两个数引自 Highway 论文本身，不是本文在同一设置下复现的。</p>
+
+<h3>优先权的争议</h3>
+<p>本文第 2 节把 Highway 称作 <span class="m">Concurrent with our work</span>，并在 gating functions 处引了 LSTM（文献 [15]）。Highway 的作者之一 Jürgen Schmidhuber 不接受这个定性，理由是 Highway 的 arXiv 首版比本文早七个月。他 2025 年 9 月在 arXiv 发了 <i>Who invented deep residual learning?</i>，时间线从 1991 年 Hochreiter 权重固定为 1.0 的循环残差连接排起，经过 1997 年的 LSTM，到 2015 年 5 月的 Highway。他个人主页上的说法是：把 Highway 的两个门都设成 1 并保持打开，得到的就是 ResNet，ResNet 是 Highway 的 <span class="m">open-gated variant</span>。</p>
+<p>Schmidhuber 用的是 Highway 论文里的一般形式，两个门各自独立；Highway 论文的实验用的是耦合形式 C = 1 − T，这个形式下两个门没法同时为 1。Highway 把灵感来源写得很清楚（<span class="m">They are inspired by Long Short-Term Memory recurrent networks</span>），本文则自称 152 层是 <span class="m">the deepest network ever presented on ImageNet</span>。分歧落在「去掉门」算不算一项独立的发明，属于评价，这里不下结论。</p>
+
+<h2>成绩：论文自报和外部认可分开看</h2>
+<table>
+<thead><tr><th>论文自报</th><th>数字</th><th>怎么来的</th></tr></thead>
+<tbody>
+<tr><td class="k">ILSVRC 2015 分类</td><td class="n">top-5 3.57%</td><td>测试集，六个不同深度模型的集成，提交时其中只有两个是 152 层</td></tr>
+<tr><td class="k">单模型</td><td class="n">top-5 4.49%</td><td>ResNet-152，验证集。论文称它已好于此前所有集成结果</td></tr>
+<tr><td class="k">其余四条赛道</td><td class="n">第一</td><td>ImageNet detection、ImageNet localization、COCO detection、COCO segmentation</td></tr>
+<tr><td class="k">COCO 检测</td><td class="n">+6.0</td><td>mAP@[.5, .95]，相对提升 28%。检测框架固定用 Faster R-CNN，只把 VGG-16 换成 ResNet-101</td></tr>
+</tbody></table>
+<table>
+<thead><tr><th>年</th><th>外部认可</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="n">2016</td><td class="k">CVPR Best Paper Award</td><td></td></tr>
+<tr><td class="n">2023</td><td class="k">未来科学大奖·数学与计算机科学奖</td><td>四位作者共获，孙剑为身后获奖</td></tr>
+<tr><td class="n">2025</td><td class="k">Nature 统计的 21 世纪被引最多论文</td><td>口径见下</td></tr>
+<tr><td class="n">2026</td><td class="k">CVPR Longuet-Higgins Prize</td><td>表彰十年前的 CVPR 论文，同年另一篇获奖的是 YOLO</td></tr>
+</tbody></table>
+<p>Nature 那个排名要读仔细。它取五个引用数据库各自的排名再取中位数，ResNet 排第一；单看 Google Scholar，它约 25.4 万次、排第二，单看 Web of Science，约 10 万次、排第三（数字据新浪科技 2025 年 5 月的转述）。Nature 当期简报的原话是 <span class="m">more than 250,000 citations according to the most generous estimate</span>，在 Web of Science 的历史总榜上它排第七。</p>
+
+<h2>各项做法今天的境遇</h2>
+<svg viewBox='0 0 760 370' xmlns='http://www.w3.org/2000/svg' role='img' font-family='-apple-system,PingFang SC,sans-serif' aria-label='ResNet 十三项做法今天的境遇：恒等旁路、He 初始化、全局平均池化三项活到今天；Batch Normalization、加法后的 ReLU、下采样块、输入 stem、投影捷径、瓶颈比、阶梯学习率、常数 warmup 八项被改写；选项 A 与选项 C 两项被放弃'><circle cx='8' cy='12' r='5' fill='#C4C0B8'/><text x='22' y='16' font-size='12.5' fill='#868D98'>被放弃</text><circle cx='158' cy='12' r='5' fill='#E3B778'/><text x='172' y='16' font-size='12.5' fill='#8A4008'>被改写</text><circle cx='308' cy='12' r='5' fill='#5BB08F'/><text x='322' y='16' font-size='12.5' fill='#0B5750'>活到今天</text><circle cx='8' cy='40' r='5' fill='#5BB08F'/><text x='22' y='44' font-size='13' font-weight='600' fill='#0B5750'>恒等旁路（残差连接）</text><text x='272' y='44' font-size='12.5' fill='#868D98'>Transformer 每个子层外面都有一个，原文引的就是本文</text><circle cx='8' cy='66' r='5' fill='#5BB08F'/><text x='22' y='70' font-size='13' font-weight='600' fill='#0B5750'>He 初始化（同组 2015 年的工作）</text><text x='272' y='70' font-size='12.5' fill='#868D98'>PyTorch 里的 kaiming_normal_ 就是它</text><circle cx='8' cy='92' r='5' fill='#5BB08F'/><text x='22' y='96' font-size='13' font-weight='600' fill='#0B5750'>全局平均池化接一层分类器</text><text x='272' y='96' font-size='12.5' fill='#868D98'>源自 NIN 与 GoogLeNet，卷积分类网络至今这样收尾</text><circle cx='8' cy='118' r='5' fill='#E3B778'/><text x='22' y='122' font-size='13' font-weight='600' fill='#8A4008'>每层卷积后接 Batch Normalization</text><text x='272' y='122' font-size='12.5' fill='#868D98'>卷积网络仍常用；Transformer 换成 Layer Normalization</text><circle cx='8' cy='144' r='5' fill='#E3B778'/><text x='22' y='148' font-size='13' font-weight='600' fill='#8A4008'>加法之后再过 ReLU</text><text x='272' y='148' font-size='12.5' fill='#868D98'>三个月后作者自己改成 pre-activation（ResNet v2）</text><circle cx='8' cy='170' r='5' fill='#E3B778'/><text x='22' y='174' font-size='13' font-weight='600' fill='#8A4008'>下采样块 stride 2 放在第一个 1×1</text><text x='272' y='174' font-size='12.5' fill='#868D98'>ResNet-B 挪到 3×3，原位置会丢掉四分之三输入</text><circle cx='8' cy='196' r='5' fill='#E3B778'/><text x='22' y='200' font-size='13' font-weight='600' fill='#8A4008'>7×7 的输入 stem</text><text x='272' y='200' font-size='12.5' fill='#868D98'>ResNet-C 换成三个 3×3</text><circle cx='8' cy='222' r='5' fill='#E3B778'/><text x='22' y='226' font-size='13' font-weight='600' fill='#8A4008'>1×1 stride 2 的投影捷径</text><text x='272' y='226' font-size='12.5' fill='#868D98'>ResNet-D 先做 2×2 平均池化再接 1×1</text><circle cx='8' cy='248' r='5' fill='#E3B778'/><text x='22' y='252' font-size='13' font-weight='600' fill='#8A4008'>瓶颈块先压到四分之一再升回</text><text x='272' y='252' font-size='12.5' fill='#868D98'>MobileNetV2 反过来做；RegNet 搜出的最好模型不要瓶颈</text><circle cx='8' cy='274' r='5' fill='#E3B778'/><text x='22' y='278' font-size='13' font-weight='600' fill='#8A4008'>误差停滞就除以 10 的学习率</text><text x='272' y='278' font-size='12.5' fill='#868D98'>后来的常见配方改用 cosine 衰减</text><circle cx='8' cy='300' r='5' fill='#E3B778'/><text x='22' y='304' font-size='13' font-weight='600' fill='#8A4008'>110 层 CIFAR 的常数 warmup</text><text x='272' y='304' font-size='12.5' fill='#868D98'>Goyal 等人改成逐步升高的 gradual warmup</text><circle cx='8' cy='326' r='5' fill='#C4C0B8'/><text x='22' y='330' font-size='13' font-weight='600' fill='#868D98'>选项 A：升维时补零</text><text x='272' y='330' font-size='12.5' fill='#868D98'>本文 50 层以上就改用选项 B</text><circle cx='8' cy='352' r='5' fill='#C4C0B8'/><text x='22' y='356' font-size='13' font-weight='600' fill='#868D98'>选项 C：捷径全部换成投影</text><text x='272' y='356' font-size='12.5' fill='#868D98'>本文 Table 3 之后弃用</text></svg>
+<p>这篇自己的结构设计里，原样留到今天的主要是恒等旁路。Transformer 的每个子层外面都包着残差连接，Vaswani 等人 2017 年的原文引的就是本文。其余细节在之后几年里被逐项改写，改动来自三个方向：</p>
+<table>
+<thead><tr><th>方向</th><th>工作与改动</th></tr></thead>
+<tbody>
+<tr><td class="k">作者自己</td><td>ResNet v2（2016，同一批作者）：把 Batch Normalization 和 ReLU 挪进残差分支，加法之后不再有非线性，信号能从任意一个块直接传到另一个块。CIFAR-10 上 1001 层做到 4.62%</td></tr>
+<tr><td class="k">工程细节</td><td>Bag of Tricks（2018）：ResNet-B、C、D 三处结构微调，在他们的复现基线上把 ResNet-50 的 top-1 从 76.21% 提到 77.16%；全部技巧叠加后，摘要给出的是 75.3% 到 79.29%</td></tr>
+<tr><td class="k">结构思路</td><td>MobileNetV2（2018）让残差块两端窄、中间宽；RegNet（2020）的搜索结果里，最好的模型瓶颈比为 1；ConvNeXt（2022）从一个标准 ResNet 出发，逐步朝视觉 Transformer 的设计改</td></tr>
+</tbody></table>
+
+<h2>缺陷</h2>
+<h3>论文自己留下的空白</h3>
+<table>
+<thead><tr><th>空白</th><th>论文里怎么写的</th><th>后来</th></tr></thead>
+<tbody>
+<tr><td class="k">退化的原因</td><td>只有一句猜想 <span class="m">the deep plain nets may have exponentially low convergence rates</span>，原因留给 <span class="m">will be studied in the future</span></td><td>Veit 等（2016）：110 层 ResNet 的梯度主要来自 10 到 34 层深的路径。Balduzzi 等（2017）：普通网络里梯度的相关性随深度指数衰减，带跳连的只按次线性衰减。Li 等（2018）用可视化比较不同结构的损失曲面。三篇各给了一种解释，角度不同</td></tr>
+<tr><td class="k">1202 层不如 110 层</td><td>CIFAR-10 上 7.93% 对 6.43%，论文归因于过拟合，但没有加正则做对照，原文说明 <span class="m">we use no maxout/dropout</span></td><td>Stochastic Depth（2016）训练时随机跳过整层，把网络加到 1200 层以上，CIFAR-10 做到 4.91%；ResNet v2 的 1001 层是 4.62%</td></tr>
+<tr><td class="k">ImageNet 对照只跑一次</td><td>Table 2、3 没有方差，选项 A、B、C 之间只差 0.51 和 0.33 个百分点</td><td>CIFAR 部分做了重复：ResNet-110 跑五次，报的 6.43% 是最好的一次，均值 6.61 ± 0.16</td></tr>
+</tbody></table>
+
+<h3>结构上后来被证明能做得更好</h3>
+<table>
+<thead><tr><th>设计</th><th>问题</th><th>后来的改法</th></tr></thead>
+<tbody>
+<tr><td class="k">加法之后的 ReLU</td><td>恒等路径上多了一层非线性</td><td>ResNet v2 的 pre-activation</td></tr>
+<tr><td class="k">下采样块</td><td>主路第一个 1×1 和捷径上的 1×1 都是 stride 2，各丢掉四分之三的输入</td><td>ResNet-B 把主路的 stride 挪到 3×3；ResNet-D 在捷径上先做平均池化</td></tr>
+<tr><td class="k">固定的 4 倍瓶颈</td><td>论文说改成瓶颈是出于 <span class="m">concerns on the training time that we can afford</span></td><td>RegNet 发现瓶颈比为 1 的模型最好</td></tr>
+<tr><td class="k">依赖 Batch Normalization</td><td>batch 变小时误差上升。本文做检测微调时直接冻结了 Batch Normalization 层，附录给的理由是省显存</td><td>Group Normalization：ResNet-50 在 batch 为 2 时，误差比同设置的 Batch Normalization 低 10.6 个百分点</td></tr>
+</tbody></table>
+
+<h3>架构的功劳和训练配方混在一起</h3>
+<p>后来几篇工作专门把这两件事拆开。Bag of Tricks 靠结构微调加训练技巧，把 ResNet-50 的 top-1 从 75.3% 提到 79.29%。Wightman 等人（2021）不改结构、只换训练配方，原版 ResNet-50 在 224 分辨率下做到 80.4%，没有额外数据，也没有蒸馏。Bello 等人（2021）的结论写得最直接：<span class="m">training and scaling strategies may matter more than architectural changes</span>。</p>
+<p>这对读本文的表有影响。Table 3 各行共用一套训练配方，行与行的差距可以归到结构上；拿这些数字和后来的模型比绝对精度，比进去的就还有配方。</p>
+
+<h2>出处</h2>
+<ul>
+<li>本文：<a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noreferrer">arXiv:1512.03385</a>（v1 2015-12-10）</li>
+<li>Highway：<a href="https://arxiv.org/abs/1505.00387" target="_blank" rel="noreferrer">arXiv:1505.00387</a>（v1 2015-05-03）；<a href="https://arxiv.org/abs/1507.06228" target="_blank" rel="noreferrer">Training Very Deep Networks</a>（NeurIPS 2015）</li>
+<li>优先权：<a href="https://arxiv.org/abs/2509.24732" target="_blank" rel="noreferrer">Who invented deep residual learning?</a>（2025-09-29）；<a href="https://people.idsia.ch/~juergen/highway-networks.html" target="_blank" rel="noreferrer">Schmidhuber 的 Highway 页面</a></li>
+<li>奖项：<a href="https://www.thecvf.com/?page_id=413" target="_blank" rel="noreferrer">CVF Computer Vision Awards</a>；<a href="https://www.futureprize.org/cn/nav/detail/1435.html" target="_blank" rel="noreferrer">未来科学大奖 2023 获奖名单</a></li>
+<li>引用排名：<a href="https://www.nature.com/articles/d41586-025-01125-9" target="_blank" rel="noreferrer">Nature 2025-04-15</a>；<a href="https://www.nature.com/articles/d41586-025-01249-y" target="_blank" rel="noreferrer">Nature 当期简报</a>；<a href="https://finance.sina.com.cn/tech/discovery/2025-05-03/doc-inevhxxp0635946.shtml" target="_blank" rel="noreferrer">新浪科技的转述</a></li>
+<li>Transformer 的残差连接：<a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need</a> 第 3.1 节</li>
+<li>改写：<a href="https://arxiv.org/abs/1603.05027" target="_blank" rel="noreferrer">ResNet v2</a>；<a href="https://arxiv.org/abs/1812.01187" target="_blank" rel="noreferrer">Bag of Tricks</a>；<a href="https://arxiv.org/abs/1801.04381" target="_blank" rel="noreferrer">MobileNetV2</a>；<a href="https://arxiv.org/abs/2003.13678" target="_blank" rel="noreferrer">RegNet</a>；<a href="https://arxiv.org/abs/2201.03545" target="_blank" rel="noreferrer">ConvNeXt</a>；<a href="https://arxiv.org/abs/1706.02677" target="_blank" rel="noreferrer">Goyal 等 2017</a></li>
+<li>缺陷与解释：<a href="https://arxiv.org/abs/1605.06431" target="_blank" rel="noreferrer">Veit 等 2016</a>；<a href="https://arxiv.org/abs/1702.08591" target="_blank" rel="noreferrer">Balduzzi 等 2017</a>；<a href="https://arxiv.org/abs/1712.09913" target="_blank" rel="noreferrer">Li 等 2018</a>；<a href="https://arxiv.org/abs/1603.09382" target="_blank" rel="noreferrer">Stochastic Depth</a>；<a href="https://arxiv.org/abs/1803.08494" target="_blank" rel="noreferrer">Group Normalization</a></li>
+<li>训练配方：<a href="https://arxiv.org/abs/2110.00476" target="_blank" rel="noreferrer">ResNet strikes back</a>；<a href="https://arxiv.org/abs/2103.07579" target="_blank" rel="noreferrer">Revisiting ResNets</a></li>
+</ul>
+</article></div><div class="docview" id="view-doc-2"><article class="doc"><h2>何恺明（Kaiming He）</h2>
+<p class="lede">本文第一作者。现为 MIT 电子工程与计算机科学系（EECS）副教授，持终身教职；2025 年 6 月起兼任 Google DeepMind 的 Distinguished Scientist（part-time）。</p>
+
+<h3>履历</h3>
+<table>
+<thead><tr><th>时间</th><th>经历</th></tr></thead>
+<tbody>
+<tr><td class="n">2003</td><td>广州执信中学毕业。当年广东高考用标准分，满分 900，他与另外八人同为总分状元</td></tr>
+<tr><td class="n">2003–2007</td><td>清华大学基础科学班，2007 年获学士学位。他原本保送的是机械工程及其自动化专业，入学后转入基础科学班</td></tr>
+<tr><td class="n">2007</td><td>进入微软亚洲研究院视觉计算组实习，实习导师孙剑</td></tr>
+<tr><td class="n">2007–2011</td><td>香港中文大学多媒体实验室读博，导师汤晓鸥。博士论文与 2009 年那篇 CVPR 最佳论文同题：<i>Single Image Haze Removal Using Dark Channel Prior</i></td></tr>
+<tr><td class="n">2011–2016</td><td>微软亚洲研究院研究员。ResNet、PReLU、Faster R-CNN 都出自这一段</td></tr>
+<tr><td class="n">2016–2024</td><td>Facebook AI Research（FAIR）研究科学家</td></tr>
+<tr><td class="n">2024 起</td><td>MIT EECS，职位名为 Douglas Ross (1954) Career Development Professor of Software Technology</td></tr>
+<tr><td class="n">2025 年 6 月起</td><td>兼任 Google DeepMind Distinguished Scientist（part-time），保留 MIT 的终身教职</td></tr>
+</tbody></table>
+<p class="fnote">清华的院系说法不一：网易 2019 年的报道写作「基础科学班」，澎湃 2023 年写作「物理系基础科学班」，未来科学大奖官网只写「清华大学学士（2007 年）」。出生年份公开资料说法不一，这里不写。</p>
+<p>未来科学大奖官网写明，ResNet 的获奖工作 <span class="m">2012至2016年间于北京的微软亚洲研究院完成</span>。署名的四个人当时都在那里：任少卿和张祥雨分别是中国科学技术大学、西安交通大学与微软亚洲研究院合作培养的博士生。</p>
+
+<h3>代表工作</h3>
+<table>
+<thead><tr><th>年</th><th>工作、署名与摘要</th><th>会议与认可</th></tr></thead>
+<tbody>
+<tr><td class="n">2009</td><td><a href="https://projectsweb.cs.washington.edu/research/insects/CVPR2009/award/hazeremv_drkchnl.pdf" target="_blank" rel="noreferrer">Dark Channel Prior 单图去雾</a><span class="who">一作（与孙剑、汤晓鸥）</span><span class="sub">统计户外无雾图像得到的先验：大多数局部块里，总有像素在某个颜色通道上亮度极低。配合成像模型直接估计雾的厚度，从单张图恢复无雾图像，深度图是副产品。</span></td><td class="k">CVPR 2009 Best Paper Award</td></tr>
+<tr><td class="n">2014</td><td><a href="https://arxiv.org/abs/1406.4729" target="_blank" rel="noreferrer">SPPNet 空间金字塔池化</a><span class="who">一作</span><span class="sub">在卷积特征图上做空间金字塔池化，任意尺寸的输入都得到定长表示。做检测时整张图只算一次卷积特征，再对各个区域池化，省掉重复计算。</span></td><td class="k">TPAMI 2015</td></tr>
+<tr><td class="n">2015</td><td><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noreferrer">PReLU 与 He 初始化</a><span class="who">一作</span><span class="sub">把整流单元推广成负半轴斜率可学的 PReLU，并推导出专门考虑整流非线性的初始化，很深的网络能从头训练。ImageNet top-5 做到 4.94%，论文称是首次超过报告的人类水平 5.1%。</span></td><td class="k">ICCV 2015<br>2025 Helmholtz Prize</td></tr>
+<tr><td class="n">2015</td><td><a href="https://arxiv.org/abs/1506.01497" target="_blank" rel="noreferrer">Faster R-CNN</a><span class="who">二作（一作任少卿）</span><span class="sub">提出区域候选网络（Region Proposal Network），和检测网络共享整图卷积特征，生成候选框几乎不再额外花时间。两者合成一个网络，VGG-16 上连同全部步骤每秒 5 帧。</span></td><td class="k">NeurIPS 2015<br>2025 NeurIPS Test of Time Award</td></tr>
+<tr><td class="n">2015</td><td><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noreferrer">ResNet（本文）</a><span class="who">一作</span><span class="sub">让堆叠的几层去学相对输入的残差，旁路把输入原样加回。152 层仍然好训，ILSVRC 2015 分类第一。</span></td><td class="k">CVPR 2016 Best Paper Award<br>2026 Longuet-Higgins Prize</td></tr>
+<tr><td class="n">2016</td><td><a href="https://arxiv.org/abs/1603.05027" target="_blank" rel="noreferrer">Identity Mappings（ResNet v2）</a><span class="who">一作</span><span class="sub">分析残差块里的信号传播：旁路和加法后的激活都取恒等时，前向和反向信号能在任意两个块之间直接传递。据此改用 pre-activation 残差单元，CIFAR-10 上 1001 层做到 4.62%。</span></td><td class="k">ECCV 2016</td></tr>
+<tr><td class="n">2016</td><td><a href="https://arxiv.org/abs/1612.03144" target="_blank" rel="noreferrer">Feature Pyramid Networks</a><span class="who">第四作者</span><span class="sub">利用卷积网络自带的多尺度层级，自顶向下加横向连接，以很小的额外开销构建各尺度都带高层语义的特征金字塔。接在 Faster R-CNN 上刷新了 COCO 单模型成绩。</span></td><td class="k"></td></tr>
+<tr><td class="n">2017</td><td><a href="https://arxiv.org/abs/1703.06870" target="_blank" rel="noreferrer">Mask R-CNN</a><span class="who">一作</span><span class="sub">在 Faster R-CNN 上加一个与框识别并行的分支，为每个物体预测分割掩码，额外开销很小，每秒 5 帧。同一框架还能做人体关键点检测。</span></td><td class="k">ICCV 2017 Marr Prize</td></tr>
+<tr><td class="n">2017</td><td><a href="https://arxiv.org/abs/1708.02002" target="_blank" rel="noreferrer">Focal Loss（RetinaNet）</a><span class="who">第四作者（一作 Tsung-Yi Lin）</span><span class="sub">找出单阶段检测器精度落后于两阶段的主因：训练时前景和背景极度不平衡。Focal Loss 调低易分样本的损失权重，配合单阶段检测器 RetinaNet 追上两阶段的精度。</span></td><td class="k">ICCV 2017 Best Student Paper Award</td></tr>
+<tr><td class="n">2018</td><td><a href="https://arxiv.org/abs/1803.08494" target="_blank" rel="noreferrer">Group Normalization</a><span class="who">二作（与 Yuxin Wu）</span><span class="sub">把通道分组，在组内算均值和方差，计算与 batch 大小无关。ResNet-50 在 batch 为 2 时，误差比 Batch Normalization 低 10.6 个百分点。</span></td><td class="k">ECCV 2018 Best Paper Honorable Mention</td></tr>
+<tr><td class="n">2018</td><td><a href="https://arxiv.org/abs/1811.08883" target="_blank" rel="noreferrer">Rethinking ImageNet Pre-training</a><span class="who">一作</span><span class="sub">在 COCO 上从随机初始化训练检测和分割，只要训练时间够长，结果不差于 ImageNet 预训练。预训练主要加快早期收敛，未必提高最终精度。</span></td><td class="k"></td></tr>
+<tr><td class="n">2019</td><td><a href="https://arxiv.org/abs/1911.05722" target="_blank" rel="noreferrer">MoCo 动量对比</a><span class="who">一作</span><span class="sub">把对比学习看成查字典，用队列和滑动平均更新的编码器维护一个又大又一致的字典。无监督学到的表征在 7 个检测和分割任务上超过有监督预训练。</span></td><td class="k">CVPR 2020</td></tr>
+<tr><td class="n">2020</td><td><a href="https://arxiv.org/abs/2011.10566" target="_blank" rel="noreferrer">SimSiam</a><span class="who">二作（与 Xinlei Chen）</span><span class="sub">简单的孪生网络不用负样本对、不用大 batch、也不用动量编码器，就能学到有意义的表征；防止坍缩的关键是 stop-gradient。</span></td><td class="k">CVPR 2021 Best Paper Honorable Mention</td></tr>
+<tr><td class="n">2021</td><td><a href="https://arxiv.org/abs/2111.06377" target="_blank" rel="noreferrer">MAE 掩码自编码器</a><span class="who">一作</span><span class="sub">随机遮掉输入图像 75% 的块，编码器只处理可见块，轻量的解码器负责重建像素。只用 ImageNet-1K 数据，ViT-Huge 达到 87.8%。</span></td><td class="k"></td></tr>
+<tr><td class="n">2024</td><td><a href="https://arxiv.org/abs/2406.11838" target="_blank" rel="noreferrer">MAR：不用向量量化的自回归图像生成</a><span class="who">末位</span><span class="sub">用扩散过程建模每个 token 的连续分布，把交叉熵换成 Diffusion Loss，自回归图像生成不再需要离散的 tokenizer。</span></td><td class="k">NeurIPS 2024 Spotlight</td></tr>
+<tr><td class="n">2025</td><td><a href="https://arxiv.org/abs/2505.13447" target="_blank" rel="noreferrer">MeanFlow 一步生成</a><span class="who">末位</span><span class="sub">引入「平均速度」刻画流场（Flow Matching 建模的是瞬时速度），一步采样就能生成图像。ImageNet 256×256 从头训练，一次函数求值的 FID 为 3.43。</span></td><td class="k"></td></tr>
+<tr><td class="n">2025</td><td><a href="https://arxiv.org/abs/2511.13720" target="_blank" rel="noreferrer">JiT：Back to Basics: Let Denoising Generative Models Denoise</a><span class="who">二作（与 Tianhong Li）</span><span class="sub">主张去噪模型直接预测干净图像，理由是自然图像落在低维流形上，带噪的量不在。在原始像素上用大 patch 的朴素 Transformer，不用 tokenizer、不用预训练、不加额外损失。</span></td><td class="k"></td></tr>
+</tbody></table>
+<p>方向上的变化从这张表里看得出来。最早的代表作是 2009 年的单图去雾，属于传统图像处理；2014 到 2017 年集中在识别和检测；2018 年前后转向训练方法本身，比如 Group Normalization，以及不用 ImageNet 预训练能不能训好检测器；2019 到 2021 年是自监督表征学习；2024 年以后的几篇都在生成模型上。署名位置也在变，2024 年以后这三篇他都排在末位。</p>
+
+<h3>获奖</h3>
+<p>下表只列能在主办方页面上查到的奖项。</p>
+<table>
+<thead><tr><th>年</th><th>奖项</th><th>对应工作</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="n">2009</td><td>CVPR Best Paper Award</td><td>Dark Channel Prior</td><td>读博期间</td></tr>
+<tr><td class="n">2016</td><td>CVPR Best Paper Award</td><td>ResNet</td><td></td></tr>
+<tr><td class="n">2017</td><td>ICCV Best Paper Award（Marr Prize）</td><td>Mask R-CNN</td><td></td></tr>
+<tr><td class="n">2017</td><td>ICCV Best Student Paper Award</td><td>Focal Loss</td><td>一作 Tsung-Yi Lin</td></tr>
+<tr><td class="n">2018</td><td>ECCV Best Paper Honorable Mention</td><td>Group Normalization</td><td></td></tr>
+<tr><td class="n">2018</td><td>PAMI Young Researcher Award</td><td>个人奖</td><td></td></tr>
+<tr><td class="n">2021</td><td>CVPR Best Paper Honorable Mention</td><td>SimSiam</td><td>一作 Xinlei Chen</td></tr>
+<tr><td class="n">2021</td><td>PAMI Mark Everingham Prize</td><td>Detectron 检测与分割软件</td><td>团队奖</td></tr>
+<tr><td class="n">2023</td><td>未来科学大奖·数学与计算机科学奖</td><td>深度残差学习</td><td>四位作者共获</td></tr>
+<tr><td class="n">2025</td><td>ICCV Helmholtz Prize</td><td>PReLU 与 He 初始化</td><td>十年影响力奖</td></tr>
+<tr><td class="n">2025</td><td>NeurIPS Test of Time Award</td><td>Faster R-CNN</td><td>一作任少卿</td></tr>
+<tr><td class="n">2026</td><td>CVPR Longuet-Higgins Prize</td><td>ResNet</td><td>十年影响力奖</td></tr>
+</tbody></table>
+<p>2025 到 2026 年的三个十年影响力奖对应三篇不同的论文。三篇都发表于 2015 到 2016 年，都是他在微软期间和孙剑等人合作的工作。</p>
+
+<h3>ResNet 的另外三位作者</h3>
+<table>
+<thead><tr><th>作者</th><th>经历（小字为教育）</th></tr></thead>
+<tbody>
+<tr><td class="k">张祥雨</td><td>博士毕业后随孙剑进入旷视，代表作有 ShuffleNet。2024 年加入阶跃星辰，现为阶跃星辰首席科学家<span class="sub">西安交通大学学士（2012）；西安交通大学与微软亚洲研究院博士（2017）</span></td></tr>
+<tr><td class="k">任少卿</td><td>Faster R-CNN 一作。曾任 Momenta 合伙人兼研发总监，2020 年 8 月加入蔚来，现为蔚来智能驾驶负责人；2025 年 9 月起兼任中国科学技术大学讲席教授。2026 年 8 月，蔚来 CEO 李斌宣布他已创立一家物理 AI 基础模型与具身智能公司，蔚来战略投资，他继续负责蔚来智能驾驶<span class="sub">中国科学技术大学学士（2011）；中国科学技术大学与微软亚洲研究院博士（2016）</span></td></tr>
+<tr><td class="k">孙剑</td><td>在微软亚洲研究院工作 13 年，2016 年 7 月加入旷视任首席科学家，2019 年起任西安交通大学人工智能学院首任院长。2022 年 6 月 14 日因突发疾病去世，2023 年的未来科学大奖是身后颁给他的<span class="sub">西安交通大学学士（1997）、硕士（2001）、博士（2003）</span></td></tr>
+</tbody></table>
+
+<h2>出处</h2>
+<ul>
+<li>履历：<a href="https://www.futureprize.org/cn/laureates/detail/76.html" target="_blank" rel="noreferrer">未来科学大奖获奖人页</a>；<a href="https://www.thepaper.cn/newsDetail_forward_24054548" target="_blank" rel="noreferrer">澎湃新闻 2023-07-31</a>；<a href="https://edu.sina.cn/sa/2003-06-27/detail-ikftpnny8653424.d.html" target="_blank" rel="noreferrer">信息时报 2003-06-27（新浪教育转载）</a>；<a href="https://tech.163.com/19/0121/09/E61KSQB600098IEO.html" target="_blank" rel="noreferrer">网易科技 2019-01-21</a>；<a href="https://dl.acm.org/doi/book/10.5555/2521310" target="_blank" rel="noreferrer">博士论文记录</a></li>
+<li>职位：<a href="https://news.mit.edu/2025/creating-common-language-kaiming-he-0207" target="_blank" rel="noreferrer">MIT News 2025-02-07</a>；<a href="https://eu.36kr.com/en/p/3352746480005763" target="_blank" rel="noreferrer">智东西 2025-06-26（36 氪转载）</a></li>
+<li>奖项：<a href="https://www.thecvf.com/?page_id=413" target="_blank" rel="noreferrer">CVF Computer Vision Awards</a>；<a href="https://blog.neurips.cc/2025/11/26/announcing-the-test-of-time-paper-award-for-neurips-2025/" target="_blank" rel="noreferrer">NeurIPS 2025 Test of Time</a>；<a href="https://www.futureprize.org/cn/nav/detail/1435.html" target="_blank" rel="noreferrer">未来科学大奖 2023 获奖名单</a></li>
+<li>论文年份与作者：以 arXiv 首版为准，链接见上表</li>
+<li>张祥雨：<a href="https://finance.sina.com.cn/tech/csj/2024-08-05/doc-inchqpae5750229.shtml" target="_blank" rel="noreferrer">新浪科技 2024-08-05</a>；<a href="https://www.qbitai.com/2026/02/382747.html" target="_blank" rel="noreferrer">量子位 2026-02</a></li>
+<li>任少卿：<a href="https://www.ithome.com/0/993/696.htm" target="_blank" rel="noreferrer">IT之家 2026-08-24（据晚点 Auto）</a></li>
+<li>孙剑：<a href="https://news.sciencenet.cn/htmlnews/2022/6/480940.shtm" target="_blank" rel="noreferrer">中国科学报 2022-06-15（科学网转载）</a></li>
+</ul>
+</article></div><div class="resview" id="view-res"><section class="res-sec"><h3 class="res-h">工具</h3><article class="vcard rcard">
       <h4><a href="https://www.bilibili.com/video/BV1P3411y7nn/" target="_blank" rel="noreferrer">ResNet 论文逐段精读 ↗</a></h4>
       <p class="vzh">从头到尾把这篇读一遍，重点在「为什么残差好训」那段的直观解释和 Fig. 7 的读法。跟本页对照着看：他讲到哪一节，就在左边找对应的批注。</p>
       <p class="vmeta"><span class="vsrc">跟李沐学AI · 53 分钟</span>

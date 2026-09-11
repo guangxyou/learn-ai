@@ -18,11 +18,11 @@
   "build": {
     "note": "page.html 是提交进仓库的成品，批注、独立 tab、全景图的产物都在同一个文件夹里。生成它们的脚本（notes/、docs/、figures/）和论文原文 paper-src.html 留在本地工作目录、不进仓库。paper-src.html 在时构建会先重新生成 page.html，不在就直接发成品。AlexNet 从没上过 arXiv，所以没有 ar5iv 版，paper-src.html 是由 build-paper-src.mjs 从 PDF 重排成 LaTeXML 形态的。",
     "tool": "tools/make-paper.mjs",
-    "requires": "02_Before Transformer/AlexNet/paper-src.html",
-    "script": "02_Before Transformer/AlexNet/build.sh",
+    "requires": "02_AlexNet/paper-src.html",
+    "script": "02_AlexNet/build.sh",
     "args": [
       "--src",
-      "02_Before Transformer/AlexNet/paper-src.html",
+      "02_AlexNet/paper-src.html",
       "--notes",
       "content/alexnet/notes.json",
       "--keys",
