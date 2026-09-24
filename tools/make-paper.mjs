@@ -262,6 +262,14 @@ function refURL(text, note) {
 function collectCites(doc) {
   const byNum = new Map(doc.refs.map((r) => [r.num, r]));
   let sec = '';
+  // 作者-年份式的引用（GPT-2：「(Krizhevsky et al., 2012)」）正文里没有 [N]，只能认 href 里的 bib 号。
+  // 先把这种 <a> 换成「\u0001号\u0002原文\u0003」再 strip，切完句子再换回原文。
+  // 链接文字是纯数字的（[16] 那种）原样留着，照旧走下面 [N] 那条路，不会同一处记两遍。
+  const AY = /<a\b[^>]*\bhref=["']?#bib\.bib(\d+)["']?[^>]*>([\s\S]*?)<\/a>/g;
+  const tagAY = (h) => h.replace(AY, (m, n, t) => (/^[\d\s,]*$/.test(strip(t)) ? m : `\u0001${n}\u0002${strip(t).replace(/\./g, '\u0004')}\u0003`));
+  // 链接文字里的句点先换掉：「Gillick et al. (2015)」的「al. (」会被下面的切句规则当成句末
+  const AYM = /\u0001(\d+)\u0002([^\u0003]*)\u0003/g;
+  const unAY = (s) => s.replace(AYM, '$2').replace(/\u0004/g, '.');
   for (const it of doc.items) {
     if (it.kind === 'h') { if (it.level <= 2 && it.num) sec = it.num; continue; }
     // 表格里的引用（表 2、表 4 的基线行）没有句子可摘，就记成「出现在某张表」
@@ -271,16 +279,20 @@ function collectCites(doc) {
       for (const m of strip(it.html).matchAll(/\[\s*(\d+(?:\s*,\s*\d+)*)\s*\]/g))
         for (const num of m[1].split(/\s*,\s*/).map(Number))
           byNum.get(num)?.cites.push({ sec, sent: `列在 ${label} 的对照行里`, float: true });
+      for (const m of strip(tagAY(it.html)).matchAll(AYM))
+        byNum.get(+m[1])?.cites.push({ sec, sent: `出现在 ${label.replace(/\.$/, '')} 里`, float: true });
       continue;
     }
     if (it.kind !== 'p') continue;
-    const text = strip(it.html);
+    const text = strip(tagAY(it.html));
     // 句子切分：句点 + 空格 + 大写开头
-    for (const sent of text.split(/(?<=\.)\s+(?=[A-Z(])/)) {
+    for (const sent of text.split(/(?<=\.)\s+(?=[A-Z(\u0001])/)) {
       // strip() 把 <a> 换成了空格，所以是「[ 13 ]」「[ 2 , 19 ]」这种形态
       for (const m of sent.matchAll(/\[\s*(\d+(?:\s*,\s*\d+)*)\s*\]/g))
         for (const num of m[1].split(/\s*,\s*/).map(Number))
           byNum.get(num)?.cites.push({ sec, sent: sent.trim().replace(/\[\s*([\d\s,]+?)\s*\]/g, (_, d) => `[${d.replace(/\s+/g, '')}]`) });
+      for (const m of sent.matchAll(AYM))
+        byNum.get(+m[1])?.cites.push({ sec, sent: unAY(sent).trim() });
     }
   }
 }
@@ -351,17 +363,21 @@ function parseAuthors(src) {
   for (const m of src.matchAll(/<span\b[^>]*\bltx_personname\b[^>]*>/g)) {
     const chunk = sliceTag(src, m.index, 'span');
     if (!strip(chunk)) continue;
+    // 手工重排的源（GPT-2）把角标原样写在 data-mark 上：* 只挂两个人、** 挂另两个人，
+    // 不能走下面「有人带 * 就挂到所有人头上」那套推断
+    const fixed = (/\bdata-mark="([^"]*)"/.exec(m[0]) || [])[1];
     for (const one of chunk.split(/&amp;|&(?![a-z]+;)/)) {
       const marks = [...one.matchAll(/<sup\b[^>]*\bltx_note_mark\b[^>]*>(\d+)<\/sup>/g)]
         .map((x) => MARKS[+x[1] - 1] || '*');
       const lines = one.replace(/<sup\b[^>]*\bltx_note_mark\b[^>]*>\d+<\/sup>/g, '')
         .split(/<br[^>]*>/).map((s) => strip(s)).filter(Boolean);
-      if (lines.length) people.push({ lines, mark: [...new Set(marks)].join('') });
+      if (lines.length) people.push({ lines, mark: fixed ?? [...new Set(marks)].join(''), fixed: fixed != null });
     }
   }
   // 等贡献那条挂在所有人头上；† ‡ 按 PDF 补
-  const shared = people.some((p) => p.mark.includes('*')) ? '*' : '';
+  const shared = people.some((p) => !p.fixed && p.mark.includes('*')) ? '*' : '';
   for (const p of people) {
+    if (p.fixed) continue;
     const extra = EXTRA_MARKS[p.lines[0]] || '';
     p.mark = (p.mark.includes('*') ? p.mark : shared + p.mark) + extra;
   }
@@ -394,9 +410,10 @@ function parseAuthorNotes(src) {
 
 /** 批注分三路：挂得上原句的做行内高亮；挂不上但属于某节的落到该节末尾；
  *  预备和岔路各自成区。返回后两路，交给 render 摆位置。 */
-function attach(items, notes) {
+function attach(items, notes, pre = '') {
   // 先定位，再按「在论文里出现的先后」编号 —— 编号不跟 notes.json 的数组顺序走，
   // 否则后补的一条会顶着很大的号码插在正文靠前的位置。
+  // pre：一页放两篇论文时，第二篇的批注各自从 1 编号，data-n 带上前缀（p2-3）才不和第一篇撞
   const placed = [], loose = [];
   for (const n of notes) {
     // 标题批注必须显式声明 target: "heading"，避免与正文同名的旧批注被标题抢走。
@@ -409,16 +426,17 @@ function attach(items, notes) {
     if (all.length > 1 && !skip) console.warn(`  ! 「${n.anchor}」在 ${all.length} 个段落里都有，挂在了第一个；` +
       '要挂到别处就加 "skip": N');
     const hit = all[skip];
-    if (!hit) { loose.push(n); continue; }
+    // 挂不上就落到章节末的散落区。以前是悄悄落，锚点写错了看不出来，现在报一声
+    if (!hit) { console.warn(`  ! 挂不上原句，落到散落区：「${String(n.anchor || n.q || '').slice(0, 46)}」`); loose.push(n); continue; }
     placed.push({ n, hit, bi: items.indexOf(hit), at: norm(hit.html).indexOf(norm(n.anchor)) });
   }
   placed.sort((a, b) => a.bi - b.bi || a.at - b.at);
-  placed.forEach((x, i) => { x.n.id = i + 1; (x.hit.notes ||= []).push(x.n); });
-  loose.forEach((n, i) => { n.id = placed.length + i + 1; });
+  placed.forEach((x, i) => { x.n.id = i + 1; x.n.key = pre + x.n.id; (x.hit.notes ||= []).push(x.n); });
+  loose.forEach((n, i) => { n.id = placed.length + i + 1; n.key = pre + n.id; });
   // 同一段里从后往前包，先插进去的 <sup> 数字才不会挪动前面锚点的定位
   for (const x of [...placed].reverse()) {
     const before = x.hit.html;
-    x.hit.html = markUp(x.hit.html, x.n.anchor, x.n.id, x.n.kind);
+    x.hit.html = markUp(x.hit.html, x.n.anchor, x.n.id, x.n.kind, x.n.key);
     if (x.hit.html === before) console.warn(`  ! 第 ${x.n.id} 条包不上 <mark>：「${x.n.anchor.slice(0, 40)}…」`);
   }
   return loose;
@@ -464,11 +482,11 @@ function keyUp(html, text) {
 }
 
 /** 在带标签的 HTML 里高亮一段纯文本：逐字符走，跳过标签与实体，命中区间包 <mark> */
-function markUp(html, anchor, id, kind) {
+function markUp(html, anchor, id, kind, key = id) {
   // 取纯文本的逻辑只留 wrapText 里那一份 —— 之前这儿有个副本，改了一处没改另一处，
   // 结果锚点跨行内公式时「卡片在、正文没高亮」
   return wrapText(html, anchor,
-    `<mark data-n="${id}" data-k="${esc(kind || '')}">`, `<sup>${id}</sup></mark>`);
+    `<mark data-n="${key}" data-k="${esc(kind || '')}">`, `<sup>${id}</sup></mark>`);
 }
 
 /** 逐字符走一遍 HTML，跳过标签与实体，把纯文本里命中的区间用 open/close 包起来 */
@@ -517,9 +535,13 @@ function wrapText(html, text, open, close, pre) {
 
 /* ══════════════════ 三、出页面 ══════════════════ */
 
-function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs = []) {
+/** 一篇论文的正文和目录。一页放两篇时（GPT-1 + GPT-2）各调一次，第二篇再整块加 id 前缀。
+ *  showVenue：没有作者脚注的论文（GPT-1）也要出页脚那行「Preprint. Work in progress.」，
+ *  只在显式传了非空 --venue 时才出，不传的老页面输出不变。 */
+function paperHTML(doc, loose, refnotes, venue, showVenue, foldAppx) {
   const secs = [];
   const parts = [];
+  const usedIds = {};
 
   // 挂不上原句的分两拨：属于某节的落到节末，预备/岔路的另开区
   const tailOf = {}, extra = { 预备: [], 岔路: [] };
@@ -536,9 +558,9 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
   parts.push(`<section class="front">
     <h2 class="ptitle">${esc(doc.title)}</h2>
     <div class="agrid">${authorHTML(doc.authors)}</div>
-    ${doc.fnotes.length ? `<div class="fnotes">${doc.fnotes.map((n) =>
+    ${doc.fnotes.length || showVenue ? `<div class="fnotes">${doc.fnotes.map((n) =>
       `<p>${n.mark ? `<sup>${n.mark}</sup>` : ''}${esc(n.text)}</p>`).join('')}${
-      VENUE() ? `<p class="venue">${esc(VENUE())}</p>` : ''}</div>` : ''}
+      venue ? `<p class="venue">${esc(venue)}</p>` : ''}</div>` : ''}
   </section>`);
 
   if (doc.absBlk) {
@@ -572,7 +594,9 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
       // 下一个正式章节标题出现，就说明带脚注的上一节已经结束。不能只等一级标题，
       // 否则 §3.2.1 的脚注会一路拖到 §4；段落级小标题（level 4）不算章节边界。
       if (it.level < 4) flush();
-      const id = 's' + (it.num || it.text).replace(/[.:\s]+/g, '-').toLowerCase().replace(/-$/, '');
+      let id = 's' + (it.num || it.text).replace(/[.:\s]+/g, '-').toLowerCase().replace(/-$/, '');
+      // 段落级小标题会重名（GPT-1 的 Unsupervised pre-training 在第 2 节和 4.1 节各一次），第二次起加序号
+      if (usedIds[id]) id += '-' + (++usedIds[id]); else usedIds[id] = 1;
       // 段落级标题（Encoder: / Decoder: / Acknowledgements）只进正文，不进目录，否则目录被撑散
       if (it.level < 4) secs.push({ id, num: it.num, text: it.text, level: it.level });
       const tag = it.level === 1 ? 'h2' : it.level < 4 ? 'h3' : 'h4';
@@ -609,6 +633,17 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
   flushTail(null);
   flush();
 
+  /* 附录折起来（--foldappx）。GPT-3 的附录八节、GPT-4 十七节里有一半是提示词样例，
+     摊开占掉页面七成篇幅，正文反而找不着。默认不折，传了这一页才折，
+     已经上线的三页输出一个字节都不差。 */
+  if (foldAppx) {
+    const at = parts.findIndex((x) => /<h2 class="ph" id="sappendix-/.test(x));
+    if (at >= 0) {
+      const n = secs.filter((x) => x.id.startsWith('sappendix-')).length;
+      const inner = parts.splice(at).join('\n');
+      parts.push(`<details class="appx" id="sappendix"><summary>附录<span>${n} 节</span></summary>\n${inner}\n</details>`);
+    }
+  }
 
   // 预备：读正文之前补的底子
   if (extra.预备.length) {
@@ -636,6 +671,38 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
 
   const toc = secs.map((s) =>
     `<a href="#${s.id}" data-ol="${s.id}" class="${s.level > 1 ? 'sub' : ''}">${s.num ? esc(s.num) + ' ' : ''}${esc(s.text)}</a>`).join('');
+  return { body: parts.join('\n'), toc };
+}
+
+/** 第二篇论文和第一篇同处一页：LaTeXML 的 id（S1、F1、bib.bib3）和生成的锚点（s1、sreferences）两篇撞名。
+ *  第二篇整块加前缀，只改这一块里真出现过的 id，指向它们的 href / data-ol / url(#) 跟着改；
+ *  指向块外的（#map-1 这种）原样留着。 */
+/** 一页多篇时，给某一篇的所有 id 和指向它们的引用加前缀。
+ *  属性值<b>不带引号</b>的也要认：浏览器存的 SingleFile 存档里写的是 id=S3.F1，
+ *  只匹配带引号的话，GPT-3 和 GPT-4 这两份存档里的图表 id 会原样撞在一起。 */
+function prefixIds(html, pre) {
+  const ids = new Set([...html.matchAll(/\sid=(?:"([^"]*)"|([^\s">]+))/g)].map((m) => m[1] ?? m[2]));
+  return html.replace(/(\sid="|\sid=|\shref="#|\shref=#|\sdata-ol="|url\(#)([^"'\s)>]+)/g,
+    (m, head, id) => (ids.has(id) ? head + pre + id : m));
+}
+
+function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs = [], extras = []) {
+  // --foldappx 收的是篇号，1 是第一篇。不传就一篇都不折
+  const FOLD = new Set(String(o.foldappx || '').split(',').map((x) => x.trim()).filter(Boolean));
+  const { body, toc } = paperHTML(doc, loose, refnotes, VENUE(), !!o.venue, FOLD.has('1'));
+  // 第 2 篇起各自成一个 tab：id 全加 p<n>- 前缀，编号各自从 1 起
+  const more = extras.map((x) => {
+    const p = paperHTML(x.doc, x.loose, x.refnotes, x.venue || '', !!x.venue, FOLD.has(String(x.idx)));
+    notes = [...notes, ...x.notes];           // 标题底下那行数全部论文合计
+    return {
+      idx: x.idx,
+      label: x.label,
+      title: x.doc.title,
+      kicker: x.kicker, srcurl: x.srcurl, srclabel: x.srclabel,
+      html: prefixIds(`<aside class="toc"><h4>论文目录</h4><div>${p.toc}</div></aside>`
+        + `<div class="paper p${x.idx}">${p.body}</div>`, `p${x.idx}-`),
+    };
+  });
 
   /** 标题底下那行数：全从批注本身数出来，改一条批注它就跟着变，不会和正文对不上。
    *  字数只算人写的话 —— 整段 <svg> 先剔掉，图里的坐标轴标签、图例不该算进字数。
@@ -654,20 +721,26 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
   // 全景图不进正文 —— 它有 1560 宽，跟正文抢版面就会压到目录上。
   // 单独成两个视图，跟论文一起挂在顶部的三个 tab 下，各自占满整幅。
   const views = posters.map((pg, i) =>
-    `<div class="mapview" id="view-map-${i + 1}">`
+    `<div class="mapview${onIf(`map-${i + 1}`)}" id="view-map-${i + 1}">`
     + (pg.note ? `<p class="area-note">${esc(pg.note)}</p>` : '')
     + `<div class="pbox"><div class="pin">${poster(pg.svg, i + 1)}</div></div></div>`).join('');
 
-  return shell(parts.join('\n'), toc, meta, doc.title, o.home || '#', posters,
-    views + docViews(docs) + resView(res), !!res, docs);
+  return shell(body, toc, meta, doc.title, o.home || '#', posters,
+    views + docViews(docs) + resView(res), !!res, docs, more);
 }
+
+/** 首屏那个视图服务端就打上 .on —— 不打的话 --first 指到资料 tab，进页面是一片空白 */
+const onIf = (v) => (o.first === v ? ' on' : '');
 
 /** 独立内容 tab：整页 HTML 片段，和论文正文并列成一个 tab。
  *  用来放不属于任何一句话的东西 —— 比赛沿革、这一篇的贡献与局限。
  *  片段自己只写 <h2>/<p>/<table>/<svg>，版式由下面的 .docview 统一管。 */
 function docViews(docs) {
-  return docs.map((d, i) =>
-    `<div class="docview" id="view-doc-${i + 1}"><article class="doc">${d.html}</article></div>`).join('');
+  return docs.map((d, i) => (d.toc
+    // 带侧边目录的：片段自己给全 <aside class="toc"> 和 <article class="doc">，
+    // 切过去时 display:contents 把它俩摊回 .main 的两栏网格，样式由 --docscss 管
+    ? `<div class="docview dtoc${onIf(`doc-${i + 1}`)}" id="view-doc-${i + 1}">${d.html}</div>`
+    : `<div class="docview${onIf(`doc-${i + 1}`)}" id="view-doc-${i + 1}"><article class="doc">${d.html}</article></div>`)).join('');
 }
 
 /** 资源 tab：站外的视频、文章。内容全在 content/<条目>/resources.json 里，
@@ -715,7 +788,7 @@ function resView(res) {
   const groups = [];
   if ((res.tools || []).length) groups.push(['工具', res.tools.map(link).join('')]);
   if ((res.videos || []).length) groups.push(['视频', res.videos.map(card).join('')]);
-  return `<div class="resview" id="view-res">${groups.map(([t, html]) =>
+  return `<div class="resview${onIf('res')}" id="view-res">${groups.map(([t, html]) =>
     `<section class="res-sec"><h3 class="res-h">${esc(t)}</h3>${html}</section>`).join('')}</div>`;
 }
 
@@ -750,7 +823,7 @@ function noteBlock(title, list) {
 }
 
 function noteCard(n) {
-  return `<div class="nt" data-n="${n.id}">
+  return `<div class="nt" data-n="${n.key ?? n.id}">
       <button class="nt-q" type="button"><span class="num" data-k="${esc(n.kind)}">${n.id}</span><span class="qt">${n.q}</span><span class="tag" data-k="${esc(n.kind)}">${n.kind}</span></button>
       <div class="nt-a">${mathify(n.a)}</div>
     </div>`;
@@ -758,7 +831,7 @@ function noteCard(n) {
 
 function blk(b) {
   const notes = (b.notes || []).map((n) => `
-    <div class="nt" data-n="${n.id}">
+    <div class="nt" data-n="${n.key ?? n.id}">
       <button class="nt-q" type="button"><span class="num" data-k="${esc(n.kind)}">${n.id}</span><span class="qt">${n.q}</span><span class="tag" data-k="${esc(n.kind)}">${n.kind}</span></button>
       <div class="nt-a">${mathify(n.a)}</div>
     </div>`).join('');
@@ -778,34 +851,41 @@ function h1HTML(t, tail = 5) {
   return esc(s.slice(0, -tail)) + `<span class="nb">${esc(s.slice(-tail))}</span>`;
 }
 
-function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false, docs = []) {
+function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false, docs = [], more = []) {
+  // 首屏落在哪个 tab：--first paper | paper-3 | doc-1 …，默认第一篇论文
+  const FIRST = o.first || 'paper';
+  // 出处：一篇的时候摆在标题上方当引题；多篇的时候是五行，压在标题头上太重，挪到统计行下面当脚注
+  const kicker = `<div class="ep-kicker${more.length ? ' two' : ''}"><span class="topic">论文</span>
+    <span>《${esc(paperTitle)}》 · ${esc(o.kicker || 'NeurIPS 2017')} ·
+      <a href="${esc(o.srcurl || 'https://arxiv.org/abs/1706.03762')}" target="_blank" rel="noreferrer">${esc(o.srclabel || 'arXiv:1706.03762')} ↗</a>${more.map((p) => `<br>《${esc(p.title)}》 · ${esc(p.kicker)} ·
+      <a href="${esc(p.srcurl)}" target="_blank" rel="noreferrer">${esc(p.srclabel)} ↗</a>`).join('')}</span>
+  </div>`;
   return `<!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(o.title || '逐句啃 Attention is All You Need')}</title>
 ${o.desc ? `<meta name="description" content="${esc(o.desc)}">` : ''}
 ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
-<style>${CSS}</style></head><body>
+<style>${CSS}${cssAppx()}${cssMulti(more)}${DOCSCSS}</style></head><body>
 <header class="topbar"><div class="wrap">
   <a class="back" href="${home}">‹ 全部条目</a>
 </div></header>
 
 <div class="wrap"><section class="ep-head">
-  <div class="ep-kicker"><span class="topic">论文</span>
-    <span>《${esc(paperTitle)}》 · ${esc(o.kicker || 'NeurIPS 2017')} ·
-      <a href="${esc(o.srcurl || 'https://arxiv.org/abs/1706.03762')}" target="_blank" rel="noreferrer">${esc(o.srclabel || 'arXiv:1706.03762')} ↗</a></span>
-  </div>
-  <h1>${h1HTML(o.h1 || '逐字、逐句理解 Transformer')}</h1>
-  ${meta}
+  ${more.length ? '' : kicker + '\n  '}<h1>${h1HTML(o.h1 || '逐字、逐句理解 Transformer')}</h1>
+  ${meta}${more.length ? '\n  ' + kicker : ''}
 </section></div>
 
 <div class="bar"><div class="wrap">
-  <div class="tabs" role="tablist">
-    <button class="tb on" type="button" role="tab" data-v="paper" aria-selected="true">论文</button>
+  <div class="tabs" role="tablist">${docs.map((d, i) => (d.top
+      ? `\n    <button class="tb${FIRST === `doc-${i + 1}` ? ' on' : ''}" type="button" role="tab" data-v="doc-${i + 1}" aria-selected="${FIRST === `doc-${i + 1}`}">${esc(d.label)}</button>`
+      : '')).join('')}
+    <button class="tb${FIRST === 'paper' ? ' on' : ''}" type="button" role="tab" data-v="paper" aria-selected="${FIRST === 'paper'}">${esc(o.paperlabel || '论文')}</button>${more.map((p) => `
+    <button class="tb${FIRST === `paper-${p.idx}` ? ' on' : ''}" type="button" role="tab" data-v="paper-${p.idx}" aria-selected="${FIRST === `paper-${p.idx}`}">${esc(p.label)}</button>`).join('')}
     ${posters.map((pg, i) =>
       `<button class="tb" type="button" role="tab" data-v="map-${i + 1}" aria-selected="false">${esc(pg.label)}</button>`).join('')}
-    ${docs.map((d, i) =>
-      `<button class="tb" type="button" role="tab" data-v="doc-${i + 1}" aria-selected="false">${esc(d.label)}</button>`).join('')}
+    ${docs.map((d, i) => (d.top ? '' :
+      `<button class="tb${FIRST === `doc-${i + 1}` ? ' on' : ''}" type="button" role="tab" data-v="doc-${i + 1}" aria-selected="${FIRST === `doc-${i + 1}`}">${esc(d.label)}</button>`)).join('')}
     ${hasRes ? `<button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>` : ''}
   </div>
   <div class="legend">
@@ -821,7 +901,8 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 
 <div class="wrap main">
   <aside class="toc"><h4>论文目录</h4><div>${toc}</div></aside>
-  <div class="paper">${body}</div>
+  <div class="paper">${body}</div>${more.map((p) => `
+  <div class="paperview" id="view-paper-${p.idx}">${p.html}</div>`).join('')}
   ${views}
 </div>
 
@@ -892,7 +973,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   document.querySelectorAll('.ph').forEach(function(h){io.observe(h);});
 
   /* ---- 顶部三个视图：论文 / 两张全景图 ---- */
-  var view='paper', scrollAt={}, VKEY='aiayn-view';
+  var view='${FIRST}', scrollAt={}, VKEY='aiayn-view';
   var mem={ get:function(){try{return sessionStorage.getItem(VKEY)}catch(e){return null}},
             set:function(v){try{sessionStorage.setItem(VKEY,v)}catch(e){}} };
   function showView(v){
@@ -910,10 +991,12 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
     void document.documentElement.scrollHeight;   // 先让新视图排完版，否则位置会被旧高度截掉
     scrollTo(0,scrollAt[v]||0);
   }
-  document.body.dataset.view='paper';
+  document.body.dataset.view='${FIRST}';
   // 刷新之后停在原来那个 tab —— 只记在本次会话里，重新打开还是从论文开始
   var saved=mem.get();
-  if(saved&&saved!=='paper'&&document.getElementById('view-'+saved))showView(saved);
+  ${FIRST === 'paper'
+    ? `if(saved&&saved!=='paper'&&document.getElementById('view-'+saved))showView(saved);`
+    : `if(saved&&saved!=='${FIRST}'&&(saved==='paper'||document.getElementById('view-'+saved)))showView(saved);`}
   document.addEventListener('click',function(e){
     var b=e.target.closest('.tb'); if(b){showView(b.dataset.v);return;}
     var a=e.target.closest('a[href^="#map-"]'); if(a){showView(a.getAttribute('href').slice(1));}
@@ -1073,7 +1156,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
       if(sheetOn())closeSheet();
       all.setAttribute('aria-pressed','false');}
   });
-})();
+${jsAppx()}${jsMulti(more)}})();
 </script>
 </body></html>`;
 }
@@ -1536,7 +1619,89 @@ body.no-notes .legend{display:none}
 .sheet-bd svg{display:block;width:100%;height:auto;margin:4px 0 10px}
 `;
 
+/** 一页多篇时才追加的样式和脚本。单篇页面一个字节都不多 —— 已经上线的三页重建出来和原来一样。 */
+const cssMulti = (more) => (more.length ? `
+/* 第 2 篇起，各自的目录和正文包在 .paperview 里；切过去时 display:contents 把它俩摊回 .main 的两栏网格，
+   第一篇的目录和正文收起 */
+.paperview{display:none}
+${more.map((p) => `body[data-view="paper-${p.idx}"] #view-paper-${p.idx}{display:contents}
+body[data-view="paper-${p.idx}"] .main>.toc,body[data-view="paper-${p.idx}"] .main>.paper{display:none}`).join('\n')}
+/* 出处有好几行，挪到统计行下面了：和上面拉开一点，药丸跟第一行对齐 */
+.ep-kicker.two{align-items:flex-start;margin-top:15px;line-height:1.9}
+.ep-kicker.two .topic{margin-top:1px}
+/* 题目都长，不平衡的话 Pre-Training 会在连字符处断开，第二行只剩一个 Training */
+.ptitle{text-wrap:balance}
+` : '');
+
+/** 附录折叠块的样式（--foldappx）。外框和 References 一套，但里头是整段正文，
+ *  所以不缩进也不换字体。没传这个参数的页面一个字节都不多。 */
+const cssAppx = () => (o.foldappx ? `
+.appx{margin:30px 0 0 22px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);scroll-margin-top:130px}
+.appx>summary{padding:12px 16px;font:650 15px/1.3 var(--sans);cursor:pointer;display:flex;align-items:center;gap:10px}
+.appx>summary span{font:12px var(--mono);color:var(--text-3);font-weight:400}
+.appx[open]{background:none;border-color:var(--line-soft)}
+.appx[open]>summary{border-bottom:1px solid var(--line-soft);margin-bottom:18px;background:var(--bg-elev);border-radius:var(--r-md) var(--r-md) 0 0}
+.appx>*:not(summary){margin-left:-22px}
+` : '');
+
+/** 附录折起来之后，目录里指向附录小节的链接要先把它撑开，否则点了不动。
+ *  只有传了 --foldappx 才出这段。 */
+const jsAppx = () => (o.foldappx ? `
+  /* ---- 附录折叠：跳进去之前先打开 ---- */
+  function openAppx(el){ for(var d=el&&el.closest('details');d;d=d.parentElement&&d.parentElement.closest('details')) d.open=true; }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]'); if(!a)return;
+    var el=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+    if(!el||!el.closest('details.appx'))return;
+    // 先撑开再滚。撑开会重排，浏览器默认那一跳量的是旧位置，落不到地方
+    openAppx(el); e.preventDefault();
+    // behavior:'instant' 是必须的：页面开了 scroll-behavior:smooth，
+    // 附录撑开后目标常在六万多像素外，平滑滚过去要好几秒，中途还会被打断
+    requestAnimationFrame(function(){
+      window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 120, behavior: 'instant' });
+      history.replaceState(null, '', a.getAttribute('href'));
+    });
+  },true);
+  addEventListener('hashchange',function(){ openAppx(document.getElementById(decodeURIComponent(location.hash.slice(1)))); });
+  openAppx(document.getElementById(decodeURIComponent(location.hash.slice(1))));
+` : '');
+
+const jsMulti = (more) => (more.length ? `
+  /* ---- 第 2 篇起：id 一律带 p<n>- 前缀 ---- */
+  // 页内链接指到别篇（或从资料 tab 指回论文）：先切到目标所在的 tab，浏览器再滚过去
+  function viewOf(el){
+    var v=el.closest('.paperview');
+    if(v)return v.id.slice(5);                      // view-paper-3 → paper-3
+    return el.closest('.main>.paper')?'paper':null;
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]'); if(!a)return;
+    var href=a.getAttribute('href');
+    var el=document.getElementById(decodeURIComponent(href.slice(1)));
+    var v=el&&viewOf(el); if(v&&v!==view)showView(v);
+    // 某一篇的引用编号，打开那一篇自己的参考文献
+    var m=/^#p(\\d+)-bib\\.bib/.exec(href);
+    if(m){ var d=document.querySelector('.p'+m[1]+' .refs'); if(d)d.open=true; }
+  });
+  // 带着锚点进来（#p3-S3.SS1）：先切 tab，load 之后 place() 才量得到位置
+  (function(){
+    var id=decodeURIComponent(location.hash.slice(1)), el=id&&document.getElementById(id);
+    var v=el&&viewOf(el); if(v&&v!==view)showView(v);
+  })();
+  // 阅读进度：每篇单独记。没切过去时它是隐藏的，高度为 0，跳过
+  document.querySelectorAll('.paperview .paper').forEach(function(doc){
+    var hit={}, tag=(doc.className.match(/\\bp(\\d+)\\b/)||[,'?'])[1];
+    addEventListener('scroll',function(){
+      var r=doc.getBoundingClientRect();
+      if(!r.height)return;
+      var seen=Math.min(1,Math.max(0,(innerHeight-r.top)/r.height))*100;
+      [25,50,75,100].forEach(function(m){ if(seen>=m&&!hit[m]){ hit[m]=1; track('read_progress',{detail:'p'+tag+'-'+m+'%'}); } });
+    },{passive:true});
+  });
+` : '');
+
 /* ══════════════════ 主流程 ══════════════════ */
+
 
 const o = args();
 const notes = o.notes && existsSync(o.notes) ? JSON.parse(readFileSync(o.notes, 'utf8')) : [];
@@ -1554,11 +1719,35 @@ const loose = attach(blocks, notes);
 console.log(`  行内高亮 ${notes.length - loose.length} 条，散落 ${loose.length} 条 → 章节末 / 预备区 / 岔路区`);
 
 // 划重点
-const keys = o.keys && existsSync(o.keys) ? JSON.parse(readFileSync(o.keys, 'utf8')) : [];
-if (keys.length) {
+/** --dumpblocks <目录>：把 applyKeys 实际会去匹配的那些块，按 norm() 的口径一块一行写出来。
+ *  挑划重点和批注 anchor 时拿它当靶子，省得猜哪些段落进了正文、哪些被并进了图表。
+ *  不传这个参数就什么都不写，页面输出不受影响。 */
+function dumpBlocks(blocks, n) {
+  if (!o.dumpblocks) return;
+  mkdirSync(o.dumpblocks, { recursive: true });
+  const lines = blocks.filter((b) => b.kind === 'p' || b.kind === 'float').map((b) => norm(b.html));
+  const f = join(o.dumpblocks, `${n}.txt`);
+  writeFileSync(f, lines.join('\n') + '\n', 'utf8');
+  console.log(`  · 块清单 ${lines.length} 条 → ${f}`);
+}
+
+/** --dumprefs <目录>：把参考文献按「编号 \t 原文」一条一行写出来，给 refnotes 的对齐脚本当靶子。
+ *  和 --dumpblocks 一样，不传就什么都不写。 */
+function dumpRefs(doc, n) {
+  if (!o.dumprefs) return;
+  mkdirSync(o.dumprefs, { recursive: true });
+  const f = join(o.dumprefs, `${n}.tsv`);
+  writeFileSync(f, doc.refs.map((r) => `${r.num}\t${strip(r.html)}`).join('\n') + '\n', 'utf8');
+  console.log(`  · 文献清单 ${doc.refs.length} 条 → ${f}`);
+}
+
+function applyKeys(blocks, file) {
+  const keys = file && existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : [];
+  if (!keys.length) return;
   const hit = {};
   for (const b of blocks) {
-    if (b.kind !== 'p') continue;
+    // 正文段落和图表（标黄常常落在表注上，比如 GPT-3 Table 2.1 的「trained for a total of 300 billion tokens」）
+    if (b.kind !== 'p' && b.kind !== 'float') continue;
     for (const k of keys) {
       if (!norm(b.html).includes(norm(k))) continue;
       b.html = keyUp(b.html, k);
@@ -1569,9 +1758,38 @@ if (keys.length) {
   console.log(`· 划重点 ${keys.length} 条，命中 ${Object.values(hit).reduce((a, b) => a + b, 0)} 处` +
     (zero.length ? `；这些在论文里没找到：${zero.join(' / ')}` : ''));
 }
+dumpBlocks(blocks, 1);
+dumpRefs(doc, 1);
+applyKeys(blocks, o.keys);
 
 SXS = (o.sxs || '').split(',').map((x) => x.trim()).filter(Boolean);
 const refnotes = o.refnotes && existsSync(o.refnotes) ? JSON.parse(readFileSync(o.refnotes, 'utf8')) : {};
+
+// 第 2 篇起：同名参数加数字后缀，--src2 --notes2 --keys2 --refnotes2 --venue2，
+// --src3 …3，依此类推，中间不能断号。顶部每篇多一个 tab（--paperlabelN），
+// 出处每篇多一行（--kickerN --srcurlN --srclabelN）。
+const extras = [];
+for (let n = 2; o['src' + n]; n++) {
+  console.log(`· 读第 ${n} 篇…`);
+  const d = parse(unscaleTables(readFileSync(o['src' + n], 'utf8')));
+  console.log(`· 标题「${d.title}」，作者 ${d.authors.length}，段落 ${d.items.filter((i) => i.kind === 'p').length}，` +
+    `公式 ${d.items.filter((i) => i.kind === 'eq').length}，图表 ${d.items.filter((i) => i.kind === 'float').length}，` +
+    `参考文献 ${d.refs.length}`);
+  const nt = o['notes' + n] && existsSync(o['notes' + n]) ? JSON.parse(readFileSync(o['notes' + n], 'utf8')) : [];
+  const blks = d.absBlk ? [d.absBlk, ...d.items] : d.items;
+  const lo = attach(blks, nt, `p${n}-`);
+  console.log(`  行内高亮 ${nt.length - lo.length} 条，散落 ${lo.length} 条`);
+  dumpBlocks(blks, n);
+  dumpRefs(d, n);
+  applyKeys(blks, o['keys' + n]);
+  const rn = o['refnotes' + n] && existsSync(o['refnotes' + n]) ? JSON.parse(readFileSync(o['refnotes' + n], 'utf8')) : {};
+  extras.push({
+    idx: n, doc: d, notes: nt, loose: lo, refnotes: rn,
+    venue: o['venue' + n] || '',
+    label: o['paperlabel' + n] || `论文 ${n}`,
+    kicker: o['kicker' + n] || '', srcurl: o['srcurl' + n] || '', srclabel: o['srclabel' + n] || '',
+  });
+}
 
 // 全景图：--posters a.svg,b.svg，标题直接取图里的 .h1
 const posters = (o.posters || '').split(',').filter(Boolean).map((spec) => {
@@ -1583,19 +1801,24 @@ const posters = (o.posters || '').split(',').filter(Boolean).map((spec) => {
 if (posters.length) console.log(`· 全景图 ${posters.length} 张：${posters.map((p) => p.title).join(' / ')}`);
 
 // 资源 tab：--res resources.json（视频 / 文章），没有就不出这个 tab
+// 资料 tab 的补充样式：--docscss 一个文件，原样接在 CSS 后面。
+// 只有传了才有输出，已经上线的三页重建出来一个字节都不差。
+const DOCSCSS = o.docscss && existsSync(o.docscss) ? readFileSync(o.docscss, 'utf8') : '';
 const res = o.res && existsSync(o.res) ? JSON.parse(readFileSync(o.res, 'utf8')) : null;
 if (res) console.log(`· 资源 ${res.videos.length} 个视频，`
   + `${res.videos.reduce((n, v) => n + (v.shots || []).length, 0)} 张截图`);
 
 // 独立内容 tab：--docs a.html#标签#,b.html#标签#
 const docs = (o.docs || '').split(',').filter(Boolean).map((spec) => {
-  const [f, label] = spec.split('#');
+  const [f, label, flags] = spec.split('#');    // 路径#tab 标签#标记（top = 排到论文 tab 前面）
   const html = readFileSync(f.trim(), 'utf8');
-  return { html, label: (label || basename(f, '.html')).trim() };
+  return { html, label: (label || basename(f, '.html')).trim(),
+    top: /\btop\b/.test(flags || ''),      // 排到论文 tab 前面
+    toc: /\btoc\b/.test(flags || '') };    // 片段自己带 <aside class="toc">，摊回 .main 的两栏网格
 });
 if (docs.length) console.log(`· 独立内容 tab ${docs.length} 个：${docs.map((d) => d.label).join(' / ')}`);
 
-const html = render(doc, notes, loose, refnotes, posters, res, docs);
+const html = render(doc, notes, loose, refnotes, posters, res, docs, extras);
 mkdirSync(dirname(o.out), { recursive: true });
 writeFileSync(o.out, html);
 console.log(`✓ ${o.out}（${(html.length / 1024 / 1024).toFixed(1)} MB）`);

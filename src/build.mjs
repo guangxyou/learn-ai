@@ -54,7 +54,9 @@ async function buildPaper({ dir, id, entry, base, dist }) {
 
   const n = (re) => (html.match(re) || []).length;
   const notes = n(/<div class="nt" data-n=/g);
-  const figs = n(/<svg viewBox/g) + n(/<figure class="poster/g);
+  // <svg viewBox 是 make-paper 生成的那种写法；自己画的图先写 xmlns 再写 viewBox，
+  // 死扣 "<svg viewBox" 会漏掉（GPT 那页 5 张图只数出 1 张）。另外数一遍内联的位图。
+  const figs = n(/<svg\b[^>]*\bviewBox=/g) + n(/<figure class="poster/g) + n(/<img class="rawfig"/g);
   // 字数是 make-paper 在页面里数好的（它才知道哪些是人写的、哪些是图里的标注），
   // 这里只把它读出来 —— 卡片上的数和页面标题下那行数，同一个来源。
   const chars = +(html.match(/class="ep-meta" data-chars="(\d+)"/) || [, 0])[1];
@@ -84,6 +86,9 @@ async function build() {
   for (const id of ids) {
     const dir = j(ROOT, 'content', id);
     const entry = JSON.parse(await readFile(j(dir, 'entry.json'), 'utf8'));
+    // 还没定稿的条目标 "draft": true：线上构建直接跳过，不进首页也不出页面。
+    // 本地想连草稿一起看，DRAFTS=1 npm run dev
+    if (entry.draft && !process.env.DRAFTS) { console.log(`[build] ${id} · 草稿，跳过`); continue; }
     if (entry.kind === 'paper') { entries.push(await buildPaper({ dir, id, entry, base: BASE, dist: DIST })); continue; }
     const chronicle = JSON.parse(await readFile(j(dir, 'chronicle.json'), 'utf8'));
     const { sections, chars, turns } = parseTranscript(
