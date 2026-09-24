@@ -1,0 +1,25 @@
+{
+  "id": "gpt-evolution",
+  "kind": "paper",
+  "title": "GPT 系列",
+  "subtitle": "GPT-1、GPT-2、GPT-3、InstructGPT、GPT-4 论文精读",
+  "topics": [
+    "AI 基础",
+    "论文",
+    "大语言模型"
+  ],
+  "date": "2018-06",
+  "studied": "2026-09",
+  "summary": "OpenAI 五篇 GPT 论文的全文精读：GPT-1 预训练加微调、GPT-2 不微调做零样本、GPT-3 放大到 1750 亿押注 Scaling Law、InstructGPT 把人类偏好接进训练回路、GPT-4 不再公开架构。五篇全文一句一句读完，90 条批注挂在原句上，划重点按 PDF 里标黄的来；外加一篇串起五代的总结、今天回头看的评价，以及三百位作者的去向。",
+  "source": {
+    "name": "Improving Language Understanding by Generative Pre-Training · OpenAI 2018",
+    "url": "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf"
+  },
+  "page": "page.html",
+  "build": {
+    "note": "这一页的输入摊在 04_GPT/blog/ 下（正文片段、批注、划重点、图、资源、作者数据），不像别的条目那样放在 content/ 里 —— 五篇论文源加起来几百 MB，不进仓库。page.html 是提交进仓库的成品；04_GPT/ 还在的时候构建会先重新生成它，不在就直接发成品。划重点由 04_GPT/blog/keys/extract.py（读 PDF 标黄）加 keys/fit.mjs（对齐到原文）生成，不手写。",
+    "tool": "04_GPT/blog/build.mjs",
+    "requires": "04_GPT/blog/build.mjs",
+    "args": []
+  }
+}
