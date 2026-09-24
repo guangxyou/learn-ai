@@ -150,7 +150,11 @@ async function build() {
     console.log(`[build] ${id} · ${sections.length} 节 / ${turns} 段 / ${chars} 字 / ${papers.length} 篇 / 包 ${mb(zipSize)}`);
   }
 
-  entries.sort((a, b) => (a.studied < b.studied ? 1 : -1));
+  // 新的在前。studied 只到月，同一个月上了好几篇（2026-09 就有三篇）时顺序是乱的，
+  // 而且原来那个比较函数在相等时也返回 -1，排序结果不稳定。
+  // 按上线那天（published，精确到日）排，没写的退回 studied。
+  const when = (e) => e.published || e.studied;
+  entries.sort((a, b) => when(b).localeCompare(when(a)) || a.id.localeCompare(b.id));
   await writeFile(j(DIST, 'index.html'), renderList({ base: BASE, entries, site: SITE }), 'utf8');
 
   await cp(j(ROOT, 'public', 'app.css'), j(DIST, 'assets', 'app.css'));
