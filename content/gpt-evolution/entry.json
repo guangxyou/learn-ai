@@ -10,6 +10,7 @@
   ],
   "date": "2018-06",
   "studied": "2026-09",
+  "published": "2026-09-24",
   "summary": "OpenAI 五篇 GPT 论文的全文精读：GPT-1 预训练加微调、GPT-2 不微调做零样本、GPT-3 放大到 1750 亿押注 Scaling Law、InstructGPT 把人类偏好接进训练回路、GPT-4 不再公开架构。五篇全文一句一句读完，90 条批注挂在原句上，划重点按 PDF 里标黄的来；外加一篇串起五代的总结、今天回头看的评价，以及三百位作者的去向。",
   "source": {
     "name": "Improving Language Understanding by Generative Pre-Training · OpenAI 2018",
