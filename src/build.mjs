@@ -22,6 +22,49 @@ const DIST = join(ROOT, 'dist');
 const j = (...p) => join(...p);
 
 
+/** 内联图拆成独立文件，发布时才拆。
+ *
+ *  make-paper 出的 page.html 所有图都是 base64 内联，所有 tab 又在同一个文件里 ——
+ *  GPT 那页 23 MB，其中 20 MB 是 134 张图，服务器上行只有 4 Mbps，打开要等半分钟，
+ *  而首屏那个 tab 只用得到其中 300 多 KB。
+ *
+ *  拆出去的文件按内容哈希命名，放 assets/img/，吃 nginx 那条 7 天长缓存。
+ *  首屏视图里的 <img> 照常加载（load 事件要等它们，带锚点进来时 place() 才量得准）；
+ *  其余一律 loading="lazy"：藏着的 tab 是 display:none，浏览器根本不会去取，
+ *  切过去之后也是滚到附近才取。<object> 的 SVG 不用管，没显示出来时本来就不加载。 */
+async function unInline(html, { id, base, dist }) {
+  // 首屏是服务端打了 .on 的那个视图；一个都没打，就是第一个视图之前的第一篇论文
+  const views = [...html.matchAll(/<div class="(?:paperview|docview|mapview|resview)\b([^"]*)" id="view-[^"]+">/g)];
+  const on = views.findIndex((m) => /\bon\b/.test(m[1]));
+  const [lo, hi] = on >= 0
+    ? [views[on].index, views[on + 1]?.index ?? html.length]
+    : [0, views[0]?.index ?? html.length];
+
+  await mkdir(j(dist, 'assets', 'img'), { recursive: true });
+  const written = new Set();
+  let n = 0, lazy = 0, bytes = 0;
+  const out = [];
+  let at = 0;
+  const RE = /(<(img|object)\b[^>]*?\s(?:src|data)=)(["']?)data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,([A-Za-z0-9+/=]+)\3/g;
+  for (const m of html.matchAll(RE)) {
+    const [all, head, tag, , type, b64] = m;
+    const buf = Buffer.from(b64, 'base64');
+    const name = `${createHash('sha256').update(buf).digest('hex').slice(0, 16)}.${{ jpeg: 'jpg', 'svg+xml': 'svg' }[type] || type}`;
+    if (!written.has(name)) { written.add(name); bytes += buf.length; await writeFile(j(dist, 'assets', 'img', name), buf); }
+    n++;
+    const end = html.indexOf('>', m.index + all.length);   // base64 里没有 >，这就是标签的收尾
+    const rest = html.slice(m.index + all.length, end);
+    const defer = tag === 'img' && !(m.index >= lo && m.index < hi) && !/\sloading=/.test(all + rest);
+    if (defer) lazy++;
+    out.push(html.slice(at, m.index), `${head}"${base}/assets/img/${name}"`,
+      rest.replace(/\s*\/?$/, (t) => (defer ? ' loading="lazy" decoding="async"' : '') + t));
+    at = end;
+  }
+  out.push(html.slice(at));
+  if (n) console.log(`[build] ${id} · 拆出内联图 ${n} 处（${written.size} 个文件，${(bytes / 1048576).toFixed(1)} MB），其中 ${lazy} 处懒加载`);
+  return out.join('');
+}
+
 /** 论文精读条目：整页由 tools/make-paper.mjs 生成，自包含，不走 render.mjs 的模板。
  *
  *  page.html 是**提交进仓库的成品** —— 素材工作现场（01_Transformer/，几百 MB）不进仓库，
@@ -42,10 +85,10 @@ async function buildPaper({ dir, id, entry, base, dist }) {
     console.log(`[build] ${id} · 用仓库里的成品 ${entry.page}`);
   }
 
-  const html = (await readFile(page, 'utf8'))
+  const html = await unInline((await readFile(page, 'utf8'))
     .replaceAll('__HOME__', `${base}/`)
     .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`)
-    .replaceAll('__ASSETS__', `${base}/${id}/assets`);
+    .replaceAll('__ASSETS__', `${base}/${id}/assets`), { id, base, dist });
   await mkdir(j(dist, id), { recursive: true });
   await writeFile(j(dist, id, 'index.html'), html, 'utf8');
 
