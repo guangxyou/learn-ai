@@ -107,7 +107,8 @@ async function buildPaper({ dir, id, entry, base, dist }) {
   // 跟页面标题下那行同一个写法：数在前，量词在后。
   // 「万字」要整个留在常规体里 —— 断成 <b>3.1 万</b>字，粗细变化落在词中间，看着像空了一格。
   const w = wan(chars).split(' ');                 // ['3.1','万'] 或 ['8500']
-  return { ...entry, outputs: [`<b>${notes}</b> 条批注`, `<b>${w[0]}</b> ${w[1] || ''}字`, `<b>${figs}</b> 张插图`] };
+  // 不是论文精读的条目（视频笔记这类）没有批注，产出在 entry.json 里自己写 outputs
+  return { ...entry, outputs: entry.outputs ?? [`<b>${notes}</b> 条批注`, `<b>${w[0]}</b> ${w[1] || ''}字`, `<b>${figs}</b> 张插图`] };
 }
 
 async function build() {
