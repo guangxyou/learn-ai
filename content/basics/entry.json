@@ -1,0 +1,31 @@
+{
+  "id": "basics",
+  "kind": "paper",
+  "title": "基础概念",
+  "subtitle": "3Blue1Brown《线性代数的本质》17 集视频笔记",
+  "topics": [
+    "AI 基础",
+    "数学",
+    "视频笔记"
+  ],
+  "date": "2016-08",
+  "studied": "2026-09",
+  "published": "2026-09-26",
+  "summary": "把矩阵看成对空间的变换：向量、基、线性变换、矩阵乘法、行列式、逆矩阵与秩、点积与对偶、叉积、克莱姆法则、基变换、特征值、抽象向量空间。17 集每集一份分节摘要，时间码点了直接跳到 B 站视频那一秒，配 265 张去掉字幕的截图和视频里思考题的答案。B 站合集缺的第 15 章已补上。",
+  "source": {
+    "name": "Essence of Linear Algebra · 3Blue1Brown",
+    "url": "https://www.bilibili.com/video/BV1ys411472E"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>17</b> 集",
+    "<b>3.4 万</b>字",
+    "<b>265</b> 张截图"
+  ],
+  "build": {
+    "note": "输入在 05_Basic/ 下（摘要 notes/chNN.mjs、截图工具、B 站原片），那个目录不进仓库。page.html 和 assets/shots/ 是提交进仓库的成品；05_Basic/ 在的时候构建会先重新生成它们，不在就直接发成品。站点版的播放器只用 B 站官方播放器。",
+    "tool": "05_Basic/build.mjs",
+    "requires": "05_Basic/build.mjs",
+    "args": []
+  }
+}
