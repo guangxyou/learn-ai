@@ -796,7 +796,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
         <a href="https://www.youtube.com/watch?v=rHLEWRxRGiM" target="_blank" rel="noreferrer">YouTube 第 5 章 · 2016-08-10 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="52">0:52</button>三维线性变换</h4>
-      <p>考虑输入、输出都是三维向量的线性变换。可视化方式和二维一样：用网格代表三维空间里的所有点，让它们移动，同时保持网格线平行等距、原点不动。看到的每个点，仍然是「终点在那里的向量」的替身，要想的是输入向量移动到输出向量。</p>
+      <p>考虑输入、输出都是三维向量的线性变换。可视化方式和二维一样：用网格代表三维空间里的所有点，让它们移动，同时保持网格线平行等距、原点不动。看到的每个点，代表的仍然是「终点在那里的向量」，要想的是输入向量移动到输出向量。</p>
       <p>和二维一样，这种变换完全由基向量的去向描述。三维有三个标准基向量：x 方向的单位向量 <span class="m"><i class="ih">î</i></span>、y 方向的 <span class="m"><i class="jh">ĵ</i></span>，以及新来的 z 方向单位向量 <span class="m"><i class="kh">k̂</i></span>。整个三维网格画出来很乱，作者觉得只跟踪这三个基向量更容易看清变换，背景里保留一份原坐标轴，读出三个落点的坐标。</p>
       <p>把三个落点的坐标记为一个 3×3 矩阵的三列，九个数就完整描述了这个变换。</p>
       
@@ -1117,7 +1117,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="117">1:57</button>列空间和满秩</h4>
       <p>用上一集的语言，这个矩阵的列空间（所有向量落到的地方）是三维空间里一个过原点的二维平面。但这个矩阵仍然是满秩的，因为列空间的维数（2）和输入空间的维数相同。</p>
-      <p>所以野外遇到一个 3×2 矩阵，就知道它的几何意义是把二维映到三维：两列说明输入空间有两个基向量，三行说明每个基向量的落点要用三个坐标描述。</p>
+      <p>所以以后碰到一个 3×2 矩阵，就知道它的几何意义是把二维映到三维：两列说明输入空间有两个基向量，三行说明每个基向量的落点要用三个坐标描述。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/nonsquare-matrices-2m05s0.jpg" alt="列空间：三维空间里一个过原点的平面" loading="lazy" decoding="async">
@@ -1139,7 +1139,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="193">3:13</button>二维到一维：1×2 矩阵</h4>
-      <p>还可以从二维变到一维。一维空间就是数轴，所以这种变换接收二维向量，吐出一个数。</p>
+      <p>还可以从二维变到一维。一维空间就是数轴，所以这种变换输入二维向量，输出一个数。</p>
       <p>这里所有东西都被压扁了，「网格线平行等距」不太好看。视觉判据换成：一排等距分布的点，映射到数轴上之后仍然等距。</p>
       <p>这种变换用 1×2 矩阵编码，两列各只有一个元素：两列代表两个基向量的落点，每个落点只需要一个数，就是那个基向量落在数轴上的位置。作者说这是一类意外有意义的变换，和点积关系很紧，下一集就讲。</p>
       
@@ -1208,7 +1208,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="236">3:56</button>到数轴的线性变换</h4>
       <p>还有一个更大的疑问：配对坐标、相乘、相加，这个数值过程为什么会和投影有关，要回答这个问题，得先讲从多维到一维（数轴）的线性变换。</p>
-      <p>这类函数接收二维向量、吐出一个数，而线性变换比一般的「二维进、一维出」函数受限得多。作者故意不讲形式化的定义，只用一个等价的视觉性质：一排等距的点，经过线性变换落到数轴上仍然等距；如果某排点变得不等距，这个变换就不是线性的。</p>
+      <p>这类函数输入二维向量、输出一个数，而线性变换比一般的「二维进、一维出」函数受限得多。作者故意不讲形式化的定义，只用一个等价的视觉性质：一排等距的点，经过线性变换落到数轴上仍然等距；如果某排点变得不等距，这个变换就不是线性的。</p>
       <p>和以前一样，这种变换完全由 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 的去向决定。只是这次每个基向量都落在一个数上，记成矩阵的列，每列只有一个数，是个 1×2 矩阵。</p>
       <p>例子：变换把 <span class="m"><i class="ih">î</i></span> 送到 1，把 <span class="m"><i class="jh">ĵ</i></span> 送到 −2。向量 <span class="m">(4, 3) = 4<i class="ih">î</i> + 3<i class="jh">ĵ</i></span>，由线性可知它落在 <span class="m">4 × 1 + 3 × (−2) = −2</span>。纯数值地算，这就是矩阵向量乘法 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>1</span><span>−2</span></span><span class="mx" style="grid-template-columns:repeat(1,auto)"><span>4</span><span>3</span></span>。</p>
       
@@ -1267,7 +1267,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="766">12:46</button>两层理解</h4>
       <p>表层：点积是理解投影、判断两个向量是否大致同向的几何工具，这是关于点积最该记住的。深一层：把两个向量点乘，是把其中一个翻译成变换的世界。</p>
-      <p>作者认为这件事之所以重要，是因为在数学里，当你熟悉一个向量的「脾气」，有时会发现把它理解为某个线性变换的实体化比理解为空间里的箭头更容易。向量像是某个变换的简写，因为想象一根箭头比想象整个空间被压到数轴上容易。</p>
+      <p>作者认为这件事之所以重要，是因为在数学里，对一个向量熟悉了以后，有时会发现把它理解成某个线性变换的具体体现，比理解成空间里的箭头更容易。向量像是某个变换的简写，因为想象一根箭头比想象整个空间被压到数轴上容易。</p>
       <p>下一集的叉积会是对偶性的另一个例子。</p>
       
       
@@ -1350,7 +1350,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>向量当作矩阵元素，意思并不清楚，学生通常被告知这只是记号上的技巧。把 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span> 当成数照常展开，得到这三个基向量的某个线性组合：</p>
       <p><span class="m"><i>v</i> × <i>w</i> = <i class="ih">î</i>(<i>v</i>₂<i>w</i>₃ − <i>v</i>₃<i>w</i>₂) + <i class="jh">ĵ</i>(<i>v</i>₃<i>w</i>₁ − <i>v</i>₁<i>w</i>₃) + <i class="kh">k̂</i>(<i>v</i>₁<i>w</i>₂ − <i>v</i>₂<i>w</i>₁)</span></p>
       <p>然后学生被告知要相信：这个线性组合定义的向量，恰好是垂直于 <span class="m"><i>v</i></span> 和 <span class="m"><i>w</i></span>、长度等于平行四边形面积、方向服从右手定则的那个唯一向量。</p>
-      <p>作者承认这是记号技巧，但它有来由：行列式再次出现不是巧合，把基向量塞进那一列也不是随便做的。要理解背后的原因，要用到上一集的对偶性。这部分有点重，放在单独的下一集，作者认为它严格说在线性代数的本质之外，最重要的是知道叉积向量在几何上代表什么。</p>
+      <p>作者承认这是记号技巧，但它有来由：行列式再次出现不是巧合，把基向量塞进那一列也不是随便做的。要理解背后的原因，要用到上一集的对偶性。这部分有点难，放在单独的下一集，作者认为它严格说在线性代数的本质之外，最重要的是知道叉积向量在几何上代表什么。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/cross-products-7m08s0.jpg" alt="第一列填 î、ĵ、k̂，后两列是 v、w 的坐标" loading="lazy" decoding="async">
@@ -1383,7 +1383,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
         <a href="https://www.youtube.com/watch?v=BaM7OCEm3G0" target="_blank" rel="noreferrer">YouTube 第 11 章 · 2016-09-01 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="16">0:16</button>问题：记号技巧为什么对</h4>
-      <p>计算 <span class="m"><i>v</i> × <i>w</i></span> 的办法：写一个矩阵，第二列是 <span class="m"><i>v</i></span> 的坐标，第三列是 <span class="m"><i>w</i></span> 的坐标，第一列却是符号 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span>，把它们当成数，算这个怪矩阵的行列式。照算下去，得到某个常数乘 <span class="m"><i class="ih">î</i></span> 加某个常数乘 <span class="m"><i class="jh">ĵ</i></span> 加某个常数乘 <span class="m"><i class="kh">k̂</i></span>。行列式具体怎么展开不重要，重要的是得到三个数，被解读为结果向量的坐标。</p>
+      <p>计算 <span class="m"><i>v</i> × <i>w</i></span> 的办法：写一个矩阵，第二列是 <span class="m"><i>v</i></span> 的坐标，第三列是 <span class="m"><i>w</i></span> 的坐标，第一列却是符号 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span>，把它们当成数，算这个特殊矩阵的行列式。照算下去，得到某个常数乘 <span class="m"><i class="ih">î</i></span> 加某个常数乘 <span class="m"><i class="jh">ĵ</i></span> 加某个常数乘 <span class="m"><i class="kh">k̂</i></span>。行列式具体怎么展开不重要，重要的是得到三个数，被解读为结果向量的坐标。</p>
       <p>学生通常被告知要相信这个向量有以下几何性质：长度等于 <span class="m"><i>v</i></span>、<span class="m"><i>w</i></span> 张成的平行四边形面积；方向垂直于 <span class="m"><i>v</i></span> 和 <span class="m"><i>w</i></span>；方向服从右手定则。可以用暴力计算验证，作者要讲的是另一条推理。</p>
       
       
@@ -1396,7 +1396,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="124">2:04</button>回顾对偶性</h4>
       <p>对偶性的要点：任何从某个空间到数轴的线性变换，都对应该空间里唯一一个向量，做这个变换等于和那个向量做点积。数值上，这种变换由只有一行的矩阵描述，每列是一个基向量落到的数；用这个矩阵乘向量 <span class="m"><i>v</i></span>，和把矩阵立起来得到的向量与 <span class="m"><i>v</i></span> 做点积，计算上完全一样。</p>
-      <p>所以在数学的野外只要遇到一个到数轴的线性变换，就能把它配上一个向量，叫这个变换的<b>对偶向量 (Dual Vector)</b>。叉积就是这个过程的一个例子。</p>
+      <p>所以以后在别处只要遇到一个到数轴的线性变换，就能把它配上一个向量，叫这个变换的<b>对偶向量 (Dual Vector)</b>。叉积就是这个过程的一个例子。</p>
       <p>计划是：定义一个从三维到数轴的线性变换，它由 <span class="m"><i>v</i></span>、<span class="m"><i>w</i></span> 定义；然后找它在三维空间里的对偶向量，这个对偶向量就是 <span class="m"><i>v</i> × <i>w</i></span>。理解这个变换，就能看清叉积的计算和几何之间的联系。</p>
       
       
@@ -1428,7 +1428,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>先从计算上看。<span class="m"><i>p</i></span> 与 <span class="m">(<i>x</i>, <i>y</i>, <i>z</i>)</span> 的点积是 <span class="m"><i>p</i>₁<i>x</i> + <i>p</i>₂<i>y</i> + <i>p</i>₃<i>z</i></span>，三个系数就是 <span class="m"><i>p</i></span> 的坐标。右边的行列式展开后，也能整理成「某个常数乘 <span class="m"><i>x</i></span> + 某个常数乘 <span class="m"><i>y</i></span> + 某个常数乘 <span class="m"><i>z</i></span>」，这些常数是 <span class="m"><i>v</i></span>、<span class="m"><i>w</i></span> 分量的特定组合：</p>
       <p><span class="m"><i>x</i>(<i>v</i>₂<i>w</i>₃ − <i>v</i>₃<i>w</i>₂) + <i>y</i>(<i>v</i>₃<i>w</i>₁ − <i>v</i>₁<i>w</i>₃) + <i>z</i>(<i>v</i>₁<i>w</i>₂ − <i>v</i>₂<i>w</i>₁)</span></p>
       <p>所以这三个组合就是 <span class="m"><i>p</i></span> 的坐标。对做过叉积计算的人来说这很眼熟：把乘在 <span class="m"><i>x</i></span>、<span class="m"><i>y</i></span>、<span class="m"><i>z</i></span> 上的常数项收集起来，和在第一列填 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span>、看哪些系数聚在哪个基向量上，是同一回事。填 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span> 只是提示我们：这些系数要解读成一个向量的坐标。</p>
-      <p>所以那个怪计算回答的问题是：什么样的向量 <span class="m"><i>p</i></span>，和任意 <span class="m">(<i>x</i>, <i>y</i>, <i>z</i>)</span> 点积的结果，等于把 <span class="m">(<i>x</i>, <i>y</i>, <i>z</i>)</span> 放进第一列、另两列是 <span class="m"><i>v</i></span>、<span class="m"><i>w</i></span> 时的行列式？</p>
+      <p>所以那个奇怪的计算回答的问题是：什么样的向量 <span class="m"><i>p</i></span>，和任意 <span class="m">(<i>x</i>, <i>y</i>, <i>z</i>)</span> 点积的结果，等于把 <span class="m">(<i>x</i>, <i>y</i>, <i>z</i>)</span> 放进第一列、另两列是 <span class="m"><i>v</i></span>、<span class="m"><i>w</i></span> 时的行列式？</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/cross-products-extended-7m55s0.jpg" alt="展开行列式，按 x、y、z 整理系数" loading="lazy" decoding="async">
@@ -1564,7 +1564,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="619">10:19</button>验算，以及推广</h4>
       <p>代数字验算：视频里 <span class="m"><i>A</i> = </span> <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>2</span><span>−1</span><span>0</span><span>1</span></span>，输出 <span class="m">(4, 2)</span>。上面那个换列矩阵 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>4</span><span>−1</span><span>2</span><span>1</span></span> 的行列式是 <span class="m">4 + 2 = 6</span>，<span class="m">det(<i>A</i>) = 2</span>，所以 <span class="m"><i>x</i> = 3</span>，和一开始的输入向量一致。<span class="m"><i>y</i> = det</span><span class="mx" style="grid-template-columns:repeat(2,auto)"><span>2</span><span>4</span><span>0</span><span>2</span></span><span class="m"> / 2 = 4 / 2 = 2</span>，也对。</p>
       <p>三维及更高维类似，作者强烈建议暂停自己推一遍。已知一个 3×3 矩阵给出的变换和方程组右边给出的输出向量，想知道哪个输入落在这个输出上。</p>
-      <p>把输入向量的 z 坐标想成 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 和它张成的平行六面体的体积：变换后这个体积怎么变？有哪些方法能算出它？作者说，自己想清楚为什么成立，比听某个 YouTube 上的家伙再讲一遍有用得多。</p>
+      <p>把输入向量的 z 坐标想成 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 和它张成的平行六面体的体积：变换后这个体积怎么变？有哪些方法能算出它？作者说，自己想清楚为什么成立，比看视频听别人再讲一遍有用得多。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/cramers-rule-10m30s0.jpg" alt="代入：x = 6 / 2 = 3" loading="lazy" decoding="async">
@@ -1782,7 +1782,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
         <a href="https://www.youtube.com/watch?v=PFDu9oVAE-g" target="_blank" rel="noreferrer">YouTube 第 14 章 · 2016-09-16 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="79">1:19</button>留在自己张成的直线上的向量</h4>
-      <p>看一个二维线性变换：<span class="m"><i class="ih">î</i></span> 移到 <span class="m">(3, 0)</span>，<span class="m"><i class="jh">ĵ</i></span> 移到 <span class="m">(1, 2)</span>，矩阵是 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>3</span><span>1</span><span>0</span><span>2</span></span>。盯住某一个向量，看它张成的空间，也就是过原点和它终点的那条直线。变换中，多数向量会被「撞离」这条直线：如果它的落点恰好还在这条线上，就太巧了。</p>
+      <p>看一个二维线性变换：<span class="m"><i class="ih">î</i></span> 移到 <span class="m">(3, 0)</span>，<span class="m"><i class="jh">ĵ</i></span> 移到 <span class="m">(1, 2)</span>，矩阵是 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>3</span><span>1</span><span>0</span><span>2</span></span>。盯住某一个向量，看它张成的空间，也就是过原点和它终点的那条直线。变换中，多数向量会偏离这条直线：如果它的落点恰好还在这条线上，就太巧了。</p>
       <p>但有些特殊向量会留在自己的张成空间上，矩阵对它的作用只是拉伸或压缩，像一个标量。这个例子里，<span class="m"><i class="ih">î</i></span> 就是一个：它张成的是 x 轴，从矩阵第一列能看出 <span class="m"><i class="ih">î</i></span> 变成了自己的 3 倍，仍在 x 轴上。由线性，x 轴上其他向量也都只是被拉伸 3 倍，都留在自己的直线上。</p>
       <p>稍隐蔽一点的是 <span class="m">(−1, 1)</span>，它被拉伸 2 倍；同样由线性，它张成的那条对角线上的所有向量都被拉伸 2 倍。对这个变换，具有这种性质的只有这两条线上的向量：x 轴上的拉伸 3 倍，对角线上的拉伸 2 倍。其他所有向量都会被转一点，离开它张成的直线。</p>
       
@@ -1859,7 +1859,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="783">13:03</button>特征基与对角化</h4>
       <p>最后一个话题是特征基，大量用到上一集的基变换。如果基向量恰好都是特征向量，比如 <span class="m"><i class="ih">î</i></span> 被乘 −1，<span class="m"><i class="jh">ĵ</i></span> 被乘 2。把新坐标写成矩阵的列，这两个倍数，也就是 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 的特征值，落在对角线上，其余全是 0。</p>
       <p>除对角线外都是零的矩阵叫<b>对角矩阵 (Diagonal Matrix)</b>，它的意思是：所有基向量都是特征向量，对角元素就是它们的特征值。</p>
-      <p>对角矩阵有很多好处，最大的一个是容易算它乘自己很多次：它做的只是把每个基向量乘上一个特征值，乘 100 次就是把每个基向量乘上特征值的 100 次方。反过来，试试算一个非对角矩阵的 100 次幂，真的试一下，那是一场噩梦。</p>
+      <p>对角矩阵有很多好处，最大的一个是容易算它乘自己很多次：它做的只是把每个基向量乘上一个特征值，乘 100 次就是把每个基向量乘上特征值的 100 次方。反过来，一个非对角矩阵的 100 次幂，作者建议真去算一下，会很痛苦。</p>
       <p>基向量恰好是特征向量的情况很少见。但如果变换有足够多的特征向量，多到能选出一组张成整个空间（比如开头那个例子），就可以换一个坐标系，让这些特征向量当基向量。</p>
       <p>按上一集的办法：把新基向量（这里是两个特征向量）的坐标作为列，得到基变换矩阵；把原变换夹在中间，右边放基变换矩阵、左边放它的逆，结果就是同一个变换在新基坐标系下的矩阵。</p>
       <p>用特征向量做这件事的意义在于：新矩阵一定是对角的，对角线上是对应的特征值。因为在这个坐标系里，变换对基向量做的就只是缩放。由特征向量组成的一组基叫<b>特征基 (Eigenbasis)</b>。</p>
@@ -2081,7 +2081,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="778">12:58</button>公理是一个接口</h4>
       <p>这些公理与其说是自然的基本规律，不如说是一个接口：一边是发现结论的你（数学家），一边是想把结论用到新向量空间上的其他人。</p>
-      <p>比如有人定义了一种疯狂的向量空间，所有 π 小人组成的集合，配上某种 π 小人的加法和数乘，公理就是他们开始使用线性代数结论前要核对的清单。你不必考虑所有可能的奇怪向量空间，只要用公理证明结论，定义满足公理的人就能放心使用，哪怕你从没想过他们的情形。</p>
+      <p>比如有人定义了一种古怪的向量空间，所有 π 小人组成的集合，配上某种 π 小人的加法和数乘，公理就是他们开始使用线性代数结论前要核对的清单。你不必考虑所有可能的奇怪向量空间，只要用公理证明结论，定义满足公理的人就能放心使用，哪怕你从没想过他们的情形。</p>
       <p>因此结论都倾向于写得很抽象，只用公理表述，而不围绕某种具体的向量。这就是为什么几乎每本教科书都用可加性和成比例来定义线性变换，而不说网格线保持平行等距，哪怕后者更直观，作者认为对初学者也更有帮助，虽然它只适用于一种情况。</p>
       <p>所以数学家对「向量是什么」的回答是：不管这个问题。在现代理论里，向量的形态无关紧要，箭头、数字列表、函数、π 小人都行，只要有满足这些规则的加法和数乘。</p>
       <p>就像问「3 是什么」：它具体出现时总是某三个东西，但在数学里，它被当作所有三元组的抽象，让你用一个概念推理所有三元组。向量也一样，有很多化身，数学把它们抽象成一个无形的概念：向量空间。</p>
