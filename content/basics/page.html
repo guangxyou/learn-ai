@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>基础概念 · 线性代数的本质 17 集视频笔记，以及 AI 里用到的线性代数</title>
-<meta name="description" content="两个 tab。「线性代数的本质」是 3Blue1Brown 17 集视频的分节笔记：把矩阵看成对空间的变换，从向量、基、线性变换一路讲到行列式、逆矩阵与秩、点积与对偶、叉积、基变换、特征值、抽象向量空间，时间码点了跳到 B 站视频那一秒，配 265 张去掉字幕的截图。「AI 中的线性代数」按概念讲这些东西在模型里出现在哪：嵌入、线性层、注意力的形状、LoRA 的低秩、RNN 的特征值、RoPE 的旋转矩阵、LayerNorm 的投影、反向传播的乘法顺序，每节配能手算的小例子，并链接回对应的那一集。「延伸资料」收了杨松琳推荐的 Gilbert Strang 的 MIT 18.06 和 18.065（附 B 站中文字幕版），以及苏剑林在科学空间讲线性代数的两批文章，每条都标了对应前两个 tab 的哪一节。">
+<title>基础概念 · 线性代数、微积分的本质视频笔记，以及它们在 AI 里的用法</title>
+<meta name="description" content="五个 tab。「线性代数的本质」和「微积分的本质」是 3Blue1Brown 两个系列共 29 集的分节笔记，时间码点了跳到 B 站视频那一秒，配 406 张去掉字幕的截图；B 站合集里缺的集已经补上。「AI 中的线性代数」「AI 中的微积分」按概念讲这些东西在模型和训练里出现在哪：嵌入、注意力的形状、LoRA 的低秩、RoPE，梯度下降、反向传播、softmax 与交叉熵、学习率的稳定性、按速度一步步采样的生成模型，每节配能手算的小例子并链接回对应的那一集。「线性代数延伸资料」收了杨松琳推荐的 Gilbert Strang 的课和苏剑林讲线性代数的文章。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -233,6 +233,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
 .exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
 .exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
 </style></head><body>
 <div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
 <div class="wrap"><header class="ep-head">
@@ -242,7 +248,9 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
   <button class="tb on" type="button" role="tab" data-v="linalg" aria-selected="true">线性代数的本质</button>
   <button class="tb" type="button" role="tab" data-v="ai" aria-selected="false">AI 中的线性代数</button>
-  <button class="tb" type="button" role="tab" data-v="more" aria-selected="false">延伸资料</button>
+  <button class="tb" type="button" role="tab" data-v="more" aria-selected="false">线性代数延伸资料</button>
+  <button class="tb" type="button" role="tab" data-v="calc" aria-selected="false">微积分的本质</button>
+  <button class="tb" type="button" role="tab" data-v="aicalc" aria-selected="false">AI 中的微积分</button>
 </div></div></nav>
 <main class="wrap">
 <div class="view on" id="view-linalg">
@@ -350,7 +358,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </div>
   <div class="eptools"><span>17 集 · 3 小时 6 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
-  <details class="ep" id="ch0" data-ch="0" data-bv="BV1ys411472E" data-p="1">
+  <details class="ep" id="ch0" data-ch="0" data-sk="ch0" data-bv="BV1ys411472E" data-p="1">
   <summary>
     <span class="no">0</span>
     <span class="tt"><b>序言</b><em>Essence of linear algebra preview</em><span class="hook">为什么要做这个系列：学线性代数的人常常会算、不懂几何意义，而几何直觉才是判断用什么工具的依据。</span></span>
@@ -424,7 +432,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch1" data-ch="1" data-bv="BV1ys411472E" data-p="2">
+<details class="ep" id="ch1" data-ch="1" data-sk="ch1" data-bv="BV1ys411472E" data-p="2">
   <summary>
     <span class="no">1</span>
     <span class="tt"><b>向量究竟是什么</b><em>Vectors</em><span class="hook">向量有三种看法：箭头、数字列表、能相加能数乘的任何东西。线性代数的用处在于这几种看法之间来回翻译。</span></span>
@@ -529,7 +537,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch2" data-ch="2" data-bv="BV1ys411472E" data-p="3">
+<details class="ep" id="ch2" data-ch="2" data-sk="ch2" data-bv="BV1ys411472E" data-p="3">
   <summary>
     <span class="no">2</span>
     <span class="tt"><b>线性组合、张成的空间与基</b><em>Linear combinations, span, and basis vectors</em><span class="hook">坐标是缩放基向量的标量；缩放再相加叫线性组合，能到达的全部向量叫张成的空间；多余的向量叫线性相关。</span></span>
@@ -647,7 +655,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch3" data-ch="3" data-bv="BV1ys411472E" data-p="4">
+<details class="ep" id="ch3" data-ch="3" data-sk="ch3" data-bv="BV1ys411472E" data-p="4">
   <summary>
     <span class="no">3</span>
     <span class="tt"><b>矩阵与线性变换</b><em>Linear transformations and matrices</em><span class="hook">整个系列最关键的一集：线性变换只要记住 î 和 ĵ 落在哪，矩阵的两列就是这两个落点，矩阵乘向量就是按坐标把两列缩放再相加。</span></span>
@@ -759,7 +767,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch4" data-ch="4" data-bv="BV1ys411472E" data-p="5">
+<details class="ep" id="ch4" data-ch="4" data-sk="ch4" data-bv="BV1ys411472E" data-p="5">
   <summary>
     <span class="no">4</span>
     <span class="tt"><b>矩阵乘法与线性变换复合</b><em>Matrix multiplication as composition</em><span class="hook">两个矩阵相乘 = 先做右边的变换，再做左边的变换。按这个意思去算，乘法公式、不满足交换律、满足结合律都是顺理成章的事。</span></span>
@@ -886,7 +894,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch5" data-ch="5" data-bv="BV1ys411472E" data-p="6">
+<details class="ep" id="ch5" data-ch="5" data-sk="ch5" data-bv="BV1ys411472E" data-p="6">
   <summary>
     <span class="no">5</span>
     <span class="tt"><b>三维空间中的线性变换</b><em>Three-dimensional linear transformations</em><span class="hook">附注 1：二维的全部结论原样推广到三维，基向量多一个 k̂，矩阵变成 3×3，九个数描述一个变换。</span></span>
@@ -947,7 +955,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch6" data-ch="6" data-bv="BV1ys411472E" data-p="7">
+<details class="ep" id="ch6" data-ch="6" data-sk="ch6" data-bv="BV1ys411472E" data-p="7">
   <summary>
     <span class="no">6</span>
     <span class="tt"><b>行列式</b><em>The determinant</em><span class="hook">行列式 = 变换把面积（三维是体积）缩放了多少倍；负号表示空间被翻了面；等于 0 表示空间被压到了更低维。</span></span>
@@ -1084,7 +1092,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch7" data-ch="7" data-bv="BV1ys411472E" data-p="8">
+<details class="ep" id="ch7" data-ch="7" data-sk="ch7" data-bv="BV1ys411472E" data-p="8">
   <summary>
     <span class="no">7</span>
     <span class="tt"><b>逆矩阵、列空间与零空间</b><em>Inverse matrices, column space and null space</em><span class="hook">把线性方程组看成「哪个向量被变换到 v」，逆矩阵、秩、列空间、零空间都从这一个画面里长出来。</span></span>
@@ -1210,7 +1218,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch8" data-ch="8" data-bv="BV1ys411472E" data-p="9">
+<details class="ep" id="ch8" data-ch="8" data-sk="ch8" data-bv="BV1ys411472E" data-p="9">
   <summary>
     <span class="no">8</span>
     <span class="tt"><b>非方阵</b><em>Nonsquare matrices as transformations between dimensions</em><span class="hook">附注 2：m×n 矩阵把 n 维空间映射到 m 维空间。列数 = 输入维数（有几个基向量），行数 = 输出维数（每个落点用几个坐标描述）。</span></span>
@@ -1289,7 +1297,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch9" data-ch="9" data-bv="BV1ys411472E" data-p="10">
+<details class="ep" id="ch9" data-ch="9" data-sk="ch9" data-bv="BV1ys411472E" data-p="10">
   <summary>
     <span class="no">9</span>
     <span class="tt"><b>点积与对偶性</b><em>Dot products and duality</em><span class="hook">点积 = 投影长度 × 被投影到的向量长度。更深一层：和一个向量做点积，就是做一个从二维到数轴的线性变换，这叫对偶性。</span></span>
@@ -1418,7 +1426,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch10" data-ch="10" data-bv="BV1ys411472E" data-p="11">
+<details class="ep" id="ch10" data-ch="10" data-sk="ch10" data-bv="BV1ys411472E" data-p="11">
   <summary>
     <span class="no">10</span>
     <span class="tt"><b>叉积的标准介绍</b><em>Cross products</em><span class="hook">叉积的标准介绍：二维里是平行四边形的有向面积（一个数），三维里是一个向量，长度等于面积、方向垂直于两个向量、服从右手定则。</span></span>
@@ -1506,7 +1514,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch11" data-ch="11" data-bv="BV1ys411472E" data-p="12">
+<details class="ep" id="ch11" data-ch="11" data-sk="ch11" data-bv="BV1ys411472E" data-p="12">
   <summary>
     <span class="no">11</span>
     <span class="tt"><b>以线性变换的眼光看叉积</b><em>Cross products in the light of linear transformations</em><span class="hook">为什么把 î、ĵ、k̂ 塞进行列式就能算出叉积：定义一个「v、w 固定，输入 (x, y, z)，输出平行六面体有向体积」的线性变换，它的对偶向量从计算看是那个行列式，从几何看就是叉积。</span></span>
@@ -1617,7 +1625,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch12" data-ch="12" data-bv="BV1ys411472E" data-p="16">
+<details class="ep" id="ch12" data-ch="12" data-sk="ch12" data-bv="BV1ys411472E" data-p="16">
   <summary>
     <span class="no">12</span>
     <span class="tt"><b>克莱姆法则的几何解释</b><em>Cramer's rule, explained geometrically</em><span class="hook">2019 年补拍：把未知向量的坐标 y 看成它和 î 张成的平行四边形面积，变换后面积乘 det(A)，所以 y = det(把 A 第二列换成 v) / det(A)。</span></span>
@@ -1732,7 +1740,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch13" data-ch="13" data-bv="BV1ys411472E" data-p="13">
+<details class="ep" id="ch13" data-ch="13" data-sk="ch13" data-bv="BV1ys411472E" data-p="13">
   <summary>
     <span class="no">13</span>
     <span class="tt"><b>基变换</b><em>Change of basis</em><span class="hook">同一个向量，换一组基就换一组坐标。基变换矩阵 A 把「她的语言」翻译成「我们的语言」；一个变换在她的坐标系里写作 A⁻¹MA。</span></span>
@@ -1924,7 +1932,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch14" data-ch="14" data-bv="BV1ys411472E" data-p="14">
+<details class="ep" id="ch14" data-ch="14" data-sk="ch14" data-bv="BV1ys411472E" data-p="14">
   <summary>
     <span class="no">14</span>
     <span class="tt"><b>特征向量与特征值</b><em>Eigenvectors and eigenvalues</em><span class="hook">特征向量 = 变换后仍留在自己张成的直线上的向量，特征值 = 它被拉伸的倍数。求法 det(A − λI) = 0 用到的全是前面几章的东西；用特征向量当基，矩阵就变成对角矩阵。</span></span>
@@ -2046,7 +2054,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch15" data-ch="15" data-bv="BV12K4y1A7NA">
+<details class="ep" id="ch15" data-ch="15" data-sk="ch15" data-bv="BV12K4y1A7NA">
   <summary>
     <span class="no">15</span>
     <span class="tt"><b>计算二阶矩阵特征值的妙计</b><em>A quick trick for computing eigenvalues</em><span class="hook">2021 年补的一集：2×2 矩阵的特征值 = m ± √(m² − p)，m 是对角元素的平均值，p 是行列式。看着矩阵就能直接写出答案。</span></span>
@@ -2144,7 +2152,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch16" data-ch="16" data-bv="BV1ys411472E" data-p="15">
+<details class="ep" id="ch16" data-ch="16" data-sk="ch16" data-bv="BV1ys411472E" data-p="15">
   <summary>
     <span class="no">16</span>
     <span class="tt"><b>抽象向量空间</b><em>Abstract vector spaces</em><span class="hook">最后一集回到「向量是什么」：函数也能相加、数乘，所以也是向量；求导是线性变换，能写成无穷矩阵。数学家的回答是：满足八条公理的任何东西都行。</span></span>
@@ -2603,6 +2611,1281 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     
   </article></section>
 </div></div>
+<div class="view" id="view-calc">
+  <div class="intro"><h2>微积分的本质 · 3Blue1Brown</h2>
+<p>Grant Sanderson 在 2017 年 4 月底到 5 月初每天一集发完前 11 集，2018-05-19 又补了第 12 集，一共 12 集、3 小时 17 分。目标和线代系列一样：把求导法则、链式法则、隐函数求导、积分与导数互逆、泰勒级数这些常被当成公式背的东西，讲成「你自己也能发明出来」的样子。全系列贯穿一个想法：<b>把 dx 当成一个具体的、非零的微小推动</b>，看它引起多大的变化，最后再问它趋近于 0 时的情况。</p>
+<p>用法和「线性代数的本质」一样：每集一张卡，点标题展开，小节标题前和右侧时间轴上的时间码都能点。「AI 中的微积分」那个 tab 会链接回这里的各集。</p>
+
+<div class="check">
+  <h3>B 站版本和 YouTube 对过了</h3>
+  <ul>
+    <li>B 站官方合集 <a href="https://www.bilibili.com/video/BV1qW411N7FU" target="_blank" rel="noreferrer">BV1qW411N7FU</a> 有 11 个分 P，对应 YouTube 第 1 到 11 章。B 站的编号到 10 为止：第 10 章「高阶导数」在 B 站叫「09 脚注」，第 11 章「泰勒级数」在 B 站编 10。</li>
+    <li>合集里缺第 12 章「导数的另一种可视化」（2018 年补的）。官方号单独投稿过，标题是「你在微积分课上学不到的知识」，<a href="https://www.bilibili.com/video/BV1XW411P75q" target="_blank" rel="noreferrer">BV1XW411P75q</a>，这里已经补上。</li>
+    <li>有 4 集（第 2、3、4、12 章）B 站版比 YouTube 长 56 到 117 秒。每 4 秒抽一帧，用 OCR 读压制的英文字幕、对官方字幕，12 集全程偏移都在 1 秒以内，多出来的部分都在片尾，是后来 YouTube 版剪掉的赞助商口播。所以时间码两边通用。</li>
+    <li>B 站这个合集最高只有 720p。</li>
+  </ul>
+</div>
+</div>
+  <div class="eptools"><span>12 集 · 3 小时 17 分 · 点标题展开</span>
+    <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <details class="ep" id="calc1" data-ch="1" data-sk="calc1" data-bv="BV1qW411N7FU" data-p="1">
+  <summary>
+    <span class="no">1</span>
+    <span class="tt"><b>微积分的本质</b><em>The essence of calculus</em><span class="hook">从圆的面积出发，一口气碰到微积分的三个核心：积分（切细再加起来）、导数（微小变化之比）、以及两者互为逆运算。</span></span>
+    <span class="side"><span class="chip">B 站 P1 · 01</span><span class="len">17:04</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">系列第一集不讲具体规则，先让你体会「自己也能发明微积分」。作者用一个几何问题引路：圆的面积为什么是 <span class="m"><i>π</i><i>R</i>²</span>。把圆切成同心圆环，每个环近似成细长方形，面积之和就变成一个图形下方的面积；再追问「一般的曲线下面积怎么求」，就碰到了导数，以及积分和导数互为逆运算这件事，也就是微积分基本定理。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=1" target="_blank" rel="noreferrer">B 站 P1：01 ↗</a>
+        <a href="https://www.youtube.com/watch?v=WUvTyaaNkzM" target="_blank" rel="noreferrer">YouTube 第 1 章 · 2017-04-28 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="86">1:26</button>从圆的面积开始</h4>
+      <p>作者的目标是让你觉得这些规则本来可以由你自己发现，而不是一堆要背的公式。第一集只看一个问题：半径为 3 的圆，面积为什么是 <span class="m"><i>π</i> × 3²</span>。</p>
+      <p>在很多种切法里，有一种尊重圆的对称性：切成一圈圈同心圆环。取其中一个内半径为 <span class="m"><i>r</i></span>（在 0 到 3 之间）的圆环，如果能写出每个圆环的面积，再有办法把它们加起来，也许就能得到整个圆的面积。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-2m55s0.jpg" alt="把一个圆环拉直，它的形状接近一个细长方形" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="176">2:56</button>把一个圆环拉直，它的形状接近一个细长方形</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="166">2:46</button>一个圆环 ≈ 一个细长方形</h4>
+      <p>把圆环拉直，严格说是个梯形，为简单起见近似成长方形。长方形的宽是圆环的周长 <span class="m">2<i>π</i><i>r</i></span>，厚度取决于你切得多细，记作 <span class="m"><i>d</i><i>r</i></span>，比如 0.1。于是每个圆环的面积约为 <span class="m">2<i>π</i><i>r</i> · <i>d</i><i>r</i></span>。</p>
+      <p>这个近似不完全对，但 <span class="m"><i>d</i><i>r</i></span> 越小越准，因为拉直后的上下两条边会越来越接近等长。所以先带着这个近似往下走，心里记着它「稍微有点错，但切得越细错得越少」。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-3m32s0.jpg" alt="每个圆环面积 ≈ 2πr · dr，dr 比如取 0.1" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="212">3:32</button>每个圆环面积 ≈ 2πr · dr，dr 比如取 0.1</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="282">4:42</button>长方形排起来，就是一个三角形</h4>
+      <p>把代表各个圆环的细长方形竖着并排放在 <span class="m"><i>r</i></span> 轴上。每个宽 <span class="m"><i>d</i><i>r</i></span>，所以正好挨着；坐在 <span class="m"><i>r</i></span> 处的那个，高度是 <span class="m">2<i>π</i><i>r</i></span>。画出 <span class="m">2<i>π</i><i>r</i></span> 的图像，它是一条斜率为 <span class="m">2<i>π</i></span> 的直线，每个长方形的顶端都刚好碰到这条线。</p>
+      <p><span class="m"><i>d</i><i>r</i></span> 越来越小，长方形越来越多，每个的面积算起来越来越麻烦。但它们的总面积看起来就是图像下方的面积，而这一块恰好是个三角形：底 3、高 <span class="m">2<i>π</i> · 3</span>，面积 <span class="m">½ × 3 × 2<i>π</i> · 3 = <i>π</i> · 3²</span>。半径是 <span class="m"><i>R</i></span> 的话，就是 <span class="m"><i>π</i><i>R</i>²</span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-4m45s0.jpg" alt="把近似圆环的长方形竖着排在 r 轴上" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="285">4:45</button>把近似圆环的长方形竖着排在 r 轴上</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-5m26s0.jpg" alt="长方形的顶端贴着 2πr 的图像" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="326">5:26</button>长方形的顶端贴着 2πr 的图像</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-6m33s0.jpg" alt="图像下方是三角形：½ · 3 · 2π·3 = π·3²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="393">6:33</button>图像下方是三角形：½ · 3 · 2π·3 = π·3²</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="410">6:50</button>刚才发生了什么</h4>
+      <p>作者要你停下来想一想，从近似走到精确这一步很微妙，也是微积分的核心。原问题可以近似成许多小数值之和，每一项形如 <span class="m">2<i>π</i><i>r</i> · <i>d</i><i>r</i></span>，<span class="m"><i>r</i></span> 从 0 取到 3。这里有两点要注意：<span class="m"><i>d</i><i>r</i></span> 既是每一项里的一个因子，也是相邻 <span class="m"><i>r</i></span> 值之间的间隔；<span class="m"><i>d</i><i>r</i></span> 越小，近似越好。</p>
+      <p>这个和可以换个角度看成许多细长方形的面积之和。<span class="m"><i>d</i><i>r</i></span> 越来越小时，这个和趋近于图像下方的面积。所以原问题的精确答案，就等于图像下方的面积。</p>
+      <p>许多难题都能这样拆成「许多小量之和」，比如只知道汽车每个时刻的速度，求它走了多远：在每个时刻把速度乘上一小段时间 <span class="m"><i>d</i><i>t</i></span>，得到那一小段走过的距离，再全部加起来。只要加起来的每一项能看成并排细长方形的面积，原问题就等价于求某个图像下方的面积。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-8m08s0.jpg" alt="关键一步：dr 越来越小，和就趋近于图像下方的面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="488">8:08</button>关键一步：dr 越来越小，和就趋近于图像下方的面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-8m50s0.jpg" alt="难题拆成许多小量之和：比如速度乘以一小段时间 v(t)dt" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="530">8:50</button>难题拆成许多小量之和：比如速度乘以一小段时间 v(t)dt</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="595">9:55</button>曲线下的面积：积分</h4>
+      <p>圆的问题里运气好，面积正好是三角形。换成抛物线 <span class="m"><i>x</i>²</span>，从 0 到 3 下方的面积是多少？不好想。换个问法：固定左端点在 0，让右端点变化，能不能找到一个函数 <span class="m"><i>A</i>(<i>x</i>)</span>，给出 0 到 <span class="m"><i>x</i></span> 之间抛物线下方的面积？这样的 <span class="m"><i>A</i>(<i>x</i>)</span> 叫作 <span class="m"><i>x</i>²</span> 的<b>积分 (Integral)</b>。</p>
+      <p>作者说求这个函数很难。遇到难题的一个好办法是不要硬冲答案，而是先玩一玩，熟悉一下「定义图像的函数 <span class="m"><i>x</i>²</span>」和「给出面积的函数 <span class="m"><i>A</i>(<i>x</i>)</span>」之间的关系。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-10m08s0.jpg" alt="x² 从 0 到 3 下方的面积是多少" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="608">10:08</button>x² 从 0 到 3 下方的面积是多少</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-10m38s0.jpg" alt="面积函数 A(x) 叫 x² 的积分" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="638">10:38</button>面积函数 A(x) 叫 x² 的积分</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="704">11:44</button>推一下 x，看面积怎么变：导数</h4>
+      <p>把 <span class="m"><i>x</i></span> 增加一点点 <span class="m"><i>d</i><i>x</i></span>，面积多出一条细条，记作 <span class="m"><i>d</i><i>A</i></span>。这个细条很接近一个长方形，高 <span class="m"><i>x</i>²</span>、宽 <span class="m"><i>d</i><i>x</i></span>，所以 <span class="m"><i>d</i><i>A</i> ≈ <i>x</i>² · <i>d</i><i>x</i></span>。换个写法：<span class="m"><i>d</i><i>A</i> / <i>d</i><i>x</i> ≈ <i>x</i>²</span>，<span class="m"><i>d</i><i>x</i></span> 越小越准。</p>
+      <p>我们还不知道 <span class="m"><i>A</i>(<i>x</i>)</span> 是什么，但知道它必须满足的一个性质。比如在 3 和 3.001 两点，<span class="m"><i>A</i></span> 的变化量除以 0.001，应该约等于 <span class="m">3²</span>；而且对所有输入都成立。任何「某个图像下方面积」的函数都有这个性质：输出的微小变化除以输入的微小变化，约等于那一点图像的高度。</p>
+      <p>这个比值 <span class="m"><i>d</i><i>A</i>/<i>d</i><i>x</i></span> 叫作 <span class="m"><i>A</i></span> 的<b>导数 (Derivative)</b>，更准确地说，是 <span class="m"><i>d</i><i>x</i></span> 越来越小时这个比值趋近的值。粗略地讲，导数衡量的是函数对输入的微小变化有多敏感。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-11m52s0.jpg" alt="把 x 推一点点 dx，面积多出一条细条 dA" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="712">11:52</button>把 x 推一点点 dx，面积多出一条细条 dA</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-12m38s0.jpg" alt="细条近似长方形：dA ≈ x² dx，即 dA/dx ≈ x²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="758">12:38</button>细条近似长方形：dA ≈ x² dx，即 dA/dx ≈ x²</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-14m20s0.jpg" alt="dA/dx 叫 A 的导数；dx → 0 时越来越准" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="861">14:21</button>dA/dx 叫 A 的导数；dx → 0 时越来越准</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="904">15:04</button>微积分基本定理</h4>
+      <p>导数是求解积分问题的钥匙。熟练求导以后，遇到「不知道函数是什么，只知道它的导数应该是 <span class="m"><i>x</i>²</span>」的情况，就能反推出这个函数。</p>
+      <p>这种来回关系叫<b>微积分基本定理 (Fundamental Theorem of Calculus)</b>：一个「图像下方面积」函数的导数，就是定义这个图像的函数本身。它把积分和导数这两个大概念连起来，说明两者互为逆运算。后面的集数讲这些概念的细节。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-15m40s0.jpg" alt="微积分基本定理：积分和导数互为逆运算" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="940">15:40</button>微积分基本定理：积分和导数互为逆运算</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>难题拆成许多小量之和（每项像 <span class="m"><i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span>），切得越细越准，和的极限就是图像下方的面积，这就是积分。</li><li>面积函数的微小变化 <span class="m"><i>d</i><i>A</i> ≈ <i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span>，所以 <span class="m"><i>d</i><i>A</i>/<i>d</i><i>x</i> = <i>f</i>(<i>x</i>)</span>：导数是输出的微小变化与输入的微小变化之比的极限。</li><li>面积函数的导数等于原函数：积分和导数互为逆运算（微积分基本定理）。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/essence-of-calculus-2m55s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=1" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="14"><b>0:14</b><span>系列目标：让你觉得自己也能发明微积分</span></button></li><li><button type="button" data-t="86"><b>1:26</b><span>引子：圆的面积为什么是 πR²</span></button></li><li><button type="button" data-t="125"><b>2:05</b><span>把圆切成同心圆环</span></button></li><li><button type="button" data-t="166"><b>2:46</b><span>把一个圆环拉直，近似成长方形</span></button></li><li><button type="button" data-t="208"><b>3:28</b><span>每个圆环的面积 ≈ 2πr·dr</span></button></li><li><button type="button" data-t="282"><b>4:42</b><span>把这些长方形竖着排在 r 轴上</span></button></li><li><button type="button" data-t="323"><b>5:23</b><span>它们的顶端贴着 2πr 的图像</span></button></li><li><button type="button" data-t="370"><b>6:10</b><span>长方形面积之和趋近于三角形面积 πR²</span></button></li><li><button type="button" data-t="410"><b>6:50</b><span>回头想想刚才发生了什么</span></button></li><li><button type="button" data-t="510"><b>8:30</b><span>很多难题都能拆成许多小量之和</span></button></li><li><button type="button" data-t="595"><b>9:55</b><span>换一条曲线：x² 下方的面积</span></button></li><li><button type="button" data-t="635"><b>10:35</b><span>面积函数 A(x) 叫 x² 的积分</span></button></li><li><button type="button" data-t="704"><b>11:44</b><span>把 x 推一点点，看面积变化 dA</span></button></li><li><button type="button" data-t="754"><b>12:34</b><span>dA/dx ≈ x²</span></button></li><li><button type="button" data-t="851"><b>14:11</b><span>这个比值叫导数</span></button></li><li><button type="button" data-t="904"><b>15:04</b><span>积分和导数互为逆运算：微积分基本定理</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc2" data-ch="2" data-sk="calc2" data-bv="BV1qW411N7FU" data-p="2">
+  <summary>
+    <span class="no">2</span>
+    <span class="tt"><b>导数的悖论</b><em>The paradox of the derivative</em><span class="hook">「瞬时变化率」自相矛盾：变化需要两个时刻。导数是 dt 趋近于 0 时 ds/dt 趋近的值，最好理解为某一点附近变化率的最佳常数近似。</span></span>
+    <span class="side"><span class="chip">B 站 P2 · 02</span><span class="len">18:38</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">人们常说导数是「瞬时变化率」，作者指出这个说法本身是矛盾的：变化发生在两个时刻之间，只看一个瞬间就谈不上变化。这一集用一辆车的运动讲清导数的定义：先看一小段时间里的平均速度 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span>，再问 <span class="m"><i>d</i><i>t</i></span> 趋近于 0 时它趋近什么。几何上这是切线的斜率。然后用 <span class="m"><i>t</i>³</span> 算一个具体的导数，说明「取极限」反而让计算变简单，最后用「车在 <span class="m"><i>t</i> = 0</span> 时动没动」这个悖论说明瞬时变化率只是一个简称。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=2" target="_blank" rel="noreferrer">B 站 P2：02 - 导数的悖论 ↗</a>
+        <a href="https://www.youtube.com/watch?v=9vKqVkMQHKk" target="_blank" rel="noreferrer">YouTube 第 2 章 · 2017-04-30 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="31">0:31</button>「瞬时变化率」自相矛盾</h4>
+      <p>常听到的说法是导数衡量「瞬时变化率」。但变化是在不同时刻之间发生的，只看一个瞬间就没有变化可言。作者认为，意识到这个说法说不通，才能体会到微积分的奠基者有多聪明：他们用一个完全说得通的数学对象，也就是导数，抓住了这句话想表达的东西。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="67">1:07</button>一辆车的运动</h4>
+      <p>一辆车从 A 点出发，加速再减速，10 秒后停在 100 米外的 B 点。用图像表示：横轴是时间，纵轴是走过的距离，这个函数记作 <span class="m"><i>s</i>(<i>t</i>)</span>（不用 d 表示距离，因为 d 在微积分里另有要职）。起初车慢，曲线平缓；中间加速，曲线变陡；最后减速，又变平。</p>
+      <p>如果画速度（米/秒）随时间的图像，大概是一个鼓包：起初很小，中间到最大，最后回到 0。这两条曲线显然有关，本集要弄清楚的就是：速度到底怎么由距离函数决定。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-2m22s0.jpg" alt="走过的距离随时间变化的图像 s(t)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="140">2:20</button>走过的距离随时间变化的图像 s(t)</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="181">3:01</button>悖论：一个时刻的速度没有意义</h4>
+      <p>直观上，某一刻的速度就是车速表那一刻的读数，而且距离曲线越陡，速度应该越大。但问题是：给你一张车的照片，一个瞬间的快照，你没法说出它开多快。算速度需要两个时刻，用距离的变化除以时间的变化。</p>
+      <p>可我们画出来的速度函数只接收一个时间 <span class="m"><i>t</i></span>。想把速度和单个时刻对应起来，但计算速度又需要比较两个时刻，这就是矛盾所在。作者说，觉得奇怪就对了，这正是微积分奠基者面对过的冲突。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-3m33s0.jpg" alt="只给一张瞬间的照片，看不出车开多快" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="213">3:33</button>只给一张瞬间的照片，看不出车开多快</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="277">4:37</button>车速表的做法：ds/dt</h4>
+      <p>先看现实世界。车速表大概是这样做的：在第 3 秒，测车在很短时间里走了多远，比如 3 秒到 3.01 秒之间，再用这段距离（米）除以 0.01 秒。真实的车绕开了悖论，它算的是一小段时间里的速度，而不是某个瞬间的速度。</p>
+      <p>把这一小段时间记作 <span class="m"><i>d</i><i>t</i></span>（比如 0.01 秒），对应的距离变化记作 <span class="m"><i>d</i><i>s</i></span>，速度就是 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span>。在图像上，<span class="m"><i>d</i><i>t</i></span> 是向右迈的一小步，<span class="m"><i>d</i><i>s</i></span> 是图像高度的变化，<span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span> 就是图像上两个很近的点之间「上升除以前进」的斜率。</p>
+      <p><span class="m"><i>t</i> = 3</span> 没什么特别的，任何时刻都可以这样算，所以 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span> 是 <span class="m"><i>t</i></span> 的函数。作者画速度曲线时就是这么让电脑算的：取 <span class="m"><i>d</i><i>t</i> = 0.01</span>，对 0 到 10 之间的一堆 <span class="m"><i>t</i></span> 算 <span class="m">(<i>s</i>(<i>t</i> + <i>d</i><i>t</i>) − <i>s</i>(<i>t</i>)) / <i>d</i><i>t</i></span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-4m45s0.jpg" alt="车速表测的是很短一段时间里走了多远" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="285">4:45</button>车速表测的是很短一段时间里走了多远</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-5m25s0.jpg" alt="速度 = 距离的变化 / 时间的变化，记作 ds/dt" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="325">5:25</button>速度 = 距离的变化 / 时间的变化，记作 ds/dt</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-5m55s0.jpg" alt="几何上是图像上两个很近的点之间的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="355">5:55</button>几何上是图像上两个很近的点之间的斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-6m40s0.jpg" alt="电脑画速度曲线：取 dt = 0.01，算 (s(t+dt) − s(t)) / dt" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="400">6:40</button>电脑画速度曲线：取 dt = 0.01，算 (s(t+dt) − s(t)) / dt</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="447">7:27</button>纯数学里的导数：趋近的值</h4>
+      <p>车速表和绘图程序用的都是具体的 <span class="m"><i>d</i><i>t</i></span>。但纯数学里的导数，指的是 <span class="m"><i>d</i><i>t</i></span> 趋近于 0 时 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span> 趋近的值，和选哪个具体的 <span class="m"><i>d</i><i>t</i></span> 无关。</p>
+      <p>几何上很好理解：对任何具体的 <span class="m"><i>d</i><i>t</i></span>，<span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span> 是穿过图像上两个点的直线的斜率。<span class="m"><i>d</i><i>t</i></span> 趋近于 0，两点彼此靠近，这条直线的斜率就趋近于该点切线的斜率。所以严格意义上的导数，等于图像在单个点处切线的斜率。</p>
+      <p>作者强调他没说的话：没说导数是 <span class="m"><i>d</i><i>t</i></span>「无穷小」时的结果，也没说把 <span class="m"><i>d</i><i>t</i></span> 代成 0。<span class="m"><i>d</i><i>t</i></span> 始终是一个有限的、非零的小量，只是它在趋近于 0。这样既能合理地谈论单个时刻的变化率，又从来不碰「一瞬间的变化」这个矛盾。</p>
+      <p>所以作者建议，与其把这个斜率想成「瞬时变化率」，不如想成<b>某一点附近变化率的最佳常数近似</b>。</p>
+      <p>关于记号：用字母 d（<span class="m"><i>d</i><i>t</i></span>、<span class="m"><i>d</i><i>s</i></span>）时，约定俗成地表示「最后要看它趋近于 0 时的情况」。所以严格的导数也写作 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span>，虽然严格说它是这个分数趋近的值，本身并不是一个分数。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-8m20s0.jpg" alt="dt 趋近于 0 时，两点靠拢，割线趋近于切线" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="500">8:20</button>dt 趋近于 0 时，两点靠拢，割线趋近于切线</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-8m55s0.jpg" alt="dt 不是「无穷小」，也不是 0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="535">8:55</button>dt 不是「无穷小」，也不是 0</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-10m15s0.jpg" alt="纯数学的导数写作 ds/dt，指的是这个比值趋近的值" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="615">10:15</button>纯数学的导数写作 ds/dt，指的是这个比值趋近的值</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="638">10:38</button>算一个导数：t³</h4>
+      <p>你可能以为「问趋近于什么」会让计算更难，结果反而更简单。设距离函数正好是 <span class="m"><i>t</i>³</span>：1 秒走 1 米，2 秒走 8 米。求 <span class="m"><i>t</i> = 2</span> 时的速度，先把 <span class="m"><i>d</i><i>t</i></span> 当成一个具体的小量：<span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i> = ((2 + <i>d</i><i>t</i>)³ − 2³) / <i>d</i><i>t</i></span>。</p>
+      <p>展开分子：<span class="m">2³ + 3·2²·<i>d</i><i>t</i> + 3·2·<i>d</i><i>t</i>² + <i>d</i><i>t</i>³ − 2³</span>。<span class="m">2³</span> 相消，剩下每一项都带 <span class="m"><i>d</i><i>t</i></span>，和分母的 <span class="m"><i>d</i><i>t</i></span> 约掉一个，得到 <span class="m">3·2² +</span>（两项还带 <span class="m"><i>d</i><i>t</i></span> 的）。<span class="m"><i>d</i><i>t</i></span> 趋近于 0 时，那两项直接消失，剩下干净的 <span class="m">3·2² = 12</span>，也就是图像在 <span class="m"><i>t</i> = 2</span> 处切线的斜率。</p>
+      <p><span class="m"><i>t</i> = 2</span> 没什么特别，一般地，<span class="m"><i>t</i>³</span> 的导数是 <span class="m">3<i>t</i>²</span>。作者说这就是微积分之所以有用的核心：对具体的 <span class="m"><i>d</i><i>t</i></span>，式子一团乱；而问「<span class="m"><i>d</i><i>t</i></span> 趋近于 0 时趋近什么」，能把大部分乱七八糟的项扔掉。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-11m48s0.jpg" alt="展开 (2 + dt)³ − 2³" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="708">11:48</button>展开 (2 + dt)³ − 2³</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-12m56s0.jpg" alt="dt → 0，只剩 3·2² = 12，即 t = 2 处切线的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="777">12:57</button>dt → 0，只剩 3·2² = 12，即 t = 2 处切线的斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-13m05s0.jpg" alt="一般地，t³ 的导数是 3t²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="785">13:05</button>一般地，t³ 的导数是 3t²</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="858">14:18</button>悖论：t = 0 时车在动吗</h4>
+      <p>车按 <span class="m"><i>t</i>³</span> 运动，<span class="m"><i>t</i> = 0</span> 时它在动吗？一方面，导数 <span class="m">3<i>t</i>²</span> 在 <span class="m"><i>t</i> = 0</span> 时为 0，切线完全水平，「瞬时速度」为 0，好像没动。另一方面，如果 0 时刻不动，它什么时候开始动？</p>
+      <p>这个问题本身没有意义，它指向的是「一瞬间的变化」，而这不存在，导数衡量的也不是这个。距离函数的导数为 0，意思是：在这一点附近，车速的最佳常数近似是 0 米/秒。</p>
+      <p>看一段真实的时间，比如 0 到 0.1 秒，车动了：<span class="m">0.1³ = 0.001</span> 米。这很小，而且相对于时间的变化更小，平均速度只有 0.01 米/秒。导数为 0 的意思是：时间段越来越短时，这个平均速度趋近于 0。这不等于车静止不动。所以听到「瞬时变化率」时，把它当成「变化率的最佳常数近似」的简称。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-14m56s0.jpg" alt="t = 0 时导数为 0，切线水平：车在动吗" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="894">14:54</button>t = 0 时导数为 0，切线水平：车在动吗</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-15m53s0.jpg" alt="0 到 0.1 秒车走了 0.001 米" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="953">15:53</button>0 到 0.1 秒车走了 0.001 米</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>导数 <span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i></span> 是 <span class="m"><i>d</i><i>t</i></span> 趋近于 0 时「<span class="m"><i>s</i></span> 的变化 / <span class="m"><i>t</i></span> 的变化」趋近的值；<span class="m"><i>d</i><i>t</i></span> 始终是非零的小量。</li><li>几何上是切线的斜率；更好的理解是「某一点附近变化率的最佳常数近似」，「瞬时变化率」只是简称。</li><li>取极限让计算变简单：带 <span class="m"><i>d</i><i>t</i></span> 的高次项直接消失，<span class="m"><i>t</i>³</span> 的导数是 <span class="m">3<i>t</i>²</span>。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/derivatives-2m22s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=2" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="15"><b>0:15</b><span>目标：解释导数，以及它引出的悖论</span></button></li><li><button type="button" data-t="31"><b>0:31</b><span>「瞬时变化率」是个自相矛盾的说法</span></button></li><li><button type="button" data-t="67"><b>1:07</b><span>例子：一辆车 10 秒走 100 米</span></button></li><li><button type="button" data-t="83"><b>1:23</b><span>距离随时间变化的图像 s(t)</span></button></li><li><button type="button" data-t="140"><b>2:20</b><span>速度随时间变化的图像</span></button></li><li><button type="button" data-t="181"><b>3:01</b><span>悖论：单独一个时刻的速度没有意义</span></button></li><li><button type="button" data-t="277"><b>4:37</b><span>车速表实际在做什么</span></button></li><li><button type="button" data-t="313"><b>5:13</b><span>ds/dt：一小段时间里的平均速度</span></button></li><li><button type="button" data-t="331"><b>5:31</b><span>几何上：两个相近点之间的斜率</span></button></li><li><button type="button" data-t="379"><b>6:19</b><span>电脑是怎么画出速度曲线的</span></button></li><li><button type="button" data-t="447"><b>7:27</b><span>纯数学里的导数：dt 趋近于 0 时的比值</span></button></li><li><button type="button" data-t="482"><b>8:02</b><span>dt → 0 时，割线变成切线</span></button></li><li><button type="button" data-t="522"><b>8:42</b><span>dt 不是无穷小，也不是 0</span></button></li><li><button type="button" data-t="584"><b>9:44</b><span>记号：d 表示最后要让它趋近于 0</span></button></li><li><button type="button" data-t="638"><b>10:38</b><span>例子：s(t) = t³ 在 t = 2 的导数</span></button></li><li><button type="button" data-t="763"><b>12:43</b><span>取极限后只剩 3·2² = 12</span></button></li><li><button type="button" data-t="781"><b>13:01</b><span>t³ 的导数是 3t²</span></button></li><li><button type="button" data-t="858"><b>14:18</b><span>悖论：t = 0 时车在动吗</span></button></li><li><button type="button" data-t="933"><b>15:33</b><span>导数为 0 的真正含义</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc3" data-ch="3" data-sk="calc3" data-bv="BV1qW411N7FU" data-p="3">
+  <summary>
+    <span class="no">3</span>
+    <span class="tt"><b>用几何来求导</b><em>Derivative formulas through geometry</em><span class="hook">用几何求导：x² 是正方形面积，x³ 是立方体体积，1/x 是面积固定为 1 的水洼，sin 是单位圆上点的高度。推一下 x，看多出来的那部分。</span></span>
+    <span class="side"><span class="chip">B 站 P3 · 03</span><span class="len">18:43</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">知道导数是什么以后，下一步是会算。这一集用几何图形推出几个基本求导公式，目的是记住导数的本质始终是「微小的推动」：把 <span class="m"><i>x</i></span> 推一点点 <span class="m"><i>d</i><i>x</i></span>，看函数值多了多少。正方形给出 <span class="m"><i>x</i>²</span> 的导数 <span class="m">2<i>x</i></span>，立方体给出 <span class="m"><i>x</i>³</span> 的导数 <span class="m">3<i>x</i>²</span>，推广到幂法则；<span class="m">1/<i>x</i></span> 看成面积为 1 的长方形水洼；<span class="m">sin</span> 的导数是 <span class="m">cos</span>，从单位圆上的一个小相似三角形看出来。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=3" target="_blank" rel="noreferrer">B 站 P3：03 - 用几何来求导 ↗</a>
+        <a href="https://www.youtube.com/watch?v=S0_qX4VJhMQ" target="_blank" rel="noreferrer">YouTube 第 3 章 · 2017-04-30 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="12">0:12</button>为什么要算抽象函数的导数</h4>
+      <p>学微积分的大部分时间花在求抽象函数的导数上，而不是具体的变化率问题。原因是现实里想用微积分分析的现象，常用多项式、三角函数、指数这些「纯」函数来建模。熟悉了这些函数的变化率，就有了一套语言去谈具体情境里的变化率。</p>
+      <p>但这个过程很容易变成背规则，然后忘了导数的根本：看一个量的微小变化引起另一个量多大的微小变化。这一集和下一集就是要从几何上直观地推出这些规则。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="150">2:30</button>x²：正方形的面积</h4>
+      <p>看图像只能看出 <span class="m"><i>x</i>²</span> 的斜率随 <span class="m"><i>x</i></span> 增大而增大（0 处为 0，1 处更陡，2 处更陡），但得不出精确公式。要得到公式，得回到 <span class="m"><i>x</i>²</span> 的字面意思：边长为 <span class="m"><i>x</i></span> 的正方形的面积。</p>
+      <p>把 <span class="m"><i>x</i></span> 增加一点点 <span class="m"><i>d</i><i>x</i></span>，面积多出三块：两条细长方形，各为 <span class="m"><i>x</i> × <i>d</i><i>x</i></span>；一个小正方形，面积 <span class="m"><i>d</i><i>x</i>²</span>。比如 <span class="m"><i>x</i> = 3</span>、<span class="m"><i>d</i><i>x</i> = 0.01</span>，两条细长方形共 <span class="m">2 × 3 × 0.01 = 0.06</span>，约为 <span class="m"><i>d</i><i>x</i></span> 的 6 倍；小正方形只有 <span class="m">0.0001</span>。</p>
+      <p>经验规则：<span class="m"><i>d</i><i>x</i></span> 很小时，含 <span class="m"><i>d</i><i>x</i></span> 二次方及以上的项都可以忽略，小变化的平方是可以忽略的变化。剩下 <span class="m"><i>d</i><i>f</i> = 2<i>x</i> · <i>d</i><i>x</i></span>，所以 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i> = 2<i>x</i></span>，这就是 <span class="m"><i>x</i>²</span> 的导数。从 <span class="m"><i>x</i> = 3</span> 出发，面积每单位边长的增长率是 6；从 5 出发是 10。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-2m08s0.jpg" alt="从图像只能看出 x² 的斜率越来越大" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="128">2:08</button>从图像只能看出 x² 的斜率越来越大</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-3m02s0.jpg" alt="边长加 dx，多出两条细长方形和一个小正方形" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="182">3:02</button>边长加 dx，多出两条细长方形和一个小正方形</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-4m10s0.jpg" alt="小正方形 dx² 可以忽略，df = 2x dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="250">4:10</button>小正方形 dx² 可以忽略，df = 2x dx</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="281">4:41</button>x³：立方体的体积</h4>
+      <p><span class="m"><i>x</i>³</span> 是边长为 <span class="m"><i>x</i></span> 的立方体的体积。<span class="m"><i>x</i></span> 增加 <span class="m"><i>d</i><i>x</i></span>，新增的体积里，几乎全部来自三个方形薄片，每片体积 <span class="m"><i>x</i>² · <i>d</i><i>x</i></span>。更准确地说，<span class="m"><i>d</i><i>x</i></span> 趋近于 0 时，这三片占新增体积的比例趋近于 100%。</p>
+      <p>其余沿棱的细条和角上的小立方体，体积正比于 <span class="m"><i>d</i><i>x</i>²</span> 或 <span class="m"><i>d</i><i>x</i>³</span>，除以 <span class="m"><i>d</i><i>x</i></span> 后仍带着 <span class="m"><i>d</i><i>x</i></span>，经不住 <span class="m"><i>d</i><i>x</i> → 0</span>，可以忽略。所以 <span class="m"><i>x</i>³</span> 的导数是 <span class="m">3<i>x</i>²</span>，也就是上一集用代数算出来的结果的几何版本。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-5m08s0.jpg" alt="边长加 dx，多出的体积主要是三个方形薄片" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="308">5:08</button>边长加 dx，多出的体积主要是三个方形薄片</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-5m45s0.jpg" alt="三个薄片共 3x² dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="345">5:45</button>三个薄片共 3x² dx</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="429">7:09</button>幂法则：为什么对任意 n 都成立</h4>
+      <p><span class="m"><i>x</i>⁴</span> 的导数是 <span class="m">4<i>x</i>³</span>，<span class="m"><i>x</i>⁵</span> 的导数是 <span class="m">5<i>x</i>⁴</span>，一般地 <span class="m"><i>x</i>ⁿ</span> 的导数是 <span class="m"><i>n</i> <i>x</i>ⁿ⁻¹</span>，这叫<b>幂法则 (Power Rule)</b>。实际中大家都会把它当成「指数跳到前面，自己减一」的符号操作。</p>
+      <p>为什么成立：<span class="m">(<i>x</i> + <i>d</i><i>x</i>)ⁿ</span> 是 <span class="m"><i>n</i></span> 个 <span class="m">(<i>x</i> + <i>d</i><i>x</i>)</span> 相乘。展开后第一项是 <span class="m"><i>x</i>ⁿ</span>，相当于原来的正方形面积或立方体体积。接下来是「只挑一个 <span class="m"><i>d</i><i>x</i></span>、其余都挑 <span class="m"><i>x</i></span>」的项：<span class="m"><i>d</i><i>x</i></span> 可以从 <span class="m"><i>n</i></span> 个括号中的任何一个挑出，所以有 <span class="m"><i>n</i></span> 项，每项是 <span class="m"><i>x</i>ⁿ⁻¹ · <i>d</i><i>x</i></span>。其余所有项都至少含 <span class="m"><i>d</i><i>x</i>²</span>，可以忽略。所以输出的增量几乎全部来自 <span class="m"><i>n</i></span> 份 <span class="m"><i>x</i>ⁿ⁻¹ <i>d</i><i>x</i></span>，导数是 <span class="m"><i>n</i> <i>x</i>ⁿ⁻¹</span>。</p>
+      <p>作者说偶尔回头想想这些规则为什么成立，不只是因为好看，还因为它锻炼的正是「用微小推动去想导数」的能力。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-7m25s0.jpg" alt="幂法则：xⁿ 的导数是 n xⁿ⁻¹" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="445">7:25</button>幂法则：xⁿ 的导数是 n xⁿ⁻¹</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-9m20s0.jpg" alt="(x + dx)ⁿ 展开：xⁿ + n xⁿ⁻¹ dx + (dx² 的倍数)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="560">9:20</button>(x + dx)ⁿ 展开：xⁿ + n xⁿ⁻¹ dx + (dx² 的倍数)</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="607">10:07</button>1/x：面积为 1 的水洼</h4>
+      <p>当然可以直接套幂法则（<span class="m">1/<i>x</i> = <i>x</i>⁻¹</span>），但作者想从几何上推。<span class="m">1/<i>x</i></span> 问的是「什么数乘 <span class="m"><i>x</i></span> 等于 1」。想象一摊面积为 1 的长方形水洼，宽为 <span class="m"><i>x</i></span>，高就必须是 <span class="m">1/<i>x</i></span>。宽拉到 2，高就压到 ½；宽为 3，高就是 ⅓。这也是理解 <span class="m">1/<i>x</i></span> 图像的一种方式。</p>
+      <p>求导：宽增加 <span class="m"><i>d</i><i>x</i></span>，右边多出一块面积；为了保持总面积为 1，高度必须减少 <span class="m"><i>d</i>(1/<i>x</i>)</span>（是负数），让顶上失去的面积正好抵掉右边增加的面积。作者把最后几步留给观众。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-10m50s0.jpg" alt="宽为 x、面积为 1 的水洼，高必须是 1/x" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="650">10:50</button>宽为 x、面积为 1 的水洼，高必须是 1/x</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-11m50s0.jpg" alt="宽增加 dx，高必须减少 d(1/x)，增减的面积相抵" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="710">11:50</button>宽增加 dx，高必须减少 d(1/x)，增减的面积相抵</figcaption></figure></div>
+      
+      
+      <details class="pz"><summary><span>思考题</span><span class="m"><i>d</i>(1/<i>x</i>)/<i>d</i><i>x</i></span> 是多少？和直接对 <span class="m"><i>x</i>⁻¹</span> 用幂法则比较。再试试 <span class="m">√<i>x</i></span> 的导数。</summary><p>右边增加的面积约 <span class="m">(1/<i>x</i>)·<i>d</i><i>x</i></span>，顶上减少的面积约 <span class="m"><i>x</i>·|<i>d</i>(1/<i>x</i>)|</span>。两者相等，所以 <span class="m"><i>d</i>(1/<i>x</i>) = −<i>d</i><i>x</i>/<i>x</i>²</span>，导数是 <span class="m">−1/<i>x</i>²</span>，和幂法则给出的 <span class="m">−1·<i>x</i>⁻²</span> 一样。<span class="m">√<i>x</i></span> 可以看成面积为 <span class="m"><i>x</i></span> 的正方形的边长 <span class="m"><i>s</i></span>：面积增加 <span class="m"><i>d</i><i>x</i></span> 时，多出的两条细长方形面积约 <span class="m">2<i>s</i> · <i>d</i><i>s</i></span>，所以 <span class="m"><i>d</i><i>s</i> = <i>d</i><i>x</i>/(2<i>s</i>)</span>，导数是 <span class="m">1/(2√<i>x</i>)</span>，也等于幂法则给出的 <span class="m">(1/2)·<i>x</i>^(−1/2)</span>。</p></details>
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="756">12:36</button>sin θ：单位圆上的一个小三角形</h4>
+      <p>在单位圆上从最右点出发，沿圆周走过弧长 <span class="m"><i>θ</i></span>（比如 0.8），此时角度正好是 <span class="m"><i>θ</i></span> 弧度。<span class="m">sin <i>θ</i></span> 就是这个点离 x 轴的高度，<span class="m"><i>θ</i></span> 增大时它在 −1 和 1 之间上下摆动，画出来就是那条典型的波形。</p>
+      <p>看图像能大致猜出导数的样子：0 处斜率为正，到峰顶斜率降为 0，下降段为负，再回到 0。峰和谷的位置和 <span class="m">cos <i>θ</i></span> 完全对上，所以你可能猜导数就是 <span class="m">cos <i>θ</i></span>。答案确实是 <span class="m">cos</span>，但形状差不多的函数有很多，为什么恰好是它，要换个角度看。</p>
+      <p>精确的理由要回到函数本身的含义。在单位圆上走一小步 <span class="m"><i>d</i><i>θ</i></span>，放大看，圆几乎是直线，得到一个小直角三角形：斜边是 <span class="m"><i>d</i><i>θ</i></span>，竖直边是高度的变化 <span class="m"><i>d</i>(sin <i>θ</i>)</span>。这个小三角形和以 <span class="m"><i>θ</i></span> 为角、斜边为半径 1 的大三角形相似，小三角形里对应的那个角正好是 <span class="m"><i>θ</i></span>。</p>
+      <p>导数 <span class="m"><i>d</i>(sin <i>θ</i>)/<i>d</i><i>θ</i></span> 就是小三角形里「与角 <span class="m"><i>θ</i></span> 相邻的边 / 斜边」，也就是 <span class="m">cos <i>θ</i></span> 的定义。所以两种看法都说明 <span class="m">sin</span> 的导数是 <span class="m">cos</span>：一种是看图像的斜率大致形状，一种是看单位圆的精确推理。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-13m16s0.jpg" alt="sin θ 是单位圆上那个点离 x 轴的高度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="796">13:16</button>sin θ 是单位圆上那个点离 x 轴的高度</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-14m22s0.jpg" alt="从图像看，sin 的导数长得很像 cos" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="862">14:22</button>从图像看，sin 的导数长得很像 cos</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-15m42s0.jpg" alt="走一小步 dθ，放大后是一个和大三角形相似的小三角形" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="942">15:42</button>走一小步 dθ，放大后是一个和大三角形相似的小三角形</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivative-formulas-geometrically-16m20s0.jpg" alt="d(sin θ)/dθ = 邻边 / 斜边 = cos θ" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="980">16:20</button>d(sin θ)/dθ = 邻边 / 斜边 = cos θ</figcaption></figure></div>
+      
+      
+      <details class="pz"><summary><span>思考题</span>用同样的推理，<span class="m">cos <i>θ</i></span> 的导数是什么？</summary><p><span class="m">cos <i>θ</i></span> 是点的横坐标。同一个小三角形里，横坐标的变化是与角 <span class="m"><i>θ</i></span> 相对的那条边，而且是往左走（变小），所以 <span class="m"><i>d</i>(cos <i>θ</i>)/<i>d</i><i>θ</i> = −</span>对边/斜边 <span class="m">= −sin <i>θ</i></span>。</p></details>
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>求导时回到函数的字面意思：推一下输入，看输出多了什么；含 <span class="m"><i>d</i><i>x</i>²</span> 及以上的项可以忽略。</li><li><span class="m"><i>x</i>²</span> 的导数 <span class="m">2<i>x</i></span>（正方形的两条边），<span class="m"><i>x</i>³</span> 的导数 <span class="m">3<i>x</i>²</span>（立方体的三个面），一般 <span class="m"><i>x</i>ⁿ</span> 的导数是 <span class="m"><i>n</i><i>x</i>ⁿ⁻¹</span>。</li><li><span class="m">1/<i>x</i></span> 的导数是 <span class="m">−1/<i>x</i>²</span>；<span class="m">sin</span> 的导数是 <span class="m">cos</span>，<span class="m">cos</span> 的导数是 <span class="m">−sin</span>。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/derivative-formulas-geometrically-2m08s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=3" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="12"><b>0:12</b><span>为什么要会求抽象函数的导数</span></button></li><li><button type="button" data-t="97"><b>1:37</b><span>f(x) = x²：先看切线斜率</span></button></li><li><button type="button" data-t="150"><b>2:30</b><span>把 x² 看成正方形的面积</span></button></li><li><button type="button" data-t="179"><b>2:59</b><span>推一下 x：多出两条细长方形和一个小正方形</span></button></li><li><button type="button" data-t="209"><b>3:29</b><span>dx² 可以忽略</span></button></li><li><button type="button" data-t="247"><b>4:07</b><span>df = 2x dx，导数是 2x</span></button></li><li><button type="button" data-t="281"><b>4:41</b><span>f(x) = x³：立方体的体积</span></button></li><li><button type="button" data-t="342"><b>5:42</b><span>df ≈ 3x² dx</span></button></li><li><button type="button" data-t="429"><b>7:09</b><span>幂法则：xⁿ 的导数是 nxⁿ⁻¹</span></button></li><li><button type="button" data-t="478"><b>7:58</b><span>为什么幂法则对任意 n 成立</span></button></li><li><button type="button" data-t="607"><b>10:07</b><span>f(x) = 1/x：面积为 1 的水洼</span></button></li><li><button type="button" data-t="686"><b>11:26</b><span>宽度增加 dx，高度必须减少</span></button></li><li><button type="button" data-t="749"><b>12:29</b><span>思考题：√x 的导数</span></button></li><li><button type="button" data-t="756"><b>12:36</b><span>sin θ：单位圆上点的高度</span></button></li><li><button type="button" data-t="817"><b>13:37</b><span>从图像猜：sin 的导数长得像 cos</span></button></li><li><button type="button" data-t="892"><b>14:52</b><span>单位圆上的小三角形</span></button></li><li><button type="button" data-t="961"><b>16:01</b><span>d(sin θ)/dθ = 邻边 / 斜边 = cos θ</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc4" data-ch="4" data-sk="calc4" data-bv="BV1qW411N7FU" data-p="4">
+  <summary>
+    <span class="no">4</span>
+    <span class="tt"><b>直观理解链式法则和乘积法则</b><em>Visualizing the chain rule and product rule</em><span class="hook">函数组合只有三种：相加、相乘、复合。加法把高度叠起来，乘法看成可调盒子的面积（左乘右导加右乘左导），复合看成三条数轴上的连锁推动（链式法则）。</span></span>
+    <span class="side"><span class="chip">B 站 P4 · 04</span><span class="len">16:52</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">现实里建模用的函数，大多是简单函数的组合。这一集说明组合只有三种基本方式：相加、相乘、嵌套（复合）。减法是乘 −1 再加，除法是乘上 <span class="m">1/<i>x</i></span> 复合出来的，所以懂这三种就能一层层拆开任何复杂表达式。作者给每种规则配一个画面：和法则看两段高度叠在一起，乘积法则看一个边长会变的盒子，链式法则看三条数轴上的连锁推动。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=4" target="_blank" rel="noreferrer">B 站 P4：04 - 直观理解链式法则和乘积法则 ↗</a>
+        <a href="https://www.youtube.com/watch?v=YG15m2VwSjA" target="_blank" rel="noreferrer">YouTube 第 4 章 · 2017-05-01 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="49">0:49</button>三种组合方式</h4>
+      <p>把函数组合起来，基本上只有三种办法：相加、相乘、把一个塞进另一个（复合）。减法就是乘 −1 再相加；除法就是先复合进 <span class="m">1/<i>x</i></span> 再相乘，都没有新东西。只要知道导数在这三种组合下怎么表现，再怪的表达式都能一层层剥开。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="110">1:50</button>和法则：高度叠在一起</h4>
+      <p>和的导数等于导数的和。以 <span class="m"><i>f</i>(<i>x</i>) = sin(<i>x</i>) + <i>x</i>²</span> 为例：在 <span class="m"><i>x</i> = 0.5</span> 处，<span class="m">sin</span> 的高度是一段竖线，<span class="m"><i>x</i>²</span> 的高度是另一段，和就是把两段摞起来。</p>
+      <p>把输入推到 <span class="m">0.5 + <i>d</i><i>x</i></span>，总高度的变化 <span class="m"><i>d</i><i>f</i></span> 就是 <span class="m">sin</span> 的变化 <span class="m"><i>d</i>(sin <i>x</i>)</span> 加上 <span class="m"><i>x</i>²</span> 的变化 <span class="m"><i>d</i>(<i>x</i>²)</span>。<span class="m">sin</span> 的导数是 <span class="m">cos</span>，意思是 <span class="m"><i>d</i>(sin <i>x</i>) ≈ cos(<i>x</i>)·<i>d</i><i>x</i></span>；同理 <span class="m"><i>d</i>(<i>x</i>²) ≈ 2<i>x</i>·<i>d</i><i>x</i></span>。所以 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i> = cos <i>x</i> + 2<i>x</i></span>。作者说这个例子是热身，乘法和复合的规则没这么直接，需要同样这种「推一下看变化」的思考。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-2m46s0.jpg" alt="和的高度 = 两段高度摞在一起" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="166">2:46</button>和的高度 = 两段高度摞在一起</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-3m25s0.jpg" alt="df = d(sin x) + d(x²) = cos(x)dx + 2x dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="205">3:25</button>df = d(sin x) + d(x²) = cos(x)dx + 2x dx</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="251">4:11</button>乘积法则：可调盒子的面积</h4>
+      <p>处理乘积时，图像不是最好的工具。很多层次的数学里都一样：两个东西相乘，把它理解成面积会有帮助。想象一个盒子，宽是 <span class="m">sin(<i>x</i>)</span>，高是 <span class="m"><i>x</i>²</span>，<span class="m"><i>x</i></span> 可以自由调节：<span class="m"><i>x</i></span> 从 0 增大，宽先增到 1 再减小，高按 <span class="m"><i>x</i>²</span> 变化。<span class="m"><i>f</i>(<i>x</i>) = sin(<i>x</i>)·<i>x</i>²</span> 就是盒子的面积。</p>
+      <p>把 <span class="m"><i>x</i></span> 推一点点 <span class="m"><i>d</i><i>x</i></span>：宽变化 <span class="m"><i>d</i>(sin <i>x</i>)</span>，高变化 <span class="m"><i>d</i>(<i>x</i>²)</span>，多出三块面积。底部一条细长方形，面积 <span class="m">sin(<i>x</i>)·<i>d</i>(<i>x</i>²)</span>；右边一条，面积 <span class="m"><i>x</i>²·<i>d</i>(sin <i>x</i>)</span>；角上一小块，正比于 <span class="m"><i>d</i><i>x</i>²</span>，可以忽略。</p>
+      <p>代入 <span class="m"><i>d</i>(<i>x</i>²) ≈ 2<i>x</i>·<i>d</i><i>x</i></span>、<span class="m"><i>d</i>(sin <i>x</i>) ≈ cos(<i>x</i>)·<i>d</i><i>x</i></span>，除以 <span class="m"><i>d</i><i>x</i></span> 得 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i> = sin(<i>x</i>)·2<i>x</i> + <i>x</i>²·cos(<i>x</i>)</span>。换成任意两个函数 <span class="m"><i>g</i></span>、<span class="m"><i>h</i></span> 也一样。口诀是「左乘右导，加右乘左导」(left d right, right d left)。单独背很奇怪，但对着盒子看，每一项就是一条细长方形。</p>
+      <p>乘一个常数更简单：<span class="m">2 sin(<i>x</i>)</span> 的导数就是 <span class="m">2 cos(<i>x</i>)</span>，常数跟着出来。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-5m22s0.jpg" alt="sin(x)·x² 看成宽 sin(x)、高 x² 的盒子的面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="322">5:22</button>sin(x)·x² 看成宽 sin(x)、高 x² 的盒子的面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-6m05s0.jpg" alt="推一下 x，多出两条细长方形，角上一小块可以忽略" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="365">6:05</button>推一下 x，多出两条细长方形，角上一小块可以忽略</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-7m36s0.jpg" alt="口诀：左乘右导，加右乘左导" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="456">7:36</button>口诀：左乘右导，加右乘左导</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="521">8:41</button>链式法则：三条数轴上的连锁推动</h4>
+      <p>最常见的组合是复合，比如把 <span class="m"><i>x</i>²</span> 塞进 <span class="m">sin</span> 得到 <span class="m">sin(<i>x</i>²)</span>。这次换一种画法：三条数轴，第一条放 <span class="m"><i>x</i></span>，第二条放 <span class="m"><i>x</i>²</span>，第三条放 <span class="m">sin(<i>x</i>²)</span>。函数 <span class="m"><i>x</i>²</span> 把第一条带到第二条，<span class="m">sin</span> 把第二条带到第三条。<span class="m"><i>x</i></span> 移到 3，第二条上的值就移到 9，第三条移到 <span class="m">sin 9</span>。</p>
+      <p>求导：把 <span class="m"><i>x</i></span> 推一点点 <span class="m"><i>d</i><i>x</i></span>，比如从 1.5 出发。第二条上的变化是 <span class="m"><i>d</i>(<i>x</i>²)</span>。给中间变量起个名字 <span class="m"><i>h</i> = <i>x</i>²</span>，这个变化写成 <span class="m"><i>d</i><i>h</i></span>，第三条上的值就是 <span class="m">sin(<i>h</i>)</span>，它的变化是 <span class="m"><i>d</i>(sin <i>h</i>) ≈ cos(<i>h</i>)·<i>d</i><i>h</i></span>。（第三条往左动而第二条往右动，说明这个变化是负的。）</p>
+      <p>再展开：<span class="m"><i>h</i></span> 换回 <span class="m"><i>x</i>²</span>，<span class="m"><i>d</i><i>h</i> ≈ 2<i>x</i>·<i>d</i><i>x</i></span>，所以第三条的变化约是 <span class="m">cos(<i>x</i>²)·2<i>x</i>·<i>d</i><i>x</i></span>。从 <span class="m"><i>x</i> = 1.5</span> 出发，就是 <span class="m">cos(1.5²) × 2 × 1.5 × <i>d</i><i>x</i></span>，和 <span class="m"><i>d</i><i>x</i></span> 成正比，导数就是这个比例系数。</p>
+      <p>一般地，<span class="m"><i>d</i>/<i>d</i><i>x</i> · <i>g</i>(<i>h</i>(<i>x</i>)) = <i>g</i>′(<i>h</i>(<i>x</i>))·<i>h</i>′(<i>x</i>)</span>：外层函数的导数（输入仍是没动过的内层函数），乘内层函数的导数。这就是<b>链式法则 (Chain Rule)</b>。作者特意把外层导数写成 <span class="m"><i>d</i><i>g</i>/<i>d</i><i>h</i></span> 而不是 <span class="m"><i>d</i><i>g</i>/<i>d</i><i>x</i></span>：先把第三条的变化表示成第二条变化 <span class="m"><i>d</i><i>h</i></span> 的倍数，再把 <span class="m"><i>d</i><i>h</i></span> 表示成 <span class="m"><i>d</i><i>x</i></span> 的倍数。<span class="m"><i>d</i><i>g</i>/<i>d</i><i>h</i> · <i>d</i><i>h</i>/<i>d</i><i>x</i></span> 里 <span class="m"><i>d</i><i>h</i></span> 相消，不只是记号上的巧合，而是这些微小推动真实的连锁关系。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-9m18s0.jpg" alt="三条数轴：x、x²、sin(x²)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="558">9:18</button>三条数轴：x、x²、sin(x²)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-10m52s0.jpg" alt="中间变量记作 h，dh 引起 d(sin h)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="652">10:52</button>中间变量记作 h，dh 引起 d(sin h)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-11m35s0.jpg" alt="展开：d(x²) = 2x dx，最终 d(sin(x²)) = cos(x²)·2x dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="695">11:35</button>展开：d(x²) = 2x dx，最终 d(sin(x²)) = cos(x²)·2x dx</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-12m50s0.jpg" alt="链式法则：外层导数（代入内层）乘内层导数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="771">12:51</button>链式法则：外层导数（代入内层）乘内层导数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/chain-rule-and-product-rule-14m10s0.jpg" alt="dg/dh · dh/dx，中间的 dh 约掉" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="850">14:10</button>dg/dh · dh/dx，中间的 dh 约掉</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="876">14:36</button>知道规则不等于会用</h4>
+      <p>和法则、乘积法则、链式法则是处理组合函数的三件工具。作者坦白说，知道规则和能在复杂情况下熟练运用差别很大，看视频代替不了自己练。他能提供的是展示这些规则从哪来：耐心想清楚导数的含义，自己就能发现这些规律，用不着硬背。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>和法则：<span class="m">(<i>g</i> + <i>h</i>)′ = <i>g</i>′ + <i>h</i>′</span>，两段高度叠在一起。</li><li>乘积法则：<span class="m">(<i>g</i><i>h</i>)′ = <i>g</i> <i>h</i>′ + <i>h</i> <i>g</i>′</span>，盒子多出的两条细长方形。</li><li>链式法则：<span class="m">(<i>g</i>(<i>h</i>(<i>x</i>)))′ = <i>g</i>′(<i>h</i>(<i>x</i>))·<i>h</i>′(<i>x</i>)</span>，推动沿着数轴一层层传下去。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/chain-rule-and-product-rule-2m46s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=4" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="49"><b>0:49</b><span>组合函数的三种方式：加、乘、复合</span></button></li><li><button type="button" data-t="110"><b>1:50</b><span>和法则：和的导数等于导数的和</span></button></li><li><button type="button" data-t="136"><b>2:16</b><span>例：sin(x) + x²，两段高度叠起来</span></button></li><li><button type="button" data-t="251"><b>4:11</b><span>乘积：把乘积看成面积</span></button></li><li><button type="button" data-t="320"><b>5:20</b><span>sin(x)·x² 是一个可调盒子的面积</span></button></li><li><button type="button" data-t="339"><b>5:39</b><span>推一下 x：多出两条细长方形</span></button></li><li><button type="button" data-t="447"><b>7:27</b><span>「左乘右导，加右乘左导」</span></button></li><li><button type="button" data-t="500"><b>8:20</b><span>乘常数：导数也乘这个常数</span></button></li><li><button type="button" data-t="521"><b>8:41</b><span>复合：sin(x²)</span></button></li><li><button type="button" data-t="553"><b>9:13</b><span>三条数轴：x、x²、sin(x²)</span></button></li><li><button type="button" data-t="642"><b>10:42</b><span>给中间变量起名 h</span></button></li><li><button type="button" data-t="730"><b>12:10</b><span>外层导数（代入内层）乘内层导数</span></button></li><li><button type="button" data-t="767"><b>12:47</b><span>链式法则</span></button></li><li><button type="button" data-t="833"><b>13:53</b><span>dh 相消不只是记号上的巧合</span></button></li><li><button type="button" data-t="876"><b>14:36</b><span>会这三条规则不等于会用，要多练</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc5" data-ch="5" data-sk="calc5" data-bv="BV1qW411N7FU" data-p="5">
+  <summary>
+    <span class="no">5</span>
+    <span class="tt"><b>指数函数求导：e 有什么特别</b><em>What's so special about Euler's number e?</em><span class="hook">所有指数函数的导数都和自身成正比，比例常数是底数的自然对数；e 就是让这个常数恰好为 1 的那个底数。</span></span>
+    <span class="side"><span class="chip">B 站 P5 · 05</span><span class="len">13:50</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">这一集讲指数函数的导数，以及为什么 <span class="m"><i>e</i>^<i>x</i></span> 最重要。作者用每天翻倍的一群 π 生物的总质量 <span class="m">2^<i>t</i></span> 引路：按整天看，增长率似乎等于自身；但导数要看越来越短的时间，结果是「和自身成正比」，比例常数约 0.6931。换底数，常数也跟着变，而且有规律。存在一个底数让常数恰好为 1，那就是 <span class="m"><i>e</i></span>。借助链式法则，所有常数都解释清楚了：它们是底数的自然对数。最后说明为什么实际中都写成 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span>：常数 <span class="m"><i>c</i></span> 有直接的含义。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=5" target="_blank" rel="noreferrer">B 站 P5：05 - 指数函数求导 ↗</a>
+        <a href="https://www.youtube.com/watch?v=m2MIpDrF7Es" target="_blank" rel="noreferrer">YouTube 第 5 章 · 2017-05-02 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="32">0:32</button>按整天看：增长率等于自身</h4>
+      <p>看 <span class="m">2^<i>t</i></span>，把 <span class="m"><i>t</i></span> 当成天数，输出当成一群每天翻一倍的 π 生物的总质量（用质量而不是个数，是为了让函数连续）。<span class="m"><i>t</i> = 0</span> 时质量是 1，第 1 天是 2，第 2 天是 4，每天翻倍。</p>
+      <p>先看一整天的变化率：第 3 天到第 4 天从 8 增到 16，一天增加 8；第 4 到第 5 天从 16 到 32，一天增加 16。每次一天的增量都等于这一天开始时的质量。于是很想说 <span class="m">2^<i>t</i></span> 的导数就是它自己。</p>
+      <p>方向是对的，但不完全对。这里比的是 <span class="m">2^(<i>t</i>+1)</span> 和 <span class="m">2^<i>t</i></span>，隔了一整天；导数要问的是十分之一天、百分之一天、十亿分之一天里的变化，也就是 <span class="m">(2^(<i>t</i>+<i>d</i><i>t</i>) − 2^<i>t</i>) / <i>d</i><i>t</i></span> 在 <span class="m"><i>d</i><i>t</i> → 0</span> 时的值。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-2m05s0.jpg" alt="第 4 天到第 5 天，质量从 16 涨到 32" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="125">2:05</button>第 4 天到第 5 天，质量从 16 涨到 32</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-3m20s0.jpg" alt="导数要看很短时间 dt 里的变化率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="200">3:20</button>导数要看很短时间 dt 里的变化率</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="248">4:08</button>和自身成正比，常数是 0.6931</h4>
+      <p>作者说这部分他找不到一张能直接「看出」答案的图，要靠数值规律。关键是指数最重要的性质：<span class="m">2^(<i>t</i>+<i>d</i><i>t</i>) = 2^<i>t</i> · 2^<i>d</i><i>t</i></span>，指数上的加法变成乘法，这让「时间上的小步」这种加法概念和「比率」这种乘法概念联系起来。</p>
+      <p>于是可以把 <span class="m">2^<i>t</i></span> 提出来：导数等于 <span class="m">2^<i>t</i> × (2^<i>d</i><i>t</i> − 1)/<i>d</i><i>t</i></span> 的极限。重要的是，右边含 <span class="m"><i>d</i><i>t</i></span> 的部分和 <span class="m"><i>t</i></span> 完全无关。拿计算器代 <span class="m"><i>d</i><i>t</i> = 0.001</span> 这样的小数，<span class="m">(2^<i>d</i><i>t</i> − 1)/<i>d</i><i>t</i></span> 趋近于一个固定的数，约 0.6931。所以 <span class="m">2^<i>t</i></span> 的导数就是它自己乘一个常数 0.6931：在很短的时间尺度上，变化率不等于自身，而是和自身成正比。</p>
+      <p>底数换成 3，常数约 1.0986；换成 8，约 2.079，而且正好是 2 的那个常数的 3 倍。这些常数显然有规律：2 和 0.6931 有什么关系？8 和 2.079 呢？</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-4m45s0.jpg" alt="2^(t+dt) = 2ᵗ · 2^dt，把 2ᵗ 提出来" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="285">4:45</button>2^(t+dt) = 2ᵗ · 2^dt，把 2ᵗ 提出来</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-5m30s0.jpg" alt="dt 越来越小，(2^dt − 1)/dt 趋近于 0.6931…" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="330">5:30</button>dt 越来越小，(2^dt − 1)/dt 趋近于 0.6931…</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-7m00s0.jpg" alt="底数 8：常数约 2.0794，是 2 的那个的 3 倍" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="420">7:00</button>底数 8：常数约 2.0794，是 2 的那个的 3 倍</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="456">7:36</button>e：让比例常数恰好为 1 的底数</h4>
+      <p>换个问法：有没有一个底数，让比例常数恰好是 1，也就是导数就等于函数本身？有，就是 <span class="m"><i>e</i> ≈ 2.71828</span>。某种意义上这就是 <span class="m"><i>e</i></span> 的定义，和 π 被定义成周长与直径之比是一个道理。</p>
+      <p>所有指数函数都和自己的导数成正比，只有 <span class="m"><i>e</i></span> 让比例常数为 1。几何上，<span class="m"><i>e</i>^<i>t</i></span> 的图像上每一点的切线斜率，都等于那一点的高度。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-8m05s0.jpg" alt="底数取 e，比例常数恰好是 1" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="485">8:05</button>底数取 e，比例常数恰好是 1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-8m40s0.jpg" alt="eᵗ 的图像：任一点的斜率等于该点的高度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="520">8:40</button>eᵗ 的图像：任一点的斜率等于该点的高度</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="539">8:59</button>用链式法则解开神秘常数</h4>
+      <p><span class="m"><i>e</i>^(3<i>t</i>)</span> 的导数：外层函数的导数就是它自己，再乘内层 <span class="m">3<i>t</i></span> 的导数 3。也可以用上一集的直觉：<span class="m"><i>t</i></span> 推一点点，<span class="m">3<i>t</i></span> 变化 3 倍，再传到 <span class="m"><i>e</i>^(3<i>t</i>)</span>。结论是 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 的导数等于 <span class="m"><i>c</i> · <i>e</i>^(<i>c</i><i>t</i>)</span>。</p>
+      <p>剩下是代数：2 可以写成 <span class="m"><i>e</i>^(<i>l</i><i>n</i> 2)</span>，这就是自然对数的定义，问的是「<span class="m"><i>e</i></span> 的多少次方等于 2」。于是 <span class="m">2^<i>t</i> = <i>e</i>^(<i>l</i><i>n</i>(2)·<i>t</i>)</span>，它的导数和自身成正比，常数是 <span class="m"><i>l</i><i>n</i> 2</span>。计算器上 <span class="m"><i>l</i><i>n</i> 2 ≈ 0.6931</span>，正是前面那个神秘常数。其他底数一样：常数就是底数的自然对数，所以 8 的常数是 <span class="m"><i>l</i><i>n</i> 8 = 3 <i>l</i><i>n</i> 2</span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-10m25s0.jpg" alt="e^(ct) 的导数是 c·e^(ct)；2ᵗ = e^(ln(2)t)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="625">10:25</button>e^(ct) 的导数是 c·e^(ct)；2ᵗ = e^(ln(2)t)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-10m40s0.jpg" alt="所以 2ᵗ 的导数是 ln(2)·2ᵗ，ln 2 = 0.6931…" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="640">10:40</button>所以 2ᵗ 的导数是 ln(2)·2ᵗ，ln 2 = 0.6931…</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="668">11:08</button>为什么都写成 e 的幂</h4>
+      <p>应用里几乎不写「某个底数的 <span class="m"><i>t</i></span> 次方」，而写成 <span class="m"><i>e</i></span> 的「常数乘 <span class="m"><i>t</i></span>」次方。两种写法等价，任何 <span class="m">2^<i>t</i></span>、<span class="m">3^<i>t</i></span> 都能改写，<span class="m"><i>e</i></span> 对这个函数本身并不根本，这是一个写法上的选择。</p>
+      <p>选择 <span class="m"><i>e</i></span> 的好处是让指数里的常数有了直接的含义。很多现象的变化率和变化的量本身成正比：没有资源限制时，种群的增长率正比于种群大小；热水放在凉房间里，降温速度正比于水和室温的温差，换句话说温差的变化率正比于温差本身；投资的增长率正比于当时的本金。这类变量随时间的函数都是指数函数，写成 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 时，<span class="m"><i>c</i></span> 正好就是「变化率 / 变量本身」这个比例常数。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-13m05s0.jpg" alt="温差的变化率正比于温差：ΔT(t) = e^(−kt)，k 就是比例常数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="785">13:05</button>温差的变化率正比于温差：ΔT(t) = e^(−kt)，k 就是比例常数</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>所有指数函数都和自己的导数成正比：<span class="m">(<i>a</i>^<i>t</i>)′ = <i>l</i><i>n</i>(<i>a</i>)·<i>a</i>^<i>t</i></span>。</li><li><span class="m"><i>e</i></span> 是让比例常数为 1 的底数：<span class="m">(<i>e</i>^<i>t</i>)′ = <i>e</i>^<i>t</i></span>，图像每点的斜率等于高度。</li><li><span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 的导数是 <span class="m"><i>c</i>·<i>e</i>^(<i>c</i><i>t</i>)</span>；写成 <span class="m"><i>e</i></span> 的幂时，<span class="m"><i>c</i></span> 就是「变化率 / 自身」的比例常数。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/eulers-number-2m05s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=5" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="14"><b>0:14</b><span>指数函数的导数，e 为什么特别</span></button></li><li><button type="button" data-t="32"><b>0:32</b><span>例：每天翻倍的种群质量 2ᵗ</span></button></li><li><button type="button" data-t="99"><b>1:39</b><span>按整天算，增长率等于当天开始时的质量</span></button></li><li><button type="button" data-t="159"><b>2:39</b><span>但导数要看越来越短的时间</span></button></li><li><button type="button" data-t="248"><b>4:08</b><span>关键：2^(t+dt) = 2ᵗ · 2^dt</span></button></li><li><button type="button" data-t="302"><b>5:02</b><span>含 dt 的部分和 t 完全无关</span></button></li><li><button type="button" data-t="327"><b>5:27</b><span>这个部分趋近于 0.6931…</span></button></li><li><button type="button" data-t="389"><b>6:29</b><span>换底数：3ᵗ 是 1.0986，8ᵗ 是 2.079</span></button></li><li><button type="button" data-t="432"><b>7:12</b><span>8 的常数正好是 2 的 3 倍</span></button></li><li><button type="button" data-t="456"><b>7:36</b><span>有没有让常数等于 1 的底数：e</span></button></li><li><button type="button" data-t="515"><b>8:35</b><span>eᵗ 的图像：每点的斜率等于高度</span></button></li><li><button type="button" data-t="539"><b>8:59</b><span>链式法则：e^(ct) 的导数是 c·e^(ct)</span></button></li><li><button type="button" data-t="596"><b>9:56</b><span>2 = e^(ln 2)，所以常数就是 ln 2</span></button></li><li><button type="button" data-t="668"><b>11:08</b><span>实际中都写成 e 的幂</span></button></li><li><button type="button" data-t="716"><b>11:56</b><span>变化率和自身成正比的现象</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc6" data-ch="6" data-sk="calc6" data-bv="BV1qW411N7FU" data-p="6">
+  <summary>
+    <span class="no">6</span>
+    <span class="tt"><b>隐函数求导是怎么回事</b><em>Implicit differentiation, what's going on here?</em><span class="hook">对 x² + y² = 5² 两边「求导」，意思是：在平面上迈一小步 (dx, dy)，两边的值各变多少；要留在曲线上，两边的变化必须相等。</span></span>
+    <span class="side"><span class="chip">B 站 P6 · 06</span><span class="len">15:33</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">隐函数求导是作者当学生时觉得最奇怪的操作：对 <span class="m"><i>x</i>² + <i>y</i>² = 5²</span> 两边同时求导，写出 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i> = 0</span>，就得到了圆的切线斜率。含两个变量的表达式「求导」是什么意思？这一集先用梯子下滑的相关变化率问题做对照，那里变量都是时间的函数，求导的意义很清楚；再把 <span class="m"><i>x</i>² + <i>y</i>²</span> 看成平面上的一个二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，求导就是问「迈一小步，<span class="m"><i>S</i></span> 变了多少」，而留在曲线上就要求这个变化为 0。最后用这个方法推出 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=6" target="_blank" rel="noreferrer">B 站 P6：06 - 隐函数求导是怎么回事？ ↗</a>
+        <a href="https://www.youtube.com/watch?v=qb40J4N1fa4" target="_blank" rel="noreferrer">YouTube 第 6 章 · 2017-05-03 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="16">0:16</button>奇怪的操作</h4>
+      <p>圆心在原点、半径 5 的圆，方程是 <span class="m"><i>x</i>² + <i>y</i>² = 5²</span>，也就是勾股定理：圆上每个点到原点的距离都是 5。想求 <span class="m">(3, 4)</span> 处切线的斜率。懂几何的话知道切线垂直于半径，但想要一个能推广到别的曲线的方法。</p>
+      <p>和其他切线问题一样，放大到曲线几乎就是它自己的切线，然后沿曲线迈一小步：竖直分量 <span class="m"><i>d</i><i>y</i></span>，水平分量 <span class="m"><i>d</i><i>x</i></span>，斜率就是 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i></span>。不同的是，这条曲线不是函数的图像，<span class="m"><i>x</i></span> 不是输入、<span class="m"><i>y</i></span> 也不是输出，它们只是被一个方程联系起来的两个量。这叫<b>隐式曲线 (Implicit Curve)</b>。</p>
+      <p>课上教的做法是：两边求导，<span class="m"><i>x</i>²</span> 变成 <span class="m">2<i>x</i> <i>d</i><i>x</i></span>，<span class="m"><i>y</i>²</span> 变成 <span class="m">2<i>y</i> <i>d</i><i>y</i></span>，右边常数 <span class="m">5²</span> 的导数是 0。整理得 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = −<i>x</i>/<i>y</i></span>，在 <span class="m">(3, 4)</span> 处斜率是 <span class="m">−3/4</span>。这叫<b>隐函数求导 (Implicit Differentiation)</b>。含两个变量的式子求导是什么意思？为什么要这样挂上 <span class="m"><i>d</i><i>x</i></span> 和 <span class="m"><i>d</i><i>y</i></span>？</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-0m45s0.jpg" alt="x² + y² = 5² 上 (3, 4) 处的切线斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="45">0:45</button>x² + y² = 5² 上 (3, 4) 处的切线斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-2m58s0.jpg" alt="两边求导：2x dx + 2y dy = 0，斜率 dy/dx = −x/y" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="178">2:58</button>两边求导：2x dx + 2y dy = 0，斜率 dy/dx = −x/y</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="196">3:16</button>对照：梯子下滑的相关变化率</h4>
+      <p>一架 5 米长的梯子靠在墙上，顶端离地 4 米，按勾股定理底端离墙 3 米。梯子下滑，顶端以每秒 1 米的速度下降。问一开始那一刻，底端离开墙的速度是多少？底端到墙的距离完全由顶端高度决定，所以两者的变化率一定有关系。</p>
+      <p>把顶端高度记作 <span class="m"><i>y</i>(<i>t</i>)</span>，底端到墙的距离记作 <span class="m"><i>x</i>(<i>t</i>)</span>，关键方程是 <span class="m"><i>x</i>(<i>t</i>)² + <i>y</i>(<i>t</i>)² = 5²</span>，而且它对每个时刻都成立。左边是时间的函数，只是恰好等于常数。所以可以对它求导：让时间过一小段 <span class="m"><i>d</i><i>t</i></span>，<span class="m"><i>y</i></span> 稍降、<span class="m"><i>x</i></span> 稍增，这个表达式变了多少？</p>
+      <p>一方面，它是常数，导数必须为 0；另一方面，用链式法则算，是 <span class="m">2<i>x</i>(<i>t</i>)·<i>d</i><i>x</i>/<i>d</i><i>t</i> + 2<i>y</i>(<i>t</i>)·<i>d</i><i>y</i>/<i>d</i><i>t</i></span>。一开始 <span class="m"><i>x</i> = 3</span>、<span class="m"><i>y</i> = 4</span>、<span class="m"><i>d</i><i>y</i>/<i>d</i><i>t</i> = −1</span>，代入就能解出 <span class="m"><i>d</i><i>x</i>/<i>d</i><i>t</i> = 4/3</span> 米/秒。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-4m40s0.jpg" alt="梯子问题：x(t)² + y(t)² = 5² 对所有时刻都成立" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="280">4:40</button>梯子问题：x(t)² + y(t)² = 5² 对所有时刻都成立</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-7m08s0.jpg" alt="对时间求导：2(3)·dx/dt + 2(4)(−1) = 0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="428">7:08</button>对时间求导：2(3)·dx/dt + 2(4)(−1) = 0</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="434">7:14</button>把 x² + y² 看成平面上的函数</h4>
+      <p>两个问题用的是同一个方程，都对两边求了导。梯子问题里，式子是时间的函数，求导的意义很清楚。圆的问题怪在 <span class="m"><i>d</i><i>x</i></span>、<span class="m"><i>d</i><i>y</i></span> 自由飘着，没有绑在时间这样的公共变量上。</p>
+      <p>作者的解释：给 <span class="m"><i>x</i>² + <i>y</i>²</span> 起个名字 <span class="m"><i>S</i></span>，它是一个二元函数，给平面上每个点 <span class="m">(<i>x</i>, <i>y</i>)</span> 配一个数。圆上的点，这个数是 25；往外走变大，往原点走变小。对 <span class="m"><i>S</i></span>「求导」，意思是让两个变量各变一点，<span class="m"><i>d</i><i>x</i></span> 和 <span class="m"><i>d</i><i>y</i></span>，迈任意方向的一小步（不一定沿着圆），问 <span class="m"><i>S</i></span> 变了多少，这就是 <span class="m"><i>d</i><i>S</i></span>。</p>
+      <p>比如从 <span class="m">(3, 4)</span> 出发，<span class="m"><i>d</i><i>x</i> = −0.02</span>、<span class="m"><i>d</i><i>y</i> = −0.01</span>，<span class="m"><i>S</i></span> 大约减少 <span class="m">2·3·(−0.02) + 2·4·(−0.01)</span>。这就是 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i></span> 的含义：给定起点和步长，告诉你 <span class="m"><i>x</i>² + <i>y</i>²</span> 变了多少。步子越小，这个近似越准。</p>
+      <p>要沿着圆走，就是要求 <span class="m"><i>S</i></span> 不变：从 25 开始，保持 25，也就是 <span class="m"><i>d</i><i>S</i> = 0</span>。所以 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i> = 0</span> 是「这一小步留在圆上」的条件。更精确地说，它保证留在切线上，但步子足够小时两者几乎一样。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-8m25s0.jpg" alt="S(x, y) = x² + y²：圆外的点值更大" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="505">8:25</button>S(x, y) = x² + y²：圆外的点值更大</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-9m25s0.jpg" alt="迈一小步 (dx, dy)，S 变化 dS ≈ 2x dx + 2y dy" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="565">9:25</button>迈一小步 (dx, dy)，S 变化 dS ≈ 2x dx + 2y dy</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-10m25s0.jpg" alt="要留在圆上，dS 必须为 0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="625">10:25</button>要留在圆上，dS 必须为 0</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="645">10:45</button>换一条曲线：sin(x)·y² = x</h4>
+      <p>方程 <span class="m">sin(<i>x</i>)·<i>y</i>² = <i>x</i></span> 描出平面上一堆 U 形曲线，也就是所有使左右两边相等的点。迈一小步 <span class="m">(<i>d</i><i>x</i>, <i>d</i><i>y</i>)</span>，两边分别变多少：左边用乘积法则（左乘右导加右乘左导），是 <span class="m">sin(<i>x</i>)·2<i>y</i> <i>d</i><i>y</i> + <i>y</i>²·cos(<i>x</i>) <i>d</i><i>x</i></span>；右边就是 <span class="m"><i>x</i></span>，变化正好是 <span class="m"><i>d</i><i>x</i></span>。</p>
+      <p>让两边相等，意思是：不管这一小步是什么，要留在曲线上，两边必须变化同样的量，方程才能继续成立。之后可以按需要做代数，最常见的是解出 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i></span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-11m55s0.jpg" alt="左边的变化 sin(x)(2y dy) + y²(cos(x) dx) 必须等于右边的变化 dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="715">11:55</button>左边的变化 sin(x)(2y dy) + y²(cos(x) dx) 必须等于右边的变化 dx</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="753">12:33</button>用隐函数求导推出 ln x 的导数</h4>
+      <p>已经知道 <span class="m"><i>e</i>^<i>x</i></span> 的导数是它自己，那它的反函数 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 呢？把 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的图像看成隐式曲线：所有满足 <span class="m"><i>y</i> = <i>l</i><i>n</i> <i>x</i></span> 的点，也就是 <span class="m"><i>e</i>^<i>y</i> = <i>x</i></span>（这正是自然对数的含义）。</p>
+      <p>两边求导，问一小步 <span class="m">(<i>d</i><i>x</i>, <i>d</i><i>y</i>)</span> 让两边各变多少：左边变 <span class="m"><i>e</i>^<i>y</i> <i>d</i><i>y</i></span>，右边变 <span class="m"><i>d</i><i>x</i></span>。要留在曲线上，两者相等，所以斜率 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = 1/<i>e</i>^<i>y</i></span>。在曲线上 <span class="m"><i>e</i>^<i>y</i></span> 就等于 <span class="m"><i>x</i></span>，所以斜率是 <span class="m">1/<i>x</i></span>，也就是 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
+      <p>作者说这是多元微积分的一瞥：函数有多个输入，研究调整这些输入时函数怎么变。关键始终是想清楚有哪些微小推动在起作用、它们彼此怎么依赖。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-13m25s0.jpg" alt="y = ln x 写成 eʸ = x" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="805">13:25</button>y = ln x 写成 eʸ = x</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-14m10s0.jpg" alt="eʸ dy = dx，所以 dy/dx = 1/eʸ = 1/x" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="850">14:10</button>eʸ dy = dx，所以 dy/dx = 1/eʸ = 1/x</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>相关变化率：各变量都是时间的函数，对恒等式两边求导，得到变化率之间的关系。</li><li>隐函数求导：把方程一边看成二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，<span class="m"><i>d</i><i>S</i> = (∂<i>S</i>/∂<i>x</i>)<i>d</i><i>x</i> + (∂<i>S</i>/∂<i>y</i>)<i>d</i><i>y</i></span>；留在曲线上等于要求两边变化相等。</li><li><span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，由 <span class="m"><i>e</i>^<i>y</i> = <i>x</i></span> 两边求导得到。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/implicit-differentiation-0m45s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=6" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="16"><b>0:16</b><span>例：半径 5 的圆 x² + y² = 5²</span></button></li><li><button type="button" data-t="40"><b>0:40</b><span>求 (3, 4) 处切线的斜率</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>放大，迈一小步 (dx, dy)</span></button></li><li><button type="button" data-t="88"><b>1:28</b><span>x、y 不是输入和输出，这是隐式曲线</span></button></li><li><button type="button" data-t="124"><b>2:04</b><span>奇怪的操作：两边求导 2x dx + 2y dy = 0</span></button></li><li><button type="button" data-t="162"><b>2:42</b><span>得到 dy/dx = −x/y，(3, 4) 处是 −3/4</span></button></li><li><button type="button" data-t="196"><b>3:16</b><span>对照：相关变化率问题</span></button></li><li><button type="button" data-t="206"><b>3:26</b><span>梯子：长 5 米，顶端以 1 米/秒下滑</span></button></li><li><button type="button" data-t="274"><b>4:34</b><span>x(t)² + y(t)² = 5² 对所有时刻都成立</span></button></li><li><button type="button" data-t="336"><b>5:36</b><span>对时间求导，左边必须为 0</span></button></li><li><button type="button" data-t="405"><b>6:45</b><span>代入 x = 3、y = 4、dy/dt = −1，dx/dt = 4/3</span></button></li><li><button type="button" data-t="434"><b>7:14</b><span>圆的问题怪在 dx、dy 没有绑在时间上</span></button></li><li><button type="button" data-t="483"><b>8:03</b><span>把 x² + y² 看成二元函数 S(x, y)</span></button></li><li><button type="button" data-t="524"><b>8:44</b><span>dS = 2x dx + 2y dy：任意一小步 S 变多少</span></button></li><li><button type="button" data-t="602"><b>10:02</b><span>留在圆上：dS = 0</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>另一个例子：sin(x)·y² = x</span></button></li><li><button type="button" data-t="753"><b>12:33</b><span>推出 ln x 的导数</span></button></li><li><button type="button" data-t="872"><b>14:32</b><span>这是多元微积分的一瞥</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc7" data-ch="7" data-sk="calc7" data-bv="BV1qW411N7FU" data-p="7">
+  <summary>
+    <span class="no">7</span>
+    <span class="tt"><b>极限、洛必达法则与 ε-δ 定义</b><em>Limits, L'Hôpital's rule, and epsilon delta definitions</em><span class="hook">导数的正式定义就是把 dx 换成 h 再取极限；ε-δ 把「趋近」说得严丝合缝；洛必达法则反过来用导数求 0/0 型极限。</span></span>
+    <span class="side"><span class="chip">B 站 P7 · 07</span><span class="len">18:26</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">讲积分之前先讲极限。作者说极限没有新东西，懂「趋近」这个词就懂极限，它只是给「一个值越来越接近另一个值」配了正式记号。这一集做三件事：说明前几集「把 <span class="m"><i>d</i><i>x</i></span> 当成具体的非零小量」的讲法和教科书上导数的正式定义完全一致；解释数学家说的「趋近」到底是什么意思，也就是 ε-δ 定义；最后讲一个算极限的技巧，洛必达法则。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=7" target="_blank" rel="noreferrer">B 站 P7：07 - 极限 ↗</a>
+        <a href="https://www.youtube.com/watch?v=kfF40MiS7zA" target="_blank" rel="noreferrer">YouTube 第 7 章 · 2017-05-04 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="77">1:17</button>导数的正式定义</h4>
+      <p>回顾：求 <span class="m"><i>f</i></span> 在 <span class="m"><i>x</i> = 2</span> 处的导数，把输入推一点点 <span class="m"><i>d</i><i>x</i></span>，看输出的变化 <span class="m"><i>d</i><i>f</i></span>。比值 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i></span> 是起点和推后那一点之间的斜率，导数是 <span class="m"><i>d</i><i>x</i></span> 趋近于 0 时它趋近的值。<span class="m"><i>d</i><i>f</i></span> 就是 <span class="m"><i>f</i>(2 + <i>d</i><i>x</i>) − <i>f</i>(2)</span>。</p>
+      <p>「趋近于 0 时的值」写作 <span class="m"><i>l</i><i>i</i><i>m</i></span>，下面标 <span class="m"><i>d</i><i>x</i> → 0</span>。不过极限表达式里几乎从不写带小写 d 的 <span class="m"><i>d</i><i>x</i></span>，而是换一个变量，比如 <span class="m">Δ<i>x</i></span>，或者常用的 <span class="m"><i>h</i></span>。作者的理解是：带小写 d 的记号本身就隐含着「最后要趋近于 0」。左边的 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i></span> 是简写，右边把 <span class="m"><i>d</i><i>f</i></span> 和取极限的过程写全了：</p>
+      <p><span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i>(2) = <i>l</i><i>i</i><i>m</i>(<i>h</i>→0) (<i>f</i>(2 + <i>h</i>) − <i>f</i>(2)) / <i>h</i></span>，这就是教科书里导数的正式定义。</p>
+      <p>作者强调，这个定义里没有任何「无穷小」。<span class="m"><i>h</i></span> 和前几集的 <span class="m"><i>d</i><i>x</i></span> 完全一样，是一个有限的非零小量，比如 0.001，只是我们在分析 <span class="m"><i>h</i></span> 任意小时会发生什么。引入新变量名 <span class="m"><i>h</i></span>，正是为了说清楚这些都是普通的数，和无穷小无关。也有人把 <span class="m"><i>d</i><i>x</i></span> 理解成无穷小，或者说它只是不必当真的符号，作者两种看法都不喜欢：把 <span class="m"><i>d</i><i>x</i></span> 当成具体的有限小量，只要记得问它趋近于 0 时的情况，就既能建立直觉，又完全符合正式定义。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/limits-1m40s0.jpg" alt="df/dx：起点和推后那一点之间的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="100">1:40</button>df/dx：起点和推后那一点之间的斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-3m05s0.jpg" alt="导数的正式定义：lim(h→0) (f(2+h) − f(2)) / h" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="185">3:05</button>导数的正式定义：lim(h→0) (f(2+h) − f(2)) / h</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="293">4:53</button>「趋近」是什么意思：ε-δ</h4>
+      <p>看函数 <span class="m">((2 + <i>h</i>)³ − 2³)/<i>h</i></span>，它恰好是 <span class="m"><i>x</i>³</span> 在 2 处导数定义里的式子，但先把它当成一个普通函数。图像像一条连续的抛物线，可在 <span class="m"><i>h</i> = 0</span> 处代进去是 <span class="m">0/0</span>，没有定义，图像在那里有个洞（要夸张地画一个空心圆）。</p>
+      <p>不管从哪边靠近，<span class="m"><i>h</i></span> 趋近于 0 时高度都趋近于 12。但如果有人较真：「趋近」到底什么意思？可以这样回答：在 0 附近取一段输入（不含 0 本身），看对应的所有输出。输入范围越缩越紧，输出范围也围绕 12 越缩越紧，而且可以缩到任意小。</p>
+      <p>反例：一个在 0 处跳一下的函数，从右边趋近是 2，从左边趋近是 1。没有一个明确的值，极限不存在。输入范围再怎么缩，输出范围始终横跨至少 1 这么宽，缩不下去。</p>
+      <p>把这个想法写精确，就是<b>ε-δ 定义</b>。取离 12 的任意距离 ε（希望它多小都行）。极限存在的意思是：总能在 0 附近找到一个距离 δ，使得离 0 不超过 δ 的所有输入，对应的输出离 12 都不超过 ε。而且对任意 ε 都能找到这样的 δ。极限不存在时，可以找到一个足够小的 ε，比如 0.4，让无论 δ 多小，对应的输出范围都太宽。</p>
+      <p>作者承认对入门来说这有点重，概念上没有新东西，但它让你一窥实分析 (Real Analysis)，看数学家怎么把微积分的直观想法变得严密。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/limits-5m45s0.jpg" alt="h = 0 代进去是 0/0，图像在那里有个洞" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="345">5:45</button>h = 0 代进去是 0/0，图像在那里有个洞</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-6m45s0.jpg" alt="输入范围缩小，输出范围围绕 12 缩小" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="405">6:45</button>输入范围缩小，输出范围围绕 12 缩小</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-7m45s0.jpg" alt="跳跃的函数：输出范围缩不下去，极限不存在" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="465">7:45</button>跳跃的函数：输出范围缩不下去，极限不存在</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-9m15s0.jpg" alt="ε-δ：对任意 ε，都能找到 δ" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="555">9:15</button>ε-δ：对任意 ε，都能找到 δ</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-9m40s0.jpg" alt="极限不存在：ε = 0.4 时，任何 δ 都不够" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="580">9:40</button>极限不存在：ε = 0.4 时，任何 δ 都不够</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="604">10:04</button>洛必达法则</h4>
+      <p>一个实际算极限的技巧。比如 <span class="m">sin(<i>π</i><i>x</i>)/(<i>x</i>² − 1)</span>，可能在描述某种阻尼振荡。图像看起来连续，但 <span class="m"><i>x</i> = 1</span> 处 <span class="m">sin <i>π</i> = 0</span>、分母也是 0，没有定义（<span class="m"><i>x</i> = −1</span> 处同样）。代 1.00001 这种很接近 1 的数，大约得到 −1.57。有没有办法知道精确值？</p>
+      <p>极限帮导数下了定义，导数也能回过来帮忙求极限。<span class="m">sin(<i>π</i><i>x</i>)</span> 和 <span class="m"><i>x</i>² − 1</span> 在 <span class="m"><i>x</i> = 1</span> 处都是 0。放大到这一点，看推一点点 <span class="m"><i>d</i><i>x</i></span> 时的情况：<span class="m">sin(<i>π</i><i>x</i>)</span> 的变化约是 <span class="m">cos(<i>π</i><i>x</i>)·<i>π</i>·<i>d</i><i>x</i></span>（链式法则），在 <span class="m"><i>x</i> = 1</span> 处 <span class="m">cos <i>π</i> = −1</span>，所以是 <span class="m">−<i>π</i>·<i>d</i><i>x</i></span>；<span class="m"><i>x</i>² − 1</span> 的变化约是 <span class="m">2<i>x</i>·<i>d</i><i>x</i></span>，在 <span class="m"><i>x</i> = 1</span> 处是 <span class="m">2·<i>d</i><i>x</i></span>。</p>
+      <p>所以在离 1 只有 <span class="m"><i>d</i><i>x</i></span> 的地方，比值约是 <span class="m">−<i>π</i> <i>d</i><i>x</i> / 2 <i>d</i><i>x</i></span>，<span class="m"><i>d</i><i>x</i></span> 约掉，剩 <span class="m">−<i>π</i>/2</span>。而且 <span class="m"><i>d</i><i>x</i></span> 越小越准，所以 <span class="m">−<i>π</i>/2</span> 就是精确的极限值。</p>
+      <p>一般地：两个函数 <span class="m"><i>f</i></span>、<span class="m"><i>g</i></span> 在 <span class="m"><i>x</i> = <i>a</i></span> 处都为 0，而且在 <span class="m"><i>a</i></span> 处可导（放大后都像直线）。在 <span class="m"><i>a</i></span> 附近推 <span class="m"><i>d</i><i>x</i></span>，<span class="m"><i>f</i> ≈ <i>f</i>′(<i>a</i>)·<i>d</i><i>x</i></span>，<span class="m"><i>g</i> ≈ <i>g</i>′(<i>a</i>)·<i>d</i><i>x</i></span>，比值约为 <span class="m"><i>f</i>′(<i>a</i>)/<i>g</i>′(<i>a</i>)</span>，<span class="m"><i>d</i><i>x</i></span> 越小越准。所以遇到代进去是 <span class="m">0/0</span> 的式子，就对分子分母分别求导再代入。这就是<b>洛必达法则 (L'Hôpital's Rule)</b>。</p>
+      <p>趣闻：它是约翰·伯努利发现的，洛必达是个有钱人，花钱买下了伯努利一些数学发现的权利。</p>
+      <p>你可能会想：导数定义本身就是一个 <span class="m">0/0</span> 型极限，能不能用洛必达法则来发现新的求导公式？那是作弊，因为你本来就不知道分子的导数。发现求导公式没有机械的套路，作者说这是好事：需要创造力的地方，往往是在做有用的事。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/limits-11m10s0.jpg" alt="sin(πx)/(x² − 1) 在 x = 1 处是 0/0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="670">11:10</button>sin(πx)/(x² − 1) 在 x = 1 处是 0/0</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-12m45s0.jpg" alt="分子的变化约为 cos(π·1)·π·dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="765">12:45</button>分子的变化约为 cos(π·1)·π·dx</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-13m55s0.jpg" alt="比值 ≈ −π dx / 2 dx = −π/2" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="835">13:55</button>比值 ≈ −π dx / 2 dx = −π/2</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/limits-16m15s0.jpg" alt="洛必达法则：lim f/g = f′(a)/g′(a)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="973">16:13</button>洛必达法则：lim f/g = f′(a)/g′(a)</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>导数的正式定义：<span class="m"><i>f</i>′(<i>a</i>) = <i>l</i><i>i</i><i>m</i>(<i>h</i>→0) (<i>f</i>(<i>a</i> + <i>h</i>) − <i>f</i>(<i>a</i>))/<i>h</i></span>；<span class="m"><i>h</i></span> 是有限的非零小量，不是无穷小。</li><li>ε-δ：对任意 ε > 0，都存在 δ > 0，使 <span class="m">0 < |<i>h</i>| < <i>δ</i></span> 时输出离极限值不超过 ε。</li><li>洛必达法则：<span class="m"><i>f</i>(<i>a</i>) = <i>g</i>(<i>a</i>) = 0</span> 时，<span class="m"><i>l</i><i>i</i><i>m</i> <i>f</i>/<i>g</i> = <i>f</i>′(<i>a</i>)/<i>g</i>′(<i>a</i>)</span>，因为两者在 <span class="m"><i>a</i></span> 附近都近似为「导数 × dx」。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/limits-1m40s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=7" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="14"><b>0:14</b><span>极限没有新东西，只是给「趋近」配上记号</span></button></li><li><button type="button" data-t="77"><b>1:17</b><span>导数的正式定义</span></button></li><li><button type="button" data-t="136"><b>2:16</b><span>极限里通常不写 dx，而写 h</span></button></li><li><button type="button" data-t="188"><b>3:08</b><span>h 就是有限的非零小量，不是无穷小</span></button></li><li><button type="button" data-t="293"><b>4:53</b><span>「趋近」到底是什么意思</span></button></li><li><button type="button" data-t="300"><b>5:00</b><span>例：((2 + h)³ − 2³)/h 在 h = 0 处没有定义</span></button></li><li><button type="button" data-t="351"><b>5:51</b><span>从两边趋近都是 12</span></button></li><li><button type="button" data-t="390"><b>6:30</b><span>输入范围缩小，输出范围也能缩到任意小</span></button></li><li><button type="button" data-t="419"><b>6:59</b><span>反例：左右趋近的值不同，极限不存在</span></button></li><li><button type="button" data-t="468"><b>7:48</b><span>ε-δ 定义</span></button></li><li><button type="button" data-t="565"><b>9:25</b><span>极限不存在：总能找到一个 ε 让任何 δ 都不够</span></button></li><li><button type="button" data-t="604"><b>10:04</b><span>算极限的技巧</span></button></li><li><button type="button" data-t="609"><b>10:09</b><span>例：sin(πx)/(x² − 1) 在 x = 1 处是 0/0</span></button></li><li><button type="button" data-t="707"><b>11:47</b><span>放大看：分子分母各推一点点</span></button></li><li><button type="button" data-t="830"><b>13:50</b><span>比值 ≈ −π dx / 2 dx = −π/2</span></button></li><li><button type="button" data-t="864"><b>14:24</b><span>一般情形：洛必达法则</span></button></li><li><button type="button" data-t="973"><b>16:13</b><span>其实是约翰·伯努利发现的</span></button></li><li><button type="button" data-t="994"><b>16:34</b><span>不能用洛必达来发现导数公式</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc8" data-ch="8" data-sk="calc8" data-bv="BV1qW411N7FU" data-p="8">
+  <summary>
+    <span class="no">8</span>
+    <span class="tt"><b>积分与微积分基本定理</b><em>Integration and the fundamental theorem of calculus</em><span class="hook">只看车速表，怎么知道开了多远：把速度当成一段段常数，距离就是细长方形面积之和，极限是曲线下的面积；而面积函数的导数正是速度，所以用原函数两端相减就能算。</span></span>
+    <span class="side"><span class="chip">B 站 P8 · 08</span><span class="len">20:46</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">这一集把积分讲清楚，并说明为什么它是导数的逆运算。例子是第 2 集的对偶：坐在车里看不到窗外，只看得到车速表，速度是 <span class="m"><i>v</i>(<i>t</i>) = <i>t</i>(8 − <i>t</i>)</span>，8 秒内开了多远？速度恒定时距离是速度乘时间，可以画成长方形面积；速度一直在变，就把它近似成一段段常数，距离是许多细长方形面积之和，<span class="m"><i>d</i><i>t</i> → 0</span> 时趋近于曲线下的面积。再把面积看成右端点的函数，推一下右端点，就看出面积函数的导数等于速度。于是求积分就变成找原函数，这就是微积分基本定理。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=8" target="_blank" rel="noreferrer">B 站 P8：08 - 积分与微积分基本定理 ↗</a>
+        <a href="https://www.youtube.com/watch?v=rfG8ce4nNh0" target="_blank" rel="noreferrer">YouTube 第 8 章 · 2017-05-05 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="55">0:55</button>问题：只看车速表</h4>
+      <p>作者引用他很崇拜的数学家 Grothendieck 的话开场：数学里太常一上来就用一长串公式证明某件事为真，而不是先退一步，确认它在直觉层面合理，最好是显然。这一集想让「积分是导数的逆」变得几乎显然。</p>
+      <p>你坐在车里看不到窗外，只看得到车速表。车启动、加速、再减速停下，共 8 秒。能不能只凭车速表算出走了多远？更好的是找到距离函数 <span class="m"><i>s</i>(<i>t</i>)</span>。记下每秒的速度，发现可以用 <span class="m"><i>v</i>(<i>t</i>) = <i>t</i>(8 − <i>t</i>)</span>（米/秒）来描述。</p>
+      <p>第 2 集是反过来：已知距离函数求速度，答案是求导。所以现在只知道速度，找距离函数就归结为：哪个函数的导数是 <span class="m"><i>t</i>(8 − <i>t</i>)</span>？这叫找<b>原函数 (Antiderivative)</b>。不过作者先花大半集讲它和速度曲线下面积的关系，因为这能帮你理解一整类「积分问题」。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-1m40s0.jpg" alt="每秒记一次车速，用 v(t) = t(8 − t) 描述" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="100">1:40</button>每秒记一次车速，用 v(t) = t(8 − t) 描述</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="162">2:42</button>距离 = 细长方形面积之和</h4>
+      <p>如果车一直匀速，距离就是速度乘时间。在这张图上，横轴单位是秒，纵轴是米/秒，所以距离可以画成一个长方形的面积，面积的单位正好是米。</p>
+      <p>难就难在速度每一刻都在变。要是它只在几个点突然跳变、中间保持常数（对乘客很难受，物理上也不可能），计算就简单了：每段用常速乘时间，再加起来。所以把真实速度近似成一段段常数，再看细化近似会发生什么。</p>
+      <p>把 0 到 8 秒切成宽 <span class="m"><i>d</i><i>t</i></span> 的小段，比如 <span class="m"><i>d</i><i>t</i> = 0.25</span>。看 1 到 1.25 秒这一段，真实速度从 7 米/秒升到约 8.4 米/秒。在这一段取什么常数都行，7 到 8.4 之间随便选，重要的是近似随 <span class="m"><i>d</i><i>t</i></span> 变小越来越好。为方便，就取这段开头的速度 7：这一段走了 <span class="m">7 × 0.25 = 1.75</span> 米，正好是一个细长方形的面积，比真实值略少一点。每一段都这样，第 <span class="m"><i>t</i></span> 段的近似距离是 <span class="m"><i>v</i>(<i>t</i>)·<i>d</i><i>t</i></span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-3m05s0.jpg" alt="匀速时，距离 = 速度 × 时间 = 长方形面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="185">3:05</button>匀速时，距离 = 速度 × 时间 = 长方形面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-4m05s0.jpg" alt="假想速度一段段跳变，每段内保持常数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="245">4:05</button>假想速度一段段跳变，每段内保持常数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-6m08s0.jpg" alt="1 到 1.25 秒按 7 米/秒算：7 × 0.25 = 1.75 米" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="368">6:08</button>1 到 1.25 秒按 7 米/秒算：7 × 0.25 = 1.75 米</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="389">6:29</button>积分记号和它的含义</h4>
+      <p>把所有细长方形面积之和写成：一个拉长的 S（表示求和），下面写 0、上面写 8，表示时间从 0 取到 8，后面是每一步加的量 <span class="m"><i>v</i>(<i>t</i>) <i>d</i><i>t</i></span>：<span class="m">∫₀⁸ <i>v</i>(<i>t</i>) <i>d</i><i>t</i></span>。</p>
+      <p>这个记号里隐含两件事。第一，<span class="m"><i>d</i><i>t</i></span> 有两个角色：它是每一项里的因子，也是相邻采样时刻的间隔。<span class="m"><i>d</i><i>t</i></span> 越小，每个长方形越窄，但长方形越多。第二，不用普通求和符号 Σ，是因为它指的是 <span class="m"><i>d</i><i>t</i> → 0</span> 时和趋近的值，不对应哪个具体的 <span class="m"><i>d</i><i>t</i></span>，也就是曲线和横轴围成的面积。这个面积就是原问题（车到底开了多远）的精确答案。</p>
+      <p>这叫 <span class="m"><i>v</i>(<i>t</i>)</span> 的<b>积分 (Integral)</b>，因为它把所有值汇集 (integrate) 到一起。作者说这很惊人：原本是加起来无数个微小量的复杂近似，它们趋近的值却能如此简单地描述，就是曲线下的面积。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-6m55s0.jpg" alt="∫₀⁸ v(t) dt：每一步加的是 v(t)·dt" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="415">6:55</button>∫₀⁸ v(t) dt：每一步加的是 v(t)·dt</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-7m40s0.jpg" alt="dt → 0 时，和趋近于曲线下的面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="460">7:40</button>dt → 0 时，和趋近于曲线下的面积</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="510">8:30</button>面积函数的导数就是原函数</h4>
+      <p>你可能会问：这只是把一个难题（车开多远）换成了另一个同样难的问题（曲线下的面积）。如果只关心速度和距离，可以直接去找原函数。但「求曲线下面积」是许多不同问题的共同语言，这些问题都能拆成许多小量之和。</p>
+      <p>把右端点看成变量 <span class="m"><i>T</i></span>，从 0 到 <span class="m"><i>T</i></span> 的积分就是 <span class="m"><i>T</i></span> 的函数，也就是车走了 <span class="m"><i>T</i></span> 秒后的距离 <span class="m"><i>s</i>(<i>T</i>)</span>。它的导数是什么？一方面，距离的微小变化除以时间的微小变化就是速度。另一方面，只看这张图：把 <span class="m"><i>T</i></span> 推一点点 <span class="m"><i>d</i><i>T</i></span>，面积多出一条细条，高是 <span class="m"><i>v</i>(<i>T</i>)</span>、宽是 <span class="m"><i>d</i><i>T</i></span>，<span class="m"><i>d</i><i>T</i></span> 足够小时它就是长方形，所以 <span class="m"><i>d</i><i>s</i> ≈ <i>v</i>(<i>T</i>)·<i>d</i><i>T</i></span>，<span class="m"><i>d</i><i>s</i>/<i>d</i><i>T</i> = <i>v</i>(<i>T</i>)</span>。</p>
+      <p>这个论证适用于一般情形：任何「图像下方面积」函数的导数，都等于这个图像本身的函数。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-9m55s0.jpg" alt="0 到 T 的面积就是 T 秒走过的距离" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="595">9:55</button>0 到 T 的面积就是 T 秒走过的距离</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-10m45s0.jpg" alt="推一下 T，多出细条 ds ≈ v(T)·dT" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="645">10:45</button>推一下 T，多出细条 ds ≈ v(T)·dT</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="678">11:18</button>找原函数，上限减下限</h4>
+      <p>哪个函数的导数是 <span class="m"><i>t</i>(8 − <i>t</i>) = 8<i>t</i> − <i>t</i>²</span>？分开找：<span class="m"><i>t</i>²</span> 的导数是 <span class="m">2<i>t</i></span>，放大 4 倍，<span class="m">4<i>t</i>²</span> 的导数是 <span class="m">8<i>t</i></span>；<span class="m"><i>t</i>³</span> 的导数是 <span class="m">3<i>t</i>²</span>，缩小到三分之一，<span class="m">⅓<i>t</i>³</span> 的导数是 <span class="m"><i>t</i>²</span>，加负号，<span class="m">−⅓<i>t</i>³</span> 的导数是 <span class="m">−<i>t</i>²</span>。所以原函数是 <span class="m">4<i>t</i>² − ⅓<i>t</i>³</span>。</p>
+      <p>但可以加任何常数，导数不变：常数的导数是 0，图像上下平移不影响各点斜率。所以原函数有无穷多个，都形如 <span class="m">4<i>t</i>² − ⅓<i>t</i>³ + <i>C</i></span>。还没用上的信息是积分的下限：右端点拖到和左端点重合时，积分必须是 0（0 秒到 0 秒车走了 0 米）。所以要减去原函数在下限处的值。这里原函数在 <span class="m"><i>t</i> = 0</span> 时正好是 0，不用减。</p>
+      <p>8 秒一共走了 <span class="m">4·8² − ⅓·8³ ≈ 85.33</span> 米。更典型的例子是 1 到 7 秒：原函数在 7 处的值减去在 1 处的值，<span class="m">81.67 − 3.67 = 78</span> 米。选哪个原函数都一样，加的常数会相减抵消。</p>
+      <p>一般地，积分 <span class="m">∫ₐᵇ <i>f</i>(<i>x</i>) <i>d</i><i>x</i></span> 是 <span class="m"><i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span> 在区间上求和、再让 <span class="m"><i>d</i><i>x</i> → 0</span> 的极限。先找一个原函数 <span class="m"><i>F</i></span>，使 <span class="m"><i>F</i>′ = <i>f</i></span>，积分就等于 <span class="m"><i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>)</span>。这就是<b>微积分基本定理</b>。</p>
+      <p>作者觉得这很不可思议：积分考虑了区间上连续统里的每一个输入，这正是「积分」这个词的意思；可用原函数算的时候，只看上下限两个输入。找原函数这一步，已经隐含地把中间所有值要加起来的信息都算进去了。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-12m25s0.jpg" alt="8t − t² 的原函数是 4t² − ⅓t³" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="745">12:25</button>8t − t² 的原函数是 4t² − ⅓t³</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-13m05s0.jpg" alt="原函数可以加任意常数 C" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="785">13:05</button>原函数可以加任意常数 C</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-14m40s0.jpg" alt="1 到 7 秒：原函数在 7 处的值减去在 1 处的值" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="880">14:40</button>1 到 7 秒：原函数在 7 处的值减去在 1 处的值</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/integration-15m34s0.jpg" alt="微积分基本定理：∫ₐᵇ f(x)dx = F(b) − F(a)，其中 F′ = f" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="934">15:34</button>微积分基本定理：∫ₐᵇ f(x)dx = F(b) − F(a)，其中 F′ = f</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1066">17:46</button>负面积</h4>
+      <p>如果速度某些时候为负，车在倒车。一小段时间里走的距离仍然约等于速度乘时间，只是速度是负数，这段距离就是负的。对应的细长方形在横轴下方，代表往回走的距离，要从总距离里减掉。</p>
+      <p>积分都是这样：图像落到横轴下方的部分，面积算作负数。所以更准确的说法是：积分量的是图像和横轴之间的<b>有向面积 (Signed Area)</b>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/integration-18m40s0.jpg" alt="图像在横轴下方的部分算负面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1120">18:40</button>图像在横轴下方的部分算负面积</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>积分 <span class="m">∫ₐᵇ <i>f</i>(<i>x</i>)<i>d</i><i>x</i></span> 是「<span class="m"><i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span> 求和」在 <span class="m"><i>d</i><i>x</i> → 0</span> 时的极限，几何上是有向面积。</li><li>面积函数推一点点，多出的细条约为 <span class="m"><i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span>，所以面积函数的导数就是 <span class="m"><i>f</i></span>。</li><li>微积分基本定理：找到 <span class="m"><i>F</i>′ = <i>f</i></span>，积分等于 <span class="m"><i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>)</span>；原函数的常数 C 在相减时抵消。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/integration-1m40s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=8" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="12"><b>0:12</b><span>Grothendieck：让事情变得显然</span></button></li><li><button type="button" data-t="55"><b>0:55</b><span>只看车速表，求走了多远</span></button></li><li><button type="button" data-t="98"><b>1:38</b><span>v(t) = t(8 − t)</span></button></li><li><button type="button" data-t="139"><b>2:19</b><span>这等于找导数是 t(8 − t) 的函数：原函数</span></button></li><li><button type="button" data-t="162"><b>2:42</b><span>速度恒定：距离 = 速度 × 时间 = 长方形面积</span></button></li><li><button type="button" data-t="202"><b>3:22</b><span>速度一直在变，难在这里</span></button></li><li><button type="button" data-t="249"><b>4:09</b><span>近似成一段段常速</span></button></li><li><button type="button" data-t="264"><b>4:24</b><span>例：dt = 0.25，1 到 1.25 秒</span></button></li><li><button type="button" data-t="374"><b>6:14</b><span>每段距离 ≈ v(t)·dt</span></button></li><li><button type="button" data-t="389"><b>6:29</b><span>积分记号：拉长的 S</span></button></li><li><button type="button" data-t="418"><b>6:58</b><span>dt 的两个角色</span></button></li><li><button type="button" data-t="442"><b>7:22</b><span>积分是 dt → 0 时和的极限，即曲线下面积</span></button></li><li><button type="button" data-t="510"><b>8:30</b><span>这有什么用：面积是许多问题的共同语言</span></button></li><li><button type="button" data-t="574"><b>9:34</b><span>把右端点当成变量 T</span></button></li><li><button type="button" data-t="623"><b>10:23</b><span>推一下 T：多出的细条 ds ≈ v(T)dT</span></button></li><li><button type="button" data-t="666"><b>11:06</b><span>面积函数的导数等于原函数</span></button></li><li><button type="button" data-t="678"><b>11:18</b><span>求 t(8 − t) 的原函数</span></button></li><li><button type="button" data-t="752"><b>12:32</b><span>可以加任意常数 C</span></button></li><li><button type="button" data-t="788"><b>13:08</b><span>用下限定常数</span></button></li><li><button type="button" data-t="847"><b>14:07</b><span>8 秒走了 85.33 米</span></button></li><li><button type="button" data-t="863"><b>14:23</b><span>一般情况：上限减下限</span></button></li><li><button type="button" data-t="932"><b>15:32</b><span>微积分基本定理</span></button></li><li><button type="button" data-t="938"><b>15:38</b><span>神奇之处：只看两个端点</span></button></li><li><button type="button" data-t="1066"><b>17:46</b><span>负面积</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc9" data-ch="9" data-sk="calc9" data-bv="BV1qW411N7FU" data-p="9">
+  <summary>
+    <span class="no">9</span>
+    <span class="tt"><b>面积和斜率有什么联系</b><em>What does area have to do with slope?</em><span class="hook">连续变量的平均值 = 面积 ÷ 宽度 = 原函数两端连线的斜率。所有切线斜率的平均值，就等于起点到终点的总斜率。</span></span>
+    <span class="side"><span class="chip">B 站 P9 · 09</span><span class="len">12:39</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">这一集看积分的一个常见用途：求连续变量的平均值，比如 <span class="m">sin <i>x</i></span> 在 0 到 π 之间的平均高度。无穷多个值不能「加起来除以无穷」，但可以先取有限个等距样本求平均，再把样本数换成用间隔 <span class="m"><i>d</i><i>x</i></span> 表示，就变成积分除以区间宽度。算出来 <span class="m">sin</span> 的平均高度是 <span class="m">2/<i>π</i></span>。更有意思的是它给了另一个角度看「为什么积分和导数互逆」：平均值等于原函数图像两个端点连线的斜率，而函数本身就是原函数各点的斜率，所有切线斜率的平均，当然等于首尾连线的斜率。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=9" target="_blank" rel="noreferrer">B 站 P9：09 - 面积和斜率有什么联系？ ↗</a>
+        <a href="https://www.youtube.com/watch?v=FnJqaIESC2s" target="_blank" rel="noreferrer">YouTube 第 9 章 · 2017-05-06 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="33">0:33</button>问题：sin x 的平均高度</h4>
+      <p>看 <span class="m">sin <i>x</i></span> 在 0 到 π（半个周期）的图像，平均高度是多少？这个问题有实际用处，很多周期现象用正弦波建模。比如每天日照时长随一年里的日期大致按正弦波变化，想预测太阳能板夏季和冬季的平均效率，就要回答这类问题。实际应用里会多出一堆常数，但方法一样。</p>
+      <p>连续变量的平均值听起来有点怪。平均通常针对有限个数：加起来除以个数。可 0 到 π 之间 <span class="m">sin <i>x</i></span> 有无穷多个值，没法加起来再除以无穷。作者说这种「想把连续统上无穷多个值加起来」的感觉在数学里很常见，出现这种感觉时，关键几乎总是用积分。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-0m40s0.jpg" alt="sin(x) 在 0 到 π 之间的平均高度是多少" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="40">0:40</button>sin(x) 在 0 到 π 之间的平均高度是多少</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="133">2:13</button>有限样本 → 积分 / 宽度</h4>
+      <p>先用有限的和来近似：在区间上均匀取有限个点，把各点的高度 <span class="m">sin <i>x</i></span> 加起来除以点数。如果「无穷多个点的平均高度」有意义，那么取的点越多，样本平均应该越接近它。</p>
+      <p>这和 <span class="m">sin <i>x</i></span> 从 0 到 π 的积分有点像，但不完全一样：积分加的是 <span class="m">sin <i>x</i> · <i>d</i><i>x</i></span>，也就是一个个小面积而不是高度，而且积分是 <span class="m"><i>d</i><i>x</i> → 0</span> 时这个和的极限。不过拿一个具体 <span class="m"><i>d</i><i>x</i></span> 的有限版本来推理很有帮助。</p>
+      <p>关键是把「除以样本数」改用间隔 <span class="m"><i>d</i><i>x</i></span> 来表示。间隔 0.1、范围 0 到 π，有多少个点？约 <span class="m"><i>π</i> / <i>d</i><i>x</i></span> 个（不整除就向下取整，作为近似没关系）。代进平均值的式子，把 <span class="m"><i>d</i><i>x</i></span> 挪到分子、分配进求和，每一项就成了 <span class="m">sin <i>x</i> · <i>d</i><i>x</i></span>，分子正好是积分的样子。样本越多，平均值就趋近于「0 到 π 的积分」除以区间长度 π。</p>
+      <p>也就是说，平均高度 = 面积 ÷ 宽度。从单位上想也很合理：面积除以宽度就是平均高度。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-2m25s0.jpg" alt="在区间上均匀取有限个点" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="145">2:25</button>在区间上均匀取有限个点</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-3m30s0.jpg" alt="积分加的是 sin(x)·dx，小面积而不是高度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="210">3:30</button>积分加的是 sin(x)·dx，小面积而不是高度</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-4m40s0.jpg" alt="样本数 ≈ π/dx，把 dx 挪到分子，分子就成了积分" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="280">4:40</button>样本数 ≈ π/dx，把 dx 挪到分子，分子就成了积分</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-5m15s0.jpg" alt="平均高度 = 面积 / 宽度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="315">5:15</button>平均高度 = 面积 / 宽度</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="331">5:31</button>算出来：2/π</h4>
+      <p>求积分要先找原函数。<span class="m">cos</span> 的导数是 <span class="m">−sin</span>，加个负号，<span class="m">−cos</span> 就是 <span class="m">sin</span> 的原函数。验算一下：<span class="m">−cos</span> 的图像在 0 处斜率为 0，增大到 π/2 处斜率最大，再在 π 处回到 0，和 <span class="m">sin</span> 的高度对得上。</p>
+      <p>积分等于原函数在上限的值减去在下限的值：<span class="m">(−cos <i>π</i>) − (−cos 0) = 1 − (−1) = 2</span>。<span class="m">sin</span> 在 0 到 π 下的面积正好是 2。所以平均高度是 <span class="m">2/<i>π</i> ≈ 0.64</span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-6m05s0.jpg" alt="−cos 的斜率在每一点都等于 sin 的高度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="365">6:05</button>−cos 的斜率在每一点都等于 sin 的高度</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-6m45s0.jpg" alt="−cos(π) − (−cos(0)) = 2" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="405">6:45</button>−cos(π) − (−cos(0)) = 2</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="421">7:01</button>另一个角度：平均值就是原函数的平均斜率</h4>
+      <p>开头说过，求平均值会给出另一个角度，解释为什么一个图像下的面积和另一个图像的斜率有关。注意 <span class="m">2/<i>π</i></span> 是怎么来的：原函数 <span class="m">−cos <i>x</i></span> 在区间上的变化量，除以区间长度。这个分数就是原函数图像上 0 处和 π 处两点连线的斜率。</p>
+      <p>为什么这个斜率就是 <span class="m">sin <i>x</i></span> 的平均值？按定义，<span class="m">sin <i>x</i></span> 是 <span class="m">−cos <i>x</i></span> 的导数，给出 <span class="m">−cos</span> 每一点的切线斜率。所以 <span class="m">sin <i>x</i></span> 的平均值也就是 0 到 π 之间所有切线斜率的平均。而一个图像在一段区间上所有点的平均斜率，等于起点和终点之间的总斜率，这很合理。</p>
+      <p>一般地，<span class="m"><i>f</i>(<i>x</i>)</span> 在 <span class="m">[<i>a</i>, <i>b</i>]</span> 上的平均值是 <span class="m">∫ₐᵇ <i>f</i>(<i>x</i>) <i>d</i><i>x</i> / (<i>b</i> − <i>a</i>)</span>，也就是有向面积除以宽度。和有限平均的关系同上：样本数约为 <span class="m">(<i>b</i> − <i>a</i>)/<i>d</i><i>x</i></span>，把 <span class="m"><i>f</i>(<i>x</i>)</span> 加起来除以样本数，等于把 <span class="m"><i>f</i>(<i>x</i>)·<i>d</i><i>x</i></span> 加起来除以 <span class="m"><i>b</i> − <i>a</i></span>，积分只是再让 <span class="m"><i>d</i><i>x</i> → 0</span>。算积分要找原函数 <span class="m"><i>F</i></span>，平均值就是 <span class="m">(<i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>))/(<i>b</i> − <i>a</i>)</span>，原函数图像两端连线的斜率。作者说他最喜欢的直觉仍是上一集那个，但这个角度的好处是：把「求连续值的平均」换成「求一堆切线斜率的平均」，只比较两个端点就能看出答案，不用真的把中间所有点都算一遍。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-7m35s0.jpg" alt="2/π 也是原函数 −cos 两端连线的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="455">7:35</button>2/π 也是原函数 −cos 两端连线的斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-8m10s0.jpg" alt="所有切线斜率的平均，等于首尾连线的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="489">8:09</button>所有切线斜率的平均，等于首尾连线的斜率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/area-and-slope-10m35s0.jpg" alt="一般情形：平均值 = (F(b) − F(a)) / (b − a)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="636">10:36</button>一般情形：平均值 = (F(b) − F(a)) / (b − a)</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="683">11:23</button>什么时候该想到积分</h4>
+      <p>上一集说过一种该想到积分的感觉：问题能拆成许多小量之和。这一集是第二种：某个概念你在有限情形下懂，而且涉及把多个值加起来（比如平均），现在想推广到连续的无穷多个值，就试着用积分来表述。作者说这在概率里尤其常见。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li><span class="m"><i>f</i></span> 在 <span class="m">[<i>a</i>, <i>b</i>]</span> 上的平均值 <span class="m">= ∫ₐᵇ <i>f</i>(<i>x</i>)<i>d</i><i>x</i> / (<i>b</i> − <i>a</i>)</span> = 有向面积 ÷ 宽度。</li><li>它也等于原函数 <span class="m"><i>F</i></span> 两端连线的斜率 <span class="m">(<i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>))/(<i>b</i> − <i>a</i>)</span>：所有切线斜率的平均等于首尾连线的斜率。</li><li>有限情形下「加起来求平均」的概念，推广到连续情形时就换成积分，这在概率里最常见。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/area-and-slope-0m40s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=9" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="15"><b>0:15</b><span>问题：连续变量的平均值</span></button></li><li><button type="button" data-t="33"><b>0:33</b><span>例：sin x 在 0 到 π 的平均高度</span></button></li><li><button type="button" data-t="46"><b>0:46</b><span>应用：一年中日照时长的平均</span></button></li><li><button type="button" data-t="88"><b>1:28</b><span>无穷多个值没法直接加起来除以个数</span></button></li><li><button type="button" data-t="133"><b>2:13</b><span>先用有限个等距样本近似</span></button></li><li><button type="button" data-t="187"><b>3:07</b><span>和积分比较：积分加的是 sin x · dx</span></button></li><li><button type="button" data-t="225"><b>3:45</b><span>样本数 ≈ π / dx</span></button></li><li><button type="button" data-t="274"><b>4:34</b><span>代进去，分子就成了积分</span></button></li><li><button type="button" data-t="311"><b>5:11</b><span>平均高度 = 面积 / 宽度</span></button></li><li><button type="button" data-t="331"><b>5:31</b><span>sin 的原函数是 −cos</span></button></li><li><button type="button" data-t="397"><b>6:37</b><span>sin 在 0 到 π 下的面积正好是 2</span></button></li><li><button type="button" data-t="408"><b>6:48</b><span>平均高度 = 2/π ≈ 0.64</span></button></li><li><button type="button" data-t="421"><b>7:01</b><span>另一个角度：为什么积分和导数互逆</span></button></li><li><button type="button" data-t="450"><b>7:30</b><span>平均值 = 原函数两端连线的斜率</span></button></li><li><button type="button" data-t="479"><b>7:59</b><span>所有切线斜率的平均 = 首尾连线的斜率</span></button></li><li><button type="button" data-t="508"><b>8:28</b><span>一般情形 f(x) 在 [a, b] 上</span></button></li><li><button type="button" data-t="683"><b>11:23</b><span>什么时候该想到积分</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc10" data-ch="10" data-sk="calc10" data-bv="BV1qW411N7FU" data-p="10">
+  <summary>
+    <span class="no">10</span>
+    <span class="tt"><b>高阶导数</b><em>Higher order derivatives</em><span class="hook">二阶导数是导数的导数：斜率怎么变。图像上看弯曲方向，运动里就是加速度；三阶导数叫急动度 (jerk)。</span></span>
+    <span class="side"><span class="chip">B 站 P10 · 09脚注</span><span class="len">5:38</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">下一集泰勒级数要频繁用到高阶导数，这个 5 分钟的脚注快速补上。重点是二阶导数：它表示斜率怎么变化，在图像上看曲线往哪边弯，在运动里就是加速度。作者还解释了 <span class="m"><i>d</i>²<i>f</i>/<i>d</i><i>x</i>²</span> 这个记号怎么读：连迈两小步 <span class="m"><i>d</i><i>x</i></span>，两次的变化量之差 <span class="m"><i>d</i>(<i>d</i><i>f</i>)</span> 除以 <span class="m"><i>d</i><i>x</i>²</span>。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=10" target="_blank" rel="noreferrer">B 站 P10：09脚注 - 高阶导数 ↗</a>
+        <a href="https://www.youtube.com/watch?v=BLkz5LGWihw" target="_blank" rel="noreferrer">YouTube 第 10 章 · 2017-05-07 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="40">0:40</button>二阶导数：斜率的变化</h4>
+      <p>函数 <span class="m"><i>f</i>(<i>x</i>)</span> 的导数可以理解为图像在某点的斜率：斜率陡，导数大；往下倾，导数为负。<b>二阶导数 (Second Derivative)</b> 是导数的导数，告诉你斜率本身怎么变。</p>
+      <p>一眼看出来的办法是看图像怎么弯。向上弯的地方，斜率在增大，二阶导数为正；向下弯的地方，斜率在减小，二阶导数为负。比如一个图像在 4 处斜率增长得很快，二阶导数就很大；另一个图像在同一点斜率只是慢慢增大，二阶导数仍为正但较小。没有弯曲的地方，二阶导数就是 0。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-1m10s0.jpg" alt="向上弯的地方斜率在增大，二阶导数为正" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="70">1:10</button>向上弯的地方斜率在增大，二阶导数为正</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-1m35s0.jpg" alt="在 4 处弯得很急，二阶导数很大" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="95">1:35</button>在 4 处弯得很急，二阶导数很大</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="113">1:53</button>记号 d²f/dx² 怎么读</h4>
+      <p>可以写成「导数函数的微小变化」除以「<span class="m"><i>x</i></span> 的微小变化」，并且照例，d 表示最后要让两个 <span class="m"><i>d</i><i>x</i></span> 都趋近于 0。这太笨重了，标准写法缩写成 <span class="m"><i>d</i>²<i>f</i>/<i>d</i><i>x</i>²</span>。</p>
+      <p>怎么读这个记号：从某个输入出发，向右连迈两小步，每步 <span class="m"><i>d</i><i>x</i></span>（画得大一点才看得见，原则上 <span class="m"><i>d</i><i>x</i></span> 很小）。第一步引起函数的变化 <span class="m"><i>d</i><i>f</i>₁</span>，第二步引起 <span class="m"><i>d</i><i>f</i>₂</span>，两者接近但可能略有不同。两次变化之差，也就是「变化量的变化量」，记作 <span class="m"><i>d</i>(<i>d</i><i>f</i>)</span>。</p>
+      <p>它通常很小，正比于 <span class="m"><i>d</i><i>x</i>²</span>：<span class="m"><i>d</i><i>x</i></span> 取 0.01 时，<span class="m"><i>d</i>(<i>d</i><i>f</i>)</span> 大约和 0.0001 成正比。二阶导数就是 <span class="m"><i>d</i>(<i>d</i><i>f</i>)</span> 除以 <span class="m"><i>d</i><i>x</i>²</span>，更准确地说是 <span class="m"><i>d</i><i>x</i> → 0</span> 时这个比值趋近的值。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-2m20s0.jpg" alt="导数的导数，缩写成 d²f/dx²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="140">2:20</button>导数的导数，缩写成 d²f/dx²</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-3m05s0.jpg" alt="连迈两步 dx：两次变化 df₁、df₂ 之差是 d(df)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="185">3:05</button>连迈两步 dx：两次变化 df₁、df₂ 之差是 d(df)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-3m35s0.jpg" alt="d(df) 约为某个常数乘 dx²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="215">3:35</button>d(df) 约为某个常数乘 dx²</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="245">4:05</button>加速度和急动度</h4>
+      <p>二阶导数最直观的理解是<b>加速度</b>。一个沿直线运动的物体，距离随时间的函数稳步增长；它的导数是速度，比如先增到最大再降回 0 的鼓包；二阶导数是速度的变化率，也就是加速度。</p>
+      <p>这个例子里，前半程二阶导数为正，表示在加速，就是被推进座椅（更准确地说是座椅推着你往前）的感觉；二阶导数为负表示在减速。</p>
+      <p>三阶导数叫<b>急动度 (Jerk)</b>，作者强调这不是玩笑。急动度不为零，意味着加速度本身的强弱在变。</p>
+      <p>高阶导数最有用的地方之一，是帮我们近似函数，这就是下一集泰勒级数的主题。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-4m25s0.jpg" alt="位移、速度、加速度：一阶、二阶导数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="265">4:25</button>位移、速度、加速度：一阶、二阶导数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-4m50s0.jpg" alt="二阶导数为负：在减速" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="290">4:50</button>二阶导数为负：在减速</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/higher-order-derivatives-5m05s0.jpg" alt="三阶导数：急动度 (jerk)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="305">5:05</button>三阶导数：急动度 (jerk)</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>二阶导数 = 斜率的变化率：图像向上弯为正、向下弯为负、直线处为 0。</li><li><span class="m"><i>d</i>²<i>f</i>/<i>d</i><i>x</i>²</span>：连迈两步 <span class="m"><i>d</i><i>x</i></span>，变化量之差 <span class="m"><i>d</i>(<i>d</i><i>f</i>)</span>（约正比于 <span class="m"><i>d</i><i>x</i>²</span>）除以 <span class="m"><i>d</i><i>x</i>²</span> 的极限。</li><li>位移的一阶、二阶、三阶导数分别是速度、加速度、急动度。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/higher-order-derivatives-1m10s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=10" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="4"><b>0:04</b><span>为下一集泰勒级数做准备</span></button></li><li><button type="button" data-t="40"><b>0:40</b><span>导数是斜率</span></button></li><li><button type="button" data-t="53"><b>0:53</b><span>二阶导数：斜率怎么变</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>向上弯为正，向下弯为负</span></button></li><li><button type="button" data-t="86"><b>1:26</b><span>弯得越急，二阶导数越大</span></button></li><li><button type="button" data-t="106"><b>1:46</b><span>没有弯曲，二阶导数为 0</span></button></li><li><button type="button" data-t="113"><b>1:53</b><span>记号：d²f/dx²</span></button></li><li><button type="button" data-t="153"><b>2:33</b><span>连迈两步 dx：变化量的变化量 d(df)</span></button></li><li><button type="button" data-t="209"><b>3:29</b><span>d(df) 正比于 dx²</span></button></li><li><button type="button" data-t="245"><b>4:05</b><span>最直观的理解：加速度</span></button></li><li><button type="button" data-t="294"><b>4:54</b><span>三阶导数：急动度 (jerk)</span></button></li><li><button type="button" data-t="306"><b>5:06</b><span>高阶导数最有用的地方：近似函数</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc11" data-ch="11" data-sk="calc11" data-bv="BV1qW411N7FU" data-p="11">
+  <summary>
+    <span class="no">11</span>
+    <span class="tt"><b>泰勒级数</b><em>Taylor series</em><span class="hook">泰勒多项式把函数在一点的各阶导数信息，翻译成这一点附近的近似：常数项对齐函数值，一次项对齐斜率，二次项对齐弯曲，依此类推，系数要除以 n!。</span></span>
+    <span class="side"><span class="chip">B 站 P11 · 10</span><span class="len">22:19</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">泰勒级数是数学里最强大的近似工具之一。作者第一次体会到它的威力是在物理课上：单摆的势能里有个 <span class="m">1 − cos <i>θ</i></span>，把 <span class="m">cos <i>θ</i></span> 换成 <span class="m">1 − <i>θ</i>²/2</span> 以后一切都顺了。这一集从这个近似出发，说明怎么一步步选多项式的系数，让它在某点和原函数的值、一阶导、二阶导……逐一对齐，为什么会出现阶乘，怎么推广到任意点 <span class="m"><i>a</i></span>。然后用面积函数给二次项一个几何解释，最后讲把项无限加下去的泰勒级数：<span class="m"><i>e</i>^<i>x</i></span> 处处收敛，<span class="m"><i>l</i><i>n</i> <i>x</i></span> 只在一定范围内收敛。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=11" target="_blank" rel="noreferrer">B 站 P11：10 - 泰勒级数 ↗</a>
+        <a href="https://www.youtube.com/watch?v=3d6DsjIBzJ4" target="_blank" rel="noreferrer">YouTube 第 11 章 · 2017-05-07 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="30">0:30</button>从单摆说起</h4>
+      <p>作者第一次体会到泰勒级数的重要性是在物理课上。研究单摆的势能，需要摆锤比最低点高多少，算出来正比于 <span class="m">1 − cos <i>θ</i></span>（<span class="m"><i>θ</i></span> 是摆和竖直方向的夹角）。这个 <span class="m">cos</span> 让问题很难处理，也看不清单摆和其他振动现象的关系。把 <span class="m">cos <i>θ</i></span> 近似成 <span class="m">1 − <i>θ</i>²/2</span>，一切都顺了。</p>
+      <p>画出来，两者在 0 附近的小角度很接近。可怎么想到这个近似，又怎么找到这个二次式？泰勒级数研究的就是：给非多项式函数找一个在某个输入附近近似它的多项式。多项式更好算、好求导、好积分，处处都更友好。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-0m50s0.jpg" alt="单摆摆锤的高度正比于 1 − cos θ" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="50">0:50</button>单摆摆锤的高度正比于 1 − cos θ</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="120">2:00</button>一步步选出 1 − x²/2</h4>
+      <p>在所有形如 <span class="m"><i>c</i>₀ + <i>c</i>₁<i>x</i> + <i>c</i>₂<i>x</i>²</span> 的多项式里，找在 <span class="m"><i>x</i> = 0</span> 附近最像 <span class="m">cos <i>x</i></span> 的那个，图像和 <span class="m">cos <i>x</i></span> 在那里「贴合」。</p>
+      <p>首先，<span class="m">cos 0 = 1</span>，近似在 0 处也应等于 1。代 0 进多项式只剩 <span class="m"><i>c</i>₀</span>，所以 <span class="m"><i>c</i>₀ = 1</span>。之后 <span class="m"><i>c</i>₁</span>、<span class="m"><i>c</i>₂</span> 怎么选都不会改变它在 0 处等于 1。</p>
+      <p>其次，切线斜率也要一样，否则近似会比必要的更快偏离。<span class="m">cos</span> 的导数是 <span class="m">−sin</span>，0 处为 0，切线水平。多项式的导数是 <span class="m"><i>c</i>₁ + 2<i>c</i>₂<i>x</i></span>，0 处就是 <span class="m"><i>c</i>₁</span>。所以 <span class="m"><i>c</i>₁</span> 完全掌控近似在 0 处的导数，取 <span class="m"><i>c</i>₁ = 0</span>。</p>
+      <p>最后，<span class="m">cos</span> 在 0 处向下弯，二阶导数为负：虽然变化率在 0 处为 0，变化率本身在减小。它的二阶导数是 <span class="m">−cos <i>x</i></span>，0 处为 −1。让二阶导数也对上，能保证多项式的斜率不会比 <span class="m">cos</span> 的斜率更快偏离。多项式的二阶导数正好是 <span class="m">2<i>c</i>₂</span>，所以 <span class="m">2<i>c</i>₂ = −1</span>，<span class="m"><i>c</i>₂ = −1/2</span>。</p>
+      <p>得到 <span class="m">1 + 0<i>x</i> − ½<i>x</i>²</span>。用它估 <span class="m">cos(0.1)</span> 得 0.995，真实值是 0.99500…，已经很准。回头看：三个自由度，<span class="m"><i>c</i>₀</span> 负责函数值对上，<span class="m"><i>c</i>₁</span> 负责导数对上，<span class="m"><i>c</i>₂</span> 负责二阶导数对上。这保证近似离开 0 时的变化方式、以及变化率本身的变化方式，尽可能和 <span class="m">cos <i>x</i></span> 一样。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-2m30s0.jpg" alt="在 c₀ + c₁x + c₂x² 里找最贴合 cos x 的那个" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="150">2:30</button>在 c₀ + c₁x + c₂x² 里找最贴合 cos x 的那个</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-3m45s0.jpg" alt="c₁ 完全掌控近似在 0 处的导数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="225">3:45</button>c₁ 完全掌控近似在 0 处的导数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-5m10s0.jpg" alt="二阶导数也对上：2c₂ = −1" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="310">5:10</button>二阶导数也对上：2c₂ = −1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-5m30s0.jpg" alt="cos(0.1) ≈ 1 − ½(0.1)² = 0.995" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="330">5:30</button>cos(0.1) ≈ 1 − ½(0.1)² = 0.995</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="384">6:24</button>加更多项，以及阶乘从哪来</h4>
+      <p>加一项 <span class="m"><i>c</i>₃<i>x</i>³</span>。三次多项式求三阶导数，二次及以下的项都变成 0，最后一项经过三次幂法则变成 <span class="m">1·2·3·<i>c</i>₃</span>。<span class="m">cos</span> 的三阶导数是 <span class="m">sin <i>x</i></span>，0 处为 0，所以 <span class="m"><i>c</i>₃ = 0</span>。也就是说 <span class="m">1 − ½<i>x</i>²</span> 不仅是最好的二次近似，也是最好的三次近似。</p>
+      <p>再加 <span class="m"><i>c</i>₄<i>x</i>⁴</span>。<span class="m">cos</span> 的四阶导数是它自己，0 处为 1；多项式的四阶导数是 <span class="m">1·2·3·4·<i>c</i>₄ = 24<i>c</i>₄</span>，所以 <span class="m"><i>c</i>₄ = 1/24</span>。<span class="m">1 − ½<i>x</i>² + (1/24)<i>x</i>⁴</span> 在 0 附近和 <span class="m">cos <i>x</i></span> 几乎重合，任何涉及小角度余弦的物理问题，换成它几乎察觉不到差别。</p>
+      <p>几个观察。第一，阶乘自然出现：对 <span class="m"><i>x</i>ⁿ</span> 连求 <span class="m"><i>n</i></span> 次导，幂法则一路往下，剩下 <span class="m">1·2·3·…·<i>n</i></span>。所以系数不是直接等于想要的导数值，而要除以相应的阶乘。第二，加新项不会打乱旧系数：比如在 0 处，多项式的二阶导数仍然等于 2 乘第二个系数，因为更高次的项求完二阶导还带着 <span class="m"><i>x</i></span>，代 0 就没了。所以在 0 处，多项式的每阶导数只由一个系数控制。</p>
+      <p>如果要在 0 以外的点（比如 π）附近近似，就写成 <span class="m">(<i>x</i> − <i>π</i>)</span> 的幂。看着复杂，做的只是让 π 这一点表现得像 0，代进去后大部分项消掉，只剩一个常数。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-7m15s0.jpg" alt="cos 的三阶导数在 0 处为 0，所以 c₃ = 0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="435">7:15</button>cos 的三阶导数在 0 处为 0，所以 c₃ = 0</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-8m10s0.jpg" alt="四阶导数：24c₄ = 1，c₄ = 1/24" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="490">8:10</button>四阶导数：24c₄ = 1，c₄ = 1/24</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-8m56s0.jpg" alt="系数 = 想要的导数值 / n!，阶乘抵消幂法则的连乘" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="536">8:56</button>系数 = 想要的导数值 / n!，阶乘抵消幂法则的连乘</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="622">10:22</button>一般的泰勒多项式</h4>
+      <p>更哲学地看，这是把函数在单个点处的高阶导数信息，翻译成这一点附近函数值的信息。<span class="m">cos</span> 的导数循环：<span class="m">cos</span>、<span class="m">−sin</span>、<span class="m">−cos</span>、<span class="m">sin</span>，再重复；在 0 处的值是 1、0、−1、0 循环。只代一个数 <span class="m"><i>x</i> = 0</span>，却得到了关于 <span class="m">cos</span> 的大量信息。让多项式的系数也按这个规律排，再各除以阶乘，就得到 <span class="m">cos <i>x</i></span> 的泰勒多项式。</p>
+      <p>一般地：<span class="m"><i>x</i>ⁿ</span> 的系数是函数 <span class="m"><i>n</i></span> 阶导数在 0 处的值除以 <span class="m"><i>n</i>!</span>。常数项让值对上，下一项让斜率对上，再下一项让斜率的变化率对上，依此类推。项越多越准，代价是多项式越复杂。在任意点 <span class="m"><i>a</i></span> 附近近似，就写成 <span class="m">(<i>x</i> − <i>a</i>)</span> 的幂，在 <span class="m"><i>a</i></span> 处求各阶导数：</p>
+      <p><span class="m"><i>P</i>(<i>x</i>) = <i>f</i>(<i>a</i>) + <i>f</i>′(<i>a</i>)(<i>x</i> − <i>a</i>) + <i>f</i>″(<i>a</i>)/2! · (<i>x</i> − <i>a</i>)² + <i>f</i>‴(<i>a</i>)/3! · (<i>x</i> − <i>a</i>)³ + …</span></p>
+      <p>最简单又有意义的例子是 <span class="m"><i>e</i>^<i>x</i></span> 在 0 附近：它的导数还是它自己，各阶导数在 0 处都是 1，所以泰勒多项式是 <span class="m">1 + <i>x</i> + <i>x</i>²/2! + <i>x</i>³/3! + …</span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-12m20s0.jpg" alt="xⁿ 的系数：n 阶导数在 0 处的值，除以 n!" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="740">12:20</button>xⁿ 的系数：n 阶导数在 0 处的值，除以 n!</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-13m20s0.jpg" alt="在 a 附近：写成 (x − a) 的幂" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="800">13:20</button>在 a 附近：写成 (x − a) 的幂</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-14m20s0.jpg" alt="e^x 的泰勒多项式：1 + x + x²/2! + x³/3! + …" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="860">14:20</button>e^x 的泰勒多项式：1 + x + x²/2! + x³/3! + …</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="866">14:26</button>二次项的几何意义</h4>
+      <p>一个有趣的几何解释，和微积分基本定理（第 1、8 章）有关。考虑面积函数：从固定左端点到可变右端点的曲线下面积。这次近似的是这个面积函数，而不是曲线本身。</p>
+      <p>微积分基本定理说，曲线本身就是面积函数的导数：右端点推一点 <span class="m"><i>d</i><i>x</i></span>，新增面积约为曲线高度乘 <span class="m"><i>d</i><i>x</i></span>。但如果推动的量 <span class="m"><i>x</i> − <i>a</i></span> 不趋近于 0，想更准，就要把顶上那块近似三角形也算进去。它的底是 <span class="m"><i>x</i> − <i>a</i></span>，高是曲线的斜率乘 <span class="m"><i>x</i> − <i>a</i></span>；曲线是面积函数的导数，所以曲线的斜率是面积函数的二阶导数。三角形面积 = ½ × 面积函数在 <span class="m"><i>a</i></span> 处的二阶导数 × <span class="m">(<i>x</i> − <i>a</i>)²</span>。</p>
+      <p>这正是泰勒多项式的样子：到 <span class="m"><i>x</i></span> 为止的面积 ≈ 到 <span class="m"><i>a</i></span> 为止的面积 <span class="m"><i>f</i>(<i>a</i>)</span>，加上长方形（一阶导数 × <span class="m">(<i>x</i> − <i>a</i>)</span>），加上小三角形（½ × 二阶导数 × <span class="m">(<i>x</i> − <i>a</i>)²</span>）。作者很喜欢这个：写出来有点乱，但每一项都能在图上指出来。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-15m25s0.jpg" alt="面积函数：新增面积 ≈ 曲线高度 × dx" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="925">15:25</button>面积函数：新增面积 ≈ 曲线高度 × dx</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-16m25s0.jpg" alt="顶上的小三角形：½ × 二阶导数 × (x − a)²" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="985">16:25</button>顶上的小三角形：½ × 二阶导数 × (x − a)²</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-17m05s0.jpg" alt="每一项都有几何含义：原面积 + 长方形 + 三角形" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1025">17:05</button>每一项都有几何含义：原面积 + 长方形 + 三角形</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1041">17:21</button>泰勒级数与收敛半径</h4>
+      <p>像数学家那样想，会问：能不能不停，一直加下去？无穷多项之和叫<b>级数 (Series)</b>，有限项的叫泰勒多项式，无穷项的叫<b>泰勒级数 (Taylor Series)</b>。无穷多个东西没法真的加起来，计算器上的加号只能按有限次。但如果一项项加下去，每一步都有意义，而且越来越接近某个值，就说这个级数<b>收敛 (Converges)</b> 到这个值，也可以把等号扩展成「级数等于它收敛到的值」。</p>
+      <p>例：<span class="m"><i>e</i>^<i>x</i></span> 的泰勒多项式代 <span class="m"><i>x</i> = 1</span>，项越加越多，总和越来越接近 <span class="m"><i>e</i></span>。代 <span class="m"><i>x</i> = 2</span>，也会收敛到 <span class="m"><i>e</i>²</span>。对任何输入都成立，不管离 0 多远，尽管这些多项式只用了 0 处的导数信息。所以说 <span class="m"><i>e</i>^<i>x</i></span> 在所有 <span class="m"><i>x</i></span> 处都等于自己的泰勒级数，<span class="m">sin</span>、<span class="m">cos</span> 也是这样。</p>
+      <p>但有些级数只在一定范围内收敛。<span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 <span class="m"><i>x</i> = 1</span> 附近的泰勒级数是 <span class="m">(<i>x</i> − 1) − (<i>x</i> − 1)²/2 + (<i>x</i> − 1)³/3 − …</span>。代 0 到 2 之间的数，加的项越多越接近 <span class="m"><i>l</i><i>n</i></span> 的值；超出这个范围哪怕一点点，和就来回乱跳，什么也不趋近，尽管 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 在大于 2 处完全有定义。某种意义上，<span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 1 处的导数信息传不了那么远。这时说级数<b>发散 (Diverges)</b>。近似中心到级数仍收敛的点之间的最大距离，叫<b>收敛半径 (Radius of Convergence)</b>。</p>
+      <p>还有很多没讲：用法、误差估计、判断收敛的方法。作者留下的核心直觉是：泰勒级数把单个点处的导数信息，翻译成这个点附近的近似信息。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-18m35s0.jpg" alt="e^x 的级数代 x = 1，总和趋近于 e" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1115">18:35</button>e^x 的级数代 x = 1，总和趋近于 e</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-20m15s0.jpg" alt="ln x 的级数代超过 2 的数，和来回乱跳" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1215">20:15</button>ln x 的级数代超过 2 的数，和来回乱跳</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-20m50s0.jpg" alt="收敛半径：级数仍收敛的最大范围" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1250">20:50</button>收敛半径：级数仍收敛的最大范围</figcaption></figure></div>
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>泰勒多项式：<span class="m"><i>f</i>(<i>x</i>) ≈ Σ <i>f</i>⁽ⁿ⁾(<i>a</i>)/<i>n</i>! · (<i>x</i> − <i>a</i>)ⁿ</span>；第 n 项让 n 阶导数在 <span class="m"><i>a</i></span> 处对上，除以 <span class="m"><i>n</i>!</span> 抵消幂法则连乘出来的阶乘。</li><li><span class="m">cos <i>x</i> ≈ 1 − <i>x</i>²/2 + <i>x</i>⁴/24</span>，<span class="m"><i>e</i>^<i>x</i> = 1 + <i>x</i> + <i>x</i>²/2! + <i>x</i>³/3! + …</span>（对所有 <span class="m"><i>x</i></span> 成立）。</li><li>二次项 ½f″(a)(x − a)² 在面积函数的图上就是顶上那个小三角形。</li><li>有的泰勒级数只在收敛半径内收敛，比如 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 1 附近的级数只对 0 < x ≤ 2 有效。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/taylor-series-0m50s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=11" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="30"><b>0:30</b><span>物理课上：单摆和 cos θ ≈ 1 − θ²/2</span></button></li><li><button type="button" data-t="101"><b>1:41</b><span>泰勒级数：用多项式近似非多项式函数</span></button></li><li><button type="button" data-t="120"><b>2:00</b><span>找 cos x 在 0 附近最好的二次近似</span></button></li><li><button type="button" data-t="153"><b>2:33</b><span>c₀：函数值要对上，c₀ = 1</span></button></li><li><button type="button" data-t="184"><b>3:04</b><span>c₁：斜率要对上，c₁ = 0</span></button></li><li><button type="button" data-t="244"><b>4:04</b><span>c₂：二阶导数要对上，c₂ = −1/2</span></button></li><li><button type="button" data-t="316"><b>5:16</b><span>1 − x²/2，cos(0.1) ≈ 0.995</span></button></li><li><button type="button" data-t="340"><b>5:40</b><span>每个系数各管一阶导数</span></button></li><li><button type="button" data-t="384"><b>6:24</b><span>加更多项：三次项系数为 0</span></button></li><li><button type="button" data-t="441"><b>7:21</b><span>四次项：c₄ = 1/24</span></button></li><li><button type="button" data-t="506"><b>8:26</b><span>观察一：阶乘自然出现</span></button></li><li><button type="button" data-t="549"><b>9:09</b><span>观察二：加新项不影响旧系数</span></button></li><li><button type="button" data-t="592"><b>9:52</b><span>在 a 附近近似：写成 (x − a) 的幂</span></button></li><li><button type="button" data-t="622"><b>10:22</b><span>观察三：一点处的导数信息变成附近的近似</span></button></li><li><button type="button" data-t="707"><b>11:47</b><span>一般的泰勒多项式</span></button></li><li><button type="button" data-t="815"><b>13:35</b><span>例：e^x</span></button></li><li><button type="button" data-t="866"><b>14:26</b><span>二次项的几何意义：面积函数</span></button></li><li><button type="button" data-t="1041"><b>17:21</b><span>无限加下去：泰勒级数</span></button></li><li><button type="button" data-t="1103"><b>18:23</b><span>e^x 在 x = 1 处收敛到 e</span></button></li><li><button type="button" data-t="1144"><b>19:04</b><span>e^x 对所有 x 都等于自己的泰勒级数</span></button></li><li><button type="button" data-t="1181"><b>19:41</b><span>ln x 在 1 附近：只在 0 到 2 之间收敛</span></button></li><li><button type="button" data-t="1244"><b>20:44</b><span>收敛半径</span></button></li><li><button type="button" data-t="1288"><b>21:28</b><span>核心直觉</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="calc12" data-ch="12" data-sk="calc12" data-bv="BV1XW411P75q">
+  <summary>
+    <span class="no">12</span>
+    <span class="tt"><b>导数的另一种可视化</b><em>The other way to visualize derivatives</em><span class="hook">另一种看导数的方式：把函数看成数轴到数轴的变换，导数是某点附近被拉伸或压缩的倍数。|导数| < 1 的不动点吸引周围的点，> 1 的排斥，这解释了为什么反复迭代 1 + 1/x 总落到黄金比例。</span></span>
+    <span class="side"><span class="chip">B 站单独投稿</span><span class="len">16:23</span>
+      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">2018 年补的一集，B 站标题是「你在微积分课上学不到的知识」。第一年微积分的直觉几乎都建立在图像上：导数是斜率，积分是面积。但推广到输入输出不是单个数的函数时，常常画不出图像，只靠图像的直觉会成为学多元微积分、复分析、微分几何的障碍。作者介绍「变换观点」：把函数看成把一条数轴上的点送到另一条数轴上，导数就是某点附近被拉伸或压缩的倍数（负数还会翻转）。然后用它分析一个谜题：无限连分数 <span class="m">1 + 1/(1 + 1/(1 + …))</span> 为什么等于黄金比例 φ 而不是它的「小兄弟」−0.618。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1XW411P75q" target="_blank" rel="noreferrer">B 站单独投稿：你在微积分课上学不到的知识 ↗</a>
+        <a href="https://www.youtube.com/watch?v=CfW845LNObM" target="_blank" rel="noreferrer">YouTube 第 12 章 · 2018-05-19 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="7">0:07</button>为什么需要另一种看法</h4>
+      <p>第一年微积分的视觉直觉几乎都基于图像：导数是图像的斜率，积分是图像下的面积。但把微积分推广到输入输出不只是数的函数时，不一定能画出图像。如果对导数这类基本概念的直觉太死板地依赖图像，就会在你和多元微积分、复分析、微分几何这些「进阶」话题之间，竖起一道很高、而且本不必要的门槛。</p>
+      <p>作者想分享一种他叫作<b>变换观点</b>的导数理解，它能更顺畅地推广到这些更一般的场合。他提醒：别把「导数是斜率」当成导数的定义，更根本的是「函数对输入附近的微小推动有多敏感」，斜率只是在这种画法下表现敏感度的一种方式。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-2m05s0.jpg" alt="标准画法：导数是图像的斜率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="125">2:05</button>标准画法：导数是图像的斜率</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="142">2:22</button>导数 = 局部拉伸的倍数</h4>
+      <p>把函数看成：把一条数轴上的所有输入点，送到另一条数轴上对应的输出点。在这个视角下，导数衡量的是输入空间在各个区域被拉伸或压缩了多少。放大看某个输入附近一些等距的点，看它们映过去以后散开还是聚拢。</p>
+      <p>例：<span class="m"><i>x</i>²</span> 把 1 送到 1，2 送到 4，3 送到 9，中间的点也跟着过去。放大看 1 附近的一小撮点，它们映过去后被拉开，大约拉伸了 2 倍，放得越大越像乘 2。这就是「<span class="m"><i>x</i>²</span> 在 1 处的导数是 2」在变换视角下的样子。3 附近的点被拉伸 6 倍，对应导数 6；1/4 附近的一小段被压缩到一半，这是导数小于 1 的样子。</p>
+      <p>0 处很有意思：放大 10 倍看，不像是均匀地拉伸或压缩，所有输出都在正的一侧。放大到 100 倍、1000 倍，越来越像 0 附近的一小段点被压成了 0 这一个点，这就是导数为 0 的样子：局部行为越来越像把整条数轴乘 0。不需要在某个放大倍数下真的全压成一个点，看的是越放越大时的极限行为。</p>
+      <p>负的输入：点会和正输入的去向挤在一起，这是用变换看整个函数的缺点。但导数只关心局部。比如 −2 附近的点不只被拉伸，还被翻转，放得越大越像乘 −4，这就是导数为负的样子。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-3m30s0.jpg" alt="x² 把输入数轴映到输出数轴，放大看 1 附近" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="209">3:29</button>x² 把输入数轴映到输出数轴，放大看 1 附近</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-3m48s0.jpg" alt="3 附近的点被拉伸 6 倍：导数为 6" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="228">3:48</button>3 附近的点被拉伸 6 倍：导数为 6</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-4m40s0.jpg" alt="0 附近放大 10000 倍：一小段点被压成一个点，导数为 0" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="280">4:40</button>0 附近放大 10000 倍：一小段点被压成一个点，导数为 0</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-5m30s0.jpg" alt="−2 附近：拉伸并翻转，相当于乘 −4" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="330">5:30</button>−2 附近：拉伸并翻转，相当于乘 −4</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="344">5:44</button>谜题：连分数 1 + 1/(1 + 1/(1 + …))</h4>
+      <p>朋友问的一个问题。常规做法：设整个连分数等于 <span class="m"><i>x</i></span>，注意到里面藏着一份完整的自己，换成 <span class="m"><i>x</i></span>，得到 <span class="m"><i>x</i> = 1 + 1/<i>x</i></span>。也就是找函数 <span class="m">1 + 1/<i>x</i></span> 的<b>不动点 (Fixed Point)</b>。</p>
+      <p>但有两个解：黄金比例 <span class="m">φ ≈ 1.618</span>，以及 <span class="m">−0.618</span>，正好是 <span class="m">−1/φ</span>。作者叫它「φ 的小兄弟」，φ 的几乎每条性质它都有。那能不能说这个连分数也等于 <span class="m">−0.618</span>？你可能马上说不行，左边全是正数。</p>
+      <p>先说清楚这个式子的意思。一种理解（不是唯一的）：从某个常数（比如 1）出发，反复套用 <span class="m">1 + 1/<i>x</i></span>，问它趋近什么。符号上看越来越像那个无限连分数。如果从负数出发，结果为负也不奇怪；而从 <span class="m">−1/φ</span> 出发，套一次还是 <span class="m">−1/φ</span>，永远停在那。</p>
+      <p>但 φ 更受偏爱。拿计算器随便输一个数，反复套 <span class="m">1 + 1/<i>x</i></span>，不管从哪里出发，最后都落到 1.618。哪怕从离小兄弟很近的负数出发，也会逐渐离开它，跳到 φ 那边。为什么？</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-6m25s0.jpg" alt="设连分数为 x：找 1 + 1/x 的不动点" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="385">6:25</button>设连分数为 x：找 1 + 1/x 的不动点</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-7m00s0.jpg" alt="另一个解 −0.618 也行吗" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="420">7:00</button>另一个解 −0.618 也行吗</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-8m05s0.jpg" alt="从 −1/φ 出发，迭代永远停在 −0.618" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="485">8:05</button>从 −1/φ 出发，迭代永远停在 −0.618</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="547">9:07</button>稳定与不稳定的不动点</h4>
+      <p>通常的教法用图像：代一个输入，纵坐标是输出；要把输出再代回去，先水平走到直线 <span class="m"><i>y</i> = <i>x</i></span>，再竖直走到函数图像，反复这样，画出「蛛网图」。作者觉得这种画法要停下来想才记得往哪画，作者留了个练习：什么条件下蛛网收向不动点、什么条件下离开，和斜率有关。</p>
+      <p>换成变换来看更清楚。画出一堆箭头表示各输入点被送到哪（<span class="m">1/<i>x</i></span> 的作用形成一个圆形图案，再整体右移 1）。反复套用，就是把输出当作新输入再映一次。动画里几个点迭代没几次就都聚到 1.618 附近。</p>
+      <p>放大看 φ 附近：映射把这一小段压向 φ，也就是 <span class="m">1 + 1/<i>x</i></span> 在 φ 处导数的绝对值小于 1，具体约为 −0.38。每迭代一次，这一小段就被压得更小，像引力一样被拉向 φ。</p>
+      <p>小兄弟附近，导数的绝对值大于 1（约 −2.62），附近的点被推开，每次拉伸两倍多（导数为负所以还会翻转，但对稳定性而言只看绝对值）。数学家把 φ 叫<b>稳定不动点 (Stable Fixed Point)</b>，小兄弟叫<b>不稳定不动点</b>：稍微扰动一下，稳定的会回来，不稳定的会跑开。所以有一条很有用的小结论：不动点是否稳定，看它处导数的绝对值是大于 1 还是小于 1。</p>
+      <p>至于小兄弟算不算这个连分数的一个合法值，由你决定。如果把它看成极限过程，除了小兄弟本身，所有初值都收敛到 φ，把两者相提并论就显得奇怪；如果把它看成纯代数对象，像多项式的根那样，可以有多个值。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-10m40s0.jpg" alt="把 1 + 1/x 看成变换：1/x 形成圆形图案，再右移 1" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="641">10:41</button>把 1 + 1/x 看成变换：1/x 形成圆形图案，再右移 1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-11m35s0.jpg" alt="φ 附近被压缩：导数的绝对值小于 1" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="694">11:34</button>φ 附近被压缩：导数的绝对值小于 1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-12m05s0.jpg" alt="−0.618 附近：|导数| ≈ 2.62 &gt; 1，点被推开" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="725">12:05</button>−0.618 附近：|导数| ≈ 2.62 > 1，点被推开</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/derivatives-and-transforms-12m40s0.jpg" alt="稳定不动点与不稳定不动点" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="760">12:40</button>稳定不动点与不稳定不动点</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="810">13:30</button>为什么要带着这个视角</h4>
+      <p>作者并不认为变换视角整体上比图像好，用这种方式画整个函数挺笨拙的。他的看法是入门课应该多提一提它，让学生对导数的理解更灵活。主要的好处在后面的课程：学到多元函数、复变函数时，导数就是「局部像一个线性变换」，这正是这个视角的推广。</p>
+      
+      
+      
+      
+      
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>变换观点：函数把输入数轴映到输出数轴，导数是某点附近被拉伸（>1）、压缩（<1）、压成一点（=0）或翻转（<0）的倍数。</li><li>反复迭代 <span class="m"><i>f</i></span> 时，不动点 <span class="m"><i>x</i>*</span> 在 <span class="m">|<i>f</i>′(<i>x</i>*)| < 1</span> 时稳定（吸引），在 <span class="m">|<i>f</i>′(<i>x</i>*)| > 1</span> 时不稳定（排斥）。</li><li><span class="m">1 + 1/<i>x</i></span> 在 φ 处导数约 −0.38，在 −1/φ 处约 −2.62，所以迭代总收敛到 φ。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/derivatives-and-transforms-2m05s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1XW411P75q" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="7"><b>0:07</b><span>第一年微积分的直觉都基于图像</span></button></li><li><button type="button" data-t="50"><b>0:50</b><span>推广到更一般的函数时，图像画不出来</span></button></li><li><button type="button" data-t="78"><b>1:18</b><span>变换观点</span></button></li><li><button type="button" data-t="100"><b>1:40</b><span>标准画法：导数是斜率</span></button></li><li><button type="button" data-t="125"><b>2:05</b><span>更根本的理解：对微小推动有多敏感</span></button></li><li><button type="button" data-t="142"><b>2:22</b><span>把函数看成数轴到数轴的映射</span></button></li><li><button type="button" data-t="177"><b>2:57</b><span>例：x²，在 1 附近拉伸 2 倍</span></button></li><li><button type="button" data-t="226"><b>3:46</b><span>在 3 附近拉伸 6 倍，在 1/4 附近压缩一半</span></button></li><li><button type="button" data-t="250"><b>4:10</b><span>在 0 附近：压成一个点，导数为 0</span></button></li><li><button type="button" data-t="295"><b>4:55</b><span>负的输入：拉伸并翻转，导数为负</span></button></li><li><button type="button" data-t="344"><b>5:44</b><span>谜题：无限连分数</span></button></li><li><button type="button" data-t="365"><b>6:05</b><span>设它等于 x，找 1 + 1/x 的不动点</span></button></li><li><button type="button" data-t="387"><b>6:27</b><span>两个解：φ 和它的小兄弟 −1/φ</span></button></li><li><button type="button" data-t="432"><b>7:12</b><span>按迭代的极限来理解</span></button></li><li><button type="button" data-t="494"><b>8:14</b><span>从任何数出发，迭代总落到 1.618</span></button></li><li><button type="button" data-t="547"><b>9:07</b><span>通常的教法：蛛网图</span></button></li><li><button type="button" data-t="612"><b>10:12</b><span>用变换来看</span></button></li><li><button type="button" data-t="674"><b>11:14</b><span>φ 附近被压缩：导数约 −0.38</span></button></li><li><button type="button" data-t="714"><b>11:54</b><span>小兄弟附近被拉伸：导数的绝对值大于 1</span></button></li><li><button type="button" data-t="743"><b>12:23</b><span>稳定不动点与不稳定不动点</span></button></li><li><button type="button" data-t="810"><b>13:30</b><span>为什么值得学这个视角</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+<div class="view" id="view-aicalc"><div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#aic-gd">导数</a></li><li><a href="#aic-backprop">链式法则</a></li><li><a href="#aic-activation">激活函数的导数，以及梯度消失</a></li><li><a href="#aic-softmax">e 与 softmax、交叉熵</a></li><li><a href="#aic-numerical">极限与有限差分</a></li><li><a href="#aic-taylor">泰勒展开</a></li><li><a href="#aic-stability">不动点的稳定性</a></li><li><a href="#aic-integral">积分</a></li><li><a href="#aic-implicit">隐函数求导</a></li>
+    <li><a href="#aic-map">对照表</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">AI 中用到的微积分</h2>
+    <p class="lede">训练一个神经网络，说到底就是反复做一件事：算出损失对每个参数的导数，然后把参数往让损失变小的方向挪一点。模型的前向计算主要是线性代数，训练这一步主要是微积分。</p><p class="lede">这一页按概念组织，每节标出对应「微积分的本质」的哪几集（点章节名跳过去展开那一集），然后说它在训练和模型里具体出现在哪，配一个能手算的小例子。</p>
+    <section class="aisec" id="aic-gd">
+    <h2><span class="n">1</span>导数：损失对参数有多敏感，梯度下降</h2>
+    <p class="chs">对应 <a class="chref" href="#calc2">第 2 集 · 导数的悖论</a><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></p>
+    <p>第 2 集把导数讲成「输入推一点点，输出变多少」的比例。训练里，输入是模型参数 <span class="m"><i>w</i></span>，输出是损失 <span class="m"><i>L</i></span>。导数 <span class="m"><i>d</i><i>L</i>/<i>d</i><i>w</i></span> 告诉你：<span class="m"><i>w</i></span> 增加一点点 <span class="m"><i>d</i><i>w</i></span>，损失大约变化 <span class="m"><i>d</i><i>L</i>/<i>d</i><i>w</i> · <i>d</i><i>w</i></span>。导数为正，说明减小 <span class="m"><i>w</i></span> 能让损失下降；为负，就增大 <span class="m"><i>w</i></span>。</p>
+    <p><b>梯度下降 (Gradient Descent)</b> 就是每一步都按这个方向挪一小步：<span class="m"><i>w</i> ← <i>w</i> − η · <i>d</i><i>L</i>/<i>d</i><i>w</i></span>，<span class="m">η</span> 叫<b>学习率 (Learning Rate)</b>。模型有几十亿个参数，就对每个参数各求一个偏导数，排成一个向量，叫<b>梯度 (Gradient)</b> <span class="m">∇<i>L</i></span>。第 6 集末尾说隐函数求导是多元微积分的一瞥：<span class="m"><i>d</i><i>S</i> = 2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i></span> 就是「每个方向各推一点，总变化是各方向贡献之和」，梯度是同一件事的多维版本。</p>
+    <p>梯度是一阶近似，只在一小步范围内准，所以学习率不能太大。步子太大，就会越过最低点，甚至越跳越远，下面第 7 节用第 12 集的不动点稳定性说明到底多大算太大。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>最小化 L(w) = (w − 3)²，从 w = 0 出发</p>
+      <p>导数是 <span class="m">2(<i>w</i> − 3)</span>。取 <span class="m">η = 0.1</span>：第一步 <span class="m"><i>w</i> = 0 − 0.1 × 2 × (0 − 3) = 0.6</span>，接着是 1.08、1.464、1.771、2.017，一步步逼近 3。每步挪动的量正比于导数，离 3 越近导数越小，步子也越小。</p></div>
+    <p class="refs"><a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noreferrer">Adam: A Method for Stochastic Optimization · 2014-12-22 ↗</a></p>
+  </section>
+<section class="aisec" id="aic-backprop">
+    <h2><span class="n">2</span>链式法则：反向传播</h2>
+    <p class="chs">对应 <a class="chref" href="#calc4">第 4 集 · 直观理解链式法则和乘积法则</a><a class="chref ai" href="#ai-backprop">线代：反向传播</a></p>
+    <p>神经网络是一层层函数的复合：输入经过第一层、第二层……最后算出损失。要求损失对某个参数的导数，就是第 4 集的链式法则：三条数轴上的连锁推动，推广成几十上百层。参数推一点，这一层的输出跟着变，再传到下一层，一直传到损失。</p>
+    <p><b>反向传播 (Backpropagation)</b> 是按链式法则高效地算出所有参数梯度的办法：先前向算一遍，记下每层的中间结果；再从损失出发往回走，每一层把「损失对本层输出的导数」乘上「本层输出对本层输入（和参数）的导数」，传给前一层。每个中间量只算一次，所以算全部梯度的代价和一次前向计算差不多。PyTorch 的 <code>loss.backward()</code> 做的就是这件事。</p>
+    <p>第 4 集强调 <span class="m"><i>d</i><i>g</i>/<i>d</i><i>h</i> · <i>d</i><i>h</i>/<i>d</i><i>x</i></span> 里 <span class="m"><i>d</i><i>h</i></span> 相消不只是记号巧合；在网络里，那个 <span class="m"><i>d</i><i>h</i></span> 就是每一层的中间激活值，反向传播沿着它们一路乘回去。多维的时候每一步乘的是雅可比矩阵，乘法顺序为什么要从损失那头开始，见「AI 中的线性代数」反向传播那一节。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>一个神经元：z = w·x，y = σ(z)，L = (y − t)²</p>
+      <p>取 <span class="m"><i>x</i> = 2</span>、<span class="m"><i>w</i> = 0.5</span>、目标 <span class="m"><i>t</i> = 1</span>。前向：<span class="m"><i>z</i> = 1</span>，<span class="m"><i>y</i> = <i>σ</i>(1) ≈ 0.7311</span>，<span class="m"><i>L</i> ≈ 0.0723</span>。</p>
+      <p>反向，一层层乘回去：<span class="m"><i>d</i><i>L</i>/<i>d</i><i>y</i> = 2(<i>y</i> − <i>t</i>) ≈ −0.5379</span>；<span class="m"><i>d</i><i>y</i>/<i>d</i><i>z</i> = <i>σ</i>(<i>z</i>)(1 − <i>σ</i>(<i>z</i>)) ≈ 0.1966</span>；<span class="m"><i>d</i><i>z</i>/<i>d</i><i>w</i> = <i>x</i> = 2</span>。所以 <span class="m"><i>d</i><i>L</i>/<i>d</i><i>w</i> ≈ −0.5379 × 0.1966 × 2 ≈ −0.2115</span>。导数为负，说明应该增大 <span class="m"><i>w</i></span>，让 <span class="m"><i>y</i></span> 更接近 1。用下面第 5 节的有限差分验算，结果一致。</p></div>
+    <p class="refs"><a href="https://www.bilibili.com/video/BV16x411V7Qg" target="_blank" rel="noreferrer">视频：3Blue1Brown：深度学习之反向传播算法（上篇直观理解，下篇微积分原理） · 2017-11-22 ↗</a><a href="https://www.nature.com/articles/323533a0" target="_blank" rel="noreferrer">Learning representations by back-propagating errors（Rumelhart、Hinton、Williams，Nature） · 1986-10-09 ↗</a></p>
+  </section>
+<section class="aisec" id="aic-activation">
+    <h2><span class="n">3</span>激活函数的导数，以及梯度消失</h2>
+    <p class="chs">对应 <a class="chref" href="#calc3">第 3 集 · 用几何来求导</a><a class="chref" href="#calc5">第 5 集 · 指数函数求导：e 有什么特别</a><a class="chref" href="#calc7">第 7 集 · 极限、洛必达法则与 ε-δ 定义</a></p>
+    <p>反向传播每经过一层，都要乘上这一层激活函数的导数，所以激活函数的导数长什么样很关键。</p>
+    <p><b>Sigmoid</b> <span class="m"><i>σ</i>(<i>z</i>) = 1/(1 + <i>e</i>^(−<i>z</i>))</span> 的导数是 <span class="m"><i>σ</i>(<i>z</i>)(1 − <i>σ</i>(<i>z</i>))</span>，最大值只有 0.25（在 <span class="m"><i>z</i> = 0</span> 处）。推导用到第 5 集：<span class="m"><i>e</i>^(−<i>z</i>)</span> 的导数是 <span class="m">−<i>e</i>^(−<i>z</i>)</span>，再加链式法则。<b>tanh</b> 的导数最大是 1。</p>
+    <p><b>ReLU</b> <span class="m"><i>m</i><i>a</i><i>x</i>(0, <i>z</i>)</span> 的导数在 <span class="m"><i>z</i> > 0</span> 时是 1，<span class="m"><i>z</i> < 0</span> 时是 0。在 <span class="m"><i>z</i> = 0</span> 处，第 7 集的话说，从左边趋近的斜率是 0、从右边是 1，极限不存在，严格说不可导；实践中直接规定取 0（或 1），这个点被精确碰到的概率几乎为 0。</p>
+    <p>深层网络的梯度要连乘每一层的导数。如果每层都乘一个小于 1 的数，梯度会指数级变小，靠近输入的层几乎学不动，这叫<b>梯度消失 (Vanishing Gradient)</b>；反过来大于 1 就会<b>梯度爆炸 (Exploding Gradient)</b>。这是 ReLU 取代 sigmoid 成为默认激活函数、以及残差连接被发明出来的原因之一。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>10 层 sigmoid</p>
+      <p>就算每层都处在 sigmoid 导数最大的地方，梯度也要乘 10 次 0.25：<span class="m">0.25¹⁰ ≈ 9.5 × 10⁻⁷</span>，还不到百万分之一。ReLU 在激活区的导数是 1，乘 10 次还是 1。</p></div>
+    
+  </section>
+<section class="aisec" id="aic-softmax">
+    <h2><span class="n">4</span>e 与 softmax、交叉熵</h2>
+    <p class="chs">对应 <a class="chref" href="#calc5">第 5 集 · 指数函数求导：e 有什么特别</a><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></p>
+    <p>语言模型最后一步把一排分数 <span class="m"><i>z</i></span> 变成概率：<b>softmax</b> <span class="m"><i>p</i>ᵢ = <i>e</i>^(<i>z</i>ᵢ) / Σⱼ <i>e</i>^(<i>z</i>ⱼ)</span>。用 <span class="m"><i>e</i></span> 做底有第 5 集说的好处：<span class="m"><i>e</i>^<i>x</i></span> 的导数就是它自己，求导特别干净。</p>
+    <p>训练用的损失是<b>交叉熵 (Cross-Entropy)</b>：正确答案是第 <span class="m"><i>k</i></span> 个 token 时，<span class="m"><i>L</i> = −<i>l</i><i>n</i> <i>p</i>ₖ</span>。第 6 集推出过 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，再加链式法则，softmax 加交叉熵对分数 <span class="m"><i>z</i>ᵢ</span> 的导数化简成一个很简单的形式：<span class="m">∂<i>L</i>/∂<i>z</i>ᵢ = <i>p</i>ᵢ − <i>y</i>ᵢ</span>，其中 <span class="m"><i>y</i></span> 是正确答案的 one-hot 向量。也就是「预测的概率减去该有的概率」。</p>
+    <p>数值上的一个细节也来自第 5 集的指数性质 <span class="m"><i>e</i>^(<i>a</i> + <i>b</i>) = <i>e</i>^<i>a</i> · <i>e</i>^<i>b</i></span>：分数很大时 <span class="m"><i>e</i>^(1000)</span> 会溢出，但所有 <span class="m"><i>z</i>ᵢ</span> 同时减去同一个数 <span class="m"><i>c</i></span>，分子分母都乘了 <span class="m"><i>e</i>^(−<i>c</i>)</span>，概率不变。所以实现时都先减去最大值再求指数。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>三个分数 (2, 1, 0.1)，正确答案是第一个</p>
+      <p>softmax 得概率约 <span class="m">(0.659, 0.242, 0.099)</span>。梯度 <span class="m"><i>p</i> − <i>y</i> = (−0.341, 0.242, 0.099)</span>：正确答案的分数被往上推，其他两个往下压，推的力度就是概率差多少。分数是 (1000, 999) 时，减去 1000 变成 (0, −1)，<span class="m"><i>e</i>^0 = 1</span>、<span class="m"><i>e</i>^(−1) ≈ 0.368</span>，不会溢出。</p></div>
+    
+  </section>
+<section class="aisec" id="aic-numerical">
+    <h2><span class="n">5</span>极限与有限差分：梯度检验</h2>
+    <p class="chs">对应 <a class="chref" href="#calc2">第 2 集 · 导数的悖论</a><a class="chref" href="#calc7">第 7 集 · 极限、洛必达法则与 ε-δ 定义</a></p>
+    <p>第 2 集里作者画速度曲线时，让电脑用一个具体的 <span class="m"><i>d</i><i>t</i> = 0.01</span> 算 <span class="m">(<i>s</i>(<i>t</i> + <i>d</i><i>t</i>) − <i>s</i>(<i>t</i>))/<i>d</i><i>t</i></span>。这就是<b>有限差分 (Finite Difference)</b>：导数是 <span class="m"><i>d</i><i>t</i> → 0</span> 的极限，电脑上只能取一个小的 <span class="m"><i>h</i></span> 来近似。</p>
+    <p>自己写反向传播时，常用它来检验梯度对不对，叫<b>梯度检验 (Gradient Checking)</b>：把某个参数加减一个小量 <span class="m"><i>h</i></span>，用 <span class="m">(<i>L</i>(<i>w</i> + <i>h</i>) − <i>L</i>(<i>w</i> − <i>h</i>)) / 2<i>h</i></span> 算一个数值梯度，和反向传播的结果比。两边对称的这种中心差分，误差正比于 <span class="m"><i>h</i>²</span>，比单边差分（误差正比于 <span class="m"><i>h</i></span>）准得多。<span class="m"><i>h</i></span> 也不能太小，太小时两个几乎相等的浮点数相减会丢精度，一般取 <span class="m">10⁻⁴</span> 到 <span class="m">10⁻⁶</span> 左右。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>x³ 在 x = 2 处，真值是 12</p>
+      <p><span class="m"><i>h</i> = 0.01</span>：单边差分 <span class="m">((2.01)³ − 8)/0.01 = 12.0601</span>，中心差分 <span class="m">((2.01)³ − (1.99)³)/0.02 = 12.0001</span>。<span class="m"><i>h</i> = 0.1</span> 时两者分别是 12.61 和 12.01。中心差分的误差正好是 <span class="m"><i>h</i>²</span>：第 2 集展开 <span class="m">(2 + <i>d</i><i>t</i>)³</span> 时那些带 <span class="m"><i>d</i><i>t</i></span> 的项，在 <span class="m">(2 + <i>h</i>)³ − (2 − <i>h</i>)³</span> 里偶数次的那几项正好抵消。</p></div>
+    
+  </section>
+<section class="aisec" id="aic-taylor">
+    <h2><span class="n">6</span>泰勒展开：学习率、二阶方法</h2>
+    <p class="chs">对应 <a class="chref" href="#calc10">第 10 集 · 高阶导数</a><a class="chref" href="#calc11">第 11 集 · 泰勒级数</a></p>
+    <p>第 11 集说泰勒级数把一点处的导数信息翻译成附近的近似。损失函数在当前参数 <span class="m"><i>w</i></span> 附近展开到二阶：<span class="m"><i>L</i>(<i>w</i> + Δ) ≈ <i>L</i>(<i>w</i>) + <i>L</i>′(<i>w</i>)·Δ + ½ <i>L</i>″(<i>w</i>)·Δ²</span>。梯度下降只用了一阶项，相当于假设损失是一条直线，所以只敢走一小步。</p>
+    <p>二阶项里的 <span class="m"><i>L</i>″</span> 是第 10 集的二阶导数，也就是损失曲面的弯曲程度；多维时它是一个矩阵，叫<b>海森矩阵 (Hessian)</b>。弯得越急，一阶近似失效得越快，学习率就得越小。如果直接最小化这个二次近似，令它对 <span class="m">Δ</span> 的导数为 0，得到 <span class="m">Δ = −<i>L</i>′/<i>L</i>″</span>，这就是<b>牛顿法 (Newton's Method)</b>：用曲率来决定步长。大模型参数太多，海森矩阵存不下，所以实践中用的是 Adam 这类只用一阶信息、再按每个参数的历史梯度大小调整步长的方法。</p>
+    <p>泰勒展开在 AI 里还有很多用处：GELU、SiLU 这类激活函数的近似公式，第 5 集 softmax 里的 <span class="m"><i>e</i>^<i>x</i></span>，线性注意力把 <span class="m"><i>e</i>^(<i>q</i>·<i>k</i>)</span> 展开成低阶多项式来近似，都是「用多项式在某一点附近代替原函数」。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>二次函数上，牛顿法一步到位</p>
+      <p><span class="m"><i>L</i>(<i>w</i>) = (<i>w</i> − 3)²</span>：<span class="m"><i>L</i>′(0) = −6</span>，<span class="m"><i>L</i>″ = 2</span>，牛顿步 <span class="m">Δ = −(−6)/2 = 3</span>，一步就到最低点 3。因为二次函数的二阶泰勒展开就是它自己。梯度下降取 <span class="m">η = 0.1</span> 要走十几步才接近。</p></div>
+    
+  </section>
+<section class="aisec" id="aic-stability">
+    <h2><span class="n">7</span>不动点的稳定性：学习率为什么不能太大</h2>
+    <p class="chs">对应 <a class="chref" href="#calc12">第 12 集 · 导数的另一种可视化</a></p>
+    <p>第 12 集说，反复迭代一个函数 <span class="m"><i>f</i></span> 时，不动点稳不稳定，看那里导数的绝对值：小于 1，附近的点被吸过去；大于 1，被推开。</p>
+    <p>梯度下降正是反复迭代一个函数：<span class="m"><i>w</i> ← <i>g</i>(<i>w</i>) = <i>w</i> − η·<i>L</i>′(<i>w</i>)</span>。最低点 <span class="m"><i>w</i>*</span> 处 <span class="m"><i>L</i>′(<i>w</i>*) = 0</span>，所以 <span class="m"><i>g</i>(<i>w</i>*) = <i>w</i>*</span>，它是 <span class="m"><i>g</i></span> 的不动点。<span class="m"><i>g</i></span> 在那里的导数是 <span class="m">1 − η·<i>L</i>″(<i>w</i>*)</span>。要让最低点成为稳定不动点，需要 <span class="m">|1 − η·<i>L</i>″| < 1</span>，也就是 <span class="m">0 < η < 2/<i>L</i>″</span>。学习率超过 <span class="m">2/<i>L</i>″</span>，每一步都把误差放大，训练发散。</p>
+    <p>这也说明了曲率和学习率的关系：损失曲面越弯（<span class="m"><i>L</i>″</span> 越大），能用的最大学习率越小。训练大模型时常用学习率预热 (warmup)，一部分原因就在这里：训练初期曲面的曲率变化大，先用小步子。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>还是 L(w) = (w − 3)²，L″ = 2，临界学习率是 1</p>
+      <p><span class="m">η = 0.1</span>：<span class="m"><i>g</i>′ = 1 − 0.2 = 0.8</span>，每步误差乘 0.8，平稳收敛（0、0.6、1.08、1.464…）。</p>
+      <p><span class="m">η = 0.9</span>：<span class="m"><i>g</i>′ = −0.8</span>，绝对值仍小于 1，但为负，所以在 3 的两侧来回跳着收敛（0、5.4、1.08、4.536、1.771…），正是第 12 集说的「压缩并翻转」。</p>
+      <p><span class="m">η = 1.1</span>：<span class="m"><i>g</i>′ = −1.2</span>，绝对值大于 1，越跳越远（0、6.6、−1.32、8.18、−3.22、10.47），发散。</p></div>
+    
+  </section>
+<section class="aisec" id="aic-integral">
+    <h2><span class="n">8</span>积分：期望、平均，以及按速度走出一条路</h2>
+    <p class="chs">对应 <a class="chref" href="#calc8">第 8 集 · 积分与微积分基本定理</a><a class="chref" href="#calc9">第 9 集 · 面积和斜率有什么联系</a></p>
+    <p>第 9 集说：有限情形下「加起来求平均」的概念，推广到连续情形就换成积分，在概率里尤其常见。训练目标本来就是一个期望：想最小化的是损失在整个数据分布上的平均 <span class="m"><i>E</i>[<i>L</i>] = ∫ <i>L</i>(<i>x</i>) <i>p</i>(<i>x</i>) <i>d</i><i>x</i></span>。我们算不出这个积分，只能用一小批样本的平均来近似，这就是<b>随机梯度下降 (Stochastic Gradient Descent)</b> 里「随机」的来历：用有限个样本的和，近似一个积分，和第 9 集取有限个等距点求平均是同一个思路。</p>
+    <p>第 8 集的车速表问题在生成模型里原样出现。<b>流匹配 (Flow Matching)</b> 和扩散模型的 ODE 采样，训练一个网络来预测「速度」<span class="m"><i>v</i>(<i>x</i>, <i>t</i>)</span>，生成时从一团噪声出发，每一步按 <span class="m"><i>x</i> ← <i>x</i> + <i>v</i>(<i>x</i>, <i>t</i>)·<i>d</i><i>t</i></span> 往前走，把许多小步加起来。这正是第 8 集里把速度近似成一段段常数、距离就是细长方形面积之和；步数越多、<span class="m"><i>d</i><i>t</i></span> 越小越准，但越慢。很多加速采样的工作，就是想用更少、更大的步子走出同样的路。</p>
+    <p><b>Neural ODE</b> 把残差网络 <span class="m"><i>x</i> ← <i>x</i> + <i>f</i>(<i>x</i>)</span> 看成这种欧拉步的离散版本，干脆用常微分方程来定义网络。</p>
+    <div class="ex"><p class="ex-h"><span>例子</span>第 8 集的车：v(t) = t(8 − t)，8 秒走了多远</p>
+      <p>精确值是 <span class="m">256/3 ≈ 85.333</span> 米。按速度一步步走（每步用这段开头的速度）：<span class="m"><i>d</i><i>t</i> = 1</span> 走 8 步，得 84；<span class="m"><i>d</i><i>t</i> = 0.25</span> 走 32 步，得 85.25；<span class="m"><i>d</i><i>t</i> = 0.01</span> 走 800 步，得 85.333。生成模型采样时选多少步，面对的就是这个取舍。</p></div>
+    <p class="refs"><a href="https://arxiv.org/abs/2210.02747" target="_blank" rel="noreferrer">Flow Matching for Generative Modeling · 2022-10-06 ↗</a><a href="https://arxiv.org/abs/1806.07366" target="_blank" rel="noreferrer">Neural Ordinary Differential Equations · 2018-06-19 ↗</a></p>
+  </section>
+<section class="aisec" id="aic-implicit">
+    <h2><span class="n">9</span>隐函数求导：对不动点方程直接求导</h2>
+    <p class="chs">对应 <a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a><a class="chref" href="#calc12">第 12 集 · 导数的另一种可视化</a></p>
+    <p>第 6 集的方法是：变量之间只有一个方程约束，不必解出显式表达式，直接对方程两边求导，就能得到变化率之间的关系。</p>
+    <p>这在一些模型里很实用。<b>深度均衡模型 (Deep Equilibrium Model)</b> 不堆固定层数，而是把输出定义成一个不动点 <span class="m"><i>z</i>* = <i>f</i>(<i>z</i>*, <i>x</i>)</span>，前向时反复迭代到收敛（第 12 集的不动点迭代）。反向传播如果沿着每一次迭代往回走，要存下所有中间结果；改用隐函数求导，对 <span class="m"><i>z</i>* = <i>f</i>(<i>z</i>*, <i>x</i>)</span> 两边求导，直接解出 <span class="m"><i>d</i><i>z</i>*/<i>d</i><i>x</i></span>，不管前向迭代了多少次，都只要常数的内存。超参数优化、元学习里的「对内层优化的结果求导」也常用这个办法。</p>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1909.01377" target="_blank" rel="noreferrer">Deep Equilibrium Models · 2019-09-03 ↗</a></p>
+  </section>
+    <section class="aisec" id="aic-map"><h2>对照表</h2>
+      <div class="tbl"><table><thead><tr><th>概念</th><th>在 AI 里</th><th>章节</th></tr></thead>
+    <tbody><tr><td>导数 = 微小变化之比</td><td>损失对参数的敏感度，梯度下降</td><td><a class="chref" href="#calc2">第 2 集 · 导数的悖论</a></td></tr><tr><td>多元：各方向贡献相加</td><td>梯度向量</td><td><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></td></tr><tr><td>链式法则</td><td>反向传播</td><td><a class="chref" href="#calc4">第 4 集 · 直观理解链式法则和乘积法则</a><a class="chref ai" href="#ai-backprop">线代：反向传播</a></td></tr><tr><td>e 的导数是自身</td><td>sigmoid、softmax 求导干净</td><td><a class="chref" href="#calc5">第 5 集 · 指数函数求导：e 有什么特别</a></td></tr><tr><td>ln x 的导数 1/x</td><td>交叉熵 + softmax 的梯度 p − y</td><td><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></td></tr><tr><td>左右极限不同</td><td>ReLU 在 0 处不可导</td><td><a class="chref" href="#calc7">第 7 集 · 极限、洛必达法则与 ε-δ 定义</a></td></tr><tr><td>有限的 dt 近似极限</td><td>有限差分梯度检验</td><td><a class="chref" href="#calc2">第 2 集 · 导数的悖论</a><a class="chref" href="#calc7">第 7 集 · 极限、洛必达法则与 ε-δ 定义</a></td></tr><tr><td>二阶导数 = 弯曲</td><td>海森矩阵、曲率限制学习率</td><td><a class="chref" href="#calc10">第 10 集 · 高阶导数</a></td></tr><tr><td>泰勒展开</td><td>牛顿法、激活函数和注意力的多项式近似</td><td><a class="chref" href="#calc11">第 11 集 · 泰勒级数</a></td></tr><tr><td>不动点的稳定性</td><td>学习率 < 2/L″</td><td><a class="chref" href="#calc12">第 12 集 · 导数的另一种可视化</a></td></tr><tr><td>积分 = 细长方形之和</td><td>流匹配、扩散模型按速度一步步采样</td><td><a class="chref" href="#calc8">第 8 集 · 积分与微积分基本定理</a></td></tr><tr><td>平均值 = 积分 / 宽度</td><td>期望损失，用小批量平均近似</td><td><a class="chref" href="#calc9">第 9 集 · 面积和斜率有什么联系</a></td></tr><tr><td>隐函数求导</td><td>深度均衡模型、双层优化</td><td><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></td></tr></tbody></table></div></section>
+  </article>
+</div></div>
 </main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
@@ -2610,6 +3893,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   function showTab(v){
     document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
     document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+    // 窄屏上 tab 栏横向滑动，切过去的那个要滑进视野
+    var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
   }
   document.querySelectorAll('.tb').forEach(function(b){
     b.addEventListener('click',function(){
@@ -2622,10 +3907,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   /* ── 看过：只记在这台浏览器里，读写都包 try，隐私模式下拿不到就当没有 ── */
   var KEY='basic-linalg-seen', seen={};
   try{seen=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){}
-  function paint(ep){var on=!!seen[ep.dataset.ch];ep.classList.toggle('is-seen',on);
+  // 只有线代一个系列时按章节号存（{"7":true}），现在按 ch7 / calc7 区分系列，旧记录换成 ch 前缀
+  Object.keys(seen).forEach(function(k){if(/^\d+$/.test(k)){if(seen[k])seen['ch'+k]=true;delete seen[k];}});
+  function paint(ep){var on=!!seen[ep.dataset.sk];ep.classList.toggle('is-seen',on);
     var s=ep.querySelector('.seen');if(s)s.setAttribute('aria-checked',on);}
   document.querySelectorAll('.ep').forEach(paint);
-  function toggleSeen(el){var ep=el.closest('.ep');seen[ep.dataset.ch]=!seen[ep.dataset.ch];
+  function toggleSeen(el){var ep=el.closest('.ep');seen[ep.dataset.sk]=!seen[ep.dataset.sk];
     try{localStorage.setItem(KEY,JSON.stringify(seen));}catch(e){}paint(ep);}
   document.addEventListener('click',function(e){var s=e.target.closest('.seen');
     if(s){e.preventDefault();e.stopPropagation();toggleSeen(s);}},true);
@@ -2634,7 +3921,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 
   /* ── 全部展开 / 收起 ── */
   document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
-    var open=b.dataset.all==='open';document.querySelectorAll('.ep').forEach(function(d){d.open=open;});});});
+    var open=b.dataset.all==='open';b.closest('.view').querySelectorAll('.ep').forEach(function(d){d.open=open;});});});
 
   /* ── 播放器：优先放本地 video/ 里的原片（跳转不用重新缓冲）；
          文件不在（比如页面单独拷走了），就换成 B 站官方播放器，t= 参数跳到那一秒 ── */
@@ -2697,10 +3984,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
 
   /* ── 带 #ch7 这类锚点打开时，直接展开那一集 ── */
-  /* #ch7 打开第一个 tab 的那一集；#ai 或 #ai-attention 切到第二个 tab（并滚到那一节） */
+  /* #ch7 / #calc7 打开对应系列的那一集；#ai-<节>、#aic-<节>、#more-<组> 切到那个 tab 并滚到那一节 */
   function openHash(){
     var h=location.hash, m=/^#ch(\d+)$/.exec(h);
     if(m){showTab('linalg');var d=document.getElementById('ch'+m[1]);if(d){d.open=true;d.scrollIntoView({block:'start'});}return;}
+    var c=/^#calc(\d+)$/.exec(h);
+    if(c){showTab('calc');var e=document.getElementById('calc'+c[1]);if(e){e.open=true;e.scrollIntoView({block:'start'});}return;}
+    if(/^#aic(-|$)/.test(h)){showTab('aicalc');var w=h.length>4&&document.getElementById(h.slice(1));if(w)w.scrollIntoView({block:'start'});return;}
     if(/^#ai(-|$)/.test(h)){showTab('ai');var t=h.length>3&&document.getElementById(h.slice(1));if(t)t.scrollIntoView({block:'start'});}
     if(/^#more(-|$)/.test(h)){showTab('more');var u=h.length>5&&document.getElementById(h.slice(1));if(u)u.scrollIntoView({block:'start'});}
   }
