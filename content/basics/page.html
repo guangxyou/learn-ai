@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>基础概念 · 3Blue1Brown《线性代数的本质》17 集视频笔记</title>
-<meta name="description" content="把矩阵看成对空间的变换：向量、基、线性变换、矩阵乘法、行列式、逆矩阵与秩、点积与对偶、叉积、克莱姆法则、基变换、特征值、抽象向量空间。17 集每集一份分节摘要，时间码点了直接跳到 B 站视频那一秒，配 265 张去掉字幕的截图和视频里思考题的答案。B 站合集缺的第 15 章已补上。">
+<title>基础概念 · 线性代数的本质 17 集视频笔记，以及 AI 里用到的线性代数</title>
+<meta name="description" content="两个 tab。「线性代数的本质」是 3Blue1Brown 17 集视频的分节笔记：把矩阵看成对空间的变换，从向量、基、线性变换一路讲到行列式、逆矩阵与秩、点积与对偶、叉积、基变换、特征值、抽象向量空间，时间码点了跳到 B 站视频那一秒，配 265 张去掉字幕的截图。「AI 中的线性代数」按概念讲这些东西在模型里出现在哪：嵌入、线性层、注意力的形状、LoRA 的低秩、RNN 的特征值、RoPE 的旋转矩阵、LayerNorm 的投影、反向传播的乘法顺序，每节配能手算的小例子，并链接回对应的那一集。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -177,6 +177,32 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .lb-prev{left:16px}.lb-next{right:16px}
 /* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
 @media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
 </style></head><body>
 <div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
 <div class="wrap"><header class="ep-head">
@@ -185,6 +211,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </header></div>
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
   <button class="tb on" type="button" role="tab" data-v="linalg" aria-selected="true">线性代数的本质</button>
+  <button class="tb" type="button" role="tab" data-v="ai" aria-selected="false">AI 中的线性代数</button>
 </div></div></nav>
 <main class="wrap">
 <div class="view on" id="view-linalg">
@@ -2232,14 +2259,250 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </div>
 </details>
 </div>
+<div class="view" id="view-ai"><div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#ai-embedding">一个 token 就是一个向量</a></li><li><a href="#ai-dot">点积</a></li><li><a href="#ai-linear">矩阵乘向量</a></li><li><a href="#ai-compose">复合</a></li><li><a href="#ai-attention">注意力</a></li><li><a href="#ai-rank">秩</a></li><li><a href="#ai-eigen">特征值</a></li><li><a href="#ai-rope">旋转矩阵</a></li><li><a href="#ai-norm">投影</a></li><li><a href="#ai-backprop">反向传播</a></li><li><a href="#ai-det">行列式</a></li><li><a href="#ai-basis">基变换</a></li>
+    <li><a href="#ai-map">对照表</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">AI 中用到的线性代数</h2>
+    <p class="lede">深度学习模型里绝大部分计算是矩阵乘法，其余是逐元素的非线性函数和少量归一化。所以《线性代数的本质》里的那套几何直觉，基本都能在 Transformer 和大语言模型里找到落点。</p><p class="lede">这一页按概念组织，每节标出对应第一个 tab 的哪几章（点章节名会跳过去展开那一集），然后说它在模型里具体出现在哪、配一个能手算的小例子。例子里的维度都取成互不相同的数，这样看得出哪些相等是数学要求、哪些只是巧合。</p>
+    <section class="aisec" id="ai-embedding">
+    <h2><span class="n">1</span>一个 token 就是一个向量：嵌入</h2>
+    <p class="chs">对应 <a class="chref" href="#ch1">第 1 章 · 向量究竟是什么</a><a class="chref" href="#ch2">第 2 章 · 线性组合、张成的空间与基</a><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a></p>
+    <p>语言模型先把文本切成 token，每个 token 在词表里有一个编号。<b>嵌入 (Embedding)</b> 把这个编号换成一个 <span class="m"><i>d</i><sub>model</sub></span> 维的向量。所有 token 的向量排在一起就是嵌入矩阵 <span class="m"><i>E</i></span>，形状是「词表大小 × <span class="m"><i>d</i><sub>model</sub></span>」。GPT-3 的词表有 50,257 个 token，<span class="m"><i>d</i><sub>model</sub> = 12,288</span>，嵌入矩阵约 6.18 亿个参数。</p>
+    <p>「查表」这个动作也可以写成矩阵乘法：token 编号 i 对应一个只有第 i 位是 1 的 one-hot 向量，它乘嵌入矩阵，结果就是矩阵的第 i 行。这和第 3 章里「矩阵乘第 k 个基向量，得到第 k 列」是同一件事，one-hot 向量就是标准基向量。实际代码直接按下标取行，不真的做乘法。</p>
+    <p>嵌入空间里的方向带有语义。word2vec 那篇论文里的经典例子是 <span class="m"><i>v</i><i>e</i><i>c</i>(<i>k</i><i>i</i><i>n</i><i>g</i>) − <i>v</i><i>e</i><i>c</i>(<i>m</i><i>a</i><i>n</i>) + <i>v</i><i>e</i><i>c</i>(<i>w</i><i>o</i><i>m</i><i>a</i><i>n</i>)</span> 最接近 <span class="m"><i>v</i><i>e</i><i>c</i>(<i>q</i><i>u</i><i>e</i><i>e</i><i>n</i>)</span>：「男性到女性」的差别大致是一个固定方向，可以加到别的词上，这就是第 1 章的向量加法。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>词表 5 个 token，每个嵌入成 3 维向量</p>
+      <p><span class="m"><i>E</i></span> 是 5×3 矩阵。token 2 的 one-hot 向量是 <span class="m">(0, 0, 1, 0, 0)</span>（编号从 0 开始），<span class="m">(0, 0, 1, 0, 0) · <i>E</i></span> 挑出来的就是 <span class="m"><i>E</i></span> 的第 3 行。模型后面拿到的只是这 3 个数。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noreferrer">Efficient Estimation of Word Representations in Vector Space（word2vec） · 2013-01-16 ↗</a><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noreferrer">Language Models are Few-Shot Learners（GPT-3，Table 2.1） · 2020-05-28 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-dot">
+    <h2><span class="n">2</span>点积：相似度，以及输出层的打分</h2>
+    <p class="chs">对应 <a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></p>
+    <p>两个向量的点积等于长度乘长度乘夹角余弦，<span class="m"><i>u</i>·<i>v</i> = |<i>u</i>| |<i>v</i>| cos <i>θ</i></span>。把两个向量都缩放到长度 1，点积就只剩 <span class="m">cos <i>θ</i></span>，这叫<b>余弦相似度 (Cosine Similarity)</b>。向量检索、语义搜索、RAG 里找「最相关的文档」，基本就是算查询向量和每个文档向量的余弦相似度，挑最大的几个。</p>
+    <p>语言模型的最后一步也是点积。最后一层的隐藏向量 <span class="m"><i>h</i></span> 要和词表里每个 token 的输出向量各做一次点积，得到词表大小那么多个分数 (logits)，再经 softmax 变成下一个 token 的概率。按第 9 章的对偶性来看，每个 token 的输出向量就是一个「把隐藏向量映到一个分数」的线性函数。GPT-2 让输出层直接复用嵌入矩阵（weight tying），同一个向量既用来把 token 变成向量，也用来给这个 token 打分。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>算一个余弦相似度</p>
+      <p><span class="m"><i>u</i> = (1, 2, 2)</span>，<span class="m"><i>v</i> = (2, 0, 1)</span>。点积 <span class="m">1×2 + 2×0 + 2×1 = 4</span>，<span class="m">|<i>u</i>| = 3</span>，<span class="m">|<i>v</i>| = √5</span>，所以 <span class="m">cos <i>θ</i> = 4 / (3√5) ≈ 0.596</span>，夹角约 53°。点积为正说明两者大致同向。</p></div>
+    
+    
+  </section>
+<section class="aisec" id="ai-linear">
+    <h2><span class="n">3</span>矩阵乘向量：线性层</h2>
+    <p class="chs">对应 <a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></p>
+    <p>神经网络里最常见的一层是<b>线性层 (Linear Layer)</b>，也叫全连接层 (Fully-Connected Layer)：<span class="m"><i>y</i> = <i>W</i><i>x</i> + <i>b</i></span>。<span class="m"><i>W</i></span> 的形状是「输出维数 × 输入维数」，一般不是方阵，按第 8 章的说法，它把 <span class="m"><i>d</i><sub>in</sub></span> 维空间映到 <span class="m"><i>d</i><sub>out</sub></span> 维空间。按第 3 章，<span class="m"><i>W</i><i>x</i></span> 就是用 <span class="m"><i>x</i></span> 的各个分量去缩放 <span class="m"><i>W</i></span> 的各列再相加；每一列是「输入的第 j 个分量」对输出的贡献方向。</p>
+    <p>实际训练时一次喂一批数据。把 B 个输入向量摞成一个 B × <span class="m"><i>d</i><sub>in</sub></span> 的矩阵 <span class="m"><i>X</i></span>，整批的输出就是 <span class="m"><i>X</i><i>W</i>ᵀ + <i>b</i></span>，一次矩阵乘法算完。PyTorch 的 <code>nn.Linear</code> 就是这样存的：权重形状是 (out_features, in_features)，前向计算 <span class="m"><i>x</i><i>W</i>ᵀ + <i>b</i></span>。</p>
+    <p>Transformer 每一层里的前馈网络 (Feed-Forward Network) 是两个线性层夹一个非线性函数：先从 <span class="m"><i>d</i><sub>model</sub></span> 升到 <span class="m"><i>d</i><sub>ff</sub></span>，再降回 <span class="m"><i>d</i><sub>model</sub></span>。原始 Transformer 的 base 模型是 512 维升到 2048 维再降回 512 维。</p>
+    <p>大模型的参数几乎全在这些矩阵里。GPT-3 每一层有注意力的 4 个 <span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub>model</sub></span> 矩阵，加前馈网络的两个 <span class="m"><i>d</i><sub>model</sub> × 4<i>d</i><sub>model</sub></span> 矩阵，一共 <span class="m">12 <i>d</i><sub>model</sub>²</span> ≈ 18.1 亿个参数；96 层约 1739 亿，再加 6.18 亿的嵌入矩阵，就是论文里的 1750 亿。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>4 维输入，3 维输出</p>
+      <p><span class="m"><i>W</i> = </span> <span class="mx" style="grid-template-columns:repeat(4,auto)"><span>1</span><span>0</span><span>2</span><span>−1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>2</span><span>−1</span><span>0</span><span>1</span></span>，<span class="m"><i>x</i> = (1, 0, 2, −1)</span>。按列看：<span class="m"><i>W</i><i>x</i> = 1·(1, 0, 2) + 0·(0, 1, −1) + 2·(2, 1, 0) + (−1)·(−1, 0, 1) = (6, 2, 1)</span>。这一层有 <span class="m">3 × 4 = 12</span> 个权重，加 3 个偏置。</p></div>
+    
+    
+  </section>
+<section class="aisec" id="ai-compose">
+    <h2><span class="n">4</span>复合：为什么线性层之间要夹激活函数</h2>
+    <p class="chs">对应 <a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></p>
+    <p>第 4 章说，连续做两个线性变换，等于做一个线性变换，矩阵是两者的乘积：<span class="m"><i>W</i>₂(<i>W</i>₁<i>x</i>) = (<i>W</i>₂<i>W</i>₁)<i>x</i></span>。所以不管摞多少个线性层，只要中间没有非线性，整体还是一个线性层，表达能力和一层没有区别，加了偏置也只是一个仿射变换。</p>
+    <p>这就是网络里要在线性层之间插 ReLU、GELU 这类<b>激活函数 (Activation Function)</b> 的原因：它们逐元素地弯折空间，打破「网格线保持平行等距」，多层叠起来才能表示复杂的函数。</p>
+    <p>形状上也能看出复合的规则：<span class="m"><i>W</i>₁</span> 是 <span class="m"><i>d</i><sub>hidden</sub> × <i>d</i><sub>in</sub></span>，<span class="m"><i>W</i>₂</span> 是 <span class="m"><i>d</i><sub>out</sub> × <i>d</i><sub>hidden</sub></span>，乘积 <span class="m"><i>W</i>₂<i>W</i>₁</span> 是 <span class="m"><i>d</i><sub>out</sub> × <i>d</i><sub>in</sub></span>。中间那个维数必须对上，因为前一层的输出空间就是后一层的输入空间。</p>
+    
+    
+    <p class="note"><span>补充</span>反过来也有用：训练好之后，如果两个线性层之间没有非线性（比如注意力里 <span class="m"><i>W</i><sub><i>V</i></sub></span> 和 <span class="m"><i>W</i><sub><i>O</i></sub></span> 之间），就可以把它们乘成一个矩阵来分析，这是可解释性研究里常用的做法。</p>
+    
+  </section>
+<section class="aisec" id="ai-attention">
+    <h2><span class="n">5</span>注意力：一次点积打分，一次加权求和</h2>
+    <p class="chs">对应 <a class="chref" href="#ch2">第 2 章 · 线性组合、张成的空间与基</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></p>
+    <p>自注意力 (Self-Attention) 的输入是 n 个 token 的向量，摞成 n × <span class="m"><i>d</i><sub>model</sub></span> 的矩阵 <span class="m"><i>X</i></span>。先用三个非方阵把它投影成查询、键、值：<span class="m"><i>Q</i> = <i>X</i><i>W</i><sub><i>Q</i></sub></span>、<span class="m"><i>K</i> = <i>X</i><i>W</i><sub><i>K</i></sub></span>、<span class="m"><i>V</i> = <i>X</i><i>W</i><sub><i>V</i></sub></span>，形状分别是 n × <span class="m"><i>d</i><sub><i>k</i></sub></span>、n × <span class="m"><i>d</i><sub><i>k</i></sub></span>、n × <span class="m"><i>d</i><sub><i>v</i></sub></span>。这三次投影都是第 8 章讲的「不同维度之间的线性变换」。</p>
+    <p>然后算 <span class="m"><i>Q</i><i>K</i>ᵀ</span>，得到 n × n 的分数矩阵，第 i 行第 j 列就是第 i 个查询和第 j 个键的点积 <span class="m"><i>q</i>ᵢ·<i>k</i>ⱼ</span>：越同向，分数越高。每个分数再除以 <span class="m">√<i>d</i><sub><i>k</i></sub></span>。原文的解释是：如果 <span class="m"><i>q</i></span>、<span class="m"><i>k</i></span> 的各分量独立、均值 0、方差 1，它们的点积方差就是 <span class="m"><i>d</i><sub><i>k</i></sub></span>，维数一大分数就很大，softmax 会被推到几乎只剩一个 1、其余是 0 的区域，梯度很小。除以 <span class="m">√<i>d</i><sub><i>k</i></sub></span> 把方差拉回 1。</p>
+    <p>softmax 按行把分数变成权重，每行非负、加起来是 1。最后输出是权重矩阵乘 <span class="m"><i>V</i></span>：第 i 个 token 的输出，是所有值向量的加权和，也就是第 2 章的线性组合，而且系数加起来是 1。</p>
+    <p>多头注意力 (Multi-Head Attention) 把这件事并行做 h 次，每个头有自己的 <span class="m"><i>W</i><sub><i>Q</i></sub></span>、<span class="m"><i>W</i><sub><i>K</i></sub></span>、<span class="m"><i>W</i><sub><i>V</i></sub></span>，h 个头的输出拼起来是 n × <span class="m"><i>h</i>·<i>d</i><sub><i>v</i></sub></span>，再乘一个 <span class="m"><i>h</i>·<i>d</i><sub><i>v</i></sub> × <i>d</i><sub>model</sub></span> 的 <span class="m"><i>W</i><sub><i>O</i></sub></span> 回到原来的维度。原始 Transformer 取 <span class="m"><i>d</i><sub>model</sub> = 512</span>、<span class="m"><i>h</i> = 8</span>、<span class="m"><i>d</i><sub><i>k</i></sub> = <i>d</i><sub><i>v</i></sub> = 64</span>，恰好 <span class="m"><i>h</i>·<i>d</i><sub><i>v</i></sub> = <i>d</i><sub>model</sub></span>，这是惯例，不是要求。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 630 394" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .grid{fill:none;stroke:#C8C3BA;stroke-width:.8}
+  .mIn{fill:#F3F1ED;stroke:#868D98;stroke-width:1.2}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mOut{fill:#fff;stroke:#14161A;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .op{font-size:18px;fill:#4E5560}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10.5px}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10.5px}
+</style>
+<defs>
+  <marker id="attention-shapes-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+</defs>
+<rect x="-20" y="-20" width="630" height="394" fill="#fff"/>
+<text x="0" y="14" class="ph">① 投影：同一个 X 乘三个不同的矩阵</text>
+<rect x="8" y="52" width="96" height="64" class="mIn"/><line x1="24" y1="52" x2="24" y2="116" class="grid"/><line x1="40" y1="52" x2="40" y2="116" class="grid"/><line x1="56" y1="52" x2="56" y2="116" class="grid"/><line x1="72" y1="52" x2="72" y2="116" class="grid"/><line x1="88" y1="52" x2="88" y2="116" class="grid"/><line x1="8" y1="68" x2="104" y2="68" class="grid"/><line x1="8" y1="84" x2="104" y2="84" class="grid"/><line x1="8" y1="100" x2="104" y2="100" class="grid"/><text x="56" y="136" class="v" text-anchor="middle">X</text><text x="56" y="152" class="xs" text-anchor="middle">n × d<tspan baseline-shift="-20%" font-size="8.5">model</tspan> = 4 × 6</text><text x="121" y="90" class="op" text-anchor="middle">×</text><rect x="138" y="36" width="32" height="96" class="mW"/><line x1="154" y1="36" x2="154" y2="132" class="grid"/><line x1="138" y1="52" x2="170" y2="52" class="grid"/><line x1="138" y1="68" x2="170" y2="68" class="grid"/><line x1="138" y1="84" x2="170" y2="84" class="grid"/><line x1="138" y1="100" x2="170" y2="100" class="grid"/><line x1="138" y1="116" x2="170" y2="116" class="grid"/><text x="154" y="152" class="v" text-anchor="middle">W<tspan class="vs" baseline-shift="-20%">Q</tspan></text><text x="154" y="168" class="xs" text-anchor="middle">6 × 2</text><text x="187" y="90" class="op" text-anchor="middle">=</text><rect x="204" y="52" width="32" height="64" class="mOut"/><line x1="220" y1="52" x2="220" y2="116" class="grid"/><line x1="204" y1="68" x2="236" y2="68" class="grid"/><line x1="204" y1="84" x2="236" y2="84" class="grid"/><line x1="204" y1="100" x2="236" y2="100" class="grid"/><text x="220" y="136" class="v" text-anchor="middle">Q</text><text x="220" y="152" class="xs" text-anchor="middle">4 × 2</text><text x="277" y="90" class="op" text-anchor="middle">×</text><rect x="294" y="36" width="32" height="96" class="mW"/><line x1="310" y1="36" x2="310" y2="132" class="grid"/><line x1="294" y1="52" x2="326" y2="52" class="grid"/><line x1="294" y1="68" x2="326" y2="68" class="grid"/><line x1="294" y1="84" x2="326" y2="84" class="grid"/><line x1="294" y1="100" x2="326" y2="100" class="grid"/><line x1="294" y1="116" x2="326" y2="116" class="grid"/><text x="310" y="152" class="v" text-anchor="middle">W<tspan class="vs" baseline-shift="-20%">K</tspan></text><text x="310" y="168" class="xs" text-anchor="middle">6 × 2</text><text x="343" y="90" class="op" text-anchor="middle">=</text><rect x="360" y="52" width="32" height="64" class="mOut"/><line x1="376" y1="52" x2="376" y2="116" class="grid"/><line x1="360" y1="68" x2="392" y2="68" class="grid"/><line x1="360" y1="84" x2="392" y2="84" class="grid"/><line x1="360" y1="100" x2="392" y2="100" class="grid"/><text x="376" y="136" class="v" text-anchor="middle">K</text><text x="376" y="152" class="xs" text-anchor="middle">4 × 2</text><text x="433" y="90" class="op" text-anchor="middle">×</text><rect x="450" y="36" width="48" height="96" class="mW"/><line x1="466" y1="36" x2="466" y2="132" class="grid"/><line x1="482" y1="36" x2="482" y2="132" class="grid"/><line x1="450" y1="52" x2="498" y2="52" class="grid"/><line x1="450" y1="68" x2="498" y2="68" class="grid"/><line x1="450" y1="84" x2="498" y2="84" class="grid"/><line x1="450" y1="100" x2="498" y2="100" class="grid"/><line x1="450" y1="116" x2="498" y2="116" class="grid"/><text x="474" y="152" class="v" text-anchor="middle">W<tspan class="vs" baseline-shift="-20%">V</tspan></text><text x="474" y="168" class="xs" text-anchor="middle">6 × 3</text><text x="515" y="90" class="op" text-anchor="middle">=</text><rect x="532" y="52" width="48" height="64" class="mOut"/><line x1="548" y1="52" x2="548" y2="116" class="grid"/><line x1="564" y1="52" x2="564" y2="116" class="grid"/><line x1="532" y1="68" x2="580" y2="68" class="grid"/><line x1="532" y1="84" x2="580" y2="84" class="grid"/><line x1="532" y1="100" x2="580" y2="100" class="grid"/><text x="556" y="136" class="v" text-anchor="middle">V</text><text x="556" y="152" class="xs" text-anchor="middle">4 × 3</text><text x="0" y="190" class="ph">② 打分，softmax，再对 V 做加权求和</text>
+<rect x="0" y="212" width="32" height="64" class="mOut"/><line x1="16" y1="212" x2="16" y2="276" class="grid"/><line x1="0" y1="228" x2="32" y2="228" class="grid"/><line x1="0" y1="244" x2="32" y2="244" class="grid"/><line x1="0" y1="260" x2="32" y2="260" class="grid"/><text x="16" y="296" class="v" text-anchor="middle">Q</text><text x="16" y="312" class="xs" text-anchor="middle">4 × 2</text><text x="49" y="250" class="op" text-anchor="middle">×</text><rect x="66" y="228" width="64" height="32" class="mOut"/><line x1="82" y1="228" x2="82" y2="260" class="grid"/><line x1="98" y1="228" x2="98" y2="260" class="grid"/><line x1="114" y1="228" x2="114" y2="260" class="grid"/><line x1="66" y1="244" x2="130" y2="244" class="grid"/><text x="98" y="280" class="v" text-anchor="middle">K<tspan class="vrs" baseline-shift="45%">T</tspan></text><text x="98" y="296" class="xs" text-anchor="middle">2 × 4</text><text x="147" y="250" class="op" text-anchor="middle">=</text><rect x="164" y="212" width="64" height="64" class="mWarm"/><line x1="180" y1="212" x2="180" y2="276" class="grid"/><line x1="196" y1="212" x2="196" y2="276" class="grid"/><line x1="212" y1="212" x2="212" y2="276" class="grid"/><line x1="164" y1="228" x2="228" y2="228" class="grid"/><line x1="164" y1="244" x2="228" y2="244" class="grid"/><line x1="164" y1="260" x2="228" y2="260" class="grid"/><text x="196" y="296" class="v" text-anchor="middle">S</text><text x="196" y="312" class="xs" text-anchor="middle">4 × 4，第 i 行第 j 列是 qᵢ·kⱼ</text><path d="M238 244 H 352" class="ink" marker-end="url(#attention-shapes-a)"/>
+<text x="295" y="220" class="sm" text-anchor="middle">除以 √d<tspan baseline-shift="-20%" font-size="8.5">k</tspan>，</text>
+<text x="295" y="238" class="sm" text-anchor="middle">按行 softmax</text>
+<rect x="362" y="212" width="64" height="64" class="mWarm"/><line x1="378" y1="212" x2="378" y2="276" class="grid"/><line x1="394" y1="212" x2="394" y2="276" class="grid"/><line x1="410" y1="212" x2="410" y2="276" class="grid"/><line x1="362" y1="228" x2="426" y2="228" class="grid"/><line x1="362" y1="244" x2="426" y2="244" class="grid"/><line x1="362" y1="260" x2="426" y2="260" class="grid"/><text x="394" y="296" class="v" text-anchor="middle">A</text><text x="394" y="312" class="xs" text-anchor="middle">4 × 4，每行和为 1</text><text x="443" y="250" class="op" text-anchor="middle">×</text><rect x="460" y="212" width="48" height="64" class="mOut"/><line x1="476" y1="212" x2="476" y2="276" class="grid"/><line x1="492" y1="212" x2="492" y2="276" class="grid"/><line x1="460" y1="228" x2="508" y2="228" class="grid"/><line x1="460" y1="244" x2="508" y2="244" class="grid"/><line x1="460" y1="260" x2="508" y2="260" class="grid"/><text x="484" y="296" class="v" text-anchor="middle">V</text><text x="484" y="312" class="xs" text-anchor="middle">4 × 3</text><text x="525" y="250" class="op" text-anchor="middle">=</text><rect x="542" y="212" width="48" height="64" class="mIn"/><line x1="558" y1="212" x2="558" y2="276" class="grid"/><line x1="574" y1="212" x2="574" y2="276" class="grid"/><line x1="542" y1="228" x2="590" y2="228" class="grid"/><line x1="542" y1="244" x2="590" y2="244" class="grid"/><line x1="542" y1="260" x2="590" y2="260" class="grid"/><text x="566" y="296" class="sm" text-anchor="middle">输出</text><text x="566" y="312" class="xs" text-anchor="middle">4 × 3</text><line x1="0" y1="332" x2="590" y2="332" class="thin"/>
+<text x="0" y="348" class="xs">绿色是要学的权重，灰色是输入和输出，橙色是 n × n 的注意力矩阵。输出第 i 行 = A 第 i 行的权重对 V 各行做线性组合。</text>
+
+</svg>
+<figcaption>一个头里各矩阵的形状。维度故意取成互不相同的数：n = 4 个 token，d_model = 6，d_k = 2，d_v = 3。</figcaption></figure>
+    <div class="ex"><p class="ex-h"><span>例子</span>一个查询对三个键：softmax 之后做线性组合</p>
+      <p>某个查询和三个键的分数（已除过 <span class="m">√<i>d</i><sub><i>k</i></sub></span>）是 <span class="m">(2, 1, 0)</span>。softmax：<span class="m"><i>e</i>² ≈ 7.389</span>、<span class="m"><i>e</i>¹ ≈ 2.718</span>、<span class="m"><i>e</i>⁰ = 1</span>，和为 11.107，权重 ≈ <span class="m">(0.665, 0.245, 0.090)</span>。</p>
+      <p>三个值向量是 <span class="m">(1, 0)</span>、<span class="m">(0, 1)</span>、<span class="m">(1, 1)</span>，输出 <span class="m">= 0.665·(1, 0) + 0.245·(0, 1) + 0.090·(1, 1) ≈ (0.755, 0.335)</span>。分数最高的那个键对应的值向量占了三分之二的份量。</p></div>
+    
+    <p class="refs"><a href="__HOME__attention-is-all-you-need/">本站：逐字、逐句理解 Transformer →</a><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need（3.2 节，脚注 4） · 2017-06-12 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-rank">
+    <h2><span class="n">6</span>秩：低秩分解与 LoRA</h2>
+    <p class="chs">对应 <a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></p>
+    <p>第 7 章说，矩阵的秩是列空间的维数。两个矩阵相乘，结果的秩不会超过中间那个维数：<span class="m"><i>B</i></span> 是 d × r、<span class="m"><i>A</i></span> 是 r × k，<span class="m"><i>B</i><i>A</i></span> 虽然是 d × k 的大矩阵，列空间最多 r 维，因为它的每一列都是 <span class="m"><i>B</i></span> 那 r 列的线性组合。</p>
+    <p><b>LoRA (Low-Rank Adaptation)</b> 就用这一点来微调大模型：冻结原来的权重 <span class="m"><i>W</i></span>，只学一个低秩的增量 <span class="m">Δ<i>W</i> = <i>B</i><i>A</i></span>，前向计算变成 <span class="m"><i>W</i><i>x</i> + <i>B</i><i>A</i><i>x</i></span>。参数从 <span class="m"><i>d</i> × <i>k</i></span> 个降到 <span class="m"><i>r</i>(<i>d</i> + <i>k</i>)</span> 个。初始化时 <span class="m"><i>B</i></span> 全为 0、<span class="m"><i>A</i></span> 随机，所以训练一开始 <span class="m">Δ<i>W</i> = 0</span>，模型和原来完全一样。论文报告在 GPT-3 175B 上，可训练参数减少到原来的万分之一，显存需求降到三分之一。</p>
+    <p>推理时可以把 <span class="m"><i>B</i><i>A</i></span> 直接加回 <span class="m"><i>W</i></span>，得到一个同样大小的矩阵，不增加任何计算。这也是低秩的好处：它只是参数化方式，最终仍是一个普通的线性层。</p>
+    <p>DeepSeek-V2 的多头潜在注意力 (Multi-head Latent Attention) 也是低秩的思路：先把每个 token 的键和值压成一个低维的潜在向量（维数 512），推理时主要缓存这个向量（另加一小段带位置编码的键），需要的键和值再从它投影出来。论文报告和前一代 DeepSeek 67B 相比，KV 缓存减少 93.3%。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 676 298" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .grid{fill:none;stroke:#C8C3BA;stroke-width:.8}
+  .mIn{fill:#F3F1ED;stroke:#868D98;stroke-width:1.2}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mOut{fill:#fff;stroke:#14161A;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .op{font-size:18px;fill:#4E5560}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10.5px}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10.5px}
+</style>
+<defs>
+  <marker id="lora-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+</defs>
+<rect x="-20" y="-20" width="676" height="298" fill="#fff"/>
+<rect x="0" y="30" width="14" height="176" class="mIn"/>
+<text x="7" y="20" class="v" text-anchor="middle">x</text>
+<text x="22" y="202" class="xs">k = 11008 维</text>
+<rect x="90" y="30" width="176" height="66" class="mIn"/>
+<text x="178" y="68" class="v" text-anchor="middle">W</text>
+<text x="178" y="114" class="xs" text-anchor="middle">d × k = 4096 × 11008，冻结</text>
+<path d="M20 60 H 82" class="ink" marker-end="url(#lora-a)"/>
+<rect x="90" y="166" width="176" height="8" class="mW"/>
+<text x="178" y="194" class="v" text-anchor="middle">A</text>
+<text x="178" y="210" class="xs" text-anchor="middle">r × k = 8 × 11008，训练</text>
+<path d="M20 170 H 82" class="ink" marker-end="url(#lora-a)"/>
+<path d="M272 170 H 328" class="ink" marker-end="url(#lora-a)"/>
+<text x="301" y="158" class="xs" text-anchor="middle">只有 r = 8 维</text>
+<rect x="336" y="108" width="8" height="66" class="mW"/>
+<text x="340" y="194" class="v" text-anchor="middle">B</text>
+<text x="380" y="210" class="xs" text-anchor="middle">d × r = 4096 × 8，初始为 0</text>
+<path d="M272 63 H 433" class="ink" marker-end="url(#lora-a)"/>
+<path d="M350 141 H 446 V 78" class="ink" marker-end="url(#lora-a)"/>
+<circle cx="446" cy="63" r="11" fill="#fff" stroke="#14161A" stroke-width="1.4"/>
+<text x="446" y="69" class="op" text-anchor="middle">+</text>
+<path d="M459 63 H 506" class="ink" marker-end="url(#lora-a)"/>
+<text x="518" y="68" class="v">h = Wx + BAx</text>
+<line x1="0" y1="236" x2="636" y2="236" class="thin"/>
+<text x="0" y="252" class="xs">W 有 45,088,768 个参数，A 和 B 加起来 120,832 个。BA 的秩最多是 8。形状按比例画，r 那一边放大到能看见。</text>
+
+</svg>
+<figcaption>LoRA：冻结的 W 旁边并一条先乘 A、再乘 B 的窄路，中间只有 r 维。例子用 LLaMA-7B 前馈层的形状 4096 × 11008，r = 8。</figcaption></figure>
+    <div class="ex"><p class="ex-h"><span>例子</span>省多少参数</p>
+      <p>一个 4096 × 11008 的权重矩阵有 45,088,768 个参数。取 <span class="m"><i>r</i> = 8</span>，LoRA 只训练 <span class="m">8 × (4096 + 11008) = 120,832</span> 个，约 0.27%。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noreferrer">LoRA: Low-Rank Adaptation of Large Language Models · 2021-06-17 ↗</a><a href="https://arxiv.org/abs/2405.04434" target="_blank" rel="noreferrer">DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model · 2024-05-07 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-eigen">
+    <h2><span class="n">7</span>特征值：同一个矩阵乘很多次</h2>
+    <p class="chs">对应 <a class="chref" href="#ch13">第 13 章 · 基变换</a><a class="chref" href="#ch14">第 14 章 · 特征向量与特征值</a></p>
+    <p>第 14 章最后讲过：一个矩阵乘 100 次，换到特征基下就是每个特征值各自乘 100 次方。循环神经网络 (RNN) 正好是这个结构：隐藏状态每一步都乘同一个矩阵，<span class="m"><i>h</i><sub><i>t</i></sub> = <i>W</i><i>h</i><sub>t−1</sub></span>（先忽略激活函数和输入）。走 t 步，就是乘 <span class="m"><i>W</i>ᵗ</span>。</p>
+    <p>把初始状态分解到 <span class="m"><i>W</i></span> 的各个特征向量上，沿特征值 <span class="m">|<i>λ</i>| > 1</span> 方向的分量指数增长，<span class="m">|<i>λ</i>| < 1</span> 的指数衰减。反向传播时梯度也要沿时间一步步乘回去，所以同样的现象出现在梯度上：这就是<b>梯度爆炸 (Exploding Gradients)</b> 和<b>梯度消失 (Vanishing Gradients)</b>。LSTM、梯度裁剪、残差连接都是针对这个问题的办法。</p>
+    <p>深层网络也有类似的问题：梯度要连乘每一层的雅可比矩阵。残差连接 (Residual Connection) <span class="m"><i>x</i> + <i>F</i>(<i>x</i>)</span> 的雅可比矩阵是 <span class="m"><i>I</i> + ∂<i>F</i>/∂<i>x</i></span>，里面总有一个单位矩阵，梯度至少有一条不被缩放的通路，这是 ResNet 能把网络堆到上百层的一个直观解释。</p>
+    <p>特征值的另一个常见用途是<b>主成分分析 (Principal Component Analysis)</b>：数据的协方差矩阵是对称矩阵，特征向量两两正交，特征值最大的几个方向就是数据变化最大的方向。把几百维的嵌入投影到前两个主成分上画散点图，是看嵌入结构最常用的办法。更一般的<b>奇异值分解 (Singular Value Decomposition)</b> <span class="m"><i>W</i> = <i>U</i>Σ<i>V</i>ᵀ</span> 对任意矩阵都成立，几何上是「旋转、沿坐标轴拉伸、再旋转」，截掉小的奇异值就得到最好的低秩近似。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>特征值 1.1 和 0.9，各乘 50 次</p>
+      <p><span class="m"><i>W</i> = </span> <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>1.1</span><span>0</span><span>0</span><span>0.9</span></span>，它已经是对角矩阵，两个特征值就是对角元素。乘 50 次后，第一个方向放大 <span class="m">1.1⁵⁰ ≈ 117.4</span> 倍，第二个方向缩小到 <span class="m">0.9⁵⁰ ≈ 0.0052</span>。两个特征值只差 0.2，50 步之后差了两万多倍。</p></div>
+    
+    <p class="refs"><a href="__HOME__resnet/">本站：ResNet 论文精读 →</a><a href="https://arxiv.org/abs/1211.5063" target="_blank" rel="noreferrer">On the difficulty of training Recurrent Neural Networks · 2012-11-21 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-rope">
+    <h2><span class="n">8</span>旋转矩阵：RoPE 位置编码</h2>
+    <p class="chs">对应 <a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></p>
+    <p>注意力本身不知道 token 的顺序，要另外加位置信息。<b>旋转位置编码 (Rotary Position Embedding, RoPE)</b> 的做法是：把查询和键向量的维度两两配对，每一对看成一个二维向量，位置 m 上的向量就旋转 <span class="m"><i>m</i><i>θ</i></span> 角。用的就是第 3 章那个旋转矩阵 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>cos <i>m</i><i>θ</i></span><span>−sin <i>m</i><i>θ</i></span><span>sin <i>m</i><i>θ</i></span><span>cos <i>m</i><i>θ</i></span></span>。不同的维度对用不同的频率，第 i 对是 <span class="m"><i>θ</i>ᵢ = 10000^(−2(<i>i</i>−1)/<i>d</i>)</span>，<span class="m"><i>i</i> = 1, …, <i>d</i>/2</span>。</p>
+    <p>好处在点积上。位置 m 的查询旋转 <span class="m"><i>m</i><i>θ</i></span>、位置 n 的键旋转 <span class="m"><i>n</i><i>θ</i></span>，两者的点积等于 <span class="m"><i>q</i>ᵀ<i>R</i>(<i>m</i><i>θ</i>)ᵀ<i>R</i>(<i>n</i><i>θ</i>)<i>k</i> = <i>q</i>ᵀ<i>R</i>((<i>n</i> − <i>m</i>)<i>θ</i>)<i>k</i></span>，只和相对距离 <span class="m"><i>n</i> − <i>m</i></span> 有关。旋转矩阵是第 12 章说的正交变换，不改变长度，所以位置信息加进去了，向量的「大小」却没变。LLaMA 等主流开源模型都用 RoPE。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>同样的相对距离，点积相同</p>
+      <p>取 <span class="m"><i>θ</i> = 30°</span>，<span class="m"><i>q</i> = (1, 2)</span>，<span class="m"><i>k</i> = (3, 1)</span>，不旋转时点积是 5。把 q 放在位置 1、k 放在位置 2（相距 1），旋转后点积 ≈ 6.830；把它们挪到位置 4 和 5（还是相距 1），点积仍是 6.830。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noreferrer">RoFormer: Enhanced Transformer with Rotary Position Embedding · 2021-04-20 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-norm">
+    <h2><span class="n">9</span>投影：LayerNorm 在几何上做了什么</h2>
+    <p class="chs">对应 <a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a><a class="chref" href="#ch2">第 2 章 · 线性组合、张成的空间与基</a></p>
+    <p><b>层归一化 (Layer Normalization)</b> 对一个 d 维向量做两步：减去各分量的均值，再除以标准差，然后乘可学习的 <span class="m"><i>γ</i></span>、加 <span class="m"><i>β</i></span>。</p>
+    <p>第一步在几何上是投影。「减去均值」等于把向量投影到和全 1 向量 <span class="m">(1, 1, …, 1)</span> 垂直的那个 <span class="m"><i>d</i> − 1</span> 维子空间上：减掉的正是向量在全 1 方向上的分量（第 9 章的投影）。第二步除以标准差后，向量的长度固定为 <span class="m">√<i>d</i></span>。所以 LayerNorm 把所有向量都放到了一个固定半径的「球面」上，只留下方向的信息，然后再用 <span class="m"><i>γ</i></span>、<span class="m"><i>β</i></span> 做逐分量的缩放和平移。</p>
+    <p>LLaMA 等模型用的 <b>RMSNorm</b> 省掉了减均值那一步，只按均方根缩放长度，计算更省，实践中效果相当。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>4 维向量 (2, 4, 6, 8)</p>
+      <p>均值 5，减掉后是 <span class="m">(−3, −1, 1, 3)</span>，各分量和为 0，所以和 <span class="m">(1, 1, 1, 1)</span> 垂直。总体标准差 <span class="m">√5</span>，除完是 <span class="m">(−1.342, −0.447, 0.447, 1.342)</span>，长度正好是 <span class="m">2 = √4</span>。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noreferrer">Layer Normalization · 2016-07-21 ↗</a><a href="https://arxiv.org/abs/1910.07467" target="_blank" rel="noreferrer">Root Mean Square Layer Normalization · 2019-10-16 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-backprop">
+    <h2><span class="n">10</span>反向传播：雅可比矩阵连乘，顺序决定计算量</h2>
+    <p class="chs">对应 <a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></p>
+    <p>一个 m 维到 n 维的可导函数，在某一点附近可以用一个线性变换近似，这个线性变换的矩阵就是<b>雅可比矩阵 (Jacobian Matrix)</b>，形状 n × m。整个网络是一串函数的复合，链式法则说复合函数的雅可比矩阵等于各层雅可比矩阵的乘积，这就是第 4 章「复合 = 矩阵乘法」。</p>
+    <p>第 4 章还证明了矩阵乘法满足结合律：怎么加括号结果都一样。但计算量差别很大。损失函数的输出是一个数，所以最左边是 1 × n 的行向量。从左往右乘，每一步都是「行向量 × 矩阵」，结果还是行向量；从右往左乘，就要先把两个大矩阵乘起来。反向传播选的是前一种，每一层只做一次「向量乘雅可比矩阵」(vector-Jacobian product)，从来不把完整的雅可比矩阵算出来。</p>
+    
+    <div class="ex"><p class="ex-h"><span>例子</span>三个矩阵，两种乘法顺序</p>
+      <p>损失对最后一层的梯度是 1 × 1000，后面接两个 1000 × 1000 的雅可比矩阵。从左往右：两次「1 × 1000 乘 1000 × 1000」，每次一百万次乘法，共两百万次。从右往左：先算 1000 × 1000 乘 1000 × 1000，就要十亿次乘法。结果相同，计算量差五百倍。</p></div>
+    
+    
+  </section>
+<section class="aisec" id="ai-det">
+    <h2><span class="n">11</span>行列式：出现得不多，但在生成模型里有用</h2>
+    <p class="chs">对应 <a class="chref" href="#ch6">第 6 章 · 行列式</a></p>
+    <p>大语言模型的前向计算里基本不算行列式。它出现的地方主要是<b>标准化流 (Normalizing Flow)</b> 这类生成模型：用一个可逆函数 <span class="m"><i>f</i></span> 把简单分布（比如标准正态）变成复杂分布，概率密度按变量替换公式换算，要乘上 <span class="m">|det(∂<i>f</i>/∂<i>x</i>)|</span>。</p>
+    <p>第 6 章给了原因：行列式是体积的缩放倍数。一小块区域被 <span class="m"><i>f</i></span> 放大了多少倍，概率密度就要相应摊薄多少倍，总概率才仍是 1。一般矩阵的行列式计算量是 <span class="m"><i>O</i>(<i>d</i>³)</span>，所以 RealNVP 这类模型专门把每一层设计成雅可比矩阵是三角矩阵，行列式就是对角元素的乘积，取对数后是求和。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1605.08803" target="_blank" rel="noreferrer">Density estimation using Real NVP · 2016-05-27 ↗</a></p>
+  </section>
+<section class="aisec" id="ai-basis">
+    <h2><span class="n">12</span>基变换：表示空间没有「天生」的坐标轴</h2>
+    <p class="chs">对应 <a class="chref" href="#ch13">第 13 章 · 基变换</a><a class="chref" href="#ch16">第 16 章 · 抽象向量空间</a></p>
+    <p>Transformer 里贯穿各层的那个 <span class="m"><i>d</i><sub>model</sub></span> 维向量（常叫残差流 (Residual Stream)），它的坐标轴本身没有特别的意义。如果把所有向量换到另一组正交基下（乘一个正交矩阵），同时把读写它的各个权重矩阵相应地变换，线性部分的计算结果完全不变，这就是第 13 章的 <span class="m"><i>A</i>⁻¹<i>M</i><i>A</i></span>。</p>
+    <p>只有逐元素的操作会让某些坐标轴变得特殊，比如 ReLU 按每个坐标分别截断、LayerNorm 里的逐分量缩放。所以研究模型内部表示时，一般不假设「第 37 维代表某个概念」，而是去找有意义的方向。Anthropic 的 Transformer Circuits 系列把这叫作「特权基 (Privileged Basis)」问题：激活函数之后的那一层有特权基，残差流没有。</p>
+    
+    
+    
+    <p class="refs"><a href="https://transformer-circuits.pub/2021/framework/index.html" target="_blank" rel="noreferrer">A Mathematical Framework for Transformer Circuits · 2021-12-22 ↗</a></p>
+  </section>
+    <section class="aisec" id="ai-map"><h2>对照表</h2>
+      <div class="tbl"><table><thead><tr><th>概念</th><th>在模型里</th><th>章节</th></tr></thead>
+    <tbody><tr><td>向量、向量加法</td><td>嵌入；king − man + woman ≈ queen</td><td><a class="chref" href="#ch1">第 1 章 · 向量究竟是什么</a></td></tr><tr><td>矩阵乘基向量 = 取一列</td><td>嵌入查表</td><td><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a></td></tr><tr><td>点积、对偶性</td><td>余弦相似度、检索；输出层打分</td><td><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></td></tr><tr><td>非方阵</td><td>线性层、Q/K/V 投影、前馈网络升维降维</td><td><a class="chref" href="#ch8">第 8 章 · 非方阵</a></td></tr><tr><td>矩阵乘法 = 复合</td><td>线性层之间要有激活函数；链式法则</td><td><a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></td></tr><tr><td>线性组合</td><td>注意力输出是值向量的加权和</td><td><a class="chref" href="#ch2">第 2 章 · 线性组合、张成的空间与基</a></td></tr><tr><td>秩、列空间</td><td>LoRA、MLA 的低秩分解</td><td><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></td></tr><tr><td>特征值、特征基</td><td>RNN 梯度爆炸与消失；PCA</td><td><a class="chref" href="#ch14">第 14 章 · 特征向量与特征值</a></td></tr><tr><td>旋转矩阵、正交变换</td><td>RoPE 位置编码</td><td><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></td></tr><tr><td>投影</td><td>LayerNorm 的减均值</td><td><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></td></tr><tr><td>结合律</td><td>反向传播选乘法顺序</td><td><a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></td></tr><tr><td>行列式 = 体积缩放</td><td>标准化流的变量替换</td><td><a class="chref" href="#ch6">第 6 章 · 行列式</a></td></tr><tr><td>基变换</td><td>残差流没有特权基</td><td><a class="chref" href="#ch13">第 13 章 · 基变换</a></td></tr></tbody></table></div></section>
+  </article>
+</div></div>
 </main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
   /* ── tab ── */
+  function showTab(v){
+    document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+  }
   document.querySelectorAll('.tb').forEach(function(b){
     b.addEventListener('click',function(){
-      document.querySelectorAll('.tb').forEach(function(x){x.classList.toggle('on',x===b);x.setAttribute('aria-selected',x===b);});
-      document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('on',v.id==='view-'+b.dataset.v);});
+      showTab(b.dataset.v);
+      // 第二个 tab 记进地址栏，手机上刷新或分享链接还停在这个 tab
+      history.replaceState(null,'',b.dataset.v==='linalg'?location.pathname:'#'+b.dataset.v);
     });
   });
 
@@ -2321,8 +2584,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
 
   /* ── 带 #ch7 这类锚点打开时，直接展开那一集 ── */
-  function openHash(){var m=/^#ch(\d+)$/.exec(location.hash);if(!m)return;var d=document.getElementById('ch'+m[1]);
-    if(d){d.open=true;d.scrollIntoView({block:'start'});}}
+  /* #ch7 打开第一个 tab 的那一集；#ai 或 #ai-attention 切到第二个 tab（并滚到那一节） */
+  function openHash(){
+    var h=location.hash, m=/^#ch(\d+)$/.exec(h);
+    if(m){showTab('linalg');var d=document.getElementById('ch'+m[1]);if(d){d.open=true;d.scrollIntoView({block:'start'});}return;}
+    if(/^#ai(-|$)/.test(h)){showTab('ai');var t=h.length>3&&document.getElementById(h.slice(1));if(t)t.scrollIntoView({block:'start'});}
+  }
   openHash();addEventListener('hashchange',openHash);
 })();
 </script>
