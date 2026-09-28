@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>基础概念 · 线性代数的本质 17 集视频笔记，以及 AI 里用到的线性代数</title>
-<meta name="description" content="两个 tab。「线性代数的本质」是 3Blue1Brown 17 集视频的分节笔记：把矩阵看成对空间的变换，从向量、基、线性变换一路讲到行列式、逆矩阵与秩、点积与对偶、叉积、基变换、特征值、抽象向量空间，时间码点了跳到 B 站视频那一秒，配 265 张去掉字幕的截图。「AI 中的线性代数」按概念讲这些东西在模型里出现在哪：嵌入、线性层、注意力的形状、LoRA 的低秩、RNN 的特征值、RoPE 的旋转矩阵、LayerNorm 的投影、反向传播的乘法顺序，每节配能手算的小例子，并链接回对应的那一集。">
+<meta name="description" content="两个 tab。「线性代数的本质」是 3Blue1Brown 17 集视频的分节笔记：把矩阵看成对空间的变换，从向量、基、线性变换一路讲到行列式、逆矩阵与秩、点积与对偶、叉积、基变换、特征值、抽象向量空间，时间码点了跳到 B 站视频那一秒，配 265 张去掉字幕的截图。「AI 中的线性代数」按概念讲这些东西在模型里出现在哪：嵌入、线性层、注意力的形状、LoRA 的低秩、RNN 的特征值、RoPE 的旋转矩阵、LayerNorm 的投影、反向传播的乘法顺序，每节配能手算的小例子，并链接回对应的那一集。「延伸资料」收了杨松琳推荐的 Gilbert Strang 的 MIT 18.06 和 18.065（附 B 站中文字幕版），以及苏剑林在科学空间讲线性代数的两批文章，每条都标了对应前两个 tab 的哪一节。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -203,6 +203,36 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
 .refs a:hover{color:var(--accent);border-color:var(--accent-line)}
 .aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
 </style></head><body>
 <div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
 <div class="wrap"><header class="ep-head">
@@ -212,6 +242,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
   <button class="tb on" type="button" role="tab" data-v="linalg" aria-selected="true">线性代数的本质</button>
   <button class="tb" type="button" role="tab" data-v="ai" aria-selected="false">AI 中的线性代数</button>
+  <button class="tb" type="button" role="tab" data-v="more" aria-selected="false">延伸资料</button>
 </div></div></nav>
 <main class="wrap">
 <div class="view on" id="view-linalg">
@@ -2490,6 +2521,88 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <tbody><tr><td>向量、向量加法</td><td>嵌入；king − man + woman ≈ queen</td><td><a class="chref" href="#ch1">第 1 章 · 向量究竟是什么</a></td></tr><tr><td>矩阵乘基向量 = 取一列</td><td>嵌入查表</td><td><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a></td></tr><tr><td>点积、对偶性</td><td>余弦相似度、检索；输出层打分</td><td><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></td></tr><tr><td>非方阵</td><td>线性层、Q/K/V 投影、前馈网络升维降维</td><td><a class="chref" href="#ch8">第 8 章 · 非方阵</a></td></tr><tr><td>矩阵乘法 = 复合</td><td>线性层之间要有激活函数；链式法则</td><td><a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></td></tr><tr><td>线性组合</td><td>注意力输出是值向量的加权和</td><td><a class="chref" href="#ch2">第 2 章 · 线性组合、张成的空间与基</a></td></tr><tr><td>秩、列空间</td><td>LoRA、MLA 的低秩分解</td><td><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></td></tr><tr><td>特征值、特征基</td><td>RNN 梯度爆炸与消失；PCA</td><td><a class="chref" href="#ch14">第 14 章 · 特征向量与特征值</a></td></tr><tr><td>旋转矩阵、正交变换</td><td>RoPE 位置编码</td><td><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></td></tr><tr><td>投影</td><td>LayerNorm 的减均值</td><td><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></td></tr><tr><td>结合律</td><td>反向传播选乘法顺序</td><td><a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></td></tr><tr><td>行列式 = 体积缩放</td><td>标准化流的变量替换</td><td><a class="chref" href="#ch6">第 6 章 · 行列式</a></td></tr><tr><td>基变换</td><td>残差流没有特权基</td><td><a class="chref" href="#ch13">第 13 章 · 基变换</a></td></tr></tbody></table></div></section>
   </article>
 </div></div>
+<div class="view" id="view-more"><div class="exdoc">
+  <section class="exgrp" id="more-strang"><h2>Gilbert Strang 的线性代数课</h2>
+    <p class="lede">杨松琳在《张小珺Jùn｜商业访谈录》EP143（DeltaNet 那期）00:57:53 说，她本科在南方科技大学最喜欢的课就是线性代数，用的是 MIT Gilbert Strang 教授的教材，他的 MIT 公开课也很火。她觉得 Strang 的讲法「非常符合直觉」，是从空间的角度去理解线性代数；如果一上来就是行列式和各种计算，她可能就没兴趣了。</p><p class="lede">后来她并行化 DeltaNet 时，是认出了转移矩阵是 Householder 矩阵，再去数值线性代数的文献里找到 WY 表示，把累乘变成累加，才和线性注意力的分块算法接上（同一期 00:59:38）。</p><p class="lede">Strang 在 MIT 任教 61 年，2023-05-15 讲完最后一堂 18.06 后退休。他的讲法和 3Blue1Brown 的路线很接近：第一讲就把 <span class="m"><i>A</i><i>x</i> = <i>b</i></span> 拆成「行的图像」和「列的图像」，后者正是「用 <span class="m"><i>x</i></span> 的分量去组合 <span class="m"><i>A</i></span> 的各列」。</p>
+    <article class="excard">
+    <h3><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noreferrer">MIT 18.06 Linear Algebra ↗</a></h3>
+    <p class="exmeta">Gilbert Strang · 1999 年秋录制，OCW 2010 年春季版 · 35 个视频，其中 4 个是复习课</p>
+    <p>杨松琳说的那门公开课。从方程组的行图像和列图像讲起，经过消元、LU 分解、四个基本子空间、投影与最小二乘、行列式、特征值、对称正定矩阵，到 SVD、基变换和伪逆。教材是他的《Introduction to Linear Algebra》（OCW 课表列的是第 4 版 2009、第 5 版 2016）。视频和现行教材的章节不完全对应。</p>
+    <p class="exrefs">对应 <span class="xref"><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></p>
+    <ul class="expick"><li><b>第 1 讲 方程组的几何解释</b><span>行图像与列图像</span><span class="xref"><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a></span></li><li><b>第 6 讲 列空间和零空间</b><span>和第 7 章同一个话题，Strang 从方程组的角度讲</span><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></span></li><li><b>第 10 讲 四个基本子空间</b><span>列空间、零空间、行空间、左零空间，3B1B 没讲到</span><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></span></li><li><b>第 15–16 讲 投影与最小二乘</b><span>点积的投影意义用到极致</span><span class="xref"><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a></span></li><li><b>第 21–22 讲 特征值、对角化与 A 的幂</b><span>对应第 14 章的特征基</span><span class="xref"><a class="chref" href="#ch14">第 14 章 · 特征向量与特征值</a></span></li><li><b>第 29 讲 奇异值分解</b><span>「AI 中的线性代数」里 SVD 那一段的完整版</span></li><li><b>第 31 讲 基变换与图像压缩</b><span>对应第 13 章</span><span class="xref"><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></li></ul>
+    
+    <p class="exlinks"><a href="https://www.bilibili.com/video/BV1zx411g7gq" target="_blank" rel="noreferrer">B 站中英字幕（转自网易公开课，35P） ↗</a><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/video_galleries/video-lectures/" target="_blank" rel="noreferrer">课程视频目录 ↗</a><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/final-1806-lecture-2023/" target="_blank" rel="noreferrer">2023-05-15 最后一课 ↗</a></p>
+  </article>
+<article class="excard">
+    <h3><a href="https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/" target="_blank" rel="noreferrer">MIT 18.065 Matrix Methods in Data Analysis, Signal Processing, and Machine Learning ↗</a></h3>
+    <p class="exmeta">Gilbert Strang · 2018 年春 · 34 个讲课视频，最后一讲是 Alan Edelman 客座讲 Julia</p>
+    <p>Strang 晚年专门为机器学习开的课，比 18.06 更贴近这一页第二个 tab。前半段是矩阵分解（SVD、Eckart–Young 最优低秩近似、范数、最小二乘），中段是优化（梯度下降、动量、随机梯度下降），后半段讲神经网络的结构、反向传播、卷积和循环矩阵。教材是《Linear Algebra and Learning from Data》（2019）。</p>
+    <p class="exrefs">对应 <span class="xref"><a class="chref ai" href="#ai-rank">秩</a><a class="chref ai" href="#ai-backprop">反向传播</a></span></p>
+    <ul class="expick"><li><b>第 1 讲 A 的列空间包含所有 Ax</b><span>一上来就是列视角</span><span class="xref"><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></span></li><li><b>第 6 讲 奇异值分解</b></li><li><b>第 7 讲 Eckart–Young：离 A 最近的秩 k 矩阵</b><span>LoRA、MLA 这类低秩方法的理论依据</span></li><li><b>第 14 讲 A 的低秩修改和它的逆</b><span>DeltaNet 里「单位阵加低秩」求逆的背景</span></li><li><b>第 26–27 讲 神经网络结构、反向传播</b><span>对应「AI 中的线性代数」反向传播一节</span></li></ul>
+    
+    <p class="exlinks"><a href="https://www.bilibili.com/video/BV1CjFkzrEfV" target="_blank" rel="noreferrer">B 站中英字幕（36P） ↗</a><a href="https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/video_galleries/video-lectures/" target="_blank" rel="noreferrer">课程视频目录 ↗</a></p>
+  </article></section>
+<section class="exgrp" id="more-su"><h2>苏剑林（科学空间 kexue.fm）</h2>
+    <p class="lede">苏剑林是旋转位置编码 RoPE 的提出者，现在在月之暗面。EP143 里主持人提到他在杨松琳的 FLA（Flash Linear Attention）小组里也很活跃（01:10:36）。他的博客讲线性代数分两批：2012–2014 年上大学时写的《新理解矩阵》系列，从孟岩的《理解矩阵》出发讲矩阵、行列式、相似矩阵的直观意义；2016 年以后的文章则把线性代数用在深度学习的具体问题上。</p>
+    <article class="excard">
+    <h3><a href="https://kexue.fm/archives/1765" target="_blank" rel="noreferrer">《新理解矩阵》系列 ↗</a></h3>
+    <p class="exmeta">6 篇 · 2012-10-29 至 2014-07-15</p>
+    <p>起因是他读了孟岩 2006 年的《理解矩阵》三篇，觉得国内教材只要求记忆和计算，于是写自己的理解，补上孟岩没讲的行列式。和 3B1B 讲的是同一套几何观点，读起来可以互相印证。</p>
+    
+    
+    <ol class="exseries"><li>
+      <a href="https://kexue.fm/archives/1754" target="_blank" rel="noreferrer">分享：孟岩的《理解矩阵》一文 ↗</a><time>2012-10-22</time>
+      <p>缘起。孟岩原文讲「矩阵是线性变换的描述，换一组基就换一个矩阵」。</p></li><li>
+      <a href="https://kexue.fm/archives/1765" target="_blank" rel="noreferrer">1：矩阵是什么？ ↗</a><time>2012-10-29</time>
+      <p>代数角度：矩阵是为了「批量」做线性运算造出来的记号。要求乘法满足结合律 <span class="m">(<i>A</i><i>B</i>)<i>x</i> = <i>A</i>(<i>B</i><i>x</i>)</span>，就能反推出矩阵乘法的公式；有了结合律才有逆矩阵。</p><span class="xref"><a class="chref" href="#ch4">第 4 章 · 矩阵乘法与线性变换复合</a></span></li><li>
+      <a href="https://kexue.fm/archives/1768" target="_blank" rel="noreferrer">2：矩阵是什么？ ↗</a><time>2012-10-31</time>
+      <p>几何角度：矩阵的各列是一个仿射坐标系的基，<span class="m"><i>y</i> = <i>A</i><i>x</i></span> 是把「在 A 坐标系下量出的 x」换成直角坐标。例子 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>3</span><span>2</span><span>1</span><span>3</span></span> 乘 <span class="m">(2, 2)</span> 得 <span class="m">(10, 8)</span>。同一个式子既可以看成点不动、坐标系变了，也可以看成坐标系不动、点被移动了。</p><span class="xref"><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></li><li>
+      <a href="https://kexue.fm/archives/1770" target="_blank" rel="noreferrer">3：行列式的点滴 ↗</a><time>2012-11-04</time>
+      <p>行列式是平行多面体的体积。作者后来说这篇有不严谨处，修订版是第 5 篇。</p><span class="xref"><a class="chref" href="#ch6">第 6 章 · 行列式</a></span></li><li>
+      <a href="https://kexue.fm/archives/1777" target="_blank" rel="noreferrer">4：相似矩阵的那些事儿 ↗</a><time>2012-11-11</time>
+      <p><span class="m"><i>P</i>^{−1}<i>A</i><i>P</i></span> 是同一个变换在坐标系 <span class="m"><i>P</i></span> 下的测量结果，和第 13 章的「换位思考」一样；并用体积解释为什么相似矩阵的行列式相同。</p><span class="xref"><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></li><li>
+      <a href="https://kexue.fm/archives/2208" target="_blank" rel="noreferrer">5：体积 = 行列式 ↗</a><time>2013-12-25</time>
+      <p>第 3 篇的修订版，把「行列式是体积」讲严格。</p><span class="xref"><a class="chref" href="#ch6">第 6 章 · 行列式</a></span></li><li>
+      <a href="https://kexue.fm/archives/2757" target="_blank" rel="noreferrer">6：为什么只有方阵有行列式？ ↗</a><time>2014-07-15</time>
+      <p>非方阵也能按体积定义行列式，比如 1×2 矩阵 <span class="m">(<i>a</i>, <i>b</i>)</span> 的「行列式」就是长度 <span class="m">√(<i>a</i>² + <i>b</i>²)</span>，但整数矩阵会得到无理数，不够好看，所以不用。2018-10-16 的《再谈非方阵的行列式》又补了一篇。</p><span class="xref"><a class="chref" href="#ch6">第 6 章 · 行列式</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></span></li></ol>
+    <p class="exlinks"><a href="https://kexue.fm/archives/2219" target="_blank" rel="noreferrer">高维空间的叉积及其几何意义（2013-12-26） ↗</a><a href="https://kexue.fm/archives/2224" target="_blank" rel="noreferrer">矩阵描述三维空间旋转（2013-12-28） ↗</a><a href="https://kexue.fm/archives/6096" target="_blank" rel="noreferrer">再谈非方阵的行列式（2018-10-16） ↗</a></p>
+  </article>
+<article class="excard">
+    <h3><a href="https://kexue.fm/content.html" target="_blank" rel="noreferrer">深度学习里的线性代数 ↗</a></h3>
+    <p class="exmeta">按和「AI 中的线性代数」各节的对应关系排</p>
+    <p>这些文章默认读者会线性代数，直接拿它分析模型。挑了和第二个 tab 能对上的几篇。</p>
+    
+    
+    <ol class="exseries"><li>
+      <a href="https://kexue.fm/archives/4122" target="_blank" rel="noreferrer">词向量与 Embedding 究竟是怎么回事？ ↗</a><time>2016-12-03</time>
+      <p>Embedding 层就是 one-hot 输入的全连接层，查表只是省掉了乘法。</p><span class="xref"><a class="chref ai" href="#ai-embedding">一个 token 就是一个向量</a></span></li><li>
+      <a href="https://kexue.fm/archives/4208" target="_blank" rel="noreferrer">SVD 分解（一）（二）（三） ↗</a><time>2017-01-15</time>
+      <p>不加激活函数的自编码器等价于 SVD；SVD 可以看成聚类；Word2Vec 的结构也等价于一个 SVD（2017-01-26、2017-02-23 两篇续集）。</p><span class="xref"><a class="chref ai" href="#ai-rank">秩</a><a class="chref ai" href="#ai-eigen">特征值</a></span></li><li>
+      <a href="https://kexue.fm/archives/7076" target="_blank" rel="noreferrer">n 维空间下两个随机向量的夹角分布 ↗</a><time>2019-11-13</time>
+      <p>维数一高，两个随机向量几乎总是接近垂直。高维点积、注意力打分都会用到这个直觉。</p><span class="xref"><a class="chref" href="#ch9">第 9 章 · 点积与对偶性</a><a class="chref ai" href="#ai-dot">点积</a></span></li><li>
+      <a href="https://kexue.fm/archives/7180" target="_blank" rel="noreferrer">从几何视角来理解模型参数的初始化策略 ↗</a><time>2020-01-16</time>
+      <p>均值 0、方差 1/n 随机初始化的 n×n 矩阵近似一个正交矩阵，所以信号经过多层后长度大致不变。</p><span class="xref"><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a><a class="chref ai" href="#ai-compose">复合</a></span></li><li>
+      <a href="https://kexue.fm/archives/8265" target="_blank" rel="noreferrer">Transformer 升级之路：2、博采众长的旋转式位置编码 ↗</a><time>2021-03-23</time>
+      <p>RoPE 的原始推导，就是「AI 中的线性代数」里旋转矩阵那一节的出处。</p><span class="xref"><a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref ai" href="#ai-rope">旋转矩阵</a></span></li><li>
+      <a href="https://kexue.fm/archives/8453" target="_blank" rel="noreferrer">从一个单位向量变换到另一个单位向量的正交矩阵 ↗</a><time>2021-06-05</time>
+      <p>用旋转或镜面反射（Householder 变换）把 a 转到 b。DeltaNet 的转移矩阵正是 Householder 形式。</p><span class="xref"><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></span></li><li>
+      <a href="https://kexue.fm/archives/8620" target="_blank" rel="noreferrer">浅谈 Transformer 的初始化、参数化与标准化 ↗</a><time>2021-08-17</time>
+      <p>他训练时忘了除以 √d 导致不收敛，借此把「为什么要除以 √d_k」和初始化、LayerNorm 放在一起讲。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a><a class="chref ai" href="#ai-norm">投影</a></span></li><li>
+      <a href="https://kexue.fm/archives/10366" target="_blank" rel="noreferrer">低秩近似之路（五篇） ↗</a><time>2024-09-15</time>
+      <p>从伪逆、SVD（Eckart–Young）讲到 CR、ID、CUR 几种带结构的低秩近似，第一篇开头就以 LoRA 为引子。</p><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a><a class="chref ai" href="#ai-rank">秩</a></span></li><li>
+      <a href="https://kexue.fm/archives/10592" target="_blank" rel="noreferrer">Muon 优化器赏析：从向量到矩阵的本质跨越 ↗</a><time>2024-12-10</time>
+      <p>Adam 把参数当成一堆独立的数，Muon 把权重当成矩阵，用矩阵符号函数（把所有奇异值变成 1）来更新。Kimi 后来用它训练了 K2。</p><span class="xref"><a class="chref ai" href="#ai-eigen">特征值</a></span></li><li>
+      <a href="https://kexue.fm/archives/10847" target="_blank" rel="noreferrer">矩阵的有效秩（Effective Rank） ↗</a><time>2025-04-10</time>
+      <p>数值计算里 1e-10 也算零，严格的秩不够用，于是用奇异值分布定义「有效秩」。</p><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a><a class="chref ai" href="#ai-rank">秩</a></span></li><li>
+      <a href="https://kexue.fm/archives/10907" target="_blank" rel="noreferrer">Transformer 升级之路：20、21、MLA 好在哪里？ ↗</a><time>2025-05-04</time>
+      <p>从 KV 缓存和低秩投影的角度分析 DeepSeek 的 MLA（下篇 2025-07-10）。</p><span class="xref"><a class="chref ai" href="#ai-rank">秩</a></span></li><li>
+      <a href="https://kexue.fm/archives/11033" target="_blank" rel="noreferrer">线性注意力简史：从模仿、创新到反哺 ↗</a><time>2025-06-20</time>
+      <p>从线性注意力讲到 DeltaNet、Gated DeltaNet，并行形式里出现 <span class="m">(<i>I</i> + <i>K</i><i>K</i>ᵀ ⊙ <i>M</i>⁻)^{−1}</span> 这个逆矩阵。可以和杨松琳那期播客对照着看。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a></span></li><li>
+      <a href="https://kexue.fm/archives/11072" target="_blank" rel="noreferrer">「对角 + 低秩」三角阵的高效求逆方法 ↗</a><time>2025-07-01</time>
+      <p>专门讲上面那个逆矩阵怎么算得快。</p><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></span></li></ol>
+    
+  </article></section>
+</div></div>
 </main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
@@ -2502,7 +2615,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     b.addEventListener('click',function(){
       showTab(b.dataset.v);
       // 第二个 tab 记进地址栏，手机上刷新或分享链接还停在这个 tab
-      history.replaceState(null,'',b.dataset.v==='linalg'?location.pathname:'#'+b.dataset.v);
+      history.replaceState(null,'',b.dataset.v==='linalg'?location.pathname+location.search:'#'+b.dataset.v);
     });
   });
 
@@ -2589,6 +2702,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     var h=location.hash, m=/^#ch(\d+)$/.exec(h);
     if(m){showTab('linalg');var d=document.getElementById('ch'+m[1]);if(d){d.open=true;d.scrollIntoView({block:'start'});}return;}
     if(/^#ai(-|$)/.test(h)){showTab('ai');var t=h.length>3&&document.getElementById(h.slice(1));if(t)t.scrollIntoView({block:'start'});}
+    if(/^#more(-|$)/.test(h)){showTab('more');var u=h.length>5&&document.getElementById(h.slice(1));if(u)u.scrollIntoView({block:'start'});}
   }
   openHash();addEventListener('hashchange',openHash);
 })();
