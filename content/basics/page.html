@@ -699,7 +699,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="228">3:48</button>只要记住 î 和 ĵ 落在哪</h4>
       <p>如果要写程序做这种动画，给计算机什么公式，它才能根据一个向量的坐标算出变换后的坐标？答案是：只需要记录两个基向量 <span class="m"><i class="ih">î</i></span> 和 <span class="m"><i class="jh">ĵ</i></span> 各自落在哪，其余一切都跟着确定。</p>
-      <p>例子：<span class="m"><i>v</i> = <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>−1</span><span>2</span></span></span>，也就是 <span class="m"><i>v</i> = −1<i class="ih">î</i> + 2<i class="jh">ĵ</i></span>。播放某个变换，跟踪这三个向量。「网格线保持平行且等距」有一个重要推论：<span class="m"><i>v</i></span> 的落点等于 −1 乘 <span class="m"><i class="ih">î</i></span> 的落点，加上 2 乘 <span class="m"><i class="jh">ĵ</i></span> 的落点。变换前 <span class="m"><i>v</i></span> 是 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 的某个线性组合，变换后它就是 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 落点的同一个线性组合。</p>
+      <p>例子：<span class="m"><i>v</i> = <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>−1</span><span>2</span></span></span>，也就是 <span class="m"><i>v</i> = −1<i class="ih">î</i> + 2<i class="jh">ĵ</i></span>。对平面施加某个变换，跟踪 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i>v</i></span> 这三个向量各自落到哪里。「网格线保持平行且等距」有一个重要推论：<span class="m"><i>v</i></span> 的落点等于 −1 乘 <span class="m"><i class="ih">î</i></span> 的落点，加上 2 乘 <span class="m"><i class="jh">ĵ</i></span> 的落点。变换前 <span class="m"><i>v</i></span> 是 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 的某个线性组合，变换后它就是 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 落点的同一个线性组合。</p>
       <p>图中的变换把 <span class="m"><i class="ih">î</i></span> 送到 <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>1</span><span>−2</span></span>，把 <span class="m"><i class="jh">ĵ</i></span> 送到 x 轴上的 <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>3</span><span>0</span></span>，所以 <span class="m"><i>v</i></span> 落在 <span class="m">−1·<span class="mx" style="grid-template-columns:repeat(1,auto)"><span>1</span><span>−2</span></span> + 2·<span class="mx" style="grid-template-columns:repeat(1,auto)"><span>3</span><span>0</span></span> = <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>5</span><span>2</span></span></span>。作者特意提醒这里值得暂停：关键在于不用看变换动画，只凭 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 的落点就能推出任何向量的去向。</p>
       <p>写成一般的 <span class="m">(<i>x</i>, <i>y</i>)</span>：它落在 <span class="m"><i>x</i>·<span class="mx" style="grid-template-columns:repeat(1,auto)"><span>1</span><span>−2</span></span> + <i>y</i>·<span class="mx" style="grid-template-columns:repeat(1,auto)"><span>3</span><span>0</span></span> = <span class="mx" style="grid-template-columns:repeat(1,auto)"><span>1<i>x</i>+3<i>y</i></span><span>−2<i>x</i>+0<i>y</i></span></span></span>。所以一个二维线性变换完全由四个数决定：<span class="m"><i class="ih">î</i></span> 落点的两个坐标和 <span class="m"><i class="jh">ĵ</i></span> 落点的两个坐标。</p>
       
@@ -872,7 +872,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="501">8:21</button>结合律：没什么要证明的</h4>
-      <p>作者回忆第一次学线性代数时，有道作业题要证明矩阵乘法满足<b>结合律</b>：三个矩阵 <span class="m"><i>A</i></span>、<span class="m"><i>B</i></span>、<span class="m"><i>C</i></span> 相乘，先算 <span class="m"><i>A</i><i>B</i></span> 再乘 <span class="m"><i>C</i></span>，和先算 <span class="m"><i>B</i><i>C</i></span> 再左乘 <span class="m"><i>A</i></span>，结果一样，括号放哪都行。用数字硬推很痛苦，也看不出道理。</p>
+      <p>作者回忆第一次学线性代数时，有道作业题要证明矩阵乘法满足<b>结合律</b>：三个矩阵 <span class="m"><i>A</i></span>、<span class="m"><i>B</i></span>、<span class="m"><i>C</i></span> 相乘，先算 <span class="m"><i>A</i><i>B</i></span> 再乘 <span class="m"><i>C</i></span>，和先算 <span class="m"><i>B</i><i>C</i></span> 再左乘 <span class="m"><i>A</i></span>，结果一样，括号放哪都行。直接用数字推导很痛苦，也看不出道理。</p>
       <p>从变换复合的角度看，这件事几乎是显然的：<span class="m">(<i>A</i><i>B</i>)<i>C</i></span> 和 <span class="m"><i>A</i>(<i>B</i><i>C</i>)</span> 说的都是先做 <span class="m"><i>C</i></span>、再做 <span class="m"><i>B</i></span>、再做 <span class="m"><i>A</i></span>。同样三个变换、同样的顺序依次作用，没有什么需要证明的。作者强调这是一个正经的证明，而且比数值推导更能解释为什么这条性质成立。</p>
       <p>最后的建议：多想象两个不同变换依次作用会怎样，再把矩阵乘积用数字算出来对照。</p>
       
@@ -1101,7 +1101,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集把前面的线性变换和行列式接到最常用的场景上：解线性方程组。作者不讲高斯消元 (Gaussian Elimination)、行阶梯形 (Row Echelon Form) 这些算法，只讲几何图像：<span class="m"><i>A</i><i>x</i> = <i>v</i></span> 就是在问「哪个向量经过 <span class="m"><i>A</i></span> 变换后落在 <span class="m"><i>v</i></span> 上」。行列式是否为零决定了能不能把变换倒放回去；倒放不了的时候，用秩、列空间、零空间来描述到底压扁成了什么样、哪些向量被压没了。</p>
+      <p class="lede">这一集把前面的线性变换和行列式接到最常用的场景上：解线性方程组。作者不讲高斯消元 (Gaussian Elimination)、行阶梯形 (Row Echelon Form) 这些算法，只讲几何图像：<span class="m"><i>A</i><i>x</i> = <i>v</i></span> 就是在问「哪个向量经过 <span class="m"><i>A</i></span> 变换后落在 <span class="m"><i>v</i></span> 上」。行列式是否为零，决定了这个变换能不能反过来做、把每个向量送回原处；做不到的时候，用秩、列空间、零空间来描述到底压扁成了什么样、哪些向量被压没了。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1ys411472E?p=8" target="_blank" rel="noreferrer">B 站 P8：06 - 逆矩阵、列空间与零空间 ↗</a>
         <a href="https://www.youtube.com/watch?v=uQhTuRlWMxw" target="_blank" rel="noreferrer">YouTube 第 7 章 · 2016-08-16 ↗</a></p>
       <section class="sec">
@@ -1130,16 +1130,16 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
     </section>
 <section class="sec">
-      <h4><button class="ts" type="button" data-t="231">3:51</button>行列式不为零：把变换倒放回去</h4>
-      <p>随手取一个矩阵，行列式几乎总不为零，这是最常见的情况。平面没有被压扁，恰好有且只有一个向量落在 <span class="m"><i>v</i></span> 上。找它的办法是把变换倒着播放，跟着 <span class="m"><i>v</i></span> 往回走，停下的位置就是 <span class="m"><i>x</i></span>。</p>
-      <p>「倒放」本身也是一个线性变换，叫 <span class="m"><i>A</i></span> 的<b>逆 (Inverse)</b>，记作 <span class="m"><i>A</i>⁻¹</span>。例子：<span class="m"><i>A</i></span> 是逆时针旋转 90°，<span class="m"><i>A</i>⁻¹</span> 就是顺时针旋转 90°；<span class="m"><i>A</i></span> 是把 <span class="m"><i class="jh">ĵ</i></span> 往右推一格的剪切，<span class="m"><i>A</i>⁻¹</span> 就是把 <span class="m"><i class="jh">ĵ</i></span> 往左推一格的剪切。</p>
+      <h4><button class="ts" type="button" data-t="231">3:51</button>行列式不为零：把变换反过来做</h4>
+      <p>随手取一个矩阵，行列式几乎总不为零，这是最常见的情况。平面没有被压扁，恰好有且只有一个向量落在 <span class="m"><i>v</i></span> 上。找它的办法是把这个变换反过来做：从 <span class="m"><i>v</i></span> 出发，沿着变换的反方向走回去，回到的位置就是 <span class="m"><i>x</i></span>。</p>
+      <p>这个「反过来做」的变换本身也是一个线性变换，叫 <span class="m"><i>A</i></span> 的<b>逆 (Inverse)</b>，记作 <span class="m"><i>A</i>⁻¹</span>。例子：<span class="m"><i>A</i></span> 是逆时针旋转 90°，<span class="m"><i>A</i>⁻¹</span> 就是顺时针旋转 90°；<span class="m"><i>A</i></span> 是把 <span class="m"><i class="jh">ĵ</i></span> 往右推一格的剪切，<span class="m"><i>A</i>⁻¹</span> 就是把 <span class="m"><i class="jh">ĵ</i></span> 往左推一格的剪切。</p>
       <p><span class="m"><i>A</i>⁻¹</span> 的定义性质是：先做 <span class="m"><i>A</i></span> 再做 <span class="m"><i>A</i>⁻¹</span>，等于什么都没做。「先做一个再做一个」在代数上是矩阵乘法，「什么都不做」的变换叫<b>恒等变换 (Identity Transformation)</b>，它不动 <span class="m"><i class="ih">î</i></span> 和 <span class="m"><i class="jh">ĵ</i></span>，矩阵是 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>1</span><span>0</span><span>0</span><span>1</span></span>，所以 <span class="m"><i>A</i>⁻¹<i>A</i> = <i>I</i></span>。有了 <span class="m"><i>A</i>⁻¹</span>，两边左乘它就得到 <span class="m"><i>x</i> = <i>A</i>⁻¹<i>v</i></span>。实际中求逆交给计算机。</p>
       <p>方程数等于未知数个数时，高维也一样：只要变换不把空间压到更低维（行列式不为零），就有逆变换，解唯一，<span class="m"><i>x</i> = <i>A</i>⁻¹<i>v</i></span>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-4m18s0.jpg" alt="变换 A" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="258">4:18</button>变换 A</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-4m24s0.jpg" alt="倒放 A 得到的变换，记作 A⁻¹" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="265">4:25</button>倒放 A 得到的变换，记作 A⁻¹</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-4m40s0.jpg" alt="向右剪切的逆是向左剪切" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="258">4:18</button>变换 A</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-4m24s0.jpg" alt="把 A 反过来做得到的变换，记作 A⁻¹" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="265">4:25</button>把 A 反过来做得到的变换，记作 A⁻¹</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-4m40s0.jpg" alt="向右剪切的逆是向左剪切" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="280">4:40</button>向右剪切的逆是向左剪切</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/inverse-matrices-5m05s0.jpg" alt="A⁻¹A 等于「什么都不做」的恒等矩阵" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="305">5:05</button>A⁻¹A 等于「什么都不做」的恒等矩阵</figcaption></figure></div>
       
@@ -1208,13 +1208,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p class="note"><span>补充</span>补充一句视频没展开的：如果 <span class="m"><i>A</i><i>x</i> = <i>v</i></span> 有一个解 <span class="m"><i>x</i>₀</span>，那么全部解就是 <span class="m"><i>x</i>₀</span> 加上零空间里的任意向量。原因是 <span class="m"><i>A</i>(<i>x</i>₀ + <i>n</i>) = <i>A</i><i>x</i>₀ + <i>A</i><i>n</i> = <i>v</i> + 0</span>。所以解集的形状和零空间一样，只是整体平移了 <span class="m"><i>x</i>₀</span>：零空间是一条线，解集就是一条平行的线。</p>
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li><span class="m"><i>A</i><i>x</i> = <i>v</i></span> 的几何意义：找经过变换 <span class="m"><i>A</i></span> 后落在 <span class="m"><i>v</i></span> 上的向量 <span class="m"><i>x</i></span>。</li><li><span class="m">det(<i>A</i>) ≠ 0</span> 时变换可以倒放，倒放的变换就是 <span class="m"><i>A</i>⁻¹</span>，满足 <span class="m"><i>A</i>⁻¹<i>A</i> = <i>I</i></span>，解是唯一的 <span class="m"><i>x</i> = <i>A</i>⁻¹<i>v</i></span>。</li><li><span class="m">det(<i>A</i>) = 0</span> 时没有逆；<span class="m"><i>v</i></span> 在列空间里才有解，而且解不唯一。</li><li>秩 = 列空间的维数；列空间 = 各列张成的空间；零空间 = 被压到原点的向量，也是 <span class="m"><i>A</i><i>x</i> = 0</span> 的解集。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li><span class="m"><i>A</i><i>x</i> = <i>v</i></span> 的几何意义：找经过变换 <span class="m"><i>A</i></span> 后落在 <span class="m"><i>v</i></span> 上的向量 <span class="m"><i>x</i></span>。</li><li><span class="m">det(<i>A</i>) ≠ 0</span> 时变换可以反过来做，反过来的那个变换就是 <span class="m"><i>A</i>⁻¹</span>，满足 <span class="m"><i>A</i>⁻¹<i>A</i> = <i>I</i></span>，解是唯一的 <span class="m"><i>x</i> = <i>A</i>⁻¹<i>v</i></span>。</li><li><span class="m">det(<i>A</i>) = 0</span> 时没有逆；<span class="m"><i>v</i></span> 在列空间里才有解，而且解不唯一。</li><li>秩 = 列空间的维数；列空间 = 各列张成的空间；零空间 = 被压到原点的向量，也是 <span class="m"><i>A</i><i>x</i> = 0</span> 的解集。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/inverse-matrices-2m04s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1ys411472E?p=8" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="10"><b>0:10</b><span>本集范围：逆矩阵、列空间、秩、零空间</span></button></li><li><button type="button" data-t="51"><b>0:51</b><span>线性代数为什么到处都要用：解方程组</span></button></li><li><button type="button" data-t="103"><b>1:43</b><span>线性方程组的标准写法</span></button></li><li><button type="button" data-t="128"><b>2:08</b><span>写成一个矩阵向量乘法 Ax = v</span></button></li><li><button type="button" data-t="167"><b>2:47</b><span>几何意义：找变换后落在 v 上的 x</span></button></li><li><button type="button" data-t="205"><b>3:25</b><span>按 det(A) 是否为零分两种情况</span></button></li><li><button type="button" data-t="231"><b>3:51</b><span>det ≠ 0：倒放变换，解唯一</span></button></li><li><button type="button" data-t="255"><b>4:15</b><span>逆矩阵 A⁻¹ 与两个例子</span></button></li><li><button type="button" data-t="308"><b>5:08</b><span>恒等变换，A⁻¹A = I</span></button></li><li><button type="button" data-t="353"><b>5:53</b><span>推广到 n 个方程 n 个未知数</span></button></li><li><button type="button" data-t="403"><b>6:43</b><span>det = 0：没有逆变换</span></button></li><li><button type="button" data-t="446"><b>7:26</b><span>没有逆也可能有解</span></button></li><li><button type="button" data-t="486"><b>8:06</b><span>秩 (Rank)：输出空间的维数</span></button></li><li><button type="button" data-t="534"><b>8:54</b><span>列空间 (Column Space)</span></button></li><li><button type="button" data-t="569"><b>9:29</b><span>满秩 (Full Rank)</span></button></li><li><button type="button" data-t="592"><b>9:52</b><span>零空间 (Null Space) / 核 (Kernel)</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>Ax = 0 的解就是零空间</span></button></li><li><button type="button" data-t="656"><b>10:56</b><span>全集总结</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="10"><b>0:10</b><span>本集范围：逆矩阵、列空间、秩、零空间</span></button></li><li><button type="button" data-t="51"><b>0:51</b><span>线性代数为什么到处都要用：解方程组</span></button></li><li><button type="button" data-t="103"><b>1:43</b><span>线性方程组的标准写法</span></button></li><li><button type="button" data-t="128"><b>2:08</b><span>写成一个矩阵向量乘法 Ax = v</span></button></li><li><button type="button" data-t="167"><b>2:47</b><span>几何意义：找变换后落在 v 上的 x</span></button></li><li><button type="button" data-t="205"><b>3:25</b><span>按 det(A) 是否为零分两种情况</span></button></li><li><button type="button" data-t="231"><b>3:51</b><span>det ≠ 0：把变换反过来做，解唯一</span></button></li><li><button type="button" data-t="255"><b>4:15</b><span>逆矩阵 A⁻¹ 与两个例子</span></button></li><li><button type="button" data-t="308"><b>5:08</b><span>恒等变换，A⁻¹A = I</span></button></li><li><button type="button" data-t="353"><b>5:53</b><span>推广到 n 个方程 n 个未知数</span></button></li><li><button type="button" data-t="403"><b>6:43</b><span>det = 0：没有逆变换</span></button></li><li><button type="button" data-t="446"><b>7:26</b><span>没有逆也可能有解</span></button></li><li><button type="button" data-t="486"><b>8:06</b><span>秩 (Rank)：输出空间的维数</span></button></li><li><button type="button" data-t="534"><b>8:54</b><span>列空间 (Column Space)</span></button></li><li><button type="button" data-t="569"><b>9:29</b><span>满秩 (Full Rank)</span></button></li><li><button type="button" data-t="592"><b>9:52</b><span>零空间 (Null Space) / 核 (Kernel)</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>Ax = 0 的解就是零空间</span></button></li><li><button type="button" data-t="656"><b>10:56</b><span>全集总结</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -1489,12 +1489,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
     </section>
 <section class="sec">
-      <h4><button class="ts" type="button" data-t="405">6:45</button>计算：三阶行列式里塞进基向量</h4>
+      <h4><button class="ts" type="button" data-t="405">6:45</button>计算：把基向量填进三阶行列式</h4>
       <p>一般的计算有一个可以背的公式，但更常见也更容易的是记住一个涉及三阶行列式的过程。这个过程初看很怪：写一个 3×3 矩阵，第二、三列是 <span class="m"><i>v</i></span> 和 <span class="m"><i>w</i></span> 的坐标，第一列却填 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span> 三个基向量，然后算行列式。</p>
       <p>向量当作矩阵元素，意思并不清楚，学生通常被告知这只是记号上的技巧。把 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span>、<span class="m"><i class="kh">k̂</i></span> 当成数照常展开，得到这三个基向量的某个线性组合：</p>
       <p><span class="m"><i>v</i> × <i>w</i> = <i class="ih">î</i>(<i>v</i>₂<i>w</i>₃ − <i>v</i>₃<i>w</i>₂) + <i class="jh">ĵ</i>(<i>v</i>₃<i>w</i>₁ − <i>v</i>₁<i>w</i>₃) + <i class="kh">k̂</i>(<i>v</i>₁<i>w</i>₂ − <i>v</i>₂<i>w</i>₁)</span></p>
       <p>然后学生被告知要相信：这个线性组合定义的向量，恰好是垂直于 <span class="m"><i>v</i></span> 和 <span class="m"><i>w</i></span>、长度等于平行四边形面积、方向服从右手定则的那个唯一向量。</p>
-      <p>作者承认这是记号技巧，但它有来由：行列式再次出现不是巧合，把基向量塞进那一列也不是随便做的。要理解背后的原因，要用到上一集的对偶性。这部分有点难，放在单独的下一集，作者认为它严格说在线性代数的本质之外，最重要的是知道叉积向量在几何上代表什么。</p>
+      <p>作者承认这是记号技巧，但它有来由：行列式再次出现不是巧合，把基向量填进那一列也不是随便做的。要理解背后的原因，要用到上一集的对偶性。这部分有点难，放在单独的下一集，作者认为它严格说在线性代数的本质之外，最重要的是知道叉积向量在几何上代表什么。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/cross-products-7m08s0.jpg" alt="第一列填 î、ĵ、k̂，后两列是 v、w 的坐标" loading="lazy" decoding="async">
@@ -1517,7 +1517,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <details class="ep" id="ch11" data-ch="11" data-sk="ch11" data-bv="BV1ys411472E" data-p="12">
   <summary>
     <span class="no">11</span>
-    <span class="tt"><b>以线性变换的眼光看叉积</b><em>Cross products in the light of linear transformations</em><span class="hook">为什么把 î、ĵ、k̂ 塞进行列式就能算出叉积：定义一个「v、w 固定，输入 (x, y, z)，输出平行六面体有向体积」的线性变换，它的对偶向量从计算看是那个行列式，从几何看就是叉积。</span></span>
+    <span class="tt"><b>以线性变换的眼光看叉积</b><em>Cross products in the light of linear transformations</em><span class="hook">为什么把 î、ĵ、k̂ 填进行列式就能算出叉积：定义一个「v、w 固定，输入 (x, y, z)，输出平行六面体有向体积」的线性变换，它的对偶向量从计算看是那个行列式，从几何看就是叉积。</span></span>
     <span class="side"><span class="chip">B 站 P12 · 08第二部分</span><span class="len">13:10</span>
       <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
   </summary>
@@ -1621,7 +1621,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/cross-products-extended-0m30s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1ys411472E?p=12" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="16"><b>0:16</b><span>回顾：叉积的「记号技巧」</span></button></li><li><button type="button" data-t="73"><b>1:13</b><span>学生被告知要相信的三条几何性质</span></button></li><li><button type="button" data-t="111"><b>1:51</b><span>前提：行列式和对偶性</span></button></li><li><button type="button" data-t="124"><b>2:04</b><span>回顾对偶性</span></button></li><li><button type="button" data-t="193"><b>3:13</b><span>计划：定义一个到数轴的线性变换，找它的对偶向量</span></button></li><li><button type="button" data-t="224"><b>3:44</b><span>回顾二维叉积</span></button></li><li><button type="button" data-t="259"><b>4:19</b><span>猜想：三个向量的三阶行列式？</span></button></li><li><button type="button" data-t="293"><b>4:53</b><span>三维叉积是两个向量进、一个向量出</span></button></li><li><button type="button" data-t="310"><b>5:10</b><span>让第一个向量变成变量 (x, y, z)</span></button></li><li><button type="button" data-t="340"><b>5:40</b><span>几何意义：平行六面体的有向体积</span></button></li><li><button type="button" data-t="375"><b>6:15</b><span>这个函数是线性的</span></button></li><li><button type="button" data-t="395"><b>6:35</b><span>所以有 1×3 矩阵，所以有对偶向量 p</span></button></li><li><button type="button" data-t="455"><b>7:35</b><span>计算角度：展开行列式</span></button></li><li><button type="button" data-t="498"><b>8:18</b><span>这就是把 î、ĵ、k̂ 塞进第一列</span></button></li><li><button type="button" data-t="561"><b>9:21</b><span>几何角度：什么 p 能满足这个性质</span></button></li><li><button type="button" data-t="613"><b>10:13</b><span>体积 = 面积 × 垂直分量</span></button></li><li><button type="button" data-t="651"><b>10:51</b><span>所以 p 垂直于 v、w，长度等于面积</span></button></li><li><button type="button" data-t="663"><b>11:03</b><span>方向和右手定则对上</span></button></li><li><button type="button" data-t="712"><b>11:52</b><span>总结</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="16"><b>0:16</b><span>回顾：叉积的「记号技巧」</span></button></li><li><button type="button" data-t="73"><b>1:13</b><span>学生被告知要相信的三条几何性质</span></button></li><li><button type="button" data-t="111"><b>1:51</b><span>前提：行列式和对偶性</span></button></li><li><button type="button" data-t="124"><b>2:04</b><span>回顾对偶性</span></button></li><li><button type="button" data-t="193"><b>3:13</b><span>计划：定义一个到数轴的线性变换，找它的对偶向量</span></button></li><li><button type="button" data-t="224"><b>3:44</b><span>回顾二维叉积</span></button></li><li><button type="button" data-t="259"><b>4:19</b><span>猜想：三个向量的三阶行列式？</span></button></li><li><button type="button" data-t="293"><b>4:53</b><span>三维叉积是两个向量进、一个向量出</span></button></li><li><button type="button" data-t="310"><b>5:10</b><span>让第一个向量变成变量 (x, y, z)</span></button></li><li><button type="button" data-t="340"><b>5:40</b><span>几何意义：平行六面体的有向体积</span></button></li><li><button type="button" data-t="375"><b>6:15</b><span>这个函数是线性的</span></button></li><li><button type="button" data-t="395"><b>6:35</b><span>所以有 1×3 矩阵，所以有对偶向量 p</span></button></li><li><button type="button" data-t="455"><b>7:35</b><span>计算角度：展开行列式</span></button></li><li><button type="button" data-t="498"><b>8:18</b><span>这就是把 î、ĵ、k̂ 填进第一列</span></button></li><li><button type="button" data-t="561"><b>9:21</b><span>几何角度：什么 p 能满足这个性质</span></button></li><li><button type="button" data-t="613"><b>10:13</b><span>体积 = 面积 × 垂直分量</span></button></li><li><button type="button" data-t="651"><b>10:51</b><span>所以 p 垂直于 v、w，长度等于面积</span></button></li><li><button type="button" data-t="663"><b>11:03</b><span>方向和右手定则对上</span></button></li><li><button type="button" data-t="712"><b>11:52</b><span>总结</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -1682,7 +1682,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="334">5:34</button>换个办法描述坐标：有向面积</h4>
       <p>虽然这个想法对大多数方程组都不行，它指明了要找什么：有没有一种对输入向量坐标的几何描述，在变换后保持不变？</p>
       <p>如果你一直在想行列式，可能会想到这个：取第一个基向量 <span class="m"><i class="ih">î</i></span> 和未知输入向量 <span class="m">(<i>x</i>, <i>y</i>)</span> 张成的平行四边形。它的面积是底 1 乘以垂直于底的高，而高就是输入向量的 y 坐标。</p>
-      <p>所以这个平行四边形的面积是描述 y 坐标的一种古怪迂回的说法。更准确地说是<b>有向面积</b>：y 坐标为负时，面积也为负（把 <span class="m"><i class="ih">î</i></span> 当作两条边里的第一条）。</p>
+      <p>所以这个平行四边形的面积是描述 y 坐标的一种绕了弯的说法。更准确地说是<b>有向面积</b>：y 坐标为负时，面积也为负（把 <span class="m"><i class="ih">î</i></span> 当作两条边里的第一条）。</p>
       <p>对称地，未知向量和第二个基向量 <span class="m"><i class="jh">ĵ</i></span> 张成的平行四边形，面积就是 x 坐标。</p>
       <p>三维里也一样。通常 z 坐标是和 <span class="m"><i class="kh">k̂</i></span> 的点积，另一种几何解释是看它和 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 张成的平行六面体：把 <span class="m"><i class="ih">î</i></span>、<span class="m"><i class="jh">ĵ</i></span> 张成的面积为 1 的正方形当作底，体积就等于高，也就是 z 坐标。</p>
       <p>其余坐标同理：用这个向量和「除了对应方向那个」的所有基向量组成平行六面体，体积就是那个坐标。这里说的是按右手定则的有向体积，所以三个向量的排列顺序有影响，负坐标也说得通。</p>
@@ -1814,7 +1814,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="434">7:14</button>反过来翻译：用逆矩阵</h4>
-      <p>反方向，也就是从开头那个我们叫 <span class="m">(3, 2)</span> 的向量算出 Jennifer 的 <span class="m">(5/3, 1/3)</span>：从「把她的语言翻译成我们的」那个基变换矩阵出发，求它的逆。逆变换就是把原变换倒着播放。</p>
+      <p>反方向，也就是从开头那个我们叫 <span class="m">(3, 2)</span> 的向量算出 Jennifer 的 <span class="m">(5/3, 1/3)</span>：从「把她的语言翻译成我们的」那个基变换矩阵出发，求它的逆。逆变换就是把原变换反过来做一遍，让每个向量回到原处。</p>
       <p>实际中，尤其高于二维时，用计算机算逆矩阵。这里，列为 Jennifer 基向量的基变换矩阵，它的逆矩阵两列是 <span class="m">(1/3, −1/3)</span> 和 <span class="m">(1/3, 2/3)</span>。用它乘 <span class="m">(3, 2)</span>，得到 <span class="m">(5/3, 1/3)</span>。</p>
       <p>小结：列为「用我们的坐标写的 Jennifer 基向量」的矩阵 <span class="m"><i>A</i></span>，把向量从她的语言翻译成我们的语言；逆矩阵 <span class="m"><i>A</i>⁻¹</span> 反过来。</p>
       
@@ -2331,7 +2331,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <h2><span class="n">3</span>矩阵乘向量：线性层</h2>
     <p class="chs">对应 <a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></p>
     <p>神经网络里最常见的一层是<b>线性层 (Linear Layer)</b>，也叫全连接层 (Fully-Connected Layer)：<span class="m"><i>y</i> = <i>W</i><i>x</i> + <i>b</i></span>。<span class="m"><i>W</i></span> 的形状是「输出维数 × 输入维数」，一般不是方阵，按第 8 章的说法，它把 <span class="m"><i>d</i><sub>in</sub></span> 维空间映到 <span class="m"><i>d</i><sub>out</sub></span> 维空间。按第 3 章，<span class="m"><i>W</i><i>x</i></span> 就是用 <span class="m"><i>x</i></span> 的各个分量去缩放 <span class="m"><i>W</i></span> 的各列再相加；每一列是「输入的第 j 个分量」对输出的贡献方向。</p>
-    <p>实际训练时一次喂一批数据。把 B 个输入向量摞成一个 B × <span class="m"><i>d</i><sub>in</sub></span> 的矩阵 <span class="m"><i>X</i></span>，整批的输出就是 <span class="m"><i>X</i><i>W</i>ᵀ + <i>b</i></span>，一次矩阵乘法算完。PyTorch 的 <code>nn.Linear</code> 就是这样存的：权重形状是 (out_features, in_features)，前向计算 <span class="m"><i>x</i><i>W</i>ᵀ + <i>b</i></span>。</p>
+    <p>实际训练时一次输入一批数据。把 B 个输入向量摞成一个 B × <span class="m"><i>d</i><sub>in</sub></span> 的矩阵 <span class="m"><i>X</i></span>，整批的输出就是 <span class="m"><i>X</i><i>W</i>ᵀ + <i>b</i></span>，一次矩阵乘法算完。PyTorch 的 <code>nn.Linear</code> 就是这样存的：权重形状是 (out_features, in_features)，前向计算 <span class="m"><i>x</i><i>W</i>ᵀ + <i>b</i></span>。</p>
     <p>Transformer 每一层里的前馈网络 (Feed-Forward Network) 是两个线性层夹一个非线性函数：先从 <span class="m"><i>d</i><sub>model</sub></span> 升到 <span class="m"><i>d</i><sub>ff</sub></span>，再降回 <span class="m"><i>d</i><sub>model</sub></span>。原始 Transformer 的 base 模型是 512 维升到 2048 维再降回 512 维。</p>
     <p>大模型的参数几乎全在这些矩阵里。GPT-3 每一层有注意力的 4 个 <span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub>model</sub></span> 矩阵，加前馈网络的两个 <span class="m"><i>d</i><sub>model</sub> × 4<i>d</i><sub>model</sub></span> 矩阵，一共 <span class="m">12 <i>d</i><sub>model</sub>²</span> ≈ 18.1 亿个参数；96 层约 1739 亿，再加 6.18 亿的嵌入矩阵，就是论文里的 1750 亿。</p>
     
@@ -2695,7 +2695,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="595">9:55</button>曲线下的面积：积分</h4>
       <p>圆的问题里运气好，面积正好是三角形。换成抛物线 <span class="m"><i>x</i>²</span>，从 0 到 3 下方的面积是多少？不好想。换个问法：固定左端点在 0，让右端点变化，能不能找到一个函数 <span class="m"><i>A</i>(<i>x</i>)</span>，给出 0 到 <span class="m"><i>x</i></span> 之间抛物线下方的面积？这样的 <span class="m"><i>A</i>(<i>x</i>)</span> 叫作 <span class="m"><i>x</i>²</span> 的<b>积分 (Integral)</b>。</p>
-      <p>作者说求这个函数很难。遇到难题的一个好办法是不要硬冲答案，而是先玩一玩，熟悉一下「定义图像的函数 <span class="m"><i>x</i>²</span>」和「给出面积的函数 <span class="m"><i>A</i>(<i>x</i>)</span>」之间的关系。</p>
+      <p>作者说求这个函数很难。遇到难题时，一个好办法是先别急着直接求答案，没有特定目标地多试几种情况，熟悉一下「定义图像的函数 <span class="m"><i>x</i>²</span>」和「给出面积的函数 <span class="m"><i>A</i>(<i>x</i>)</span>」之间的关系。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/essence-of-calculus-10m08s0.jpg" alt="x² 从 0 到 3 下方的面积是多少" loading="lazy" decoding="async">
@@ -2722,7 +2722,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="904">15:04</button>微积分基本定理</h4>
-      <p>导数是求解积分问题的钥匙。熟练求导以后，遇到「不知道函数是什么，只知道它的导数应该是 <span class="m"><i>x</i>²</span>」的情况，就能反推出这个函数。</p>
+      <p>导数是求解积分问题的关键。熟练求导以后，遇到「不知道函数是什么，只知道它的导数应该是 <span class="m"><i>x</i>²</span>」的情况，就能反推出这个函数。</p>
       <p>这种来回关系叫<b>微积分基本定理 (Fundamental Theorem of Calculus)</b>：一个「图像下方面积」函数的导数，就是定义这个图像的函数本身。它把积分和导数这两个大概念连起来，说明两者互为逆运算。后面的集数讲这些概念的细节。</p>
       
       
@@ -2825,7 +2825,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="638">10:38</button>算一个导数：t³</h4>
       <p>你可能以为「问趋近于什么」会让计算更难，结果反而更简单。设距离函数正好是 <span class="m"><i>t</i>³</span>：1 秒走 1 米，2 秒走 8 米。求 <span class="m"><i>t</i> = 2</span> 时的速度，先把 <span class="m"><i>d</i><i>t</i></span> 当成一个具体的小量：<span class="m"><i>d</i><i>s</i>/<i>d</i><i>t</i> = ((2 + <i>d</i><i>t</i>)³ − 2³) / <i>d</i><i>t</i></span>。</p>
       <p>展开分子：<span class="m">2³ + 3·2²·<i>d</i><i>t</i> + 3·2·<i>d</i><i>t</i>² + <i>d</i><i>t</i>³ − 2³</span>。<span class="m">2³</span> 相消，剩下每一项都带 <span class="m"><i>d</i><i>t</i></span>，和分母的 <span class="m"><i>d</i><i>t</i></span> 约掉一个，得到 <span class="m">3·2² +</span>（两项还带 <span class="m"><i>d</i><i>t</i></span> 的）。<span class="m"><i>d</i><i>t</i></span> 趋近于 0 时，那两项直接消失，剩下干净的 <span class="m">3·2² = 12</span>，也就是图像在 <span class="m"><i>t</i> = 2</span> 处切线的斜率。</p>
-      <p><span class="m"><i>t</i> = 2</span> 没什么特别，一般地，<span class="m"><i>t</i>³</span> 的导数是 <span class="m">3<i>t</i>²</span>。作者说这就是微积分之所以有用的核心：对具体的 <span class="m"><i>d</i><i>t</i></span>，式子一团乱；而问「<span class="m"><i>d</i><i>t</i></span> 趋近于 0 时趋近什么」，能把大部分乱七八糟的项扔掉。</p>
+      <p><span class="m"><i>t</i> = 2</span> 没什么特别，一般地，<span class="m"><i>t</i>³</span> 的导数是 <span class="m">3<i>t</i>²</span>。作者说这就是微积分之所以有用的核心：对具体的 <span class="m"><i>d</i><i>t</i></span>，式子一团乱；而问「<span class="m"><i>d</i><i>t</i></span> 趋近于 0 时趋近什么」，能把大部分复杂的项直接略去。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/derivatives-11m48s0.jpg" alt="展开 (2 + dt)³ − 2³" loading="lazy" decoding="async">
@@ -2979,7 +2979,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
         <a href="https://www.youtube.com/watch?v=YG15m2VwSjA" target="_blank" rel="noreferrer">YouTube 第 4 章 · 2017-05-01 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="49">0:49</button>三种组合方式</h4>
-      <p>把函数组合起来，基本上只有三种办法：相加、相乘、把一个塞进另一个（复合）。减法就是乘 −1 再相加；除法就是先复合进 <span class="m">1/<i>x</i></span> 再相乘，都没有新东西。只要知道导数在这三种组合下怎么表现，再怪的表达式都能一层层剥开。</p>
+      <p>把函数组合起来，基本上只有三种办法：相加、相乘、把一个代入另一个（复合）。减法就是乘 −1 再相加；除法就是先复合进 <span class="m">1/<i>x</i></span> 再相乘，都没有新东西。只要知道导数在这三种组合下怎么表现，再怪的表达式都能一层层剥开。</p>
       
       
       
@@ -3018,7 +3018,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="521">8:41</button>链式法则：三条数轴上的连锁推动</h4>
-      <p>最常见的组合是复合，比如把 <span class="m"><i>x</i>²</span> 塞进 <span class="m">sin</span> 得到 <span class="m">sin(<i>x</i>²)</span>。这次换一种画法：三条数轴，第一条放 <span class="m"><i>x</i></span>，第二条放 <span class="m"><i>x</i>²</span>，第三条放 <span class="m">sin(<i>x</i>²)</span>。函数 <span class="m"><i>x</i>²</span> 把第一条带到第二条，<span class="m">sin</span> 把第二条带到第三条。<span class="m"><i>x</i></span> 移到 3，第二条上的值就移到 9，第三条移到 <span class="m">sin 9</span>。</p>
+      <p>最常见的组合是复合，比如把 <span class="m"><i>x</i>²</span> 代入 <span class="m">sin</span> 得到 <span class="m">sin(<i>x</i>²)</span>。这次换一种画法：三条数轴，第一条放 <span class="m"><i>x</i></span>，第二条放 <span class="m"><i>x</i>²</span>，第三条放 <span class="m">sin(<i>x</i>²)</span>。函数 <span class="m"><i>x</i>²</span> 把第一条带到第二条，<span class="m">sin</span> 把第二条带到第三条。<span class="m"><i>x</i></span> 移到 3，第二条上的值就移到 9，第三条移到 <span class="m">sin 9</span>。</p>
       <p>求导：把 <span class="m"><i>x</i></span> 推一点点 <span class="m"><i>d</i><i>x</i></span>，比如从 1.5 出发。第二条上的变化是 <span class="m"><i>d</i>(<i>x</i>²)</span>。给中间变量起个名字 <span class="m"><i>h</i> = <i>x</i>²</span>，这个变化写成 <span class="m"><i>d</i><i>h</i></span>，第三条上的值就是 <span class="m">sin(<i>h</i>)</span>，它的变化是 <span class="m"><i>d</i>(sin <i>h</i>) ≈ cos(<i>h</i>)·<i>d</i><i>h</i></span>。（第三条往左动而第二条往右动，说明这个变化是负的。）</p>
       <p>再展开：<span class="m"><i>h</i></span> 换回 <span class="m"><i>x</i>²</span>，<span class="m"><i>d</i><i>h</i> ≈ 2<i>x</i>·<i>d</i><i>x</i></span>，所以第三条的变化约是 <span class="m">cos(<i>x</i>²)·2<i>x</i>·<i>d</i><i>x</i></span>。从 <span class="m"><i>x</i> = 1.5</span> 出发，就是 <span class="m">cos(1.5²) × 2 × 1.5 × <i>d</i><i>x</i></span>，和 <span class="m"><i>d</i><i>x</i></span> 成正比，导数就是这个比例系数。</p>
       <p>一般地，<span class="m"><i>d</i>/<i>d</i><i>x</i> · <i>g</i>(<i>h</i>(<i>x</i>)) = <i>g</i>′(<i>h</i>(<i>x</i>))·<i>h</i>′(<i>x</i>)</span>：外层函数的导数（输入仍是没动过的内层函数），乘内层函数的导数。这就是<b>链式法则 (Chain Rule)</b>。作者特意把外层导数写成 <span class="m"><i>d</i><i>g</i>/<i>d</i><i>h</i></span> 而不是 <span class="m"><i>d</i><i>g</i>/<i>d</i><i>x</i></span>：先把第三条的变化表示成第二条变化 <span class="m"><i>d</i><i>h</i></span> 的倍数，再把 <span class="m"><i>d</i><i>h</i></span> 表示成 <span class="m"><i>d</i><i>x</i></span> 的倍数。<span class="m"><i>d</i><i>g</i>/<i>d</i><i>h</i> · <i>d</i><i>h</i>/<i>d</i><i>x</i></span> 里 <span class="m"><i>d</i><i>h</i></span> 相消，不只是记号上的巧合，而是这些微小推动真实的连锁关系。</p>
@@ -3159,7 +3159,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="16">0:16</button>奇怪的操作</h4>
       <p>圆心在原点、半径 5 的圆，方程是 <span class="m"><i>x</i>² + <i>y</i>² = 5²</span>，也就是勾股定理：圆上每个点到原点的距离都是 5。想求 <span class="m">(3, 4)</span> 处切线的斜率。懂几何的话知道切线垂直于半径，但想要一个能推广到别的曲线的方法。</p>
       <p>和其他切线问题一样，放大到曲线几乎就是它自己的切线，然后沿曲线迈一小步：竖直分量 <span class="m"><i>d</i><i>y</i></span>，水平分量 <span class="m"><i>d</i><i>x</i></span>，斜率就是 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i></span>。不同的是，这条曲线不是函数的图像，<span class="m"><i>x</i></span> 不是输入、<span class="m"><i>y</i></span> 也不是输出，它们只是被一个方程联系起来的两个量。这叫<b>隐式曲线 (Implicit Curve)</b>。</p>
-      <p>课上教的做法是：两边求导，<span class="m"><i>x</i>²</span> 变成 <span class="m">2<i>x</i> <i>d</i><i>x</i></span>，<span class="m"><i>y</i>²</span> 变成 <span class="m">2<i>y</i> <i>d</i><i>y</i></span>，右边常数 <span class="m">5²</span> 的导数是 0。整理得 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = −<i>x</i>/<i>y</i></span>，在 <span class="m">(3, 4)</span> 处斜率是 <span class="m">−3/4</span>。这叫<b>隐函数求导 (Implicit Differentiation)</b>。含两个变量的式子求导是什么意思？为什么要这样挂上 <span class="m"><i>d</i><i>x</i></span> 和 <span class="m"><i>d</i><i>y</i></span>？</p>
+      <p>课上教的做法是：两边求导，<span class="m"><i>x</i>²</span> 变成 <span class="m">2<i>x</i> <i>d</i><i>x</i></span>，<span class="m"><i>y</i>²</span> 变成 <span class="m">2<i>y</i> <i>d</i><i>y</i></span>，右边常数 <span class="m">5²</span> 的导数是 0。整理得 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = −<i>x</i>/<i>y</i></span>，在 <span class="m">(3, 4)</span> 处斜率是 <span class="m">−3/4</span>。这叫<b>隐函数求导 (Implicit Differentiation)</b>。含两个变量的式子求导是什么意思？为什么要在两边写上 <span class="m"><i>d</i><i>x</i></span> 和 <span class="m"><i>d</i><i>y</i></span>？</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/implicit-differentiation-0m45s0.jpg" alt="x² + y² = 5² 上 (3, 4) 处的切线斜率" loading="lazy" decoding="async">
@@ -3185,7 +3185,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="434">7:14</button>把 x² + y² 看成平面上的函数</h4>
-      <p>两个问题用的是同一个方程，都对两边求了导。梯子问题里，式子是时间的函数，求导的意义很清楚。圆的问题怪在 <span class="m"><i>d</i><i>x</i></span>、<span class="m"><i>d</i><i>y</i></span> 自由飘着，没有绑在时间这样的公共变量上。</p>
+      <p>两个问题用的是同一个方程，都对两边求了导。梯子问题里，式子是时间的函数，求导的意义很清楚。圆的问题特殊在 <span class="m"><i>d</i><i>x</i></span>、<span class="m"><i>d</i><i>y</i></span> 是两个各自独立的小变化，不依附于时间这样的公共变量。</p>
       <p>作者的解释：给 <span class="m"><i>x</i>² + <i>y</i>²</span> 起个名字 <span class="m"><i>S</i></span>，它是一个二元函数，给平面上每个点 <span class="m">(<i>x</i>, <i>y</i>)</span> 配一个数。圆上的点，这个数是 25；往外走变大，往原点走变小。对 <span class="m"><i>S</i></span>「求导」，意思是让两个变量各变一点，<span class="m"><i>d</i><i>x</i></span> 和 <span class="m"><i>d</i><i>y</i></span>，迈任意方向的一小步（不一定沿着圆），问 <span class="m"><i>S</i></span> 变了多少，这就是 <span class="m"><i>d</i><i>S</i></span>。</p>
       <p>比如从 <span class="m">(3, 4)</span> 出发，<span class="m"><i>d</i><i>x</i> = −0.02</span>、<span class="m"><i>d</i><i>y</i> = −0.01</span>，<span class="m"><i>S</i></span> 大约减少 <span class="m">2·3·(−0.02) + 2·4·(−0.01)</span>。这就是 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i></span> 的含义：给定起点和步长，告诉你 <span class="m"><i>x</i>² + <i>y</i>²</span> 变了多少。步子越小，这个近似越准。</p>
       <p>要沿着圆走，就是要求 <span class="m"><i>S</i></span> 不变：从 25 开始，保持 25，也就是 <span class="m"><i>d</i><i>S</i> = 0</span>。所以 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i> = 0</span> 是「这一小步留在圆上」的条件。更精确地说，它保证留在切线上，但步子足够小时两者几乎一样。</p>
@@ -3231,7 +3231,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/implicit-differentiation-0m45s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=6" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="16"><b>0:16</b><span>例：半径 5 的圆 x² + y² = 5²</span></button></li><li><button type="button" data-t="40"><b>0:40</b><span>求 (3, 4) 处切线的斜率</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>放大，迈一小步 (dx, dy)</span></button></li><li><button type="button" data-t="88"><b>1:28</b><span>x、y 不是输入和输出，这是隐式曲线</span></button></li><li><button type="button" data-t="124"><b>2:04</b><span>奇怪的操作：两边求导 2x dx + 2y dy = 0</span></button></li><li><button type="button" data-t="162"><b>2:42</b><span>得到 dy/dx = −x/y，(3, 4) 处是 −3/4</span></button></li><li><button type="button" data-t="196"><b>3:16</b><span>对照：相关变化率问题</span></button></li><li><button type="button" data-t="206"><b>3:26</b><span>梯子：长 5 米，顶端以 1 米/秒下滑</span></button></li><li><button type="button" data-t="274"><b>4:34</b><span>x(t)² + y(t)² = 5² 对所有时刻都成立</span></button></li><li><button type="button" data-t="336"><b>5:36</b><span>对时间求导，左边必须为 0</span></button></li><li><button type="button" data-t="405"><b>6:45</b><span>代入 x = 3、y = 4、dy/dt = −1，dx/dt = 4/3</span></button></li><li><button type="button" data-t="434"><b>7:14</b><span>圆的问题怪在 dx、dy 没有绑在时间上</span></button></li><li><button type="button" data-t="483"><b>8:03</b><span>把 x² + y² 看成二元函数 S(x, y)</span></button></li><li><button type="button" data-t="524"><b>8:44</b><span>dS = 2x dx + 2y dy：任意一小步 S 变多少</span></button></li><li><button type="button" data-t="602"><b>10:02</b><span>留在圆上：dS = 0</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>另一个例子：sin(x)·y² = x</span></button></li><li><button type="button" data-t="753"><b>12:33</b><span>推出 ln x 的导数</span></button></li><li><button type="button" data-t="872"><b>14:32</b><span>这是多元微积分的一瞥</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="16"><b>0:16</b><span>例：半径 5 的圆 x² + y² = 5²</span></button></li><li><button type="button" data-t="40"><b>0:40</b><span>求 (3, 4) 处切线的斜率</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>放大，迈一小步 (dx, dy)</span></button></li><li><button type="button" data-t="88"><b>1:28</b><span>x、y 不是输入和输出，这是隐式曲线</span></button></li><li><button type="button" data-t="124"><b>2:04</b><span>奇怪的操作：两边求导 2x dx + 2y dy = 0</span></button></li><li><button type="button" data-t="162"><b>2:42</b><span>得到 dy/dx = −x/y，(3, 4) 处是 −3/4</span></button></li><li><button type="button" data-t="196"><b>3:16</b><span>对照：相关变化率问题</span></button></li><li><button type="button" data-t="206"><b>3:26</b><span>梯子：长 5 米，顶端以 1 米/秒下滑</span></button></li><li><button type="button" data-t="274"><b>4:34</b><span>x(t)² + y(t)² = 5² 对所有时刻都成立</span></button></li><li><button type="button" data-t="336"><b>5:36</b><span>对时间求导，左边必须为 0</span></button></li><li><button type="button" data-t="405"><b>6:45</b><span>代入 x = 3、y = 4、dy/dt = −1，dx/dt = 4/3</span></button></li><li><button type="button" data-t="434"><b>7:14</b><span>圆的问题特殊在 dx、dy 不依附于时间</span></button></li><li><button type="button" data-t="483"><b>8:03</b><span>把 x² + y² 看成二元函数 S(x, y)</span></button></li><li><button type="button" data-t="524"><b>8:44</b><span>dS = 2x dx + 2y dy：任意一小步 S 变多少</span></button></li><li><button type="button" data-t="602"><b>10:02</b><span>留在圆上：dS = 0</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>另一个例子：sin(x)·y² = x</span></button></li><li><button type="button" data-t="753"><b>12:33</b><span>推出 ln x 的导数</span></button></li><li><button type="button" data-t="872"><b>14:32</b><span>这是多元微积分的一瞥</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -3748,7 +3748,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="547">9:07</button>稳定与不稳定的不动点</h4>
       <p>通常的教法用图像：代一个输入，纵坐标是输出；要把输出再代回去，先水平走到直线 <span class="m"><i>y</i> = <i>x</i></span>，再竖直走到函数图像，反复这样，画出「蛛网图」。作者觉得这种画法要停下来想才记得往哪画，作者留了个练习：什么条件下蛛网收向不动点、什么条件下离开，和斜率有关。</p>
-      <p>换成变换来看更清楚。画出一堆箭头表示各输入点被送到哪（<span class="m">1/<i>x</i></span> 的作用形成一个圆形图案，再整体右移 1）。反复套用，就是把输出当作新输入再映一次。动画里几个点迭代没几次就都聚到 1.618 附近。</p>
+      <p>换成变换来看更清楚。画出一堆箭头表示各输入点被送到哪（<span class="m">1/<i>x</i></span> 的作用形成一个圆形图案，再整体右移 1）。反复套用，就是把输出当作新输入再映一次。视频里取了几个点来演示，迭代没几次就都聚到 1.618 附近。</p>
       <p>放大看 φ 附近：映射把这一小段压向 φ，也就是 <span class="m">1 + 1/<i>x</i></span> 在 φ 处导数的绝对值小于 1，具体约为 −0.38。每迭代一次，这一小段就被压得更小，像引力一样被拉向 φ。</p>
       <p>小兄弟附近，导数的绝对值大于 1（约 −2.62），附近的点被推开，每次拉伸两倍多（导数为负所以还会翻转，但对稳定性而言只看绝对值）。数学家把 φ 叫<b>稳定不动点 (Stable Fixed Point)</b>，小兄弟叫<b>不稳定不动点</b>：稍微扰动一下，稳定的会回来，不稳定的会跑开。所以有一条很有用的小结论：不动点是否稳定，看它处导数的绝对值是大于 1 还是小于 1。</p>
       <p>至于小兄弟算不算这个连分数的一个合法值，由你决定。如果把它看成极限过程，除了小兄弟本身，所有初值都收敛到 φ，把两者相提并论就显得奇怪；如果把它看成纯代数对象，像多项式的根那样，可以有多个值。</p>
