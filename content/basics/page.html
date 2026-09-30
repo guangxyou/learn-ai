@@ -73,7 +73,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .ep>summary:hover{background:var(--bg-hover)}
 .ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
 .no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
-.ep.is-seen .no{background:var(--accent);color:#fff}
 .tt{display:flex;flex-direction:column;gap:1px;min-width:0}
 .tt b{font-size:16px;font-weight:650;line-height:1.4}
 .tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
@@ -81,10 +80,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
 .chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
 .len{font:12px var(--mono);color:var(--text-3)}
-.seen{font-size:12px;color:var(--text-3);border:1px dashed var(--line);padding:1px 8px;border-radius:var(--r-full);cursor:pointer;user-select:none;white-space:nowrap}
-.seen:hover{color:var(--text-2);border-color:var(--text-3)}
-.seen[aria-checked="true"]{border-style:solid;border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent-ink)}
-.seen[aria-checked="true"]::before{content:"✓ "}
 @media(max-width:720px){
   .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
   .side{grid-column:2;justify-content:flex-start;padding-top:2px}
@@ -258,7 +253,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <div class="view on" id="view-linalg">
   <div class="intro"><h2>线性代数的本质 · 3Blue1Brown</h2>
 <p>Grant Sanderson 在 2016 年 8 月到 9 月做的系列动画，2019 年和 2021 年各补了一集，一共 17 集、3 小时 6 分。整套只讲一件事：<b>把矩阵看成对空间的变换</b>。第 3 章把这个观点立起来之后，矩阵乘法、行列式、逆矩阵、点积、叉积、基变换、特征值全都换成「空间怎么动」来理解，几乎不讲计算方法。</p>
-<p>每集一张卡，点标题展开。展开后左边是摘要，按视频的段落分节，每节标题前和正文里的绿色时间码都能点，右边的播放器会跳到那一秒；截图点开看大图。卡片右上角的「看过」只记在这台浏览器里。</p>
+<p>每集一张卡，点标题展开。展开后左边是摘要，按视频的段落分节，每节标题前和正文里的绿色时间码都能点，右边的播放器会跳到那一秒；截图点开看大图。</p>
 
 <h3>17 集怎么串起来</h3>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 1040 424" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
@@ -360,12 +355,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </div>
   <div class="eptools"><span>17 集 · 3 小时 6 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
-  <details class="ep" id="ch0" data-ch="0" data-sk="ch0" data-bv="BV1ys411472E" data-p="1">
+  <details class="ep" id="ch0" data-ch="0" data-bv="BV1ys411472E" data-p="1">
   <summary>
     <span class="no">0</span>
     <span class="tt"><b>序言</b><em>Essence of linear algebra preview</em><span class="hook">为什么要做这个系列：学线性代数的人常常会算、不懂几何意义，而几何直觉才是判断用什么工具的依据。</span></span>
-    <span class="side"><span class="chip">B 站 P1 · 00</span><span class="len">5:09</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P1 · 00</span><span class="len">5:09</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -434,12 +428,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch1" data-ch="1" data-sk="ch1" data-bv="BV1ys411472E" data-p="2">
+<details class="ep" id="ch1" data-ch="1" data-bv="BV1ys411472E" data-p="2">
   <summary>
     <span class="no">1</span>
     <span class="tt"><b>向量究竟是什么</b><em>Vectors</em><span class="hook">向量有三种看法：箭头、数字列表、能相加能数乘的任何东西。线性代数的用处在于这几种看法之间来回翻译。</span></span>
-    <span class="side"><span class="chip">B 站 P2 · 01</span><span class="len">9:52</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P2 · 01</span><span class="len">9:52</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -539,12 +532,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch2" data-ch="2" data-sk="ch2" data-bv="BV1ys411472E" data-p="3">
+<details class="ep" id="ch2" data-ch="2" data-bv="BV1ys411472E" data-p="3">
   <summary>
     <span class="no">2</span>
     <span class="tt"><b>线性组合、张成的空间与基</b><em>Linear combinations, span, and basis vectors</em><span class="hook">坐标是缩放基向量的标量；缩放再相加叫线性组合，能到达的全部向量叫张成的空间；多余的向量叫线性相关。</span></span>
-    <span class="side"><span class="chip">B 站 P3 · 02</span><span class="len">9:59</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P3 · 02</span><span class="len">9:59</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -657,12 +649,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch3" data-ch="3" data-sk="ch3" data-bv="BV1ys411472E" data-p="4">
+<details class="ep" id="ch3" data-ch="3" data-bv="BV1ys411472E" data-p="4">
   <summary>
     <span class="no">3</span>
     <span class="tt"><b>矩阵与线性变换</b><em>Linear transformations and matrices</em><span class="hook">整个系列最关键的一集：线性变换只要记住 î 和 ĵ 落在哪，矩阵的两列就是这两个落点，矩阵乘向量就是按坐标把两列缩放再相加。</span></span>
-    <span class="side"><span class="chip">B 站 P4 · 03</span><span class="len">10:58</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P4 · 03</span><span class="len">10:58</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -769,12 +760,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch4" data-ch="4" data-sk="ch4" data-bv="BV1ys411472E" data-p="5">
+<details class="ep" id="ch4" data-ch="4" data-bv="BV1ys411472E" data-p="5">
   <summary>
     <span class="no">4</span>
     <span class="tt"><b>矩阵乘法与线性变换复合</b><em>Matrix multiplication as composition</em><span class="hook">两个矩阵相乘 = 先做右边的变换，再做左边的变换。按这个意思去算，乘法公式、不满足交换律、满足结合律都是顺理成章的事。</span></span>
-    <span class="side"><span class="chip">B 站 P5 · 04</span><span class="len">10:03</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P5 · 04</span><span class="len">10:03</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -900,12 +890,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch5" data-ch="5" data-sk="ch5" data-bv="BV1ys411472E" data-p="6">
+<details class="ep" id="ch5" data-ch="5" data-bv="BV1ys411472E" data-p="6">
   <summary>
     <span class="no">5</span>
     <span class="tt"><b>三维空间中的线性变换</b><em>Three-dimensional linear transformations</em><span class="hook">附注 1：二维的全部结论原样推广到三维，基向量多一个 k̂，矩阵变成 3×3，九个数描述一个变换。</span></span>
-    <span class="side"><span class="chip">B 站 P6 · 附注1</span><span class="len">4:45</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P6 · 附注1</span><span class="len">4:45</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -961,12 +950,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch6" data-ch="6" data-sk="ch6" data-bv="BV1ys411472E" data-p="7">
+<details class="ep" id="ch6" data-ch="6" data-bv="BV1ys411472E" data-p="7">
   <summary>
     <span class="no">6</span>
     <span class="tt"><b>行列式</b><em>The determinant</em><span class="hook">行列式 = 变换把面积（三维是体积）缩放了多少倍；负号表示空间被翻了面；等于 0 表示空间被压到了更低维。</span></span>
-    <span class="side"><span class="chip">B 站 P7 · 05</span><span class="len">10:03</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P7 · 05</span><span class="len">10:03</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1098,12 +1086,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch7" data-ch="7" data-sk="ch7" data-bv="BV1ys411472E" data-p="8">
+<details class="ep" id="ch7" data-ch="7" data-bv="BV1ys411472E" data-p="8">
   <summary>
     <span class="no">7</span>
     <span class="tt"><b>逆矩阵、列空间与零空间</b><em>Inverse matrices, column space and null space</em><span class="hook">把线性方程组看成「哪个向量被变换到 v」，逆矩阵、秩、列空间、零空间都从这一个画面里长出来。</span></span>
-    <span class="side"><span class="chip">B 站 P8 · 06</span><span class="len">12:09</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P8 · 06</span><span class="len">12:09</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1224,12 +1211,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch8" data-ch="8" data-sk="ch8" data-bv="BV1ys411472E" data-p="9">
+<details class="ep" id="ch8" data-ch="8" data-bv="BV1ys411472E" data-p="9">
   <summary>
     <span class="no">8</span>
     <span class="tt"><b>非方阵</b><em>Nonsquare matrices as transformations between dimensions</em><span class="hook">附注 2：m×n 矩阵把 n 维空间映射到 m 维空间。列数 = 输入维数（有几个基向量），行数 = 输出维数（每个落点用几个坐标描述）。</span></span>
-    <span class="side"><span class="chip">B 站 P9 · 附注2</span><span class="len">4:26</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P9 · 附注2</span><span class="len">4:26</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1303,12 +1289,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch9" data-ch="9" data-sk="ch9" data-bv="BV1ys411472E" data-p="10">
+<details class="ep" id="ch9" data-ch="9" data-bv="BV1ys411472E" data-p="10">
   <summary>
     <span class="no">9</span>
     <span class="tt"><b>点积与对偶性</b><em>Dot products and duality</em><span class="hook">点积 = 投影长度 × 被投影到的向量长度。更深一层：和一个向量做点积，就是做一个从二维到数轴的线性变换，这叫对偶性。</span></span>
-    <span class="side"><span class="chip">B 站 P10 · 07</span><span class="len">14:11</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P10 · 07</span><span class="len">14:11</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1432,12 +1417,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch10" data-ch="10" data-sk="ch10" data-bv="BV1ys411472E" data-p="11">
+<details class="ep" id="ch10" data-ch="10" data-bv="BV1ys411472E" data-p="11">
   <summary>
     <span class="no">10</span>
     <span class="tt"><b>叉积的标准介绍</b><em>Cross products</em><span class="hook">叉积的标准介绍：二维里是平行四边形的有向面积（一个数），三维里是一个向量，长度等于面积、方向垂直于两个向量、服从右手定则。</span></span>
-    <span class="side"><span class="chip">B 站 P11 · 08第一部分</span><span class="len">8:53</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P11 · 08第一部分</span><span class="len">8:53</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1520,12 +1504,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch11" data-ch="11" data-sk="ch11" data-bv="BV1ys411472E" data-p="12">
+<details class="ep" id="ch11" data-ch="11" data-bv="BV1ys411472E" data-p="12">
   <summary>
     <span class="no">11</span>
     <span class="tt"><b>以线性变换的眼光看叉积</b><em>Cross products in the light of linear transformations</em><span class="hook">为什么把 î、ĵ、k̂ 填进行列式就能算出叉积：定义一个「v、w 固定，输入 (x, y, z)，输出平行六面体有向体积」的线性变换，它的对偶向量从计算看是那个行列式，从几何看就是叉积。</span></span>
-    <span class="side"><span class="chip">B 站 P12 · 08第二部分</span><span class="len">13:10</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P12 · 08第二部分</span><span class="len">13:10</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1631,12 +1614,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch12" data-ch="12" data-sk="ch12" data-bv="BV1ys411472E" data-p="16">
+<details class="ep" id="ch12" data-ch="12" data-bv="BV1ys411472E" data-p="16">
   <summary>
     <span class="no">12</span>
     <span class="tt"><b>克莱姆法则的几何解释</b><em>Cramer's rule, explained geometrically</em><span class="hook">2019 年补拍：把未知向量的坐标 y 看成它和 î 张成的平行四边形面积，变换后面积乘 det(A)，所以 y = det(把 A 第二列换成 v) / det(A)。</span></span>
-    <span class="side"><span class="chip">B 站 P16 · 12</span><span class="len">12:13</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P16 · 12</span><span class="len">12:13</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1746,12 +1728,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch13" data-ch="13" data-sk="ch13" data-bv="BV1ys411472E" data-p="13">
+<details class="ep" id="ch13" data-ch="13" data-bv="BV1ys411472E" data-p="13">
   <summary>
     <span class="no">13</span>
     <span class="tt"><b>基变换</b><em>Change of basis</em><span class="hook">同一个向量，换一组基就换一组坐标。基变换矩阵 A 把「她的语言」翻译成「我们的语言」；一个变换在她的坐标系里写作 A<sup>−1</sup>MA。</span></span>
-    <span class="side"><span class="chip">B 站 P13 · 09</span><span class="len">12:51</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P13 · 09</span><span class="len">12:51</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -1938,12 +1919,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch14" data-ch="14" data-sk="ch14" data-bv="BV1ys411472E" data-p="14">
+<details class="ep" id="ch14" data-ch="14" data-bv="BV1ys411472E" data-p="14">
   <summary>
     <span class="no">14</span>
     <span class="tt"><b>特征向量与特征值</b><em>Eigenvectors and eigenvalues</em><span class="hook">特征向量 = 变换后仍留在自己张成的直线上的向量，特征值 = 它被拉伸的倍数。求法 det(A − λI) = 0 用到的全是前面几章的东西；用特征向量当基，矩阵就变成对角矩阵。</span></span>
-    <span class="side"><span class="chip">B 站 P14 · 10</span><span class="len">17:15</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P14 · 10</span><span class="len">17:15</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2060,12 +2040,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch15" data-ch="15" data-sk="ch15" data-bv="BV12K4y1A7NA">
+<details class="ep" id="ch15" data-ch="15" data-bv="BV12K4y1A7NA">
   <summary>
     <span class="no">15</span>
     <span class="tt"><b>计算二阶矩阵特征值的妙计</b><em>A quick trick for computing eigenvalues</em><span class="hook">2021 年补的一集：2×2 矩阵的特征值 = m ± √(m<sup>2</sup> − p)，m 是对角元素的平均值，p 是行列式。看着矩阵就能直接写出答案。</span></span>
-    <span class="side"><span class="chip">B 站单独投稿</span><span class="len">13:12</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站单独投稿</span><span class="len">13:12</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2158,12 +2137,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="ch16" data-ch="16" data-sk="ch16" data-bv="BV1ys411472E" data-p="15">
+<details class="ep" id="ch16" data-ch="16" data-bv="BV1ys411472E" data-p="15">
   <summary>
     <span class="no">16</span>
     <span class="tt"><b>抽象向量空间</b><em>Abstract vector spaces</em><span class="hook">最后一集回到「向量是什么」：函数也能相加、数乘，所以也是向量；求导是线性变换，能写成无穷矩阵。数学家的回答是：满足八条公理的任何东西都行。</span></span>
-    <span class="side"><span class="chip">B 站 P15 · 11</span><span class="len">16:46</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P15 · 11</span><span class="len">16:46</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2634,12 +2612,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </div>
   <div class="eptools"><span>12 集 · 3 小时 17 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
-  <details class="ep" id="calc1" data-ch="1" data-sk="calc1" data-bv="BV1qW411N7FU" data-p="1">
+  <details class="ep" id="calc1" data-ch="1" data-bv="BV1qW411N7FU" data-p="1">
   <summary>
     <span class="no">1</span>
     <span class="tt"><b>微积分的本质</b><em>The essence of calculus</em><span class="hook">从圆的面积出发，一口气碰到微积分的三个核心：积分（切细再加起来）、导数（微小变化之比）、以及两者互为逆运算。</span></span>
-    <span class="side"><span class="chip">B 站 P1 · 01</span><span class="len">17:04</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P1 · 01</span><span class="len">17:04</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2748,12 +2725,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc2" data-ch="2" data-sk="calc2" data-bv="BV1qW411N7FU" data-p="2">
+<details class="ep" id="calc2" data-ch="2" data-bv="BV1qW411N7FU" data-p="2">
   <summary>
     <span class="no">2</span>
     <span class="tt"><b>导数的悖论</b><em>The paradox of the derivative</em><span class="hook">「瞬时变化率」自相矛盾：变化需要两个时刻。导数是 dt 趋近于 0 时 ds/dt 趋近的值，最好理解为某一点附近变化率的最佳常数近似。</span></span>
-    <span class="side"><span class="chip">B 站 P2 · 02</span><span class="len">18:38</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P2 · 02</span><span class="len">18:38</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2866,12 +2842,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc3" data-ch="3" data-sk="calc3" data-bv="BV1qW411N7FU" data-p="3">
+<details class="ep" id="calc3" data-ch="3" data-bv="BV1qW411N7FU" data-p="3">
   <summary>
     <span class="no">3</span>
     <span class="tt"><b>用几何来求导</b><em>Derivative formulas through geometry</em><span class="hook">用几何求导：x<sup>2</sup> 是正方形面积，x<sup>3</sup> 是立方体体积，1/x 是面积固定为 1 的水洼，sin 是单位圆上点的高度。推一下 x，看多出来的那部分。</span></span>
-    <span class="side"><span class="chip">B 站 P3 · 03</span><span class="len">18:43</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P3 · 03</span><span class="len">18:43</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -2971,12 +2946,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc4" data-ch="4" data-sk="calc4" data-bv="BV1qW411N7FU" data-p="4">
+<details class="ep" id="calc4" data-ch="4" data-bv="BV1qW411N7FU" data-p="4">
   <summary>
     <span class="no">4</span>
     <span class="tt"><b>直观理解链式法则和乘积法则</b><em>Visualizing the chain rule and product rule</em><span class="hook">函数组合只有三种：相加、相乘、复合。加法把高度叠起来，乘法看成可调盒子的面积（左乘右导加右乘左导），复合看成三条数轴上的连锁推动（链式法则）。</span></span>
-    <span class="side"><span class="chip">B 站 P4 · 04</span><span class="len">16:52</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P4 · 04</span><span class="len">16:52</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3060,12 +3034,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc5" data-ch="5" data-sk="calc5" data-bv="BV1qW411N7FU" data-p="5">
+<details class="ep" id="calc5" data-ch="5" data-bv="BV1qW411N7FU" data-p="5">
   <summary>
     <span class="no">5</span>
     <span class="tt"><b>指数函数求导：e 有什么特别</b><em>What's so special about Euler's number e?</em><span class="hook">所有指数函数的导数都和自身成正比，比例常数是底数的自然对数；e 就是让这个常数恰好为 1 的那个底数。</span></span>
-    <span class="side"><span class="chip">B 站 P5 · 05</span><span class="len">13:50</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P5 · 05</span><span class="len">13:50</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3149,12 +3122,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc6" data-ch="6" data-sk="calc6" data-bv="BV1qW411N7FU" data-p="6">
+<details class="ep" id="calc6" data-ch="6" data-bv="BV1qW411N7FU" data-p="6">
   <summary>
     <span class="no">6</span>
     <span class="tt"><b>隐函数求导是怎么回事</b><em>Implicit differentiation, what's going on here?</em><span class="hook">对 x<sup>2</sup> + y<sup>2</sup> = 5<sup>2</sup> 两边「求导」，意思是：在平面上迈一小步 (dx, dy)，两边的值各变多少；要留在曲线上，两边的变化必须相等。</span></span>
-    <span class="side"><span class="chip">B 站 P6 · 06</span><span class="len">15:33</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P6 · 06</span><span class="len">15:33</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3241,12 +3213,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc7" data-ch="7" data-sk="calc7" data-bv="BV1qW411N7FU" data-p="7">
+<details class="ep" id="calc7" data-ch="7" data-bv="BV1qW411N7FU" data-p="7">
   <summary>
     <span class="no">7</span>
     <span class="tt"><b>极限、洛必达法则与 ε-δ 定义</b><em>Limits, L'Hôpital's rule, and epsilon delta definitions</em><span class="hook">导数的正式定义就是把 dx 换成 h 再取极限；ε-δ 把「趋近」说得严丝合缝；洛必达法则反过来用导数求 0/0 型极限。</span></span>
-    <span class="side"><span class="chip">B 站 P7 · 07</span><span class="len">18:26</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P7 · 07</span><span class="len">18:26</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3316,12 +3287,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc8" data-ch="8" data-sk="calc8" data-bv="BV1qW411N7FU" data-p="8">
+<details class="ep" id="calc8" data-ch="8" data-bv="BV1qW411N7FU" data-p="8">
   <summary>
     <span class="no">8</span>
     <span class="tt"><b>积分与微积分基本定理</b><em>Integration and the fundamental theorem of calculus</em><span class="hook">只看车速表，怎么知道开了多远：把速度当成一段段常数，距离就是细长方形面积之和，极限是曲线下的面积；而面积函数的导数正是速度，所以用原函数两端相减就能算。</span></span>
-    <span class="side"><span class="chip">B 站 P8 · 08</span><span class="len">20:46</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P8 · 08</span><span class="len">20:46</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3424,12 +3394,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc9" data-ch="9" data-sk="calc9" data-bv="BV1qW411N7FU" data-p="9">
+<details class="ep" id="calc9" data-ch="9" data-bv="BV1qW411N7FU" data-p="9">
   <summary>
     <span class="no">9</span>
     <span class="tt"><b>面积和斜率有什么联系</b><em>What does area have to do with slope?</em><span class="hook">连续变量的平均值 = 面积 ÷ 宽度 = 原函数两端连线的斜率。所有切线斜率的平均值，就等于起点到终点的总斜率。</span></span>
-    <span class="side"><span class="chip">B 站 P9 · 09</span><span class="len">12:39</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P9 · 09</span><span class="len">12:39</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3513,12 +3482,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc10" data-ch="10" data-sk="calc10" data-bv="BV1qW411N7FU" data-p="10">
+<details class="ep" id="calc10" data-ch="10" data-bv="BV1qW411N7FU" data-p="10">
   <summary>
     <span class="no">10</span>
     <span class="tt"><b>高阶导数</b><em>Higher order derivatives</em><span class="hook">二阶导数是导数的导数：斜率怎么变。图像上看弯曲方向，运动里就是加速度；三阶导数叫急动度 (jerk)。</span></span>
-    <span class="side"><span class="chip">B 站 P10 · 09脚注</span><span class="len">5:38</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P10 · 09脚注</span><span class="len">5:38</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3579,12 +3547,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc11" data-ch="11" data-sk="calc11" data-bv="BV1qW411N7FU" data-p="11">
+<details class="ep" id="calc11" data-ch="11" data-bv="BV1qW411N7FU" data-p="11">
   <summary>
     <span class="no">11</span>
     <span class="tt"><b>泰勒级数</b><em>Taylor series</em><span class="hook">泰勒多项式把函数在一点的各阶导数信息，翻译成这一点附近的近似：常数项对齐函数值，一次项对齐斜率，二次项对齐弯曲，依此类推，系数要除以 n!。</span></span>
-    <span class="side"><span class="chip">B 站 P11 · 10</span><span class="len">22:19</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站 P11 · 10</span><span class="len">22:19</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3694,12 +3661,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="calc12" data-ch="12" data-sk="calc12" data-bv="BV1XW411P75q">
+<details class="ep" id="calc12" data-ch="12" data-bv="BV1XW411P75q">
   <summary>
     <span class="no">12</span>
     <span class="tt"><b>导数的另一种可视化</b><em>The other way to visualize derivatives</em><span class="hook">另一种看导数的方式：把函数看成数轴到数轴的变换，导数是某点附近被拉伸或压缩的倍数。|导数| < 1 的不动点吸引周围的点，> 1 的排斥，这解释了为什么反复迭代 1 + 1/x 总落到黄金比例。</span></span>
-    <span class="side"><span class="chip">B 站单独投稿</span><span class="len">16:23</span>
-      <span class="seen" role="checkbox" aria-checked="false" tabindex="0" title="标记看过">看过</span></span>
+    <span class="side"><span class="chip">B 站单独投稿</span><span class="len">16:23</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
@@ -3909,21 +3875,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       history.replaceState(null,'',b.dataset.v==='linalg'?location.pathname+location.search:'#'+b.dataset.v);
     });
   });
-
-  /* ── 看过：只记在这台浏览器里，读写都包 try，隐私模式下拿不到就当没有 ── */
-  var KEY='basic-linalg-seen', seen={};
-  try{seen=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){}
-  // 只有线代一个系列时按章节号存（{"7":true}），现在按 ch7 / calc7 区分系列，旧记录换成 ch 前缀
-  Object.keys(seen).forEach(function(k){if(/^\d+$/.test(k)){if(seen[k])seen['ch'+k]=true;delete seen[k];}});
-  function paint(ep){var on=!!seen[ep.dataset.sk];ep.classList.toggle('is-seen',on);
-    var s=ep.querySelector('.seen');if(s)s.setAttribute('aria-checked',on);}
-  document.querySelectorAll('.ep').forEach(paint);
-  function toggleSeen(el){var ep=el.closest('.ep');seen[ep.dataset.sk]=!seen[ep.dataset.sk];
-    try{localStorage.setItem(KEY,JSON.stringify(seen));}catch(e){}paint(ep);}
-  document.addEventListener('click',function(e){var s=e.target.closest('.seen');
-    if(s){e.preventDefault();e.stopPropagation();toggleSeen(s);}},true);
-  document.addEventListener('keydown',function(e){var s=e.target.closest&&e.target.closest('.seen');
-    if(s&&(e.key===' '||e.key==='Enter')){e.preventDefault();toggleSeen(s);}});
 
   /* ── 全部展开 / 收起 ── */
   document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
