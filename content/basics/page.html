@@ -1380,8 +1380,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <figcaption><button class="ts" type="button" data-t="470">7:50</button>斜放的数轴，1 的位置是单位向量 û</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/dot-products-8m05s0.jpg" alt="投影到这条数轴上：等距的点仍等距，是线性变换" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="485">8:05</button>投影到这条数轴上：等距的点仍等距，是线性变换</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/dot-products-9m05s0.jpg" alt="对称轴两边：î 投影到 û 上，和 û 投影到 x 轴上是一回事" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="545">9:05</button>对称轴两边：î 投影到 û 上，和 û 投影到 x 轴上是一回事</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/dot-products-9m45s0.jpg" alt="ĵ 落在 uy，同样的对称性" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="585">9:45</button>ĵ 落在 u_y，同样的对称性</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/dot-products-10m15s0.jpg" alt="投影变换 [uₓ uy] 乘 (x, y)" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="615">10:15</button>投影变换 [u<sub><i>x</i></sub> u_y] 乘 (x, y)</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="585">9:45</button>ĵ 落在 u<sub>y</sub>，同样的对称性</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/dot-products-10m15s0.jpg" alt="投影变换 [uₓ uy] 乘 (x, y)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="615">10:15</button>投影变换 [u<sub><i>x</i></sub> u<sub>y</sub>] 乘 (x, y)</figcaption></figure></div>
       
       
       
@@ -2114,7 +2114,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/quick-eigen-6m55s0.jpg" alt="三个泡利矩阵" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="415">6:55</button>三个泡利矩阵</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/quick-eigen-7m40s0.jpg" alt="平均值都是 0，乘积都是 −1：特征值 ±1" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="460">7:40</button>平均值都是 0，乘积都是 −1：特征值 ±1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/quick-eigen-10m15s0.jpg" alt="线性组合 aσₓ + bσy + cσz：m = 0，p = −1" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="616">10:16</button>线性组合 aσ<sub><i>x</i></sub> + bσ_y + cσ_z：m = 0，p = −1</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="616">10:16</button>线性组合 aσ<sub><i>x</i></sub> + bσ<sub>y</sub> + cσ<sub>z</sub>：m = 0，p = −1</figcaption></figure></div>
       
       
       <details class="pz"><summary><span class="lbl">思考题</span>验证 <span class="m"><i>a</i><i>σ</i><sub><i>x</i></sub> + <i>b</i><i>σ</i><sub><i>y</i></sub> + <i>c</i><i>σ</i><sub><i>z</i></sub></span> 的行列式是 −1（已知 <span class="m"><i>a</i><sup>2</sup> + <i>b</i><sup>2</sup> + <i>c</i><sup>2</sup> = 1</span>）。</summary><p>这个矩阵是 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span><i>c</i></span><span><i>a</i>−<i>b</i><i>i</i></span><span><i>a</i>+<i>b</i><i>i</i></span><span>−<i>c</i></span></span>。行列式 <span class="m">= −<i>c</i><sup>2</sup> − (<i>a</i> − <i>b</i><i>i</i>)(<i>a</i> + <i>b</i><i>i</i>) = −<i>c</i><sup>2</sup> − (<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>) = −(<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup> + <i>c</i><sup>2</sup>) = −1</span>。对角元素平均值为 0，所以特征值是 <span class="m">0 ± √(0 + 1) = ±1</span>。</p></details>
@@ -2322,7 +2322,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <h2><span class="n">3</span><span>矩阵乘向量：线性层</span></h2>
     <p class="chs">对应 <a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch8">第 8 章 · 非方阵</a></p>
     <p>神经网络里最常见的一层是<b>线性层 (Linear Layer)</b>，也叫全连接层 (Fully-Connected Layer)：<span class="m"><i>y</i> = <i>W</i><i>x</i> + <i>b</i></span>。<span class="m"><i>W</i></span> 的形状是「输出维数 × 输入维数」，一般不是方阵，按第 8 章的说法，它把 <span class="m"><i>d</i><sub>in</sub></span> 维空间映到 <span class="m"><i>d</i><sub>out</sub></span> 维空间。按第 3 章，<span class="m"><i>W</i><i>x</i></span> 就是用 <span class="m"><i>x</i></span> 的各个分量去缩放 <span class="m"><i>W</i></span> 的各列再相加；每一列是「输入的第 j 个分量」对输出的贡献方向。</p>
-    <p>实际训练时一次输入一批数据。把 B 个输入向量摞成一个 B × <span class="m"><i>d</i><sub>in</sub></span> 的矩阵 <span class="m"><i>X</i></span>，整批的输出就是 <span class="m"><i>X</i><i>W</i><sup>T</sup> + <i>b</i></span>，一次矩阵乘法算完。PyTorch 的 <code>nn.Linear</code> 就是这样存的：权重形状是 (out_features, in_features)，前向计算 <span class="m"><i>x</i><i>W</i><sup>T</sup> + <i>b</i></span>。</p>
+    <p>实际训练时一次输入一批数据。把 B 个输入向量摞成一个 B × <span class="m"><i>d</i><sub>in</sub></span> 的矩阵 <span class="m"><i>X</i></span>，整批的输出就是 <span class="m"><i>X</i><i>W</i><sup>T</sup> + <i>b</i></span>，一次矩阵乘法算完。PyTorch 的 <code>nn.Linear</code> 就是这样存的：权重形状是 (<code>out_features</code>, <code>in_features</code>)，前向计算 <span class="m"><i>x</i><i>W</i><sup>T</sup> + <i>b</i></span>。</p>
     <p>Transformer 每一层里的前馈网络 (Feed-Forward Network) 是两个线性层夹一个非线性函数：先从 <span class="m"><i>d</i><sub>model</sub></span> 升到 <span class="m"><i>d</i><sub>ff</sub></span>，再降回 <span class="m"><i>d</i><sub>model</sub></span>。原始 Transformer 的 base 模型是 512 维升到 2048 维再降回 512 维。</p>
     <p>大模型的参数几乎全在这些矩阵里。GPT-3 每一层有注意力的 4 个 <span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub>model</sub></span> 矩阵，加前馈网络的两个 <span class="m"><i>d</i><sub>model</sub> × 4<i>d</i><sub>model</sub></span> 矩阵，一共 <span class="m">12 <i>d</i><sub>model</sub><sup>2</sup></span> ≈ 18.1 亿个参数；96 层约 1739 亿，再加 6.18 亿的嵌入矩阵，就是论文里的 1750 亿。</p>
     
@@ -2380,7 +2380,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <text x="0" y="348" class="xs">绿色是要学的权重，灰色是输入和输出，橙色是 n × n 的注意力矩阵。输出第 i 行 = A 第 i 行的权重对 V 各行做线性组合。</text>
 
 </svg>
-<figcaption>一个头里各矩阵的形状。维度故意取成互不相同的数：n = 4 个 token，d_model = 6，d_k = 2，d_v = 3。</figcaption></figure>
+<figcaption>一个头里各矩阵的形状。维度故意取成互不相同的数：n = 4 个 token，d<sub>model</sub> = 6，d<sub>k</sub> = 2，d<sub>v</sub> = 3。</figcaption></figure>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>一个查询对三个键：softmax 之后做线性组合</p>
       <p>某个查询和三个键的分数（已除过 <span class="m">√<i>d</i><sub><i>k</i></sub></span>）是 <span class="m">(2, 1, 0)</span>。softmax：<span class="m"><i>e</i><sup>2</sup> ≈ 7.389</span>、<span class="m"><i>e</i><sup>1</sup> ≈ 2.718</span>、<span class="m"><i>e</i><sup>0</sup> = 1</span>，和为 11.107，权重 ≈ <span class="m">(0.665, 0.245, 0.090)</span>。</p>
       <p>三个值向量是 <span class="m">(1, 0)</span>、<span class="m">(0, 1)</span>、<span class="m">(1, 1)</span>，输出 <span class="m">= 0.665·(1, 0) + 0.245·(0, 1) + 0.090·(1, 1) ≈ (0.755, 0.335)</span>。分数最高的那个键对应的值向量占了三分之二的份量。</p></div>
@@ -2464,7 +2464,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="aisec" id="ai-rope">
     <h2><span class="n">8</span><span>旋转矩阵：RoPE 位置编码</span></h2>
     <p class="chs">对应 <a class="chref" href="#ch3">第 3 章 · 矩阵与线性变换</a><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></p>
-    <p>注意力本身不知道 token 的顺序，要另外加位置信息。<b>旋转位置编码 (Rotary Position Embedding, RoPE)</b> 的做法是：把查询和键向量的维度两两配对，每一对看成一个二维向量，位置 m 上的向量就旋转 <span class="m"><i>m</i><i>θ</i></span> 角。用的就是第 3 章那个旋转矩阵 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>cos <i>m</i><i>θ</i></span><span>−sin <i>m</i><i>θ</i></span><span>sin <i>m</i><i>θ</i></span><span>cos <i>m</i><i>θ</i></span></span>。不同的维度对用不同的频率，第 i 对是 <span class="m"><i>θ</i><sub><i>i</i></sub> = 10000^(−2(<i>i</i>−1)/<i>d</i>)</span>，<span class="m"><i>i</i> = 1, …, <i>d</i>/2</span>。</p>
+    <p>注意力本身不知道 token 的顺序，要另外加位置信息。<b>旋转位置编码 (Rotary Position Embedding, RoPE)</b> 的做法是：把查询和键向量的维度两两配对，每一对看成一个二维向量，位置 m 上的向量就旋转 <span class="m"><i>m</i><i>θ</i></span> 角。用的就是第 3 章那个旋转矩阵 <span class="mx" style="grid-template-columns:repeat(2,auto)"><span>cos <i>m</i><i>θ</i></span><span>−sin <i>m</i><i>θ</i></span><span>sin <i>m</i><i>θ</i></span><span>cos <i>m</i><i>θ</i></span></span>。不同的维度对用不同的频率，第 i 对是 <span class="m"><i>θ</i><sub><i>i</i></sub> = 10000<sup>−2(<i>i</i>−1)/<i>d</i></sup></span>，<span class="m"><i>i</i> = 1, …, <i>d</i>/2</span>。</p>
     <p>好处在点积上。位置 m 的查询旋转 <span class="m"><i>m</i><i>θ</i></span>、位置 n 的键旋转 <span class="m"><i>n</i><i>θ</i></span>，两者的点积等于 <span class="m"><i>q</i><sup>T</sup><i>R</i>(<i>m</i><i>θ</i>)<sup>T</sup><i>R</i>(<i>n</i><i>θ</i>)<i>k</i> = <i>q</i><sup>T</sup><i>R</i>((<i>n</i> − <i>m</i>)<i>θ</i>)<i>k</i></span>，只和相对距离 <span class="m"><i>n</i> − <i>m</i></span> 有关。旋转矩阵是第 12 章说的正交变换，不改变长度，所以位置信息加进去了，向量的「大小」却没变。LLaMA 等主流开源模型都用 RoPE。</p>
     
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>同样的相对距离，点积相同</p>
@@ -2559,7 +2559,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <a href="https://kexue.fm/archives/1770" target="_blank" rel="noreferrer">3：行列式的点滴 ↗</a><time>2012-11-04</time>
       <p>行列式是平行多面体的体积。作者后来说这篇有不严谨处，修订版是第 5 篇。</p><span class="xref"><a class="chref" href="#ch6">第 6 章 · 行列式</a></span></li><li>
       <a href="https://kexue.fm/archives/1777" target="_blank" rel="noreferrer">4：相似矩阵的那些事儿 ↗</a><time>2012-11-11</time>
-      <p><span class="m"><i>P</i>^{−1}<i>A</i><i>P</i></span> 是同一个变换在坐标系 <span class="m"><i>P</i></span> 下的测量结果，和第 13 章的「换位思考」一样；并用体积解释为什么相似矩阵的行列式相同。</p><span class="xref"><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></li><li>
+      <p><span class="m"><i>P</i><sup>−1</sup><i>A</i><i>P</i></span> 是同一个变换在坐标系 <span class="m"><i>P</i></span> 下的测量结果，和第 13 章的「换位思考」一样；并用体积解释为什么相似矩阵的行列式相同。</p><span class="xref"><a class="chref" href="#ch13">第 13 章 · 基变换</a></span></li><li>
       <a href="https://kexue.fm/archives/2208" target="_blank" rel="noreferrer">5：体积 = 行列式 ↗</a><time>2013-12-25</time>
       <p>第 3 篇的修订版，把「行列式是体积」讲严格。</p><span class="xref"><a class="chref" href="#ch6">第 6 章 · 行列式</a></span></li><li>
       <a href="https://kexue.fm/archives/2757" target="_blank" rel="noreferrer">6：为什么只有方阵有行列式？ ↗</a><time>2014-07-15</time>
@@ -2586,7 +2586,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <a href="https://kexue.fm/archives/8453" target="_blank" rel="noreferrer">从一个单位向量变换到另一个单位向量的正交矩阵 ↗</a><time>2021-06-05</time>
       <p>用旋转或镜面反射（Householder 变换）把 a 转到 b。DeltaNet 的转移矩阵正是 Householder 形式。</p><span class="xref"><a class="chref" href="#ch12">第 12 章 · 克莱姆法则的几何解释</a></span></li><li>
       <a href="https://kexue.fm/archives/8620" target="_blank" rel="noreferrer">浅谈 Transformer 的初始化、参数化与标准化 ↗</a><time>2021-08-17</time>
-      <p>他训练时忘了除以 √d 导致不收敛，借此把「为什么要除以 √d_k」和初始化、LayerNorm 放在一起讲。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a><a class="chref ai" href="#ai-norm">投影</a></span></li><li>
+      <p>他训练时忘了除以 √d 导致不收敛，借此把「为什么要除以 √d<sub>k</sub>」和初始化、LayerNorm 放在一起讲。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a><a class="chref ai" href="#ai-norm">投影</a></span></li><li>
       <a href="https://kexue.fm/archives/10366" target="_blank" rel="noreferrer">低秩近似之路（五篇） ↗</a><time>2024-09-15</time>
       <p>从伪逆、SVD（Eckart–Young）讲到 CR、ID、CUR 几种带结构的低秩近似，第一篇开头就以 LoRA 为引子。</p><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a><a class="chref ai" href="#ai-rank">秩</a></span></li><li>
       <a href="https://kexue.fm/archives/10592" target="_blank" rel="noreferrer">Muon 优化器赏析：从向量到矩阵的本质跨越 ↗</a><time>2024-12-10</time>
@@ -2596,7 +2596,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <a href="https://kexue.fm/archives/10907" target="_blank" rel="noreferrer">Transformer 升级之路：20、21、MLA 好在哪里？ ↗</a><time>2025-05-04</time>
       <p>从 KV 缓存和低秩投影的角度分析 DeepSeek 的 MLA（下篇 2025-07-10）。</p><span class="xref"><a class="chref ai" href="#ai-rank">秩</a></span></li><li>
       <a href="https://kexue.fm/archives/11033" target="_blank" rel="noreferrer">线性注意力简史：从模仿、创新到反哺 ↗</a><time>2025-06-20</time>
-      <p>从线性注意力讲到 DeltaNet、Gated DeltaNet，并行形式里出现 <span class="m">(<i>I</i> + <i>K</i><i>K</i><sup>T</sup> ⊙ <i>M</i><sup>−</sup>)^{−1}</span> 这个逆矩阵。可以和杨松琳那期播客对照着看。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a></span></li><li>
+      <p>从线性注意力讲到 DeltaNet、Gated DeltaNet，并行形式里出现 <span class="m">(<i>I</i> + <i>K</i><i>K</i><sup>T</sup> ⊙ <i>M</i><sup>−</sup>)<sup>−1</sup></span> 这个逆矩阵。可以和杨松琳那期播客对照着看。</p><span class="xref"><a class="chref ai" href="#ai-attention">注意力</a></span></li><li>
       <a href="https://kexue.fm/archives/11072" target="_blank" rel="noreferrer">「对角 + 低秩」三角阵的高效求逆方法 ↗</a><time>2025-07-01</time>
       <p>专门讲上面那个逆矩阵怎么算得快。</p><span class="xref"><a class="chref" href="#ch7">第 7 章 · 逆矩阵、列空间与零空间</a></span></li></ol>
     
@@ -2924,7 +2924,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <figcaption><button class="ts" type="button" data-t="710">11:50</button>宽增加 dx，高必须减少 d(1/x)，增减的面积相抵</figcaption></figure></div>
       
       
-      <details class="pz"><summary><span class="lbl">思考题</span><span class="m"><i>d</i>(1/<i>x</i>)/<i>d</i><i>x</i></span> 是多少？和直接对 <span class="m"><i>x</i><sup>−1</sup></span> 用幂法则比较。再试试 <span class="m">√<i>x</i></span> 的导数。</summary><p>右边增加的面积约 <span class="m">(1/<i>x</i>)·<i>d</i><i>x</i></span>，顶上减少的面积约 <span class="m"><i>x</i>·|<i>d</i>(1/<i>x</i>)|</span>。两者相等，所以 <span class="m"><i>d</i>(1/<i>x</i>) = −<i>d</i><i>x</i>/<i>x</i><sup>2</sup></span>，导数是 <span class="m">−1/<i>x</i><sup>2</sup></span>，和幂法则给出的 <span class="m">−1·<i>x</i><sup>−2</sup></span> 一样。<span class="m">√<i>x</i></span> 可以看成面积为 <span class="m"><i>x</i></span> 的正方形的边长 <span class="m"><i>s</i></span>：面积增加 <span class="m"><i>d</i><i>x</i></span> 时，多出的两条细长方形面积约 <span class="m">2<i>s</i> · <i>d</i><i>s</i></span>，所以 <span class="m"><i>d</i><i>s</i> = <i>d</i><i>x</i>/(2<i>s</i>)</span>，导数是 <span class="m">1/(2√<i>x</i>)</span>，也等于幂法则给出的 <span class="m">(1/2)·<i>x</i>^(−1/2)</span>。</p></details>
+      <details class="pz"><summary><span class="lbl">思考题</span><span class="m"><i>d</i>(1/<i>x</i>)/<i>d</i><i>x</i></span> 是多少？和直接对 <span class="m"><i>x</i><sup>−1</sup></span> 用幂法则比较。再试试 <span class="m">√<i>x</i></span> 的导数。</summary><p>右边增加的面积约 <span class="m">(1/<i>x</i>)·<i>d</i><i>x</i></span>，顶上减少的面积约 <span class="m"><i>x</i>·|<i>d</i>(1/<i>x</i>)|</span>。两者相等，所以 <span class="m"><i>d</i>(1/<i>x</i>) = −<i>d</i><i>x</i>/<i>x</i><sup>2</sup></span>，导数是 <span class="m">−1/<i>x</i><sup>2</sup></span>，和幂法则给出的 <span class="m">−1·<i>x</i><sup>−2</sup></span> 一样。<span class="m">√<i>x</i></span> 可以看成面积为 <span class="m"><i>x</i></span> 的正方形的边长 <span class="m"><i>s</i></span>：面积增加 <span class="m"><i>d</i><i>x</i></span> 时，多出的两条细长方形面积约 <span class="m">2<i>s</i> · <i>d</i><i>s</i></span>，所以 <span class="m"><i>d</i><i>s</i> = <i>d</i><i>x</i>/(2<i>s</i>)</span>，导数是 <span class="m">1/(2√<i>x</i>)</span>，也等于幂法则给出的 <span class="m">(1/2)·<i>x</i><sup>−1/2</sup></span>。</p></details>
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="756">12:36</button><span>sin θ：单位圆上的一个小三角形</span></h4>
@@ -3049,14 +3049,14 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集讲指数函数的导数，以及为什么 <span class="m"><i>e</i>^<i>x</i></span> 最重要。作者用每天翻倍的一群 π 生物的总质量 <span class="m">2^<i>t</i></span> 引路：按整天看，增长率似乎等于自身；但导数要看越来越短的时间，结果是「和自身成正比」，比例常数约 0.6931。换底数，常数也跟着变，而且有规律。存在一个底数让常数恰好为 1，那就是 <span class="m"><i>e</i></span>。借助链式法则，所有常数都解释清楚了：它们是底数的自然对数。最后说明为什么实际中都写成 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span>：常数 <span class="m"><i>c</i></span> 有直接的含义。</p>
+      <p class="lede">这一集讲指数函数的导数，以及为什么 <span class="m"><i>e</i><sup><i>x</i></sup></span> 最重要。作者用每天翻倍的一群 π 生物的总质量 <span class="m">2<sup><i>t</i></sup></span> 引路：按整天看，增长率似乎等于自身；但导数要看越来越短的时间，结果是「和自身成正比」，比例常数约 0.6931。换底数，常数也跟着变，而且有规律。存在一个底数让常数恰好为 1，那就是 <span class="m"><i>e</i></span>。借助链式法则，所有常数都解释清楚了：它们是底数的自然对数。最后说明为什么实际中都写成 <span class="m"><i>e</i><sup><i>c</i><i>t</i></sup></span>：常数 <span class="m"><i>c</i></span> 有直接的含义。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=5" target="_blank" rel="noreferrer">B 站 P5：05 - 指数函数求导 ↗</a>
         <a href="https://www.youtube.com/watch?v=m2MIpDrF7Es" target="_blank" rel="noreferrer">YouTube 第 5 章 · 2017-05-02 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="32">0:32</button><span>按整天看：增长率等于自身</span></h4>
-      <p>看 <span class="m">2^<i>t</i></span>，把 <span class="m"><i>t</i></span> 当成天数，输出当成一群每天翻一倍的 π 生物的总质量（用质量而不是个数，是为了让函数连续）。<span class="m"><i>t</i> = 0</span> 时质量是 1，第 1 天是 2，第 2 天是 4，每天翻倍。</p>
-      <p>先看一整天的变化率：第 3 天到第 4 天从 8 增到 16，一天增加 8；第 4 到第 5 天从 16 到 32，一天增加 16。每次一天的增量都等于这一天开始时的质量。于是很想说 <span class="m">2^<i>t</i></span> 的导数就是它自己。</p>
-      <p>方向是对的，但不完全对。这里比的是 <span class="m">2^(<i>t</i>+1)</span> 和 <span class="m">2^<i>t</i></span>，隔了一整天；导数要问的是十分之一天、百分之一天、十亿分之一天里的变化，也就是 <span class="m">(2^(<i>t</i>+<i>d</i><i>t</i>) − 2^<i>t</i>) / <i>d</i><i>t</i></span> 在 <span class="m"><i>d</i><i>t</i> → 0</span> 时的值。</p>
+      <p>看 <span class="m">2<sup><i>t</i></sup></span>，把 <span class="m"><i>t</i></span> 当成天数，输出当成一群每天翻一倍的 π 生物的总质量（用质量而不是个数，是为了让函数连续）。<span class="m"><i>t</i> = 0</span> 时质量是 1，第 1 天是 2，第 2 天是 4，每天翻倍。</p>
+      <p>先看一整天的变化率：第 3 天到第 4 天从 8 增到 16，一天增加 8；第 4 到第 5 天从 16 到 32，一天增加 16。每次一天的增量都等于这一天开始时的质量。于是很想说 <span class="m">2<sup><i>t</i></sup></span> 的导数就是它自己。</p>
+      <p>方向是对的，但不完全对。这里比的是 <span class="m">2<sup><i>t</i>+1</sup></span> 和 <span class="m">2<sup><i>t</i></sup></span>，隔了一整天；导数要问的是十分之一天、百分之一天、十亿分之一天里的变化，也就是 <span class="m">(2<sup><i>t</i>+<i>d</i><i>t</i></sup> − 2<sup><i>t</i></sup>) / <i>d</i><i>t</i></span> 在 <span class="m"><i>d</i><i>t</i> → 0</span> 时的值。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-2m05s0.jpg" alt="第 4 天到第 5 天，质量从 16 涨到 32" loading="lazy" decoding="async">
@@ -3068,14 +3068,14 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="248">4:08</button><span>和自身成正比，常数是 0.6931</span></h4>
-      <p>作者说这部分他找不到一张能直接「看出」答案的图，要靠数值规律。关键是指数最重要的性质：<span class="m">2^(<i>t</i>+<i>d</i><i>t</i>) = 2^<i>t</i> · 2^<i>d</i><i>t</i></span>，指数上的加法变成乘法，这让「时间上的小步」这种加法概念和「比率」这种乘法概念联系起来。</p>
-      <p>于是可以把 <span class="m">2^<i>t</i></span> 提出来：导数等于 <span class="m">2^<i>t</i> × (2^<i>d</i><i>t</i> − 1)/<i>d</i><i>t</i></span> 的极限。重要的是，右边含 <span class="m"><i>d</i><i>t</i></span> 的部分和 <span class="m"><i>t</i></span> 完全无关。拿计算器代 <span class="m"><i>d</i><i>t</i> = 0.001</span> 这样的小数，<span class="m">(2^<i>d</i><i>t</i> − 1)/<i>d</i><i>t</i></span> 趋近于一个固定的数，约 0.6931。所以 <span class="m">2^<i>t</i></span> 的导数就是它自己乘一个常数 0.6931：在很短的时间尺度上，变化率不等于自身，而是和自身成正比。</p>
+      <p>作者说这部分他找不到一张能直接「看出」答案的图，要靠数值规律。关键是指数最重要的性质：<span class="m">2<sup><i>t</i>+<i>d</i><i>t</i></sup> = 2<sup><i>t</i></sup> · 2<sup><i>d</i><i>t</i></sup></span>，指数上的加法变成乘法，这让「时间上的小步」这种加法概念和「比率」这种乘法概念联系起来。</p>
+      <p>于是可以把 <span class="m">2<sup><i>t</i></sup></span> 提出来：导数等于 <span class="m">2<sup><i>t</i></sup> × (2<sup><i>d</i><i>t</i></sup> − 1)/<i>d</i><i>t</i></span> 的极限。重要的是，右边含 <span class="m"><i>d</i><i>t</i></span> 的部分和 <span class="m"><i>t</i></span> 完全无关。拿计算器代 <span class="m"><i>d</i><i>t</i> = 0.001</span> 这样的小数，<span class="m">(2<sup><i>d</i><i>t</i></sup> − 1)/<i>d</i><i>t</i></span> 趋近于一个固定的数，约 0.6931。所以 <span class="m">2<sup><i>t</i></sup></span> 的导数就是它自己乘一个常数 0.6931：在很短的时间尺度上，变化率不等于自身，而是和自身成正比。</p>
       <p>底数换成 3，常数约 1.0986；换成 8，约 2.079，而且正好是 2 的那个常数的 3 倍。这些常数显然有规律：2 和 0.6931 有什么关系？8 和 2.079 呢？</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-4m45s0.jpg" alt="2^(t+dt) = 2ᵗ · 2^dt，把 2ᵗ 提出来" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="285">4:45</button>2^(t+dt) = 2<sup><i>t</i></sup> · 2^dt，把 2<sup><i>t</i></sup> 提出来</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-5m30s0.jpg" alt="dt 越来越小，(2^dt − 1)/dt 趋近于 0.6931…" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="330">5:30</button>dt 越来越小，(2^dt − 1)/dt 趋近于 0.6931…</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-7m00s0.jpg" alt="底数 8：常数约 2.0794，是 2 的那个的 3 倍" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="285">4:45</button>2<sup>t+dt</sup> = 2<sup><i>t</i></sup> · 2<sup>dt</sup>，把 2<sup><i>t</i></sup> 提出来</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-5m30s0.jpg" alt="dt 越来越小，(2^dt − 1)/dt 趋近于 0.6931…" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="330">5:30</button>dt 越来越小，(2<sup>dt</sup> − 1)/dt 趋近于 0.6931…</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-7m00s0.jpg" alt="底数 8：常数约 2.0794，是 2 的那个的 3 倍" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="420">7:00</button>底数 8：常数约 2.0794，是 2 的那个的 3 倍</figcaption></figure></div>
       
       
@@ -3084,7 +3084,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="456">7:36</button><span>e：让比例常数恰好为 1 的底数</span></h4>
       <p>换个问法：有没有一个底数，让比例常数恰好是 1，也就是导数就等于函数本身？有，就是 <span class="m"><i>e</i> ≈ 2.71828</span>。某种意义上这就是 <span class="m"><i>e</i></span> 的定义，和 π 被定义成周长与直径之比是一个道理。</p>
-      <p>所有指数函数都和自己的导数成正比，只有 <span class="m"><i>e</i></span> 让比例常数为 1。几何上，<span class="m"><i>e</i>^<i>t</i></span> 的图像上每一点的切线斜率，都等于那一点的高度。</p>
+      <p>所有指数函数都和自己的导数成正比，只有 <span class="m"><i>e</i></span> 让比例常数为 1。几何上，<span class="m"><i>e</i><sup><i>t</i></sup></span> 的图像上每一点的切线斜率，都等于那一点的高度。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-8m05s0.jpg" alt="底数取 e，比例常数恰好是 1" loading="lazy" decoding="async">
@@ -3096,12 +3096,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="539">8:59</button><span>用链式法则解开神秘常数</span></h4>
-      <p><span class="m"><i>e</i>^(3<i>t</i>)</span> 的导数：外层函数的导数就是它自己，再乘内层 <span class="m">3<i>t</i></span> 的导数 3。也可以用上一集的直觉：<span class="m"><i>t</i></span> 推一点点，<span class="m">3<i>t</i></span> 变化 3 倍，再传到 <span class="m"><i>e</i>^(3<i>t</i>)</span>。结论是 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 的导数等于 <span class="m"><i>c</i> · <i>e</i>^(<i>c</i><i>t</i>)</span>。</p>
-      <p>剩下是代数：2 可以写成 <span class="m"><i>e</i>^(<i>l</i><i>n</i> 2)</span>，这就是自然对数的定义，问的是「<span class="m"><i>e</i></span> 的多少次方等于 2」。于是 <span class="m">2^<i>t</i> = <i>e</i>^(<i>l</i><i>n</i>(2)·<i>t</i>)</span>，它的导数和自身成正比，常数是 <span class="m"><i>l</i><i>n</i> 2</span>。计算器上 <span class="m"><i>l</i><i>n</i> 2 ≈ 0.6931</span>，正是前面那个神秘常数。其他底数一样：常数就是底数的自然对数，所以 8 的常数是 <span class="m"><i>l</i><i>n</i> 8 = 3 <i>l</i><i>n</i> 2</span>。</p>
+      <p><span class="m"><i>e</i><sup>3<i>t</i></sup></span> 的导数：外层函数的导数就是它自己，再乘内层 <span class="m">3<i>t</i></span> 的导数 3。也可以用上一集的直觉：<span class="m"><i>t</i></span> 推一点点，<span class="m">3<i>t</i></span> 变化 3 倍，再传到 <span class="m"><i>e</i><sup>3<i>t</i></sup></span>。结论是 <span class="m"><i>e</i><sup><i>c</i><i>t</i></sup></span> 的导数等于 <span class="m"><i>c</i> · <i>e</i><sup><i>c</i><i>t</i></sup></span>。</p>
+      <p>剩下是代数：2 可以写成 <span class="m"><i>e</i><sup>ln 2</sup></span>，这就是自然对数的定义，问的是「<span class="m"><i>e</i></span> 的多少次方等于 2」。于是 <span class="m">2<sup><i>t</i></sup> = <i>e</i><sup>ln(2)·<i>t</i></sup></span>，它的导数和自身成正比，常数是 <span class="m">ln 2</span>。计算器上 <span class="m">ln 2 ≈ 0.6931</span>，正是前面那个神秘常数。其他底数一样：常数就是底数的自然对数，所以 8 的常数是 <span class="m">ln 8 = 3 ln 2</span>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-10m25s0.jpg" alt="e^(ct) 的导数是 c·e^(ct)；2ᵗ = e^(ln(2)t)" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="625">10:25</button>e^(ct) 的导数是 c·e^(ct)；2<sup><i>t</i></sup> = e^(ln(2)t)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-10m40s0.jpg" alt="所以 2ᵗ 的导数是 ln(2)·2ᵗ，ln 2 = 0.6931…" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="625">10:25</button>e<sup>ct</sup> 的导数是 c·e<sup>ct</sup>；2<sup><i>t</i></sup> = e<sup>ln(2)t</sup></figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/eulers-number-10m40s0.jpg" alt="所以 2ᵗ 的导数是 ln(2)·2ᵗ，ln 2 = 0.6931…" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="640">10:40</button>所以 2<sup><i>t</i></sup> 的导数是 ln(2)·2<sup><i>t</i></sup>，ln 2 = 0.6931…</figcaption></figure></div>
       
       
@@ -3109,23 +3109,23 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="668">11:08</button><span>为什么都写成 e 的幂</span></h4>
-      <p>应用里几乎不写「某个底数的 <span class="m"><i>t</i></span> 次方」，而写成 <span class="m"><i>e</i></span> 的「常数乘 <span class="m"><i>t</i></span>」次方。两种写法等价，任何 <span class="m">2^<i>t</i></span>、<span class="m">3^<i>t</i></span> 都能改写，<span class="m"><i>e</i></span> 对这个函数本身并不根本，这是一个写法上的选择。</p>
-      <p>选择 <span class="m"><i>e</i></span> 的好处是让指数里的常数有了直接的含义。很多现象的变化率和变化的量本身成正比：没有资源限制时，种群的增长率正比于种群大小；热水放在凉房间里，降温速度正比于水和室温的温差，换句话说温差的变化率正比于温差本身；投资的增长率正比于当时的本金。这类变量随时间的函数都是指数函数，写成 <span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 时，<span class="m"><i>c</i></span> 正好就是「变化率 / 变量本身」这个比例常数。</p>
+      <p>应用里几乎不写「某个底数的 <span class="m"><i>t</i></span> 次方」，而写成 <span class="m"><i>e</i></span> 的「常数乘 <span class="m"><i>t</i></span>」次方。两种写法等价，任何 <span class="m">2<sup><i>t</i></sup></span>、<span class="m">3<sup><i>t</i></sup></span> 都能改写，<span class="m"><i>e</i></span> 对这个函数本身并不根本，这是一个写法上的选择。</p>
+      <p>选择 <span class="m"><i>e</i></span> 的好处是让指数里的常数有了直接的含义。很多现象的变化率和变化的量本身成正比：没有资源限制时，种群的增长率正比于种群大小；热水放在凉房间里，降温速度正比于水和室温的温差，换句话说温差的变化率正比于温差本身；投资的增长率正比于当时的本金。这类变量随时间的函数都是指数函数，写成 <span class="m"><i>e</i><sup><i>c</i><i>t</i></sup></span> 时，<span class="m"><i>c</i></span> 正好就是「变化率 / 变量本身」这个比例常数。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/eulers-number-13m05s0.jpg" alt="温差的变化率正比于温差：ΔT(t) = e^(−kt)，k 就是比例常数" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="785">13:05</button>温差的变化率正比于温差：ΔT(t) = e^(−kt)，k 就是比例常数</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="785">13:05</button>温差的变化率正比于温差：ΔT(t) = e<sup>−kt</sup>，k 就是比例常数</figcaption></figure></div>
       
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>所有指数函数都和自己的导数成正比：<span class="m">(<i>a</i>^<i>t</i>)′ = <i>l</i><i>n</i>(<i>a</i>)·<i>a</i>^<i>t</i></span>。</li><li><span class="m"><i>e</i></span> 是让比例常数为 1 的底数：<span class="m">(<i>e</i>^<i>t</i>)′ = <i>e</i>^<i>t</i></span>，图像每点的斜率等于高度。</li><li><span class="m"><i>e</i>^(<i>c</i><i>t</i>)</span> 的导数是 <span class="m"><i>c</i>·<i>e</i>^(<i>c</i><i>t</i>)</span>；写成 <span class="m"><i>e</i></span> 的幂时，<span class="m"><i>c</i></span> 就是「变化率 / 自身」的比例常数。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>所有指数函数都和自己的导数成正比：<span class="m">(<i>a</i><sup><i>t</i></sup>)′ = ln(<i>a</i>)·<i>a</i><sup><i>t</i></sup></span>。</li><li><span class="m"><i>e</i></span> 是让比例常数为 1 的底数：<span class="m">(<i>e</i><sup><i>t</i></sup>)′ = <i>e</i><sup><i>t</i></sup></span>，图像每点的斜率等于高度。</li><li><span class="m"><i>e</i><sup><i>c</i><i>t</i></sup></span> 的导数是 <span class="m"><i>c</i>·<i>e</i><sup><i>c</i><i>t</i></sup></span>；写成 <span class="m"><i>e</i></span> 的幂时，<span class="m"><i>c</i></span> 就是「变化率 / 自身」的比例常数。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/eulers-number-2m05s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=5" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="14"><b>0:14</b><span>指数函数的导数，e 为什么特别</span></button></li><li><button type="button" data-t="32"><b>0:32</b><span>例：每天翻倍的种群质量 2<sup><i>t</i></sup></span></button></li><li><button type="button" data-t="99"><b>1:39</b><span>按整天算，增长率等于当天开始时的质量</span></button></li><li><button type="button" data-t="159"><b>2:39</b><span>但导数要看越来越短的时间</span></button></li><li><button type="button" data-t="248"><b>4:08</b><span>关键：2^(t+dt) = 2<sup><i>t</i></sup> · 2^dt</span></button></li><li><button type="button" data-t="302"><b>5:02</b><span>含 dt 的部分和 t 完全无关</span></button></li><li><button type="button" data-t="327"><b>5:27</b><span>这个部分趋近于 0.6931…</span></button></li><li><button type="button" data-t="389"><b>6:29</b><span>换底数：3<sup><i>t</i></sup> 是 1.0986，8<sup><i>t</i></sup> 是 2.079</span></button></li><li><button type="button" data-t="432"><b>7:12</b><span>8 的常数正好是 2 的 3 倍</span></button></li><li><button type="button" data-t="456"><b>7:36</b><span>有没有让常数等于 1 的底数：e</span></button></li><li><button type="button" data-t="515"><b>8:35</b><span>e<sup><i>t</i></sup> 的图像：每点的斜率等于高度</span></button></li><li><button type="button" data-t="539"><b>8:59</b><span>链式法则：e^(ct) 的导数是 c·e^(ct)</span></button></li><li><button type="button" data-t="596"><b>9:56</b><span>2 = e^(ln 2)，所以常数就是 ln 2</span></button></li><li><button type="button" data-t="668"><b>11:08</b><span>实际中都写成 e 的幂</span></button></li><li><button type="button" data-t="716"><b>11:56</b><span>变化率和自身成正比的现象</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="14"><b>0:14</b><span>指数函数的导数，e 为什么特别</span></button></li><li><button type="button" data-t="32"><b>0:32</b><span>例：每天翻倍的种群质量 2<sup><i>t</i></sup></span></button></li><li><button type="button" data-t="99"><b>1:39</b><span>按整天算，增长率等于当天开始时的质量</span></button></li><li><button type="button" data-t="159"><b>2:39</b><span>但导数要看越来越短的时间</span></button></li><li><button type="button" data-t="248"><b>4:08</b><span>关键：2<sup>t+dt</sup> = 2<sup><i>t</i></sup> · 2<sup>dt</sup></span></button></li><li><button type="button" data-t="302"><b>5:02</b><span>含 dt 的部分和 t 完全无关</span></button></li><li><button type="button" data-t="327"><b>5:27</b><span>这个部分趋近于 0.6931…</span></button></li><li><button type="button" data-t="389"><b>6:29</b><span>换底数：3<sup><i>t</i></sup> 是 1.0986，8<sup><i>t</i></sup> 是 2.079</span></button></li><li><button type="button" data-t="432"><b>7:12</b><span>8 的常数正好是 2 的 3 倍</span></button></li><li><button type="button" data-t="456"><b>7:36</b><span>有没有让常数等于 1 的底数：e</span></button></li><li><button type="button" data-t="515"><b>8:35</b><span>e<sup><i>t</i></sup> 的图像：每点的斜率等于高度</span></button></li><li><button type="button" data-t="539"><b>8:59</b><span>链式法则：e<sup>ct</sup> 的导数是 c·e<sup>ct</sup></span></button></li><li><button type="button" data-t="596"><b>9:56</b><span>2 = e<sup>ln 2</sup>，所以常数就是 ln 2</span></button></li><li><button type="button" data-t="668"><b>11:08</b><span>实际中都写成 e 的幂</span></button></li><li><button type="button" data-t="716"><b>11:56</b><span>变化率和自身成正比的现象</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -3137,7 +3137,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">隐函数求导是作者当学生时觉得最奇怪的操作：对 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> = 5<sup>2</sup></span> 两边同时求导，写出 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i> = 0</span>，就得到了圆的切线斜率。含两个变量的表达式「求导」是什么意思？这一集先用梯子下滑的相关变化率问题做对照，那里变量都是时间的函数，求导的意义很清楚；再把 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup></span> 看成平面上的一个二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，求导就是问「迈一小步，<span class="m"><i>S</i></span> 变了多少」，而留在曲线上就要求这个变化为 0。最后用这个方法推出 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
+      <p class="lede">隐函数求导是作者当学生时觉得最奇怪的操作：对 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> = 5<sup>2</sup></span> 两边同时求导，写出 <span class="m">2<i>x</i> <i>d</i><i>x</i> + 2<i>y</i> <i>d</i><i>y</i> = 0</span>，就得到了圆的切线斜率。含两个变量的表达式「求导」是什么意思？这一集先用梯子下滑的相关变化率问题做对照，那里变量都是时间的函数，求导的意义很清楚；再把 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup></span> 看成平面上的一个二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，求导就是问「迈一小步，<span class="m"><i>S</i></span> 变了多少」，而留在曲线上就要求这个变化为 0。最后用这个方法推出 <span class="m">ln <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=6" target="_blank" rel="noreferrer">B 站 P6：06 - 隐函数求导是怎么回事？ ↗</a>
         <a href="https://www.youtube.com/watch?v=qb40J4N1fa4" target="_blank" rel="noreferrer">YouTube 第 6 章 · 2017-05-03 ↗</a></p>
       <section class="sec">
@@ -3198,8 +3198,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="753">12:33</button><span>用隐函数求导推出 ln x 的导数</span></h4>
-      <p>已经知道 <span class="m"><i>e</i>^<i>x</i></span> 的导数是它自己，那它的反函数 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 呢？把 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的图像看成隐式曲线：所有满足 <span class="m"><i>y</i> = <i>l</i><i>n</i> <i>x</i></span> 的点，也就是 <span class="m"><i>e</i>^<i>y</i> = <i>x</i></span>（这正是自然对数的含义）。</p>
-      <p>两边求导，问一小步 <span class="m">(<i>d</i><i>x</i>, <i>d</i><i>y</i>)</span> 让两边各变多少：左边变 <span class="m"><i>e</i>^<i>y</i> <i>d</i><i>y</i></span>，右边变 <span class="m"><i>d</i><i>x</i></span>。要留在曲线上，两者相等，所以斜率 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = 1/<i>e</i>^<i>y</i></span>。在曲线上 <span class="m"><i>e</i>^<i>y</i></span> 就等于 <span class="m"><i>x</i></span>，所以斜率是 <span class="m">1/<i>x</i></span>，也就是 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
+      <p>已经知道 <span class="m"><i>e</i><sup><i>x</i></sup></span> 的导数是它自己，那它的反函数 <span class="m">ln <i>x</i></span> 呢？把 <span class="m">ln <i>x</i></span> 的图像看成隐式曲线：所有满足 <span class="m"><i>y</i> = ln <i>x</i></span> 的点，也就是 <span class="m"><i>e</i><sup><i>y</i></sup> = <i>x</i></span>（这正是自然对数的含义）。</p>
+      <p>两边求导，问一小步 <span class="m">(<i>d</i><i>x</i>, <i>d</i><i>y</i>)</span> 让两边各变多少：左边变 <span class="m"><i>e</i><sup><i>y</i></sup> <i>d</i><i>y</i></span>，右边变 <span class="m"><i>d</i><i>x</i></span>。要留在曲线上，两者相等，所以斜率 <span class="m"><i>d</i><i>y</i>/<i>d</i><i>x</i> = 1/<i>e</i><sup><i>y</i></sup></span>。在曲线上 <span class="m"><i>e</i><sup><i>y</i></sup></span> 就等于 <span class="m"><i>x</i></span>，所以斜率是 <span class="m">1/<i>x</i></span>，也就是 <span class="m">ln <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>。</p>
       <p>作者说这是多元微积分的一瞥：函数有多个输入，研究调整这些输入时函数怎么变。关键始终是想清楚有哪些微小推动在起作用、它们彼此怎么依赖。</p>
       
       
@@ -3210,7 +3210,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>相关变化率：各变量都是时间的函数，对恒等式两边求导，得到变化率之间的关系。</li><li>隐函数求导：把方程一边看成二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，<span class="m"><i>d</i><i>S</i> = (∂<i>S</i>/∂<i>x</i>)<i>d</i><i>x</i> + (∂<i>S</i>/∂<i>y</i>)<i>d</i><i>y</i></span>；留在曲线上等于要求两边变化相等。</li><li><span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，由 <span class="m"><i>e</i>^<i>y</i> = <i>x</i></span> 两边求导得到。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>相关变化率：各变量都是时间的函数，对恒等式两边求导，得到变化率之间的关系。</li><li>隐函数求导：把方程一边看成二元函数 <span class="m"><i>S</i>(<i>x</i>, <i>y</i>)</span>，<span class="m"><i>d</i><i>S</i> = (∂<i>S</i>/∂<i>x</i>)<i>d</i><i>x</i> + (∂<i>S</i>/∂<i>y</i>)<i>d</i><i>y</i></span>；留在曲线上等于要求两边变化相等。</li><li><span class="m">ln <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，由 <span class="m"><i>e</i><sup><i>y</i></sup> = <i>x</i></span> 两边求导得到。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/implicit-differentiation-0m45s0.jpg')"><span class="tri"></span></button></div>
@@ -3562,7 +3562,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">泰勒级数是数学里最强大的近似工具之一。作者第一次体会到它的威力是在物理课上：单摆的势能里有个 <span class="m">1 − cos <i>θ</i></span>，把 <span class="m">cos <i>θ</i></span> 换成 <span class="m">1 − <i>θ</i><sup>2</sup>/2</span> 以后一切都顺了。这一集从这个近似出发，说明怎么一步步选多项式的系数，让它在某点和原函数的值、一阶导、二阶导……逐一对齐，为什么会出现阶乘，怎么推广到任意点 <span class="m"><i>a</i></span>。然后用面积函数给二次项一个几何解释，最后讲把项无限加下去的泰勒级数：<span class="m"><i>e</i>^<i>x</i></span> 处处收敛，<span class="m"><i>l</i><i>n</i> <i>x</i></span> 只在一定范围内收敛。</p>
+      <p class="lede">泰勒级数是数学里最强大的近似工具之一。作者第一次体会到它的威力是在物理课上：单摆的势能里有个 <span class="m">1 − cos <i>θ</i></span>，把 <span class="m">cos <i>θ</i></span> 换成 <span class="m">1 − <i>θ</i><sup>2</sup>/2</span> 以后一切都顺了。这一集从这个近似出发，说明怎么一步步选多项式的系数，让它在某点和原函数的值、一阶导、二阶导……逐一对齐，为什么会出现阶乘，怎么推广到任意点 <span class="m"><i>a</i></span>。然后用面积函数给二次项一个几何解释，最后讲把项无限加下去的泰勒级数：<span class="m"><i>e</i><sup><i>x</i></sup></span> 处处收敛，<span class="m">ln <i>x</i></span> 只在一定范围内收敛。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1qW411N7FU?p=11" target="_blank" rel="noreferrer">B 站 P11：10 - 泰勒级数 ↗</a>
         <a href="https://www.youtube.com/watch?v=3d6DsjIBzJ4" target="_blank" rel="noreferrer">YouTube 第 11 章 · 2017-05-07 ↗</a></p>
       <section class="sec">
@@ -3616,13 +3616,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>更哲学地看，这是把函数在单个点处的高阶导数信息，翻译成这一点附近函数值的信息。<span class="m">cos</span> 的导数循环：<span class="m">cos</span>、<span class="m">−sin</span>、<span class="m">−cos</span>、<span class="m">sin</span>，再重复；在 0 处的值是 1、0、−1、0 循环。只代一个数 <span class="m"><i>x</i> = 0</span>，却得到了关于 <span class="m">cos</span> 的大量信息。让多项式的系数也按这个规律排，再各除以阶乘，就得到 <span class="m">cos <i>x</i></span> 的泰勒多项式。</p>
       <p>一般地：<span class="m"><i>x</i><sup><i>n</i></sup></span> 的系数是函数 <span class="m"><i>n</i></span> 阶导数在 0 处的值除以 <span class="m"><i>n</i>!</span>。常数项让值对上，下一项让斜率对上，再下一项让斜率的变化率对上，依此类推。项越多越准，代价是多项式越复杂。在任意点 <span class="m"><i>a</i></span> 附近近似，就写成 <span class="m">(<i>x</i> − <i>a</i>)</span> 的幂，在 <span class="m"><i>a</i></span> 处求各阶导数：</p>
       <p><span class="m"><i>P</i>(<i>x</i>) = <i>f</i>(<i>a</i>) + <i>f</i>′(<i>a</i>)(<i>x</i> − <i>a</i>) + <i>f</i>″(<i>a</i>)/2! · (<i>x</i> − <i>a</i>)<sup>2</sup> + <i>f</i>‴(<i>a</i>)/3! · (<i>x</i> − <i>a</i>)<sup>3</sup> + …</span></p>
-      <p>最简单又有意义的例子是 <span class="m"><i>e</i>^<i>x</i></span> 在 0 附近：它的导数还是它自己，各阶导数在 0 处都是 1，所以泰勒多项式是 <span class="m">1 + <i>x</i> + <i>x</i><sup>2</sup>/2! + <i>x</i><sup>3</sup>/3! + …</span>。</p>
+      <p>最简单又有意义的例子是 <span class="m"><i>e</i><sup><i>x</i></sup></span> 在 0 附近：它的导数还是它自己，各阶导数在 0 处都是 1，所以泰勒多项式是 <span class="m">1 + <i>x</i> + <i>x</i><sup>2</sup>/2! + <i>x</i><sup>3</sup>/3! + …</span>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-12m20s0.jpg" alt="xⁿ 的系数：n 阶导数在 0 处的值，除以 n!" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="740">12:20</button>x<sup><i>n</i></sup> 的系数：n 阶导数在 0 处的值，除以 n!</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-13m20s0.jpg" alt="在 a 附近：写成 (x − a) 的幂" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="800">13:20</button>在 a 附近：写成 (x − a) 的幂</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-14m20s0.jpg" alt="e^x 的泰勒多项式：1 + x + x²/2! + x³/3! + …" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="860">14:20</button>e^x 的泰勒多项式：1 + x + x<sup>2</sup>/2! + x<sup>3</sup>/3! + …</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="860">14:20</button>e<sup>x</sup> 的泰勒多项式：1 + x + x<sup>2</sup>/2! + x<sup>3</sup>/3! + …</figcaption></figure></div>
       
       
       
@@ -3645,26 +3645,26 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1041">17:21</button><span>泰勒级数与收敛半径</span></h4>
       <p>像数学家那样想，会问：能不能不停，一直加下去？无穷多项之和叫<b>级数 (Series)</b>，有限项的叫泰勒多项式，无穷项的叫<b>泰勒级数 (Taylor Series)</b>。无穷多个东西没法真的加起来，计算器上的加号只能按有限次。但如果一项项加下去，每一步都有意义，而且越来越接近某个值，就说这个级数<b>收敛 (Converges)</b> 到这个值，也可以把等号扩展成「级数等于它收敛到的值」。</p>
-      <p>例：<span class="m"><i>e</i>^<i>x</i></span> 的泰勒多项式代 <span class="m"><i>x</i> = 1</span>，项越加越多，总和越来越接近 <span class="m"><i>e</i></span>。代 <span class="m"><i>x</i> = 2</span>，也会收敛到 <span class="m"><i>e</i><sup>2</sup></span>。对任何输入都成立，不管离 0 多远，尽管这些多项式只用了 0 处的导数信息。所以说 <span class="m"><i>e</i>^<i>x</i></span> 在所有 <span class="m"><i>x</i></span> 处都等于自己的泰勒级数，<span class="m">sin</span>、<span class="m">cos</span> 也是这样。</p>
-      <p>但有些级数只在一定范围内收敛。<span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 <span class="m"><i>x</i> = 1</span> 附近的泰勒级数是 <span class="m">(<i>x</i> − 1) − (<i>x</i> − 1)<sup>2</sup>/2 + (<i>x</i> − 1)<sup>3</sup>/3 − …</span>。代 0 到 2 之间的数，加的项越多越接近 <span class="m"><i>l</i><i>n</i></span> 的值；超出这个范围哪怕一点点，和就来回乱跳，什么也不趋近，尽管 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 在大于 2 处完全有定义。某种意义上，<span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 1 处的导数信息传不了那么远。这时说级数<b>发散 (Diverges)</b>。近似中心到级数仍收敛的点之间的最大距离，叫<b>收敛半径 (Radius of Convergence)</b>。</p>
+      <p>例：<span class="m"><i>e</i><sup><i>x</i></sup></span> 的泰勒多项式代 <span class="m"><i>x</i> = 1</span>，项越加越多，总和越来越接近 <span class="m"><i>e</i></span>。代 <span class="m"><i>x</i> = 2</span>，也会收敛到 <span class="m"><i>e</i><sup>2</sup></span>。对任何输入都成立，不管离 0 多远，尽管这些多项式只用了 0 处的导数信息。所以说 <span class="m"><i>e</i><sup><i>x</i></sup></span> 在所有 <span class="m"><i>x</i></span> 处都等于自己的泰勒级数，<span class="m">sin</span>、<span class="m">cos</span> 也是这样。</p>
+      <p>但有些级数只在一定范围内收敛。<span class="m">ln <i>x</i></span> 在 <span class="m"><i>x</i> = 1</span> 附近的泰勒级数是 <span class="m">(<i>x</i> − 1) − (<i>x</i> − 1)<sup>2</sup>/2 + (<i>x</i> − 1)<sup>3</sup>/3 − …</span>。代 0 到 2 之间的数，加的项越多越接近 <span class="m">ln</span> 的值；超出这个范围哪怕一点点，和就来回乱跳，什么也不趋近，尽管 <span class="m">ln <i>x</i></span> 在大于 2 处完全有定义。某种意义上，<span class="m">ln <i>x</i></span> 在 1 处的导数信息传不了那么远。这时说级数<b>发散 (Diverges)</b>。近似中心到级数仍收敛的点之间的最大距离，叫<b>收敛半径 (Radius of Convergence)</b>。</p>
       <p>还有很多没讲：用法、误差估计、判断收敛的方法。作者留下的核心直觉是：泰勒级数把单个点处的导数信息，翻译成这个点附近的近似信息。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/taylor-series-18m35s0.jpg" alt="e^x 的级数代 x = 1，总和趋近于 e" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1115">18:35</button>e^x 的级数代 x = 1，总和趋近于 e</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-20m15s0.jpg" alt="ln x 的级数代超过 2 的数，和来回乱跳" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1115">18:35</button>e<sup>x</sup> 的级数代 x = 1，总和趋近于 e</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-20m15s0.jpg" alt="ln x 的级数代超过 2 的数，和来回乱跳" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="1215">20:15</button>ln x 的级数代超过 2 的数，和来回乱跳</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/taylor-series-20m50s0.jpg" alt="收敛半径：级数仍收敛的最大范围" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="1250">20:50</button>收敛半径：级数仍收敛的最大范围</figcaption></figure></div>
       
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>泰勒多项式：<span class="m"><i>f</i>(<i>x</i>) ≈ Σ <i>f</i><sup>(<i>n</i>)</sup>(<i>a</i>)/<i>n</i>! · (<i>x</i> − <i>a</i>)<sup><i>n</i></sup></span>；第 n 项让 n 阶导数在 <span class="m"><i>a</i></span> 处对上，除以 <span class="m"><i>n</i>!</span> 抵消幂法则连乘出来的阶乘。</li><li><span class="m">cos <i>x</i> ≈ 1 − <i>x</i><sup>2</sup>/2 + <i>x</i><sup>4</sup>/24</span>，<span class="m"><i>e</i>^<i>x</i> = 1 + <i>x</i> + <i>x</i><sup>2</sup>/2! + <i>x</i><sup>3</sup>/3! + …</span>（对所有 <span class="m"><i>x</i></span> 成立）。</li><li>二次项 ½f″(a)(x − a)<sup>2</sup> 在面积函数的图上就是顶上那个小三角形。</li><li>有的泰勒级数只在收敛半径内收敛，比如 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 在 1 附近的级数只对 0 < x ≤ 2 有效。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>泰勒多项式：<span class="m"><i>f</i>(<i>x</i>) ≈ Σ <i>f</i><sup>(<i>n</i>)</sup>(<i>a</i>)/<i>n</i>! · (<i>x</i> − <i>a</i>)<sup><i>n</i></sup></span>；第 n 项让 n 阶导数在 <span class="m"><i>a</i></span> 处对上，除以 <span class="m"><i>n</i>!</span> 抵消幂法则连乘出来的阶乘。</li><li><span class="m">cos <i>x</i> ≈ 1 − <i>x</i><sup>2</sup>/2 + <i>x</i><sup>4</sup>/24</span>，<span class="m"><i>e</i><sup><i>x</i></sup> = 1 + <i>x</i> + <i>x</i><sup>2</sup>/2! + <i>x</i><sup>3</sup>/3! + …</span>（对所有 <span class="m"><i>x</i></span> 成立）。</li><li>二次项 ½f″(a)(x − a)<sup>2</sup> 在面积函数的图上就是顶上那个小三角形。</li><li>有的泰勒级数只在收敛半径内收敛，比如 <span class="m">ln <i>x</i></span> 在 1 附近的级数只对 0 < x ≤ 2 有效。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/taylor-series-0m50s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1qW411N7FU?p=11" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="30"><b>0:30</b><span>物理课上：单摆和 cos θ ≈ 1 − θ<sup>2</sup>/2</span></button></li><li><button type="button" data-t="101"><b>1:41</b><span>泰勒级数：用多项式近似非多项式函数</span></button></li><li><button type="button" data-t="120"><b>2:00</b><span>找 cos x 在 0 附近最好的二次近似</span></button></li><li><button type="button" data-t="153"><b>2:33</b><span>c<sub>0</sub>：函数值要对上，c<sub>0</sub> = 1</span></button></li><li><button type="button" data-t="184"><b>3:04</b><span>c<sub>1</sub>：斜率要对上，c<sub>1</sub> = 0</span></button></li><li><button type="button" data-t="244"><b>4:04</b><span>c<sub>2</sub>：二阶导数要对上，c<sub>2</sub> = −1/2</span></button></li><li><button type="button" data-t="316"><b>5:16</b><span>1 − x<sup>2</sup>/2，cos(0.1) ≈ 0.995</span></button></li><li><button type="button" data-t="340"><b>5:40</b><span>每个系数各管一阶导数</span></button></li><li><button type="button" data-t="384"><b>6:24</b><span>加更多项：三次项系数为 0</span></button></li><li><button type="button" data-t="441"><b>7:21</b><span>四次项：c<sub>4</sub> = 1/24</span></button></li><li><button type="button" data-t="506"><b>8:26</b><span>观察一：阶乘自然出现</span></button></li><li><button type="button" data-t="549"><b>9:09</b><span>观察二：加新项不影响旧系数</span></button></li><li><button type="button" data-t="592"><b>9:52</b><span>在 a 附近近似：写成 (x − a) 的幂</span></button></li><li><button type="button" data-t="622"><b>10:22</b><span>观察三：一点处的导数信息变成附近的近似</span></button></li><li><button type="button" data-t="707"><b>11:47</b><span>一般的泰勒多项式</span></button></li><li><button type="button" data-t="815"><b>13:35</b><span>例：e^x</span></button></li><li><button type="button" data-t="866"><b>14:26</b><span>二次项的几何意义：面积函数</span></button></li><li><button type="button" data-t="1041"><b>17:21</b><span>无限加下去：泰勒级数</span></button></li><li><button type="button" data-t="1103"><b>18:23</b><span>e^x 在 x = 1 处收敛到 e</span></button></li><li><button type="button" data-t="1144"><b>19:04</b><span>e^x 对所有 x 都等于自己的泰勒级数</span></button></li><li><button type="button" data-t="1181"><b>19:41</b><span>ln x 在 1 附近：只在 0 到 2 之间收敛</span></button></li><li><button type="button" data-t="1244"><b>20:44</b><span>收敛半径</span></button></li><li><button type="button" data-t="1288"><b>21:28</b><span>核心直觉</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="30"><b>0:30</b><span>物理课上：单摆和 cos θ ≈ 1 − θ<sup>2</sup>/2</span></button></li><li><button type="button" data-t="101"><b>1:41</b><span>泰勒级数：用多项式近似非多项式函数</span></button></li><li><button type="button" data-t="120"><b>2:00</b><span>找 cos x 在 0 附近最好的二次近似</span></button></li><li><button type="button" data-t="153"><b>2:33</b><span>c<sub>0</sub>：函数值要对上，c<sub>0</sub> = 1</span></button></li><li><button type="button" data-t="184"><b>3:04</b><span>c<sub>1</sub>：斜率要对上，c<sub>1</sub> = 0</span></button></li><li><button type="button" data-t="244"><b>4:04</b><span>c<sub>2</sub>：二阶导数要对上，c<sub>2</sub> = −1/2</span></button></li><li><button type="button" data-t="316"><b>5:16</b><span>1 − x<sup>2</sup>/2，cos(0.1) ≈ 0.995</span></button></li><li><button type="button" data-t="340"><b>5:40</b><span>每个系数各管一阶导数</span></button></li><li><button type="button" data-t="384"><b>6:24</b><span>加更多项：三次项系数为 0</span></button></li><li><button type="button" data-t="441"><b>7:21</b><span>四次项：c<sub>4</sub> = 1/24</span></button></li><li><button type="button" data-t="506"><b>8:26</b><span>观察一：阶乘自然出现</span></button></li><li><button type="button" data-t="549"><b>9:09</b><span>观察二：加新项不影响旧系数</span></button></li><li><button type="button" data-t="592"><b>9:52</b><span>在 a 附近近似：写成 (x − a) 的幂</span></button></li><li><button type="button" data-t="622"><b>10:22</b><span>观察三：一点处的导数信息变成附近的近似</span></button></li><li><button type="button" data-t="707"><b>11:47</b><span>一般的泰勒多项式</span></button></li><li><button type="button" data-t="815"><b>13:35</b><span>例：e<sup>x</sup></span></button></li><li><button type="button" data-t="866"><b>14:26</b><span>二次项的几何意义：面积函数</span></button></li><li><button type="button" data-t="1041"><b>17:21</b><span>无限加下去：泰勒级数</span></button></li><li><button type="button" data-t="1103"><b>18:23</b><span>e<sup>x</sup> 在 x = 1 处收敛到 e</span></button></li><li><button type="button" data-t="1144"><b>19:04</b><span>e<sup>x</sup> 对所有 x 都等于自己的泰勒级数</span></button></li><li><button type="button" data-t="1181"><b>19:41</b><span>ln x 在 1 附近：只在 0 到 2 之间收敛</span></button></li><li><button type="button" data-t="1244"><b>20:44</b><span>收敛半径</span></button></li><li><button type="button" data-t="1288"><b>21:28</b><span>核心直觉</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -3794,7 +3794,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <h2><span class="n">3</span><span>激活函数的导数，以及梯度消失</span></h2>
     <p class="chs">对应 <a class="chref" href="#calc3">第 3 集 · 用几何来求导</a><a class="chref" href="#calc5">第 5 集 · 指数函数求导：e 有什么特别</a><a class="chref" href="#calc7">第 7 集 · 极限、洛必达法则与 ε-δ 定义</a></p>
     <p>反向传播每经过一层，都要乘上这一层激活函数的导数，所以激活函数的导数长什么样很关键。</p>
-    <p><b>Sigmoid</b> <span class="m"><i>σ</i>(<i>z</i>) = 1/(1 + <i>e</i>^(−<i>z</i>))</span> 的导数是 <span class="m"><i>σ</i>(<i>z</i>)(1 − <i>σ</i>(<i>z</i>))</span>，最大值只有 0.25（在 <span class="m"><i>z</i> = 0</span> 处）。推导用到第 5 集：<span class="m"><i>e</i>^(−<i>z</i>)</span> 的导数是 <span class="m">−<i>e</i>^(−<i>z</i>)</span>，再加链式法则。<b>tanh</b> 的导数最大是 1。</p>
+    <p><b>Sigmoid</b> <span class="m"><i>σ</i>(<i>z</i>) = 1/(1 + <i>e</i><sup>−<i>z</i></sup>)</span> 的导数是 <span class="m"><i>σ</i>(<i>z</i>)(1 − <i>σ</i>(<i>z</i>))</span>，最大值只有 0.25（在 <span class="m"><i>z</i> = 0</span> 处）。推导用到第 5 集：<span class="m"><i>e</i><sup>−<i>z</i></sup></span> 的导数是 <span class="m">−<i>e</i><sup>−<i>z</i></sup></span>，再加链式法则。<b>tanh</b> 的导数最大是 1。</p>
     <p><b>ReLU</b> <span class="m">max(0, <i>z</i>)</span> 的导数在 <span class="m"><i>z</i> > 0</span> 时是 1，<span class="m"><i>z</i> < 0</span> 时是 0。在 <span class="m"><i>z</i> = 0</span> 处，第 7 集的话说，从左边趋近的斜率是 0、从右边是 1，极限不存在，严格说不可导；实践中直接规定取 0（或 1），这个点被精确碰到的概率几乎为 0。</p>
     <p>深层网络的梯度要连乘每一层的导数。如果每层都乘一个小于 1 的数，梯度会指数级变小，靠近输入的层几乎学不动，这叫<b>梯度消失 (Vanishing Gradient)</b>；反过来大于 1 就会<b>梯度爆炸 (Exploding Gradient)</b>。这是 ReLU 取代 sigmoid 成为默认激活函数、以及残差连接被发明出来的原因之一。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>10 层 sigmoid</p>
@@ -3804,11 +3804,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="aisec" id="aic-softmax">
     <h2><span class="n">4</span><span>e 与 softmax、交叉熵</span></h2>
     <p class="chs">对应 <a class="chref" href="#calc5">第 5 集 · 指数函数求导：e 有什么特别</a><a class="chref" href="#calc6">第 6 集 · 隐函数求导是怎么回事</a></p>
-    <p>语言模型最后一步把一排分数 <span class="m"><i>z</i></span> 变成概率：<b>softmax</b> <span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i>^(<i>z</i><sub><i>i</i></sub>) / Σ<sub><i>j</i></sub> <i>e</i>^(<i>z</i><sub><i>j</i></sub>)</span>。用 <span class="m"><i>e</i></span> 做底有第 5 集说的好处：<span class="m"><i>e</i>^<i>x</i></span> 的导数就是它自己，求导特别干净。</p>
-    <p>训练用的损失是<b>交叉熵 (Cross-Entropy)</b>：正确答案是第 <span class="m"><i>k</i></span> 个 token 时，<span class="m"><i>L</i> = −<i>l</i><i>n</i> <i>p</i><sub><i>k</i></sub></span>。第 6 集推出过 <span class="m"><i>l</i><i>n</i> <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，再加链式法则，softmax 加交叉熵对分数 <span class="m"><i>z</i><sub><i>i</i></sub></span> 的导数化简成一个很简单的形式：<span class="m">∂<i>L</i>/∂<i>z</i><sub><i>i</i></sub> = <i>p</i><sub><i>i</i></sub> − <i>y</i><sub><i>i</i></sub></span>，其中 <span class="m"><i>y</i></span> 是正确答案的 one-hot 向量。也就是「预测的概率减去该有的概率」。</p>
-    <p>数值上的一个细节也来自第 5 集的指数性质 <span class="m"><i>e</i>^(<i>a</i> + <i>b</i>) = <i>e</i>^<i>a</i> · <i>e</i>^<i>b</i></span>：分数很大时 <span class="m"><i>e</i>^(1000)</span> 会溢出，但所有 <span class="m"><i>z</i><sub><i>i</i></sub></span> 同时减去同一个数 <span class="m"><i>c</i></span>，分子分母都乘了 <span class="m"><i>e</i>^(−<i>c</i>)</span>，概率不变。所以实现时都先减去最大值再求指数。</p>
+    <p>语言模型最后一步把一排分数 <span class="m"><i>z</i></span> 变成概率：<b>softmax</b> <span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i><sup><i>z</i><sub><i>i</i></sub></sup> / Σ<sub><i>j</i></sub> <i>e</i><sup><i>z</i><sub><i>j</i></sub></sup></span>。用 <span class="m"><i>e</i></span> 做底有第 5 集说的好处：<span class="m"><i>e</i><sup><i>x</i></sup></span> 的导数就是它自己，求导特别干净。</p>
+    <p>训练用的损失是<b>交叉熵 (Cross-Entropy)</b>：正确答案是第 <span class="m"><i>k</i></span> 个 token 时，<span class="m"><i>L</i> = −ln <i>p</i><sub><i>k</i></sub></span>。第 6 集推出过 <span class="m">ln <i>x</i></span> 的导数是 <span class="m">1/<i>x</i></span>，再加链式法则，softmax 加交叉熵对分数 <span class="m"><i>z</i><sub><i>i</i></sub></span> 的导数化简成一个很简单的形式：<span class="m">∂<i>L</i>/∂<i>z</i><sub><i>i</i></sub> = <i>p</i><sub><i>i</i></sub> − <i>y</i><sub><i>i</i></sub></span>，其中 <span class="m"><i>y</i></span> 是正确答案的 one-hot 向量。也就是「预测的概率减去该有的概率」。</p>
+    <p>数值上的一个细节也来自第 5 集的指数性质 <span class="m"><i>e</i><sup><i>a</i> + <i>b</i></sup> = <i>e</i><sup><i>a</i></sup> · <i>e</i><sup><i>b</i></sup></span>：分数很大时 <span class="m"><i>e</i><sup>1000</sup></span> 会溢出，但所有 <span class="m"><i>z</i><sub><i>i</i></sub></span> 同时减去同一个数 <span class="m"><i>c</i></span>，分子分母都乘了 <span class="m"><i>e</i><sup>−<i>c</i></sup></span>，概率不变。所以实现时都先减去最大值再求指数。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>三个分数 (2, 1, 0.1)，正确答案是第一个</p>
-      <p>softmax 得概率约 <span class="m">(0.659, 0.242, 0.099)</span>。梯度 <span class="m"><i>p</i> − <i>y</i> = (−0.341, 0.242, 0.099)</span>：正确答案的分数被往上推，其他两个往下压，推的力度就是概率差多少。分数是 (1000, 999) 时，减去 1000 变成 (0, −1)，<span class="m"><i>e</i>^0 = 1</span>、<span class="m"><i>e</i>^(−1) ≈ 0.368</span>，不会溢出。</p></div>
+      <p>softmax 得概率约 <span class="m">(0.659, 0.242, 0.099)</span>。梯度 <span class="m"><i>p</i> − <i>y</i> = (−0.341, 0.242, 0.099)</span>：正确答案的分数被往上推，其他两个往下压，推的力度就是概率差多少。分数是 (1000, 999) 时，减去 1000 变成 (0, −1)，<span class="m"><i>e</i><sup>0</sup> = 1</span>、<span class="m"><i>e</i><sup>−1</sup> ≈ 0.368</span>，不会溢出。</p></div>
     
   </section>
 <section class="aisec" id="aic-numerical">
@@ -3825,7 +3825,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <p class="chs">对应 <a class="chref" href="#calc10">第 10 集 · 高阶导数</a><a class="chref" href="#calc11">第 11 集 · 泰勒级数</a></p>
     <p>第 11 集说泰勒级数把一点处的导数信息翻译成附近的近似。损失函数在当前参数 <span class="m"><i>w</i></span> 附近展开到二阶：<span class="m"><i>L</i>(<i>w</i> + Δ) ≈ <i>L</i>(<i>w</i>) + <i>L</i>′(<i>w</i>)·Δ + ½ <i>L</i>″(<i>w</i>)·Δ<sup>2</sup></span>。梯度下降只用了一阶项，相当于假设损失是一条直线，所以只敢走一小步。</p>
     <p>二阶项里的 <span class="m"><i>L</i>″</span> 是第 10 集的二阶导数，也就是损失曲面的弯曲程度；多维时它是一个矩阵，叫<b>海森矩阵 (Hessian)</b>。弯得越急，一阶近似失效得越快，学习率就得越小。如果直接最小化这个二次近似，令它对 <span class="m">Δ</span> 的导数为 0，得到 <span class="m">Δ = −<i>L</i>′/<i>L</i>″</span>，这就是<b>牛顿法 (Newton's Method)</b>：用曲率来决定步长。大模型参数太多，海森矩阵存不下，所以实践中用的是 Adam 这类只用一阶信息、再按每个参数的历史梯度大小调整步长的方法。</p>
-    <p>泰勒展开在 AI 里还有很多用处：GELU、SiLU 这类激活函数的近似公式，第 5 集 softmax 里的 <span class="m"><i>e</i>^<i>x</i></span>，线性注意力把 <span class="m"><i>e</i>^(<i>q</i>·<i>k</i>)</span> 展开成低阶多项式来近似，都是「用多项式在某一点附近代替原函数」。</p>
+    <p>泰勒展开在 AI 里还有很多用处：GELU、SiLU 这类激活函数的近似公式，第 5 集 softmax 里的 <span class="m"><i>e</i><sup><i>x</i></sup></span>，线性注意力把 <span class="m"><i>e</i><sup><i>q</i>·<i>k</i></sup></span> 展开成低阶多项式来近似，都是「用多项式在某一点附近代替原函数」。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>二次函数上，牛顿法一步到位</p>
       <p><span class="m"><i>L</i>(<i>w</i>) = (<i>w</i> − 3)<sup>2</sup></span>：<span class="m"><i>L</i>′(0) = −6</span>，<span class="m"><i>L</i>″ = 2</span>，牛顿步 <span class="m">Δ = −(−6)/2 = 3</span>，一步就到最低点 3。因为二次函数的二阶泰勒展开就是它自己。梯度下降取 <span class="m">η = 0.1</span> 要走十几步才接近。</p></div>
     
@@ -5113,8 +5113,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <figcaption><button class="ts" type="button" data-t="1535">25:35</button>结论 f′(q) ∝ 1/q，只有对数满足</figcaption></figure></div>
       <div class="ex"><p class="ex-h"><span class="lbl">例子</span>把屏幕上那几行补全</p>
         <p>拉格朗日函数 <span class="m"><i>L</i> = Σ<sub><i>i</i></sub> <i>p</i><sub><i>i</i></sub> <i>f</i>(<i>q</i><sub><i>i</i></sub>) − <i>λ</i>(Σ<sub><i>i</i></sub> <i>q</i><sub><i>i</i></sub> − 1)</span>，对每个 <span class="m"><i>q</i><sub><i>i</i></sub></span> 求偏导令其为 0：<span class="m"><i>p</i><sub><i>i</i></sub> <i>f</i>′(<i>q</i><sub><i>i</i></sub>) = <i>λ</i></span>。</p>
-        <p>要求最小值恰好落在 <span class="m"><i>q</i><sub><i>i</i></sub> = <i>p</i><sub><i>i</i></sub></span>，代进去得 <span class="m"><i>p</i><sub><i>i</i></sub> <i>f</i>′(<i>p</i><sub><i>i</i></sub>) = <i>λ</i></span> 对所有 <span class="m"><i>p</i><sub><i>i</i></sub></span> 都成立，也就是 <span class="m"><i>f</i>′(<i>p</i>) = <i>λ</i>/<i>p</i></span>，积分得 <span class="m"><i>f</i>(<i>p</i>) = <i>λ</i> <i>l</i><i>n</i> <i>p</i> + <i>C</i></span>。</p>
-        <p>损失要随概率增大而减小，所以 <span class="m"><i>λ</i> < 0</span>，取 <span class="m"><i>λ</i> = −1</span>、<span class="m"><i>C</i> = 0</span> 就是 <span class="m"><i>f</i>(<i>p</i>) = −<i>l</i><i>n</i> <i>p</i></span>。常数倍和平移都不改变最小值的位置，这正是「底是 2 还是 e 无所谓」的原因。</p>
+        <p>要求最小值恰好落在 <span class="m"><i>q</i><sub><i>i</i></sub> = <i>p</i><sub><i>i</i></sub></span>，代进去得 <span class="m"><i>p</i><sub><i>i</i></sub> <i>f</i>′(<i>p</i><sub><i>i</i></sub>) = <i>λ</i></span> 对所有 <span class="m"><i>p</i><sub><i>i</i></sub></span> 都成立，也就是 <span class="m"><i>f</i>′(<i>p</i>) = <i>λ</i>/<i>p</i></span>，积分得 <span class="m"><i>f</i>(<i>p</i>) = <i>λ</i> ln <i>p</i> + <i>C</i></span>。</p>
+        <p>损失要随概率增大而减小，所以 <span class="m"><i>λ</i> < 0</span>，取 <span class="m"><i>λ</i> = −1</span>、<span class="m"><i>C</i> = 0</span> 就是 <span class="m"><i>f</i>(<i>p</i>) = −ln <i>p</i></span>。常数倍和平移都不改变最小值的位置，这正是「底是 2 还是 e 无所谓」的原因。</p>
         
         </div>
       
@@ -5600,13 +5600,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="904">15:04</button><span>搭出正态分布的公式</span></h4>
       <p>作者要你记住的核心直觉是：把这些分布平移到均值对齐，再缩放到标准差都等于 1，它们会越来越接近同一个普适的形状。不管最初的骰子是什么分布都一样。</p>
-      <p>然后一层层搭公式。<span class="m"><i>e</i>^<i>x</i></span> 是指数增长，指数取负 <span class="m"><i>e</i>^(−<i>x</i>)</span> 是指数衰减。要两边都衰减，可以用 <span class="m"><i>e</i>^(−|<i>x</i>|)</span>，但中间会有个尖角；改成 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 就得到两边光滑衰减的<b>钟形曲线</b>。在 <span class="m"><i>x</i></span> 前面乘个常数可以横向拉伸或压缩。按指数运算法则，改这个常数等价于换底数，所以 <span class="m"><i>e</i></span> 在这里并不特殊，换成 2 或 3 得到的是同一族曲线。用 <span class="m"><i>e</i></span> 的好处是能让常数有直接的含义：把指数写成 <span class="m">−½(<i>x</i>/<i>σ</i>)<sup>2</sup></span>，变成概率分布之后，<span class="m"><i>σ</i></span> 正好就是它的标准差。</p>
+      <p>然后一层层搭公式。<span class="m"><i>e</i><sup><i>x</i></sup></span> 是指数增长，指数取负 <span class="m"><i>e</i><sup>−<i>x</i></sup></span> 是指数衰减。要两边都衰减，可以用 <span class="m"><i>e</i><sup>−|<i>x</i>|</sup></span>，但中间会有个尖角；改成 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 就得到两边光滑衰减的<b>钟形曲线</b>。在 <span class="m"><i>x</i></span> 前面乘个常数可以横向拉伸或压缩。按指数运算法则，改这个常数等价于换底数，所以 <span class="m"><i>e</i></span> 在这里并不特殊，换成 2 或 3 得到的是同一族曲线。用 <span class="m"><i>e</i></span> 的好处是能让常数有直接的含义：把指数写成 <span class="m">−½(<i>x</i>/<i>σ</i>)<sup>2</sup></span>，变成概率分布之后，<span class="m"><i>σ</i></span> 正好就是它的标准差。</p>
       <p>要当成概率分布，曲线下的总面积必须是 1。原因在于连续分布的读法：不问某一点的概率，而问落在两个值之间的概率，它等于这两个值之间曲线下的面积。这样的曲线叫<b>概率密度函数 (Probability Density Function)</b>，总面积代表「总会出现某个数」的概率，必须是 1。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/clt-15m15s0.jpg" alt="和的分布对齐均值后，形状越来越接近" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="915">15:15</button>和的分布对齐均值后，形状越来越接近</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/clt-16m35s0.jpg" alt="e^(−x²)：向两边光滑衰减的钟形" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="995">16:35</button>e^(−x<sup>2</sup>)：向两边光滑衰减的钟形</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/clt-17m30s0.jpg" alt="指数写成 −½(x/σ)²，σ 就是标准差" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="995">16:35</button>e<sup>−x<sup>2</sup></sup>：向两边光滑衰减的钟形</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/clt-17m30s0.jpg" alt="指数写成 −½(x/σ)²，σ 就是标准差" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="1050">17:30</button>指数写成 −½(x/σ)<sup>2</sup>，σ 就是标准差</figcaption></figure></div>
       
       
@@ -5614,7 +5614,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1101">18:21</button><span>面积里的 √π，以及标准正态分布</span></h4>
-      <p><span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 下的面积不是 1，而是 <span class="m">√<i>π</i></span>。圆周率为什么会出现在这里，是下一集的主题；眼下只需要除以 <span class="m">√<i>π</i></span>。再把 ½ 和 <span class="m"><i>σ</i></span> 放回去，图像被横向拉伸了 <span class="m"><i>σ</i>√2</span> 倍，所以还要再除以它。合起来，前面的系数是 <span class="m">1/(<i>σ</i>√(2<i>π</i>))</span>，得到一个合法的概率分布：不管 <span class="m"><i>σ</i></span> 取多少，面积都是 1。</p>
+      <p><span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 下的面积不是 1，而是 <span class="m">√<i>π</i></span>。圆周率为什么会出现在这里，是下一集的主题；眼下只需要除以 <span class="m">√<i>π</i></span>。再把 ½ 和 <span class="m"><i>σ</i></span> 放回去，图像被横向拉伸了 <span class="m"><i>σ</i>√2</span> 倍，所以还要再除以它。合起来，前面的系数是 <span class="m">1/(<i>σ</i>√(2<i>π</i>))</span>，得到一个合法的概率分布：不管 <span class="m"><i>σ</i></span> 取多少，面积都是 1。</p>
       <p><span class="m"><i>σ</i> = 1</span> 的特例叫<b>标准正态分布 (Standard Normal Distribution)</b>。一般的正态分布还会在 <span class="m"><i>x</i></span> 上减去一个常数 <span class="m"><i>μ</i></span>，把图像左右平移，设定均值。所以正态分布只有两个参数，均值和标准差，都装在一个同时含有 <span class="m"><i>e</i></span> 和 <span class="m"><i>π</i></span> 的公式里。</p>
       
       
@@ -5628,7 +5628,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <h4><button class="ts" type="button" data-t="1255">20:55</button><span>更优雅的写法：离均值几个标准差</span></h4>
       <p>随机变量的均值是 <span class="m"><i>μ</i></span>、标准差是 <span class="m"><i>σ</i></span>，那么 <span class="m"><i>n</i></span> 项之和的均值是 <span class="m"><i>n</i><i>μ</i></span>，标准差是 <span class="m"><i>σ</i>√<i>n</i></span>。直接把这两个数代进正态分布公式，就能写出一条近似和的分布的曲线。</p>
       <p>更优雅的办法是改看这个量：<span class="m">(<i>X</i><sub>1</sub> + ⋯ + <i>X</i><sub><i>n</i></sub> − <i>n</i><i>μ</i>) / (<i>σ</i>√<i>n</i>)</span>。先减去和的期望，让均值变成 0；再除以和的标准差，让标准差变成 1。它的含义很好读：<b>这个和离均值有几个标准差</b>。下面的图里每根柱子的面积（而不是高度）代表概率，纵轴是一种概率密度，所有柱子面积加起来是 1，这是为了和连续分布「面积就是概率」的读法对上。</p>
-      <p>接下来最能说明问题：只加 3 项时，改变初始分布，和的分布形状跟着剧烈变化。加 10 项时大多仍像钟形，但那个集中在 1 和 6 的骰子会让它带尖刺，前面模拟里的尖刺是真实分布，不是随机误差，10 项还不够让定理起作用。加到 50 项，不管怎么改初始分布，下面的形状几乎不动。<span class="m"><i>X</i></span> 分布的所有细节都被抹平，趋向同一个形状：标准正态分布 <span class="m">1/√(2<i>π</i>) · <i>e</i>^(−<i>x</i><sup>2</sup>/2)</span>。这就是中心极限定理的全部意思。</p>
+      <p>接下来最能说明问题：只加 3 项时，改变初始分布，和的分布形状跟着剧烈变化。加 10 项时大多仍像钟形，但那个集中在 1 和 6 的骰子会让它带尖刺，前面模拟里的尖刺是真实分布，不是随机误差，10 项还不够让定理起作用。加到 50 项，不管怎么改初始分布，下面的形状几乎不动。<span class="m"><i>X</i></span> 分布的所有细节都被抹平，趋向同一个形状：标准正态分布 <span class="m">1/√(2<i>π</i>) · <i>e</i><sup>−<i>x</i><sup>2</sup>/2</sup></span>。这就是中心极限定理的全部意思。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/clt-21m35s0.jpg" alt="减去 nμ、除以 σ√n：读作「离均值几个标准差」" loading="lazy" decoding="async">
@@ -5667,63 +5667,63 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>中心极限定理：<span class="m"><i>n</i></span> 个独立同分布、方差有限的随机变量之和，减去 <span class="m"><i>n</i><i>μ</i></span>、除以 <span class="m"><i>σ</i>√<i>n</i></span> 后，分布趋于标准正态分布，与单个变量的分布无关。</li><li>期望相加，方差也相加（独立时），标准差不相加：<span class="m"><i>n</i></span> 项之和的标准差是 <span class="m">√<i>n</i>·<i>σ</i></span>，平均值的标准差是 <span class="m"><i>σ</i>/√<i>n</i></span>。</li><li>正态分布 <span class="m">1/(<i>σ</i>√(2<i>π</i>)) · <i>e</i>^(−½((<i>x</i>−<i>μ</i>)/<i>σ</i>)<sup>2</sup>)</span> 只有两个参数；系数是为了让面积为 1。</li><li>68–95–99.7：落在 ±1、±2、±3 个标准差内的概率。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>中心极限定理：<span class="m"><i>n</i></span> 个独立同分布、方差有限的随机变量之和，减去 <span class="m"><i>n</i><i>μ</i></span>、除以 <span class="m"><i>σ</i>√<i>n</i></span> 后，分布趋于标准正态分布，与单个变量的分布无关。</li><li>期望相加，方差也相加（独立时），标准差不相加：<span class="m"><i>n</i></span> 项之和的标准差是 <span class="m">√<i>n</i>·<i>σ</i></span>，平均值的标准差是 <span class="m"><i>σ</i>/√<i>n</i></span>。</li><li>正态分布 <span class="m">1/(<i>σ</i>√(2<i>π</i>)) · <i>e</i><sup>−½((<i>x</i>−<i>μ</i>)/<i>σ</i>)<sup>2</sup></sup></span> 只有两个参数；系数是为了让面积为 1。</li><li>68–95–99.7：落在 ±1、±2、±3 个标准差内的概率。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/clt-0m12s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1gh4y1W7ag" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>高尔顿板：单个结果混乱，大量结果的比例却可以精确描述</span></button></li><li><button type="button" data-t="65"><b>1:05</b><span>中心极限定理解释了正态分布为什么常见</span></button></li><li><button type="button" data-t="113"><b>1:53</b><span>简化的高尔顿板：每次碰钉 +1 或 −1</span></button></li><li><button type="button" data-t="255"><b>4:15</b><span>一般思路：随机变量、N 个样本求和</span></button></li><li><button type="button" data-t="327"><b>5:27</b><span>要回答的问题：掷 100 次骰子，和的 95% 区间</span></button></li><li><button type="button" data-t="370"><b>6:10</b><span>骰子模拟：不管单个骰子怎么偏，和都趋向钟形</span></button></li><li><button type="button" data-t="539"><b>8:59</b><span>精确算和的分布：两个骰子数对角线</span></button></li><li><button type="button" data-t="588"><b>9:48</b><span>不均匀的骰子：卷积</span></button></li><li><button type="button" data-t="673"><b>11:13</b><span>分布在右移、变宽：需要均值和标准差</span></button></li><li><button type="button" data-t="703"><b>11:43</b><span>均值 μ：期望值</span></button></li><li><button type="button" data-t="730"><b>12:10</b><span>方差与标准差 σ</span></button></li><li><button type="button" data-t="796"><b>13:16</b><span>和的均值是 nμ</span></button></li><li><button type="button" data-t="825"><b>13:45</b><span>方差相加，所以标准差是 √n·σ</span></button></li><li><button type="button" data-t="904"><b>15:04</b><span>对齐均值、缩放到标准差为 1，趋向同一形状</span></button></li><li><button type="button" data-t="954"><b>15:54</b><span>一步步搭出正态分布的公式</span></button></li><li><button type="button" data-t="1058"><b>17:38</b><span>面积必须为 1：概率密度</span></button></li><li><button type="button" data-t="1101"><b>18:21</b><span>e^(−x<sup>2</sup>) 的面积是 √π</span></button></li><li><button type="button" data-t="1155"><b>19:15</b><span>标准正态分布，以及参数 μ 和 σ</span></button></li><li><button type="button" data-t="1255"><b>20:55</b><span>更优雅的写法：离均值几个标准差</span></button></li><li><button type="button" data-t="1338"><b>22:18</b><span>和的项数从 3 到 50：初始分布的细节被抹平</span></button></li><li><button type="button" data-t="1439"><b>23:59</b><span>定理的严格表述</span></button></li><li><button type="button" data-t="1504"><b>25:04</b><span>例子：掷 100 次骰子，68–95–99.7 法则</span></button></li><li><button type="button" data-t="1631"><b>27:11</b><span>除以 100：样本平均值的范围</span></button></li><li><button type="button" data-t="1692"><b>28:12</b><span>三个前提：独立、同分布、方差有限</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>高尔顿板：单个结果混乱，大量结果的比例却可以精确描述</span></button></li><li><button type="button" data-t="65"><b>1:05</b><span>中心极限定理解释了正态分布为什么常见</span></button></li><li><button type="button" data-t="113"><b>1:53</b><span>简化的高尔顿板：每次碰钉 +1 或 −1</span></button></li><li><button type="button" data-t="255"><b>4:15</b><span>一般思路：随机变量、N 个样本求和</span></button></li><li><button type="button" data-t="327"><b>5:27</b><span>要回答的问题：掷 100 次骰子，和的 95% 区间</span></button></li><li><button type="button" data-t="370"><b>6:10</b><span>骰子模拟：不管单个骰子怎么偏，和都趋向钟形</span></button></li><li><button type="button" data-t="539"><b>8:59</b><span>精确算和的分布：两个骰子数对角线</span></button></li><li><button type="button" data-t="588"><b>9:48</b><span>不均匀的骰子：卷积</span></button></li><li><button type="button" data-t="673"><b>11:13</b><span>分布在右移、变宽：需要均值和标准差</span></button></li><li><button type="button" data-t="703"><b>11:43</b><span>均值 μ：期望值</span></button></li><li><button type="button" data-t="730"><b>12:10</b><span>方差与标准差 σ</span></button></li><li><button type="button" data-t="796"><b>13:16</b><span>和的均值是 nμ</span></button></li><li><button type="button" data-t="825"><b>13:45</b><span>方差相加，所以标准差是 √n·σ</span></button></li><li><button type="button" data-t="904"><b>15:04</b><span>对齐均值、缩放到标准差为 1，趋向同一形状</span></button></li><li><button type="button" data-t="954"><b>15:54</b><span>一步步搭出正态分布的公式</span></button></li><li><button type="button" data-t="1058"><b>17:38</b><span>面积必须为 1：概率密度</span></button></li><li><button type="button" data-t="1101"><b>18:21</b><span>e<sup>−x<sup>2</sup></sup> 的面积是 √π</span></button></li><li><button type="button" data-t="1155"><b>19:15</b><span>标准正态分布，以及参数 μ 和 σ</span></button></li><li><button type="button" data-t="1255"><b>20:55</b><span>更优雅的写法：离均值几个标准差</span></button></li><li><button type="button" data-t="1338"><b>22:18</b><span>和的项数从 3 到 50：初始分布的细节被抹平</span></button></li><li><button type="button" data-t="1439"><b>23:59</b><span>定理的严格表述</span></button></li><li><button type="button" data-t="1504"><b>25:04</b><span>例子：掷 100 次骰子，68–95–99.7 法则</span></button></li><li><button type="button" data-t="1631"><b>27:11</b><span>除以 100：样本平均值的范围</span></button></li><li><button type="button" data-t="1692"><b>28:12</b><span>三个前提：独立、同分布、方差有限</span></button></li></ol>
     </aside>
   </div>
 </details>
 <details class="ep" id="prob3" data-ch="3" data-bv="BV1wu411W7uU">
   <summary>
     <span class="no">3</span>
-    <span class="tt"><b>正态分布里为什么有 π</b><em>Why π is in the normal distribution (beyond integral tricks)</em><span class="hook">正态分布里的 π 来自 e^(−x<sup>2</sup>) 下的面积 √π；更深的原因是：同时满足「只和到原点的距离有关」与「x、y 相互独立」的二维分布，只能是 e^(−c(x<sup>2</sup>+y<sup>2</sup>))。</span></span>
+    <span class="tt"><b>正态分布里为什么有 π</b><em>Why π is in the normal distribution (beyond integral tricks)</em><span class="hook">正态分布里的 π 来自 e<sup>−x<sup>2</sup></sup> 下的面积 √π；更深的原因是：同时满足「只和到原点的距离有关」与「x、y 相互独立」的二维分布，只能是 e<sup>−c(x<sup>2</sup>+y<sup>2</sup>)</sup>。</span></span>
     <span class="side"><span class="chip">B 站官方投稿</span><span class="len">25:35</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集回答一个统计学家的朋友提出的疑问：人口统计的公式里，怎么会有圆周长和直径之比？作者分两步走。第一步是经典证明：把一维的钟形曲线升到二维，钟形曲面下的体积用「圆筒」切片算出来是 π，换成平行切片算出来是面积的平方，所以面积是 √π。第二步更进一步，讲赫歇尔 (John Herschel) 1850 年的推导：一个二维分布若既旋转对称、两个坐标又相互独立，就只能是 e^(−c(x<sup>2</sup>+y<sup>2</sup>))。这让经典证明不再像碰巧成功的技巧。最后一步，把这件事和中心极限定理连起来，作者留给了下一集。</p>
+      <p class="lede">这一集回答一个统计学家的朋友提出的疑问：人口统计的公式里，怎么会有圆周长和直径之比？作者分两步走。第一步是经典证明：把一维的钟形曲线升到二维，钟形曲面下的体积用「圆筒」切片算出来是 π，换成平行切片算出来是面积的平方，所以面积是 √π。第二步更进一步，讲赫歇尔 (John Herschel) 1850 年的推导：一个二维分布若既旋转对称、两个坐标又相互独立，就只能是 e<sup>−c(x<sup>2</sup>+y<sup>2</sup>)</sup>。这让经典证明不再像碰巧成功的技巧。最后一步，把这件事和中心极限定理连起来，作者留给了下一集。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1wu411W7uU" target="_blank" rel="noreferrer">B 站官方投稿：为什么正态分布里会有一个π？（不止是积分技巧） ↗</a>
         <a href="https://www.youtube.com/watch?v=cy8r7WSuT1I" target="_blank" rel="noreferrer">YouTube · 2023-04-02 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="0">0:00</button><span>统计学家的朋友</span></h4>
       <p>物理学家维格纳 (Eugene Wigner) 的论文《数学在自然科学中不合理的有效性》开头讲了一个故事：两个高中同学聊工作，一个成了统计学家，研究人口趋势，拿出论文给老同学看，论文照例从高斯分布开始。统计学家解释公式里各个符号的意思，老同学不太相信。「那这个符号是什么？」「哦，这是 π。」「那是什么？」「圆的周长与直径之比。」「这玩笑开过头了吧，人口和圆周长能有什么关系？」</p>
       <p>作者说，有一个非常漂亮的经典证明能解释正态分布公式里为什么有 π，但他想走得更远。那位朋友要的不是一个纯数学证明，他怀疑的是圆和人口统计怎么会有关系。在把这条线连起来之前，任务不算完成。</p>
-      <p>上一集拆过正态分布的公式：去掉参数和常数，钟形的基本函数是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span>。公式里出现 π，是因为这条曲线下的面积等于 <span class="m">√<i>π</i></span>，要除掉它才能让面积为 1。所以第一步是解释这个面积；第二步是回答为什么偏偏是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span>，毕竟中间鼓、两边收的函数有很多，它和中心极限定理有什么联系。</p>
+      <p>上一集拆过正态分布的公式：去掉参数和常数，钟形的基本函数是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span>。公式里出现 π，是因为这条曲线下的面积等于 <span class="m">√<i>π</i></span>，要除掉它才能让面积为 1。所以第一步是解释这个面积；第二步是回答为什么偏偏是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span>，毕竟中间鼓、两边收的函数有很多，它和中心极限定理有什么联系。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-0m45s0.jpg" alt="「这个符号是什么？」「哦，这是 π。」" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="45">0:45</button>「这个符号是什么？」「哦，这是 π。」</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-2m30s0.jpg" alt="π 来自 e^(−x²) 曲线下的面积" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="150">2:30</button>π 来自 e^(−x<sup>2</sup>) 曲线下的面积</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="150">2:30</button>π 来自 e<sup>−x<sup>2</sup></sup> 曲线下的面积</figcaption></figure></div>
       
       
       
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="231">3:51</button><span>经典证明（一）：升到二维，用圆筒切</span></h4>
-      <p>求曲线下面积用积分：把面积近似成许多小矩形，高是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span>，宽是 <span class="m"><i>d</i><i>x</i></span>，从 <span class="m">−∞</span> 加到 <span class="m">∞</span>，再看 <span class="m"><i>d</i><i>x</i></span> 越来越小时这个和趋近什么。通常的办法是找一个导数等于 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 的函数，也就是原函数。问题在于，可以证明这个原函数虽然存在，却无法用多项式、三角函数、指数这些常用工具的任何组合写出来。所以得换个巧法。</p>
-      <p>第一步看起来最荒谬：升一维，不求钟形曲线下的面积，改求一个钟形曲面下的体积。这个二元函数的定义是：对平面上的点 <span class="m">(<i>x</i>, <i>y</i>)</span>，算它到原点的距离 <span class="m"><i>r</i></span>，再代进原来的函数，得到 <span class="m"><i>e</i>^(−<i>r</i><sup>2</sup>)</span>。由勾股定理，<span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> = <i>r</i><sup>2</sup></span>，所以它就是 <span class="m"><i>e</i>^(−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>))</span>。关键在于它有圆对称性：同一个圆上的点函数值都一样，图像绕 z 轴旋转对称。</p>
-      <p>数学喜欢你尊重它的对称性。于是把曲面下的体积切成一层层薄圆筒来算。一个圆筒的侧面展开是个矩形，一边是周长 <span class="m">2<i>π</i><i>r</i></span>，另一边是曲面在这里的高度 <span class="m"><i>e</i>^(−<i>r</i><sup>2</sup>)</span>，再乘厚度 <span class="m"><i>d</i><i>r</i></span> 就是它的体积。把 <span class="m"><i>r</i></span> 从 0 到 ∞ 的圆筒全加起来。</p>
-      <p>看起来三维比二维更难，其实发生了好事：积分里多出了一个 <span class="m">2<i>r</i></span>，<span class="m">2<i>r</i> · <i>e</i>^(−<i>r</i><sup>2</sup>)</span> 有原函数，正是 <span class="m">−<i>e</i>^(−<i>r</i><sup>2</sup>)</span> 的导数。代入上下限：<span class="m"><i>r</i> → ∞</span> 时趋于 0，<span class="m"><i>r</i> = 0</span> 时是 −1，差是 1。整个积分只剩前面那个因子：钟形曲面下的体积是 <span class="m"><i>π</i></span>。曲面本身有圆对称性，出现 π 并不奇怪。</p>
+      <p>求曲线下面积用积分：把面积近似成许多小矩形，高是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span>，宽是 <span class="m"><i>d</i><i>x</i></span>，从 <span class="m">−∞</span> 加到 <span class="m">∞</span>，再看 <span class="m"><i>d</i><i>x</i></span> 越来越小时这个和趋近什么。通常的办法是找一个导数等于 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 的函数，也就是原函数。问题在于，可以证明这个原函数虽然存在，却无法用多项式、三角函数、指数这些常用工具的任何组合写出来。所以得换个巧法。</p>
+      <p>第一步看起来最荒谬：升一维，不求钟形曲线下的面积，改求一个钟形曲面下的体积。这个二元函数的定义是：对平面上的点 <span class="m">(<i>x</i>, <i>y</i>)</span>，算它到原点的距离 <span class="m"><i>r</i></span>，再代进原来的函数，得到 <span class="m"><i>e</i><sup>−<i>r</i><sup>2</sup></sup></span>。由勾股定理，<span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> = <i>r</i><sup>2</sup></span>，所以它就是 <span class="m"><i>e</i><sup>−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)</sup></span>。关键在于它有圆对称性：同一个圆上的点函数值都一样，图像绕 z 轴旋转对称。</p>
+      <p>数学喜欢你尊重它的对称性。于是把曲面下的体积切成一层层薄圆筒来算。一个圆筒的侧面展开是个矩形，一边是周长 <span class="m">2<i>π</i><i>r</i></span>，另一边是曲面在这里的高度 <span class="m"><i>e</i><sup>−<i>r</i><sup>2</sup></sup></span>，再乘厚度 <span class="m"><i>d</i><i>r</i></span> 就是它的体积。把 <span class="m"><i>r</i></span> 从 0 到 ∞ 的圆筒全加起来。</p>
+      <p>看起来三维比二维更难，其实发生了好事：积分里多出了一个 <span class="m">2<i>r</i></span>，<span class="m">2<i>r</i> · <i>e</i><sup>−<i>r</i><sup>2</sup></sup></span> 有原函数，正是 <span class="m">−<i>e</i><sup>−<i>r</i><sup>2</sup></sup></span> 的导数。代入上下限：<span class="m"><i>r</i> → ∞</span> 时趋于 0，<span class="m"><i>r</i> = 0</span> 时是 −1，差是 1。整个积分只剩前面那个因子：钟形曲面下的体积是 <span class="m"><i>π</i></span>。曲面本身有圆对称性，出现 π 并不奇怪。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-4m10s0.jpg" alt="用小矩形逼近 e^(−x²) 下的面积" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="250">4:10</button>用小矩形逼近 e^(−x<sup>2</sup>) 下的面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-6m30s0.jpg" alt="二维版本 e^(−(x²+y²))：同一圆上的点高度相同" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="390">6:30</button>二维版本 e^(−(x<sup>2</sup>+y<sup>2</sup>))：同一圆上的点高度相同</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-7m15s0.jpg" alt="圆筒切片：侧面积是周长 2πr 乘高度 e^(−r²)" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="434">7:14</button>圆筒切片：侧面积是周长 2πr 乘高度 e^(−r<sup>2</sup>)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-8m58s0.jpg" alt="2r·e^(−r²) 有原函数，积分等于 1，体积是 π" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="538">8:58</button>2r·e^(−r<sup>2</sup>) 有原函数，积分等于 1，体积是 π</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="250">4:10</button>用小矩形逼近 e<sup>−x<sup>2</sup></sup> 下的面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-6m30s0.jpg" alt="二维版本 e^(−(x²+y²))：同一圆上的点高度相同" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="390">6:30</button>二维版本 e<sup>−(x<sup>2</sup>+y<sup>2</sup>)</sup>：同一圆上的点高度相同</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-7m15s0.jpg" alt="圆筒切片：侧面积是周长 2πr 乘高度 e^(−r²)" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="434">7:14</button>圆筒切片：侧面积是周长 2πr 乘高度 e<sup>−r<sup>2</sup></sup></figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-8m58s0.jpg" alt="2r·e^(−r²) 有原函数，积分等于 1，体积是 π" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="538">8:58</button>2r·e<sup>−r<sup>2</sup></sup> 有原函数，积分等于 1，体积是 π</figcaption></figure></div>
       
       
       
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="553">9:13</button><span>经典证明（二）：平行切片，体积是面积的平方</span></h4>
-      <p>换一种方法算同一个体积：用平行于 x 轴的平面切片。<span class="m"><i>y</i> = 0</span> 那一片正好就是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 的曲线，因为按指数法则，<span class="m"><i>e</i>^(−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)) = <i>e</i>^(−<i>x</i><sup>2</sup>) · <i>e</i>^(−<i>y</i><sup>2</sup>)</span>，在这一片上 <span class="m"><i>e</i>^(−<i>y</i><sup>2</sup>)</span> 等于 1。所以这一片的面积正是要找的神秘常数，记作 <span class="m"><i>C</i></span>。</p>
-      <p>别的切片也一样：换一个 <span class="m"><i>y</i></span>，就相当于把同一条曲线乘上一个数 <span class="m"><i>e</i>^(−<i>y</i><sup>2</sup>)</span>，形状相同，只是竖直方向缩小，面积是 <span class="m"><i>C</i> · <i>e</i>^(−<i>y</i><sup>2</sup>)</span>。作者指出，这对大多数二元函数都不成立，完全依赖于函数能拆成只含 <span class="m"><i>x</i></span> 的部分和只含 <span class="m"><i>y</i></span> 的部分相乘。</p>
-      <p>把所有切片的面积乘厚度 <span class="m"><i>d</i><i>y</i></span> 加起来：<span class="m">∫ <i>C</i> · <i>e</i>^(−<i>y</i><sup>2</sup>) <i>d</i><i>y</i></span>。把 <span class="m"><i>C</i></span> 提出去，剩下的积分又正好是 <span class="m"><i>C</i></span>。所以体积等于 <span class="m"><i>C</i><sup>2</sup></span>。单看这一步是用一个未知数表示另一个未知数，但体积已经算出来是 <span class="m"><i>π</i></span>，所以 <span class="m"><i>C</i> = √<i>π</i></span>。</p>
+      <p>换一种方法算同一个体积：用平行于 x 轴的平面切片。<span class="m"><i>y</i> = 0</span> 那一片正好就是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 的曲线，因为按指数法则，<span class="m"><i>e</i><sup>−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)</sup> = <i>e</i><sup>−<i>x</i><sup>2</sup></sup> · <i>e</i><sup>−<i>y</i><sup>2</sup></sup></span>，在这一片上 <span class="m"><i>e</i><sup>−<i>y</i><sup>2</sup></sup></span> 等于 1。所以这一片的面积正是要找的神秘常数，记作 <span class="m"><i>C</i></span>。</p>
+      <p>别的切片也一样：换一个 <span class="m"><i>y</i></span>，就相当于把同一条曲线乘上一个数 <span class="m"><i>e</i><sup>−<i>y</i><sup>2</sup></sup></span>，形状相同，只是竖直方向缩小，面积是 <span class="m"><i>C</i> · <i>e</i><sup>−<i>y</i><sup>2</sup></sup></span>。作者指出，这对大多数二元函数都不成立，完全依赖于函数能拆成只含 <span class="m"><i>x</i></span> 的部分和只含 <span class="m"><i>y</i></span> 的部分相乘。</p>
+      <p>把所有切片的面积乘厚度 <span class="m"><i>d</i><i>y</i></span> 加起来：<span class="m">∫ <i>C</i> · <i>e</i><sup>−<i>y</i><sup>2</sup></sup> <i>d</i><i>y</i></span>。把 <span class="m"><i>C</i></span> 提出去，剩下的积分又正好是 <span class="m"><i>C</i></span>。所以体积等于 <span class="m"><i>C</i><sup>2</sup></span>。单看这一步是用一个未知数表示另一个未知数，但体积已经算出来是 <span class="m"><i>π</i></span>，所以 <span class="m"><i>C</i> = √<i>π</i></span>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-10m40s0.jpg" alt="每个切片形状相同，面积是 C 乘一个数（这里是 0.78）" loading="lazy" decoding="async">
@@ -5736,7 +5736,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="730">12:10</button><span>为什么这个证明还不够</span></h4>
-      <p>证明很漂亮，但有两处不令人满意。一是它像一个碰巧成功的技巧，看不出你自己怎么会想到它。二是它没回答那位朋友的问题：圆和人口统计到底有什么关系？这只是第一步。接下来看看这个证明为什么没有看上去那么随意，以及它和「<span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 从哪来」有什么关系。</p>
+      <p>证明很漂亮，但有两处不令人满意。一是它像一个碰巧成功的技巧，看不出你自己怎么会想到它。二是它没回答那位朋友的问题：圆和人口统计到底有什么关系？这只是第一步。接下来看看这个证明为什么没有看上去那么随意，以及它和「<span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 从哪来」有什么关系。</p>
       
       
       
@@ -5746,7 +5746,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="771">12:51</button><span>赫歇尔的推导：两条性质逼出高斯</span></h4>
-      <p>赫歇尔 (John Herschel) 是 19 世纪的通才，涉猎化学、天文、摄影、植物学，发明了蓝图，给太阳系好几颗卫星命名。1850 年他给出了高斯分布的一个简洁推导。设想要描述二维平面上的一个概率分布，比如飞镖落在靶上的概率密度。赫歇尔证明：只要分布满足两条看似合理的性质，你就别无选择，即使从没听说过高斯，也会被逼到 <span class="m"><i>e</i>^(−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>))</span> 这个形状上。只剩一个控制分散程度的自由度，外加一个保证归一化的常数。</p>
+      <p>赫歇尔 (John Herschel) 是 19 世纪的通才，涉猎化学、天文、摄影、植物学，发明了蓝图，给太阳系好几颗卫星命名。1850 年他给出了高斯分布的一个简洁推导。设想要描述二维平面上的一个概率分布，比如飞镖落在靶上的概率密度。赫歇尔证明：只要分布满足两条看似合理的性质，你就别无选择，即使从没听说过高斯，也会被逼到 <span class="m"><i>e</i><sup>−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)</sup></span> 这个形状上。只剩一个控制分散程度的自由度，外加一个保证归一化的常数。</p>
       <p><b>性质一</b>：每一点附近的概率密度只取决于它到原点的距离，与方向无关。大家都瞄准靶心时，把靶子转一转，分布不变。数学上，描述分布的二元函数 <span class="m"><i>f</i><sub>2</sub>(<i>x</i>, <i>y</i>)</span> 可以写成半径 <span class="m"><i>r</i> = √(<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>)</span> 的一元函数 <span class="m"><i>f</i>(<i>r</i>)</span>。</p>
       <p><b>性质二</b>：每个点的 <span class="m"><i>x</i></span> 坐标和 <span class="m"><i>y</i></span> 坐标相互独立，知道了 <span class="m"><i>x</i></span> 不会给你关于 <span class="m"><i>y</i></span> 的任何信息。写成方程，就是 <span class="m"><i>f</i><sub>2</sub>(<i>x</i>, <i>y</i>)</span> 能分解成只含 <span class="m"><i>x</i></span> 的部分（<span class="m"><i>x</i></span> 坐标的分布 <span class="m"><i>g</i></span>）乘只含 <span class="m"><i>y</i></span> 的部分。再结合旋转对称，两个轴上的分布应该一样，所以是 <span class="m"><i>g</i>(<i>x</i>) · <i>g</i>(<i>y</i>)</span>。</p>
       <p>看 x 轴上距原点 <span class="m"><i>r</i></span> 的一点，两种写法说明 <span class="m"><i>f</i>(<i>r</i>)</span> 等于某个常数乘 <span class="m"><i>g</i>(<i>r</i>)</span>，两个函数只差一个常数倍。作者干脆假设这个常数就是 1，这样推出的答案会差一个常数因子，但无所谓，最后反正要重新缩放让面积为 1。于是得到一个只含 <span class="m"><i>f</i></span> 的方程：<span class="m"><i>f</i>(√(<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>)) = <i>f</i>(<i>x</i>) · <i>f</i>(<i>y</i>)</span>。</p>
@@ -5761,17 +5761,17 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1025">17:05</button><span>解函数方程：加法变乘法，只能是指数</span></h4>
-      <p>这种方程叫<b>函数方程 (Functional Equation)</b>：不是求一个未知数，而是对所有 <span class="m"><i>x</i></span>、<span class="m"><i>y</i></span> 都成立，要找的是一个未知函数。我们心里知道 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 满足它，但要假装不知道，推出所有满足它的函数。</p>
+      <p>这种方程叫<b>函数方程 (Functional Equation)</b>：不是求一个未知数，而是对所有 <span class="m"><i>x</i></span>、<span class="m"><i>y</i></span> 都成立，要找的是一个未知函数。我们心里知道 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 满足它，但要假装不知道，推出所有满足它的函数。</p>
       <p>引入辅助函数 <span class="m"><i>h</i>(<i>x</i>) = <i>f</i>(√<i>x</i>)</span>，也就是 <span class="m"><i>h</i>(<i>x</i><sup>2</sup>) = <i>f</i>(<i>x</i>)</span>。用 <span class="m"><i>h</i></span> 表示，方程变成 <span class="m"><i>h</i>(<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>) = <i>h</i>(<i>x</i><sup>2</sup>) · <i>h</i>(<i>y</i><sup>2</sup>)</span>：两个正数相加再求 <span class="m"><i>h</i></span>，等于分别求 <span class="m"><i>h</i></span> 再相乘。<span class="m"><i>h</i></span> 把加法变成了乘法。</p>
-      <p>这很有约束力。对两个数成立，就对任意多个数成立。<span class="m"><i>h</i>(5) = <i>h</i>(1 + 1 + 1 + 1 + 1) = <i>h</i>(1)<sup>5</sup></span>，任何正整数 <span class="m"><i>n</i></span> 都有 <span class="m"><i>h</i>(<i>n</i>) = <i>h</i>(1)<sup><i>n</i></sup></span>，记 <span class="m"><i>b</i> = <i>h</i>(1)</span>。作者留了个小练习：对有理数 <span class="m"><i>p</i>/<i>q</i></span> 也有 <span class="m"><i>h</i>(<i>p</i>/<i>q</i>) = <i>b</i>^(<i>p</i>/<i>q</i>)</span>（提示：把这个输入自己加 <span class="m"><i>q</i></span> 次）。有理数在实数中稠密，再假定只考虑连续函数，<span class="m"><i>h</i></span> 就必须是指数函数 <span class="m"><i>b</i><sup><i>x</i></sup></span>。</p>
-      <p>按习惯写成 <span class="m"><i>e</i>^(<i>c</i><i>x</i>)</span>，于是 <span class="m"><i>f</i>(<i>x</i>) = <i>e</i>^(<i>c</i><i>x</i><sup>2</sup>)</span>。这个函数不再是从天上掉下来的：从「二维分布应该怎样」的两个前提出发，被逼出了「密度是到原点距离平方的指数」这个形状。最后，<span class="m"><i>c</i> > 0</span> 时函数向各方向发散，体积无穷大，无法归一化成概率分布，所以 <span class="m"><i>c</i></span> 必须是负数，它的具体值决定分布的宽窄。</p>
+      <p>这很有约束力。对两个数成立，就对任意多个数成立。<span class="m"><i>h</i>(5) = <i>h</i>(1 + 1 + 1 + 1 + 1) = <i>h</i>(1)<sup>5</sup></span>，任何正整数 <span class="m"><i>n</i></span> 都有 <span class="m"><i>h</i>(<i>n</i>) = <i>h</i>(1)<sup><i>n</i></sup></span>，记 <span class="m"><i>b</i> = <i>h</i>(1)</span>。作者留了个小练习：对有理数 <span class="m"><i>p</i>/<i>q</i></span> 也有 <span class="m"><i>h</i>(<i>p</i>/<i>q</i>) = <i>b</i><sup><i>p</i>/<i>q</i></sup></span>（提示：把这个输入自己加 <span class="m"><i>q</i></span> 次）。有理数在实数中稠密，再假定只考虑连续函数，<span class="m"><i>h</i></span> 就必须是指数函数 <span class="m"><i>b</i><sup><i>x</i></sup></span>。</p>
+      <p>按习惯写成 <span class="m"><i>e</i><sup><i>c</i><i>x</i></sup></span>，于是 <span class="m"><i>f</i>(<i>x</i>) = <i>e</i><sup><i>c</i><i>x</i><sup>2</sup></sup></span>。这个函数不再是从天上掉下来的：从「二维分布应该怎样」的两个前提出发，被逼出了「密度是到原点距离平方的指数」这个形状。最后，<span class="m"><i>c</i> > 0</span> 时函数向各方向发散，体积无穷大，无法归一化成概率分布，所以 <span class="m"><i>c</i></span> 必须是负数，它的具体值决定分布的宽窄。</p>
       <p>赫歇尔之后十年，麦克斯韦 (James Clerk Maxwell) 研究统计力学、推导气体分子速度的分布时，在三维里独立得出了同样的推导，逻辑完全一样。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-18m25s0.jpg" alt="令 h(x²) = f(x)：h 把加法变成乘法" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="1105">18:25</button>令 h(x<sup>2</sup>) = f(x)：h 把加法变成乘法</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-19m08s0.jpg" alt="h(n) = h(1)ⁿ：只能是指数函数" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="1148">19:08</button>h(n) = h(1)<sup><i>n</i></sup>：只能是指数函数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-20m30s0.jpg" alt="结论：f(x) = e^(cx²)，c 必须为负" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1230">20:30</button>结论：f(x) = e^(cx<sup>2</sup>)，c 必须为负</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="1230">20:30</button>结论：f(x) = e<sup>cx<sup>2</sup></sup>，c 必须为负</figcaption></figure></div>
       
       
       
@@ -5783,14 +5783,14 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-21m30s0.jpg" alt="两条性质必然推出 f(r) = e^(cr²)，c 决定分散程度" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1290">21:30</button>两条性质必然推出 f(r) = e^(cr<sup>2</sup>)，c 决定分散程度</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="1290">21:30</button>两条性质必然推出 f(r) = e<sup>cr<sup>2</sup></sup>，c 决定分散程度</figcaption></figure></div>
       
       <div class="note"><p><span class="lbl">补充</span>B 站这一集比 YouTube 现在的版本多了约 49 秒（23:52 到 24:40 的回顾：作者说这是第三次把这个话题鸽到下一期，并把卷积、中心极限定理、√π 和赫歇尔-麦克斯韦刻画并排放在一张图里），YouTube 后来剪掉了。所以 23:50 以后的时间码按 B 站计。</p></div>
       
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1479">24:39</button><span>附加题：高维球的体积</span></h4>
-      <p>作者在 Patreon 上发了这个项目的消息后，一位叫 Kevin Ega 的数学家告诉他：把这个积分技巧用到更高维，可以推出高维球的体积公式。细节留在屏幕上，给会分部积分的观众自己推：1 维是 <span class="m">2<i>r</i></span>，2 维是 <span class="m"><i>π</i><i>r</i><sup>2</sup></span>，3 维是 <span class="m">(4/3)<i>π</i><i>r</i><sup>3</sup></span>，4 维是 <span class="m">(1/2)<i>π</i><sup>2</sup><i>r</i><sup>4</sup></span>，一般的 <span class="m"><i>n</i></span> 维是 <span class="m"><i>π</i>^(<i>n</i>/2) / (<i>n</i>/2)! · <i>r</i><sup><i>n</i></sup></span>。</p>
+      <p>作者在 Patreon 上发了这个项目的消息后，一位叫 Kevin Ega 的数学家告诉他：把这个积分技巧用到更高维，可以推出高维球的体积公式。细节留在屏幕上，给会分部积分的观众自己推：1 维是 <span class="m">2<i>r</i></span>，2 维是 <span class="m"><i>π</i><i>r</i><sup>2</sup></span>，3 维是 <span class="m">(4/3)<i>π</i><i>r</i><sup>3</sup></span>，4 维是 <span class="m">(1/2)<i>π</i><sup>2</sup><i>r</i><sup>4</sup></span>，一般的 <span class="m"><i>n</i></span> 维是 <span class="m"><i>π</i><sup><i>n</i>/2</sup> / (<i>n</i>/2)! · <i>r</i><sup><i>n</i></sup></span>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-integral-24m55s0.jpg" alt="同一个技巧推出 n 维球的体积与表面积" loading="lazy" decoding="async">
@@ -5799,13 +5799,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li><span class="m">∫ <i>e</i>^(−<i>x</i><sup>2</sup>) <i>d</i><i>x</i> = √<i>π</i></span>：升到二维，同一个体积用圆筒切是 <span class="m"><i>π</i></span>，用平行切片是 <span class="m"><i>C</i><sup>2</sup></span>。</li><li>赫歇尔-麦克斯韦：二维分布若只依赖到原点的距离，且 <span class="m"><i>x</i></span>、<span class="m"><i>y</i></span> 独立，就必然是 <span class="m"><i>e</i>^(−<i>c</i>(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>))</span>。</li><li>函数方程 <span class="m"><i>h</i>(<i>a</i> + <i>b</i>) = <i>h</i>(<i>a</i>)<i>h</i>(<i>b</i>)</span> 加上连续性，只能是指数函数。</li><li>经典证明用到的两步（圆筒切、平行切）正对应这两条定义性质，π 来自圆对称。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li><span class="m">∫ <i>e</i><sup>−<i>x</i><sup>2</sup></sup> <i>d</i><i>x</i> = √<i>π</i></span>：升到二维，同一个体积用圆筒切是 <span class="m"><i>π</i></span>，用平行切片是 <span class="m"><i>C</i><sup>2</sup></span>。</li><li>赫歇尔-麦克斯韦：二维分布若只依赖到原点的距离，且 <span class="m"><i>x</i></span>、<span class="m"><i>y</i></span> 独立，就必然是 <span class="m"><i>e</i><sup>−<i>c</i>(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)</sup></span>。</li><li>函数方程 <span class="m"><i>h</i>(<i>a</i> + <i>b</i>) = <i>h</i>(<i>a</i>)<i>h</i>(<i>b</i>)</span> 加上连续性，只能是指数函数。</li><li>经典证明用到的两步（圆筒切、平行切）正对应这两条定义性质，π 来自圆对称。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/gaussian-integral-0m45s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1wu411W7uU" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>维格纳论文开头的故事：人口统计里怎么会有 π</span></button></li><li><button type="button" data-t="127"><b>2:07</b><span>回顾：π 来自 e^(−x<sup>2</sup>) 下的面积 √π</span></button></li><li><button type="button" data-t="185"><b>3:05</b><span>还要回答：为什么偏偏是 e^(−x<sup>2</sup>)</span></button></li><li><button type="button" data-t="231"><b>3:51</b><span>经典证明：积分，但 e^(−x<sup>2</sup>) 没有初等原函数</span></button></li><li><button type="button" data-t="319"><b>5:19</b><span>升一维：钟形曲面 e^(−(x<sup>2</sup>+y<sup>2</sup>))</span></button></li><li><button type="button" data-t="385"><b>6:25</b><span>旋转对称：用圆筒切片</span></button></li><li><button type="button" data-t="461"><b>7:41</b><span>积分 2πr·e^(−r<sup>2</sup>)dr，体积是 π</span></button></li><li><button type="button" data-t="553"><b>9:13</b><span>换个切法：平行于 x 轴的切片</span></button></li><li><button type="button" data-t="605"><b>10:05</b><span>函数可以分解：e^(−x<sup>2</sup>)·e^(−y<sup>2</sup>)</span></button></li><li><button type="button" data-t="662"><b>11:02</b><span>体积 = C<sup>2</sup>，所以 C = √π</span></button></li><li><button type="button" data-t="730"><b>12:10</b><span>这个证明还不够：像技巧，也没回答那个朋友</span></button></li><li><button type="button" data-t="771"><b>12:51</b><span>赫歇尔的推导：飞镖靶上的二维分布</span></button></li><li><button type="button" data-t="833"><b>13:53</b><span>性质一：密度只取决于到原点的距离</span></button></li><li><button type="button" data-t="873"><b>14:33</b><span>性质二：x 和 y 坐标相互独立</span></button></li><li><button type="button" data-t="1025"><b>17:05</b><span>函数方程 f(r) = f(x)f(y)</span></button></li><li><button type="button" data-t="1064"><b>17:44</b><span>h 把加法变成乘法，只能是指数函数</span></button></li><li><button type="button" data-t="1225"><b>20:25</b><span>所以 f 必须是 e^(cx<sup>2</sup>)，c < 0</span></button></li><li><button type="button" data-t="1294"><b>21:34</b><span>麦克斯韦在三维里独立得到同样的推导</span></button></li><li><button type="button" data-t="1315"><b>21:55</b><span>回头看经典证明：用的正是这两条性质</span></button></li><li><button type="button" data-t="1398"><b>23:18</b><span>还差一步：和中心极限定理的联系</span></button></li><li><button type="button" data-t="1479"><b>24:39</b><span>附加：用同样的技巧推高维球的体积</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>维格纳论文开头的故事：人口统计里怎么会有 π</span></button></li><li><button type="button" data-t="127"><b>2:07</b><span>回顾：π 来自 e<sup>−x<sup>2</sup></sup> 下的面积 √π</span></button></li><li><button type="button" data-t="185"><b>3:05</b><span>还要回答：为什么偏偏是 e<sup>−x<sup>2</sup></sup></span></button></li><li><button type="button" data-t="231"><b>3:51</b><span>经典证明：积分，但 e<sup>−x<sup>2</sup></sup> 没有初等原函数</span></button></li><li><button type="button" data-t="319"><b>5:19</b><span>升一维：钟形曲面 e<sup>−(x<sup>2</sup>+y<sup>2</sup>)</sup></span></button></li><li><button type="button" data-t="385"><b>6:25</b><span>旋转对称：用圆筒切片</span></button></li><li><button type="button" data-t="461"><b>7:41</b><span>积分 2πr·e<sup>−r<sup>2</sup></sup>dr，体积是 π</span></button></li><li><button type="button" data-t="553"><b>9:13</b><span>换个切法：平行于 x 轴的切片</span></button></li><li><button type="button" data-t="605"><b>10:05</b><span>函数可以分解：e<sup>−x<sup>2</sup></sup>·e<sup>−y<sup>2</sup></sup></span></button></li><li><button type="button" data-t="662"><b>11:02</b><span>体积 = C<sup>2</sup>，所以 C = √π</span></button></li><li><button type="button" data-t="730"><b>12:10</b><span>这个证明还不够：像技巧，也没回答那个朋友</span></button></li><li><button type="button" data-t="771"><b>12:51</b><span>赫歇尔的推导：飞镖靶上的二维分布</span></button></li><li><button type="button" data-t="833"><b>13:53</b><span>性质一：密度只取决于到原点的距离</span></button></li><li><button type="button" data-t="873"><b>14:33</b><span>性质二：x 和 y 坐标相互独立</span></button></li><li><button type="button" data-t="1025"><b>17:05</b><span>函数方程 f(r) = f(x)f(y)</span></button></li><li><button type="button" data-t="1064"><b>17:44</b><span>h 把加法变成乘法，只能是指数函数</span></button></li><li><button type="button" data-t="1225"><b>20:25</b><span>所以 f 必须是 e<sup>cx<sup>2</sup></sup>，c < 0</span></button></li><li><button type="button" data-t="1294"><b>21:34</b><span>麦克斯韦在三维里独立得到同样的推导</span></button></li><li><button type="button" data-t="1315"><b>21:55</b><span>回头看经典证明：用的正是这两条性质</span></button></li><li><button type="button" data-t="1398"><b>23:18</b><span>还差一步：和中心极限定理的联系</span></button></li><li><button type="button" data-t="1479"><b>24:39</b><span>附加：用同样的技巧推高维球的体积</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -5817,12 +5817,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集收尾前两集留下的问题：概率论为什么偏爱 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span>？作者先回顾两件事：中心极限定理说很多独立变量之和趋向正态分布；两个随机变量之和的分布，是两个分布的卷积。然后算一个具体例子，两个高斯函数的卷积。直接代公式是一道配方练习，作者给了一个几何算法：在 <span class="m"><i>f</i>(<i>x</i>)<i>g</i>(<i>y</i>)</span> 的三维图上沿 <span class="m"><i>x</i> + <i>y</i> = <i>s</i></span> 切片，利用高斯曲面的旋转对称，把斜切片转成平行于坐标轴的切片，积分一下就出来了。结论是高斯卷高斯还是高斯。最后说明这一步在证明中心极限定理里的位置：它解释了为什么那个普适形状是高斯，而不是别的函数。</p>
+      <p class="lede">这一集收尾前两集留下的问题：概率论为什么偏爱 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span>？作者先回顾两件事：中心极限定理说很多独立变量之和趋向正态分布；两个随机变量之和的分布，是两个分布的卷积。然后算一个具体例子，两个高斯函数的卷积。直接代公式是一道配方练习，作者给了一个几何算法：在 <span class="m"><i>f</i>(<i>x</i>)<i>g</i>(<i>y</i>)</span> 的三维图上沿 <span class="m"><i>x</i> + <i>y</i> = <i>s</i></span> 切片，利用高斯曲面的旋转对称，把斜切片转成平行于坐标轴的切片，积分一下就出来了。结论是高斯卷高斯还是高斯。最后说明这一步在证明中心极限定理里的位置：它解释了为什么那个普适形状是高斯，而不是别的函数。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1EP411p7bV" target="_blank" rel="noreferrer">B 站官方投稿：到底为什么“中心极限”是正态分布啊 ↗</a>
         <a href="https://www.youtube.com/watch?v=d_qvLDhkg00" target="_blank" rel="noreferrer">YouTube · 2023-07-11 ↗</a></p>
       <section class="sec">
       <h4><button class="ts" type="button" data-t="0">0:00</button><span>问题和回顾</span></h4>
-      <p>正态分布的基本函数是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span>。对称、光滑、中间集中的函数能写出无数个，概率论为什么偏偏对这一个情有独钟？前几集一直在暗示答案，这一集给出一个令人满意的回答。</p>
+      <p>正态分布的基本函数是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span>。对称、光滑、中间集中的函数能写出无数个，概率论为什么偏偏对这一个情有独钟？前几集一直在暗示答案，这一集给出一个令人满意的回答。</p>
       <p>回顾两件事。第一，中心极限定理：把一个随机变量的多个副本相加（反复掷一个灌铅骰子、小球反复碰钉子），和的分布近似正态分布，在适当条件下项数越多越接近。但作者一直没解释它为什么成立。第二，上一集（这一页没收，「卷积的两种可视化」）讲了两个随机变量相加：两个变量各自服从某个分布，它们之和的分布就是两个分布函数的<b>卷积 (Convolution)</b>，并给了两种可视化卷积的方法。</p>
       <p>这一集的任务是：两个正态分布的随机变量相加，得到什么？也就是两个高斯函数的卷积是什么。作者说这个计算正是证明中心极限定理的步骤之一，它回答的问题是「为什么极限是高斯而不是别的」。</p>
       
@@ -5836,8 +5836,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="129">2:09</button><span>直接算：一道配方练习</span></h4>
-      <p>完整的高斯公式比 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 复杂：指数写成 <span class="m">−½(<i>x</i>/<i>σ</i>)<sup>2</sup></span>，<span class="m"><i>σ</i></span> 是标准差；前面乘一个分数让面积为 1；不以 0 为中心时再加一个参数 <span class="m"><i>μ</i></span>。这一集只考虑以 0 为中心的分布。</p>
-      <p>最直接的算法是把两个高斯公式代进卷积的积分定义里。符号很多，但本质上就是一道配方 (completing the square) 练习，能得到正确答案。作者说他偏爱几何直觉，这里有一种他没见别人写过的看法，还能和 π 的出现、正态分布的推导联系起来。先把常数都剥掉，只算两个 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 的卷积。</p>
+      <p>完整的高斯公式比 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 复杂：指数写成 <span class="m">−½(<i>x</i>/<i>σ</i>)<sup>2</sup></span>，<span class="m"><i>σ</i></span> 是标准差；前面乘一个分数让面积为 1；不以 0 为中心时再加一个参数 <span class="m"><i>μ</i></span>。这一集只考虑以 0 为中心的分布。</p>
+      <p>最直接的算法是把两个高斯公式代进卷积的积分定义里。符号很多，但本质上就是一道配方 (completing the square) 练习，能得到正确答案。作者说他偏爱几何直觉，这里有一种他没见别人写过的看法，还能和 π 的出现、正态分布的推导联系起来。先把常数都剥掉，只算两个 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 的卷积。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-2m20s0.jpg" alt="完整的高斯：σ 描述分散程度" loading="lazy" decoding="async">
@@ -5861,17 +5861,17 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="313">5:13</button><span>旋转对称：把斜切片转正</span></h4>
-      <p>两个函数都是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 和 <span class="m"><i>e</i>^(−<i>y</i><sup>2</sup>)</span> 时，三维图有一个很好用的性质：<b>旋转对称</b>。合并指数得 <span class="m"><i>e</i>^(−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>))</span>，它完全是 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup></span> 的函数，也就是到原点距离平方的函数。作者强调，别的分布都没有这个性质，它唯一地刻画了钟形曲线。对大多数函数，斜切片的形状很复杂，求它的面积就等于重新算一遍卷积的积分，几何直觉帮不上忙。</p>
+      <p>两个函数都是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 和 <span class="m"><i>e</i><sup>−<i>y</i><sup>2</sup></sup></span> 时，三维图有一个很好用的性质：<b>旋转对称</b>。合并指数得 <span class="m"><i>e</i><sup>−(<i>x</i><sup>2</sup>+<i>y</i><sup>2</sup>)</sup></span>，它完全是 <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup></span> 的函数，也就是到原点距离平方的函数。作者强调，别的分布都没有这个性质，它唯一地刻画了钟形曲线。对大多数函数，斜切片的形状很复杂，求它的面积就等于重新算一遍卷积的积分，几何直觉帮不上忙。</p>
       <p>看 <span class="m"><i>x</i> + <i>y</i> = <i>s</i></span> 这条线：它与 x 轴交于 <span class="m">(<i>s</i>, 0)</span>，与 y 轴交于 <span class="m">(0, <i>s</i>)</span>，用勾股定理可得原点到它的距离是 <span class="m"><i>s</i>/√2</span>。由于旋转对称，这个斜切片和转 45° 后、平行于 y 轴、距原点同样远的切片完全一样。平行于 y 轴的切片好算得多，只需对 <span class="m"><i>y</i></span> 积分，切片上的 <span class="m"><i>x</i></span> 是常数 <span class="m"><i>s</i>/√2</span>。</p>
-      <p>于是 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 这一项在积分里就是一个数，可以提出去。关键在于：所有含 <span class="m"><i>s</i></span> 的东西都和积分变量分开了。剩下的积分 <span class="m">∫ <i>e</i>^(−<i>y</i><sup>2</sup>) <i>d</i><i>y</i></span> 就是上一集那个著名的积分，等于 <span class="m">√<i>π</i></span>，但它具体是多少不重要，重要的是它和 <span class="m"><i>s</i></span> 无关。</p>
-      <p>所以切片面积作为 <span class="m"><i>s</i></span> 的函数是 <span class="m">√<i>π</i> · <i>e</i>^(−<i>s</i><sup>2</sup>/2)</span>：还是一条钟形曲线，只是因为指数里的 2 被拉宽了一些。卷积的值是这个面积再除以 <span class="m">√2</span>，也只是并进常数里。<b>两个高斯函数的卷积还是一个高斯函数</b>。</p>
+      <p>于是 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 这一项在积分里就是一个数，可以提出去。关键在于：所有含 <span class="m"><i>s</i></span> 的东西都和积分变量分开了。剩下的积分 <span class="m">∫ <i>e</i><sup>−<i>y</i><sup>2</sup></sup> <i>d</i><i>y</i></span> 就是上一集那个著名的积分，等于 <span class="m">√<i>π</i></span>，但它具体是多少不重要，重要的是它和 <span class="m"><i>s</i></span> 无关。</p>
+      <p>所以切片面积作为 <span class="m"><i>s</i></span> 的函数是 <span class="m">√<i>π</i> · <i>e</i><sup>−<i>s</i><sup>2</sup>/2</sup></span>：还是一条钟形曲线，只是因为指数里的 2 被拉宽了一些。卷积的值是这个面积再除以 <span class="m">√2</span>，也只是并进常数里。<b>两个高斯函数的卷积还是一个高斯函数</b>。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-5m30s0.jpg" alt="f(x)g(y) = e^(−(x²+y²))：只取决于到原点的距离" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="330">5:30</button>f(x)g(y) = e^(−(x<sup>2</sup>+y<sup>2</sup>))：只取决于到原点的距离</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-6m40s0.jpg" alt="x + y = s 到原点的距离是 s/√2" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="330">5:30</button>f(x)g(y) = e<sup>−(x<sup>2</sup>+y<sup>2</sup>)</sup>：只取决于到原点的距离</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-6m40s0.jpg" alt="x + y = s 到原点的距离是 s/√2" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="400">6:40</button>x + y = s 到原点的距离是 s/√2</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-7m10s0.jpg" alt="转成平行于 y 轴的切片：x = s/√2 是常数，可以提出积分" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="430">7:10</button>转成平行于 y 轴的切片：x = s/√2 是常数，可以提出积分</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/gaussian-convolution-7m50s0.jpg" alt="切片面积 = e^(−s²/2)·√π，还是钟形" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="470">7:50</button>切片面积 = e^(−s<sup>2</sup>/2)·√π，还是钟形</figcaption></figure></div>
+      <figcaption><button class="ts" type="button" data-t="470">7:50</button>切片面积 = e<sup>−s<sup>2</sup>/2</sup>·√π，还是钟形</figcaption></figure></div>
       
       
       
@@ -5905,7 +5905,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="695">11:35</button><span>三条线连在一起</span></h4>
-      <p>作者喜欢这个几何论证，是因为它把频道里讲过的几件事直接连起来：赫歇尔-麦克斯韦的推导说，旋转对称可以当成高斯分布的定义性特征，它把你锁定在 <span class="m"><i>e</i>^(−<i>x</i><sup>2</sup>)</span> 这个形式上；这个论证也和 π 出现在公式里的经典证明是同一张图。于是 π 的来历和中心极限定理之间终于有了一条直线。</p>
+      <p>作者喜欢这个几何论证，是因为它把频道里讲过的几件事直接连起来：赫歇尔-麦克斯韦的推导说，旋转对称可以当成高斯分布的定义性特征，它把你锁定在 <span class="m"><i>e</i><sup>−<i>x</i><sup>2</sup></sup></span> 这个形式上；这个论证也和 π 出现在公式里的经典证明是同一张图。于是 π 的来历和中心极限定理之间终于有了一条直线。</p>
       <p>作者还提到，一位支持者告诉他另一种完全不同的思路，用熵来说明为什么是高斯（给定方差时，正态分布是熵最大的分布），链接放在视频简介里。</p>
       
       
@@ -5921,7 +5921,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/gaussian-convolution-0m35s0.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
         <a class="plbili" href="https://www.bilibili.com/video/BV1EP411p7bV" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>为什么是 e^(−x<sup>2</sup>)？这一集给出答案</span></button></li><li><button type="button" data-t="27"><b>0:27</b><span>回顾：中心极限定理</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>回顾：两个随机变量之和的分布是卷积</span></button></li><li><button type="button" data-t="85"><b>1:25</b><span>目标：两个高斯函数的卷积</span></button></li><li><button type="button" data-t="129"><b>2:09</b><span>完整的高斯公式；直接算是一道配方题</span></button></li><li><button type="button" data-t="208"><b>3:28</b><span>先去掉常数，只看 e^(−x<sup>2</sup>)</span></button></li><li><button type="button" data-t="224"><b>3:44</b><span>卷积的第二种可视化：沿对角线切片</span></button></li><li><button type="button" data-t="313"><b>5:13</b><span>e^(−x<sup>2</sup>)·e^(−y<sup>2</sup>) 的图像旋转对称</span></button></li><li><button type="button" data-t="344"><b>5:44</b><span>这个性质只有钟形曲线有</span></button></li><li><button type="button" data-t="374"><b>6:14</b><span>切片到原点的距离是 s/√2</span></button></li><li><button type="button" data-t="405"><b>6:45</b><span>转 45°：变成平行于 y 轴的切片</span></button></li><li><button type="button" data-t="443"><b>7:23</b><span>含 s 的部分可以提到积分外</span></button></li><li><button type="button" data-t="468"><b>7:48</b><span>结果：e^(−s<sup>2</sup>/2)，还是钟形</span></button></li><li><button type="button" data-t="507"><b>8:27</b><span>放回常数：标准差变成 √2·σ</span></button></li><li><button type="button" data-t="550"><b>9:10</b><span>有什么了不起？别倒因为果</span></button></li><li><button type="button" data-t="597"><b>9:57</b><span>证明中心极限定理的两步</span></button></li><li><button type="button" data-t="670"><b>11:10</b><span>第二步就是这一集：高斯是反复卷积的不动点</span></button></li><li><button type="button" data-t="695"><b>11:35</b><span>和赫歇尔-麦克斯韦推导、π 的经典证明连起来</span></button></li></ol>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>为什么是 e<sup>−x<sup>2</sup></sup>？这一集给出答案</span></button></li><li><button type="button" data-t="27"><b>0:27</b><span>回顾：中心极限定理</span></button></li><li><button type="button" data-t="63"><b>1:03</b><span>回顾：两个随机变量之和的分布是卷积</span></button></li><li><button type="button" data-t="85"><b>1:25</b><span>目标：两个高斯函数的卷积</span></button></li><li><button type="button" data-t="129"><b>2:09</b><span>完整的高斯公式；直接算是一道配方题</span></button></li><li><button type="button" data-t="208"><b>3:28</b><span>先去掉常数，只看 e<sup>−x<sup>2</sup></sup></span></button></li><li><button type="button" data-t="224"><b>3:44</b><span>卷积的第二种可视化：沿对角线切片</span></button></li><li><button type="button" data-t="313"><b>5:13</b><span>e<sup>−x<sup>2</sup></sup>·e<sup>−y<sup>2</sup></sup> 的图像旋转对称</span></button></li><li><button type="button" data-t="344"><b>5:44</b><span>这个性质只有钟形曲线有</span></button></li><li><button type="button" data-t="374"><b>6:14</b><span>切片到原点的距离是 s/√2</span></button></li><li><button type="button" data-t="405"><b>6:45</b><span>转 45°：变成平行于 y 轴的切片</span></button></li><li><button type="button" data-t="443"><b>7:23</b><span>含 s 的部分可以提到积分外</span></button></li><li><button type="button" data-t="468"><b>7:48</b><span>结果：e<sup>−s<sup>2</sup>/2</sup>，还是钟形</span></button></li><li><button type="button" data-t="507"><b>8:27</b><span>放回常数：标准差变成 √2·σ</span></button></li><li><button type="button" data-t="550"><b>9:10</b><span>有什么了不起？别倒因为果</span></button></li><li><button type="button" data-t="597"><b>9:57</b><span>证明中心极限定理的两步</span></button></li><li><button type="button" data-t="670"><b>11:10</b><span>第二步就是这一集：高斯是反复卷积的不动点</span></button></li><li><button type="button" data-t="695"><b>11:35</b><span>和赫歇尔-麦克斯韦推导、π 的经典证明连起来</span></button></li></ol>
     </aside>
   </div>
 </details>
@@ -5968,13 +5968,13 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="490">8:10</button><span>比特：把可能性砍半就是 1 比特</span></h4>
       <p>信息的标准单位是<b>比特 (bit)</b>。一次观察把可能性空间砍掉一半，就说它带来 1 比特信息。五字母词里大约一半含 S，得知「有 S」就是约 1 比特。砍到四分之一是 2 比特（约四分之一的词含 T），砍到八分之一是 3 比特，十六分之一是 4 比特，以此类推。</p>
-      <p>写成公式：<span class="m">(1/2)^<i>I</i> = <i>p</i></span>，即 <span class="m">2^<i>I</i> = 1/<i>p</i></span>，所以信息量 <span class="m"><i>I</i> = log<sub>2</sub>(1/<i>p</i>)</span>，也常写成 <span class="m">−log<sub>2</sub> <i>p</i></span>。这个写法初看有点怪，但它就是在问：可能性被对半砍了几次？</p>
+      <p>写成公式：<span class="m">(1/2)<sup><i>I</i></sup> = <i>p</i></span>，即 <span class="m">2<sup><i>I</i></sup> = 1/<i>p</i></span>，所以信息量 <span class="m"><i>I</i> = log<sub>2</sub>(1/<i>p</i>)</span>，也常写成 <span class="m">−log<sub>2</sub> <i>p</i></span>。这个写法初看有点怪，但它就是在问：可能性被对半砍了几次？</p>
       <p>为什么要用对数？一个原因是方便谈很小的概率：说「20 比特信息」比说「概率是 0.00000095」容易。更实质的原因是<b>信息可以相加</b>：第一次观察给 2 比特（砍到 1/4），第二次再给 3 比特（再砍到 1/8），合起来就是 5 比特。概率喜欢相乘，信息喜欢相加。一旦要算期望这种把很多数加起来的东西，对数就方便多了。</p>
       
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/wordle-8m25s0.jpg" alt="观察把可能性空间砍半：1 比特" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="504">8:24</button>观察把可能性空间砍半：1 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/wordle-9m20s0.jpg" alt="(1/2)^I = p，所以 I = log₂(1/p)" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="559">9:19</button>(1/2)^I = p，所以 I = log<sub>2</sub>(1/p)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/wordle-10m10s0.jpg" alt="2 比特加 3 比特是 5 比特：信息可以相加" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="559">9:19</button>(1/2)<sup>I</sup> = p，所以 I = log<sub>2</sub>(1/p)</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/wordle-10m10s0.jpg" alt="2 比特加 3 比特是 5 比特：信息可以相加" loading="lazy" decoding="async">
       <figcaption><button class="ts" type="button" data-t="610">10:10</button>2 比特加 3 比特是 5 比特：信息可以相加</figcaption></figure></div>
       
       
@@ -5998,7 +5998,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="834">13:54</button><span>第一版：每步都选熵最大的词</span></h4>
       <p>第一版程序很简单：遍历全部约 13000 个可猜词，算每个词对应的颜色组合分布的熵，选最大的。后面几步同理：第一步的颜色结果把候选词缩小后，就在这个更小的集合上再做一遍。按这个算法，排第一的开局是 tares。</p>
-      <p>作者用自己写的一个带分析面板的版本演示。猜 slate，期望 5.8 比特，实际拿到的少一些，运气不好。左边列出剩下的候选词，蓝条是每个词的概率（此时都一样），上面的「不确定性」是候选词分布的熵，均匀时它只是换个复杂说法数个数：<span class="m">2^13.66</span> 约等于 13000。再猜 rains，期望 4.3 比特，实际 3.39 比特，剩 55 个；再猜程序建议的 kombu，这一步给了 4.7 比特。</p>
+      <p>作者用自己写的一个带分析面板的版本演示。猜 slate，期望 5.8 比特，实际拿到的少一些，运气不好。左边列出剩下的候选词，蓝条是每个词的概率（此时都一样），上面的「不确定性」是候选词分布的熵，均匀时它只是换个复杂说法数个数：<span class="m">2<sup>13.66</sup></span> 约等于 13000。再猜 rains，期望 4.3 比特，实际 3.39 比特，剩 55 个；再猜程序建议的 kombu，这一步给了 4.7 比特。</p>
       <p>作者出了个小题：这一步之前有 5.78 比特的不确定性，拿到 4.7 比特信息后，还剩几个可能？剩约 1 比特，也就是两个等可能的答案。我们知道答案应该是常见词 abyss，但程序不知道，它会继续榨取信息直到只剩一个可能才猜。拿全部 2315 个真实答案当测试集跑模拟，第一版平均 4.124 步，比作者预想的好，但玩 Wordle 的人一般也能四步猜中，真正的挑战是尽量多地三步猜中。</p>
       
       
@@ -6025,7 +6025,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1397">23:17</button><span>第二版：信息和猜中概率一起算</span></h4>
-      <p>第二版有几处不同。第一，算每个猜测的熵时，用的是考虑了词频先验的颜色组合分布；tares 仍排第一，后面几个变了。第二，左边的不确定性不再只是数个数：有 526 个词符合当前组合时，熵是 8.02 比特，<span class="m">2^8.02</span> 约 259，意思是不确定性相当于 259 个等可能的结果，因为程序知道 borks、yorts 这类词不会是答案。</p>
+      <p>第二版有几处不同。第一，算每个猜测的熵时，用的是考虑了词频先验的颜色组合分布；tares 仍排第一，后面几个变了。第二，左边的不确定性不再只是数个数：有 526 个词符合当前组合时，熵是 8.02 比特，<span class="m">2<sup>8.02</sup></span> 约 259，意思是不确定性相当于 259 个等可能的结果，因为程序知道 borks、yorts 这类词不会是答案。</p>
       <p>第三，程序不再只是最大化熵。第四步时还有 7 个可能，但只有 dorms 和 words 有像样的概率，程序把它俩排在那些信息更多的词前面。作者最初是把两个数简单相加，效果出奇地好，但不够系统。他最后的做法是算<b>期望得分</b>：猜 words，模型认为它是答案的概率是 58%，那就有 58% 的可能这局 4 步结束；剩下 42% 要多于 4 步，多多少，按那时还剩多少不确定性估计。</p>
       <p>具体说：现在有 1.44 比特不确定性，猜 words 期望得 1.27 比特信息，两者之差就是猜完后大约剩下的不确定性。需要一个函数 <span class="m"><i>f</i></span> 把「剩余不确定性」映射成「还要猜几次」。作者拿第一版跑出来的大量对局数据画图：不确定性为 0 时总是再猜 1 次；为 1 比特时平均约 1.5 次；略高于 4 比特（约 16 个可能）时平均略多于 2 次。然后做回归拟合出 <span class="m"><i>f</i></span>。于是期望得分 <span class="m">= 0.58 × 4 + (1 − 0.58) × (4 + <i>f</i>(1.44 − 1.27))</span>。</p>
       
@@ -6051,7 +6051,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>信息量 <span class="m"><i>I</i> = log<sub>2</sub>(1/<i>p</i>) = −log<sub>2</sub> <i>p</i></span>：概率 <span class="m"><i>p</i></span> 的事件发生，相当于把可能性对半砍了 <span class="m"><i>I</i></span> 次。</li><li>概率相乘，信息相加；这是用对数的实质原因。</li><li>熵 <span class="m"><i>H</i> = Σ <i>p</i>(<i>x</i>) log<sub>2</sub>(1/<i>p</i>(<i>x</i>))</span> 是信息量的期望；分布越平、可能性越多，熵越高，<span class="m"><i>n</i></span> 个等可能结果的熵是 <span class="m">log<sub>2</sub> <i>n</i></span>。</li><li>熵的两种读法：一个问题平均能带来多少信息；一个分布里还剩多少不确定性（相当于 <span class="m">2^<i>H</i></span> 个等可能结果）。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>信息量 <span class="m"><i>I</i> = log<sub>2</sub>(1/<i>p</i>) = −log<sub>2</sub> <i>p</i></span>：概率 <span class="m"><i>p</i></span> 的事件发生，相当于把可能性对半砍了 <span class="m"><i>I</i></span> 次。</li><li>概率相乘，信息相加；这是用对数的实质原因。</li><li>熵 <span class="m"><i>H</i> = Σ <i>p</i>(<i>x</i>) log<sub>2</sub>(1/<i>p</i>(<i>x</i>))</span> 是信息量的期望；分布越平、可能性越多，熵越高，<span class="m"><i>n</i></span> 个等可能结果的熵是 <span class="m">log<sub>2</sub> <i>n</i></span>。</li><li>熵的两种读法：一个问题平均能带来多少信息；一个分布里还剩多少不确定性（相当于 <span class="m">2<sup><i>H</i></sup></span> 个等可能结果）。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/wordle-1m20s0.jpg')"><span class="tri"></span></button></div>
@@ -6129,7 +6129,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="887">14:47</button><span>重新发明信息量：−log<sub>2</sub> p</span></h4>
-      <p>有了「完美压缩像随机噪声」，定义就被逼出来了：在完美方案里用 <span class="m"><i>n</i></span> 位的消息，概率必然是 <span class="m">2^(−<i>n</i>)</span>。两边取以 2 为底的对数再取负：完美压缩下分配给一条消息的比特数是 <span class="m">−log<sub>2</sub> <i>p</i></span>，<span class="m"><i>p</i></span> 是它出现的概率。这个负对数表达式是整个信息论最基本的公式。</p>
+      <p>有了「完美压缩像随机噪声」，定义就被逼出来了：在完美方案里用 <span class="m"><i>n</i></span> 位的消息，概率必然是 <span class="m">2<sup>−<i>n</i></sup></span>。两边取以 2 为底的对数再取负：完美压缩下分配给一条消息的比特数是 <span class="m">−log<sub>2</sub> <i>p</i></span>，<span class="m"><i>p</i></span> 是它出现的概率。这个负对数表达式是整个信息论最基本的公式。</p>
       <p>负对数初看有点别扭，好像应该是负数，其实分数取对数本来就是负的。直观的读法是：要对半砍几次才能砍到这个量。也有人写成 <span class="m">log(1/<i>p</i>)</span>；作者说他个人偏爱 <span class="m">log<sub>½</sub> <i>p</i></span> 这个写法，虽然没人这么用。香农意识到，即使完美压缩做不到、<span class="m"><i>p</i></span> 也不是 2 的整数次幂、结果是个小数，这仍然是衡量一条消息所含信息的有用方式。他把它定义为事件的<b>信息量 (Information)</b>。作者脑中的图像是：一个表示概率的小饼图，上面一根柱子，概率越接近 0 柱子越高，越接近 1 柱子越低。不太可能的消息信息多，意料之中的消息信息少。</p>
       <p>这个定义有实质内容，不只是给概率换个单位：完美压缩方案里，整条消息分到的比特数恰好等于它的信息量。更一般的说法是，信息量给出了压缩的下界，至少在对所有可能消息取平均时如此（针对某一个特例过拟合压缩算法是可能的）。</p>
       
@@ -6366,8 +6366,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <section class="aisec" id="aip-dist">
     <h2><span class="n">1</span><span>模型的输出是一个概率分布：softmax、温度与采样</span></h2>
     <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
-    <p>语言模型最后一层给词表里每个 token 打一个分数，叫 <b>logit</b>，一共 <span class="m"><i>V</i></span> 个（GPT-2 的词表 <span class="m"><i>V</i> = 50257</span>）。<b>softmax</b> 把它们变成概率：<span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i>^(<i>z</i><sub><i>i</i></sub>) / Σ<sub><i>j</i></sub> <i>e</i>^(<i>z</i><sub><i>j</i></sub>)</span>，每个都是正数，加起来是 1。这就是第 7 集说的「模型输出下一个 token 上的一个分布 <span class="m"><i>q</i></span>」。</p>
-    <p>生成文本时，从这个分布里<b>采样</b>一个 token，接到输入后面，再算下一步。采样前常把 logit 除以一个<b>温度 (Temperature)</b> <span class="m"><i>T</i></span>：<span class="m"><i>p</i><sub><i>i</i></sub> ∝ <i>e</i>^(<i>z</i><sub><i>i</i></sub>/<i>T</i>)</span>。<span class="m"><i>T</i> < 1</span> 把分布压得更尖，高分的更占优；<span class="m"><i>T</i> → 0</span> 就是每步取最大的，叫贪心解码；<span class="m"><i>T</i> > 1</span> 把分布摊平，趋于均匀。用第 5 集的话说，温度调的是输出分布的熵。</p>
+    <p>语言模型最后一层给词表里每个 token 打一个分数，叫 <b>logit</b>，一共 <span class="m"><i>V</i></span> 个（GPT-2 的词表 <span class="m"><i>V</i> = 50257</span>）。<b>softmax</b> 把它们变成概率：<span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i><sup><i>z</i><sub><i>i</i></sub></sup> / Σ<sub><i>j</i></sub> <i>e</i><sup><i>z</i><sub><i>j</i></sub></sup></span>，每个都是正数，加起来是 1。这就是第 7 集说的「模型输出下一个 token 上的一个分布 <span class="m"><i>q</i></span>」。</p>
+    <p>生成文本时，从这个分布里<b>采样</b>一个 token，接到输入后面，再算下一步。采样前常把 logit 除以一个<b>温度 (Temperature)</b> <span class="m"><i>T</i></span>：<span class="m"><i>p</i><sub><i>i</i></sub> ∝ <i>e</i><sup><i>z</i><sub><i>i</i></sub>/<i>T</i></sup></span>。<span class="m"><i>T</i> < 1</span> 把分布压得更尖，高分的更占优；<span class="m"><i>T</i> → 0</span> 就是每步取最大的，叫贪心解码；<span class="m"><i>T</i> > 1</span> 把分布摊平，趋于均匀。用第 5 集的话说，温度调的是输出分布的熵。</p>
     <p>只调温度还不够：词表有几万个 token，长尾里每个概率都很小，但加起来不小，偶尔采到一个就会跑偏。<b>Top-k</b> 只在概率最高的 <span class="m"><i>k</i></span> 个里采；<b>Top-p</b>（也叫 nucleus sampling）按概率从高到低累加，只保留累计概率刚超过 <span class="m"><i>p</i></span> 的那一小撮，再重新归一化。Holtzman 等人 2019 年的论文说明了为什么纯最大化概率的解码会产生重复、乏味的文本，而完全按分布采样又容易胡言乱语。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>三个 logit (2, 1, 0.1)，换不同温度</p>
       <p><span class="m"><i>T</i> = 1</span>：概率 <span class="m">(0.659, 0.242, 0.099)</span>，熵 1.22 比特。<span class="m"><i>T</i> = 0.5</span>：<span class="m">(0.864, 0.117, 0.019)</span>，熵降到 0.66 比特。<span class="m"><i>T</i> = 2</span>：<span class="m">(0.502, 0.304, 0.194)</span>，熵升到 1.48 比特，离三个等可能的上限 <span class="m">log<sub>2</sub> 3 = 1.58</span> 比特不远了。</p></div>
@@ -6389,10 +6389,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <h2><span class="n">3</span><span>贝叶斯与对数赔率：logit 和 sigmoid</span></h2>
     <p class="chs">对应 <a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a></p>
     <p>第 1 集的公式换一种写法更好用。<b>赔率 (Odds)</b> 是「是」与「不是」的比：概率 1/21 对应赔率 1 : 20。贝叶斯定理的<b>赔率形式</b>是：后验赔率 = 先验赔率 × 似然比，似然比 <span class="m"><i>P</i>(<i>E</i>|<i>H</i>) / <i>P</i>(<i>E</i>|¬<i>H</i>)</span> 也叫<b>贝叶斯因子 (Bayes Factor)</b>。3b1b 另一集《医检阳性≠得了病？》专门讲这种写法。</p>
-    <p>两边取对数，乘法变加法：<b>对数赔率 (Log-Odds)</b> = 先验的对数赔率 + 每条证据的对数似然比。对数赔率有个更常见的名字：<b>logit</b>。把对数赔率换回概率的函数就是 <b>sigmoid</b>：<span class="m"><i>σ</i>(<i>z</i>) = 1 / (1 + <i>e</i>^(−<i>z</i>))</span>。所以二分类模型最后输出一个数再过 sigmoid，那个数就是模型对「是」的对数赔率；它常写成若干特征的加权和，读作每个特征贡献一份对数似然比，一条条加上去。多分类的 softmax 是同一件事的推广：logit 之差就是两个类别的对数赔率。</p>
+    <p>两边取对数，乘法变加法：<b>对数赔率 (Log-Odds)</b> = 先验的对数赔率 + 每条证据的对数似然比。对数赔率有个更常见的名字：<b>logit</b>。把对数赔率换回概率的函数就是 <b>sigmoid</b>：<span class="m"><i>σ</i>(<i>z</i>) = 1 / (1 + <i>e</i><sup>−<i>z</i></sup>)</span>。所以二分类模型最后输出一个数再过 sigmoid，那个数就是模型对「是」的对数赔率；它常写成若干特征的加权和，读作每个特征贡献一份对数似然比，一条条加上去。多分类的 softmax 是同一件事的推广：logit 之差就是两个类别的对数赔率。</p>
     <p>先验在 AI 里也处处都是：类别不平衡时，分类器的偏置项学到的大致就是先验的对数赔率；下面「先验与正则化」那节，先验放在参数上。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>用对数赔率重算 Steve</p>
-      <p>先验赔率 1 : 20（10 个图书管理员、200 个农民），似然比 <span class="m">0.4 / 0.1 = 4</span>，后验赔率 4 : 20 = 1 : 5，概率 1/6 ≈ 16.7%，和视频里的 4/24 一样。换成对数：<span class="m"><i>l</i><i>n</i>(1/20) = −3.00</span>，加上 <span class="m"><i>l</i><i>n</i> 4 = 1.39</span>，得 <span class="m">−1.61</span>；<span class="m"><i>σ</i>(−1.61) = 0.167</span>。</p></div>
+      <p>先验赔率 1 : 20（10 个图书管理员、200 个农民），似然比 <span class="m">0.4 / 0.1 = 4</span>，后验赔率 4 : 20 = 1 : 5，概率 1/6 ≈ 16.7%，和视频里的 4/24 一样。换成对数：<span class="m">ln(1/20) = −3.00</span>，加上 <span class="m">ln 4 = 1.39</span>，得 <span class="m">−1.61</span>；<span class="m"><i>σ</i>(−1.61) = 0.167</span>。</p></div>
     
     <p class="refs"><a href="https://www.bilibili.com/video/BV1Ei4y1F72M" target="_blank" rel="noreferrer">视频：3Blue1Brown：医检阳性≠得了病？重新理解贝叶斯定理（贝叶斯因子、赔率形式） · 2020-12-31 ↗</a></p>
   </section>
@@ -6420,10 +6420,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="aisec" id="aip-entropy">
     <h2><span class="n">6</span><span>信息量与熵：奈特、比特，和未训练模型的损失</span></h2>
     <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></p>
-    <p>第 5、6 集用的是以 2 为底的对数，单位是比特。机器学习几乎总用自然对数，单位叫<b>奈特 (nat)</b>，<span class="m">1 奈特 = 1/<i>l</i><i>n</i> 2 ≈ 1.443</span> 比特。PyTorch 里 <code>cross_entropy</code> 返回的就是奈特。第 7 集说两者只差一个常数，会被学习率吸收。</p>
+    <p>第 5、6 集用的是以 2 为底的对数，单位是比特。机器学习几乎总用自然对数，单位叫<b>奈特 (nat)</b>，<span class="m">1 奈特 = 1/ln 2 ≈ 1.443</span> 比特。PyTorch 里 <code>cross_entropy</code> 返回的就是奈特。第 7 集说两者只差一个常数，会被学习率吸收。</p>
     <p>一个 token 的信息量 <span class="m">−log <i>p</i></span> 就是模型看到它时有多意外；模型输出分布的熵 <span class="m"><i>H</i> = −Σ <i>p</i> log <i>p</i></span> 是它在这一步有多拿不准。熵在模型里还有别的用处：PPO 这类强化学习算法常在目标里加一项输出分布的熵（一些 RLHF 实现也保留了它），鼓励策略保持一定的随机性，别太早收缩到一个动作上；给定均值和方差时熵最大的分布是高斯分布，这也是第 4 集结尾提到的「用熵解释为什么是高斯」的思路。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>刚初始化的 GPT-2，损失应该是多少</p>
-      <p>刚初始化时 logit 都接近 0，输出接近词表上的均匀分布，每个 token 的概率约 <span class="m">1/50257</span>。损失是 <span class="m"><i>l</i><i>n</i> 50257 ≈ 10.82</span> 奈特，也就是 15.6 比特，第 5 集说的「<span class="m"><i>n</i></span> 个等可能结果的熵是 <span class="m">log<sub>2</sub> <i>n</i></span>」。训练刚开始时如果损失明显高于这个数，通常说明初始化让模型对某些错误答案很有把握，是一个现成的检查项。</p></div>
+      <p>刚初始化时 logit 都接近 0，输出接近词表上的均匀分布，每个 token 的概率约 <span class="m">1/50257</span>。损失是 <span class="m">ln 50257 ≈ 10.82</span> 奈特，也就是 15.6 比特，第 5 集说的「<span class="m"><i>n</i></span> 个等可能结果的熵是 <span class="m">log<sub>2</sub> <i>n</i></span>」。训练刚开始时如果损失明显高于这个数，通常说明初始化让模型对某些错误答案很有把握，是一个现成的检查项。</p></div>
     
     <p class="refs"><a href="https://www.youtube.com/watch?v=ErfnhcEV1O8" target="_blank" rel="noreferrer">视频：Aurélien Géron：A Short Introduction to Entropy, Cross-Entropy and KL-Divergence · 2018-02-05 ↗</a><a href="https://colah.github.io/posts/2015-09-Visual-Information/" target="_blank" rel="noreferrer">Chris Olah：Visual Information Theory（用面积图讲编码长度、熵、交叉熵、KL 散度） · 2015-10-14 ↗</a></p>
   </section>
@@ -6431,10 +6431,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <h2><span class="n">7</span><span>交叉熵损失与困惑度</span></h2>
     <p class="chs">对应 <a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
     <p>预训练的损失就是第 7 集说的：对训练集里每个 token，取模型给它的概率的负对数，求平均。在同一个上下文的所有出现上平均，它就是模型分布相对于数据分布的交叉熵；它的下限是语言本身的熵（第 6 集里香农估计英语约每字符 1 比特），损失永远降不到 0。它对 logit 的梯度是 <span class="m"><i>p</i> − <i>y</i></span>，推导见「AI 中的微积分」。</p>
-    <p>论文里评测语言模型常报的是<b>困惑度 (Perplexity)</b>：<span class="m"><i>P</i><i>P</i><i>L</i> = <i>e</i>^(平均负对数似然)</span>（用比特时是 <span class="m">2^<i>H</i></span>）。第 5 集说过，熵为 <span class="m"><i>H</i></span> 比特的分布，不确定性相当于 <span class="m">2^<i>H</i></span> 个等可能的结果。所以困惑度 20 读作：模型在每个位置平均像是在 20 个等可能的 token 里犹豫。困惑度只能在同一个分词器下比较，因为 token 切得越细，每个 token 越好猜；跨模型比较时常改用每字节或每字符的比特数 (bits per byte / bits per character)，这就是第 6 集说的压缩率。</p>
+    <p>论文里评测语言模型常报的是<b>困惑度 (Perplexity)</b>：<span class="m"><i>P</i><i>P</i><i>L</i> = <i>e</i><sup>平均负对数似然</sup></span>（用比特时是 <span class="m">2<sup><i>H</i></sup></span>）。第 5 集说过，熵为 <span class="m"><i>H</i></span> 比特的分布，不确定性相当于 <span class="m">2<sup><i>H</i></sup></span> 个等可能的结果。所以困惑度 20 读作：模型在每个位置平均像是在 20 个等可能的 token 里犹豫。困惑度只能在同一个分词器下比较，因为 token 切得越细，每个 token 越好猜；跨模型比较时常改用每字节或每字符的比特数 (bits per byte / bits per character)，这就是第 6 集说的压缩率。</p>
     <p>两个常见的改动也能用这一节的语言解释。<b>标签平滑 (Label Smoothing)</b> 把目标分布从 one-hot 改成「正确答案 0.9，其余平分 0.1」，防止模型把概率推到 1、logit 推向无穷大。蒸馏直接用教师模型的完整分布做目标，第 7 集说它给的信号比 one-hot 丰富得多。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>损失与困惑度的换算</p>
-      <p>平均损失 3.0 奈特，困惑度 <span class="m"><i>e</i><sup>3</sup> ≈ 20.1</span>；降到 2.3 奈特，困惑度约 10.0。损失只降了 0.7，困惑度减了一半：损失每降 <span class="m"><i>l</i><i>n</i> 2 ≈ 0.69</span> 奈特，相当于每个位置的候选数砍半，也就是第 5 集说的多得到 1 比特信息。</p></div>
+      <p>平均损失 3.0 奈特，困惑度 <span class="m"><i>e</i><sup>3</sup> ≈ 20.1</span>；降到 2.3 奈特，困惑度约 10.0。损失只降了 0.7，困惑度减了一半：损失每降 <span class="m">ln 2 ≈ 0.69</span> 奈特，相当于每个位置的候选数砍半，也就是第 5 集说的多得到 1 比特信息。</p></div>
     
     <p class="refs"><a href="https://thegradient.pub/understanding-evaluation-metrics-for-language-models/" target="_blank" rel="noreferrer">Chip Huyen：Evaluation Metrics for Language Modeling（困惑度、交叉熵、BPC 的关系） · 2019-10-18 ↗</a><a href="https://arxiv.org/abs/1512.00567" target="_blank" rel="noreferrer">Rethinking the Inception Architecture for Computer Vision（提出标签平滑） · 2015-12-02 ↗</a></p>
   </section>
@@ -6445,7 +6445,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <p>它在大模型里出现的地方：<b>蒸馏</b>让学生模型的分布贴近教师模型的分布，Hinton 等人 2015 年的论文还把两边的 logit 都除以一个较高的温度，让教师分布里那些小概率（「这张图有点像猫」）也传递给学生。<b>RLHF</b> 里，InstructGPT 的目标是奖励减去 <span class="m"><i>β</i> · <i>K</i><i>L</i>(<i>π</i> ‖ <i>π</i><sub>ref</sub>)</span>：在拿高奖励的同时，别离原来的监督微调模型太远，防止模型钻奖励模型的空子、说话变得怪异。<b>变分自编码器 (Variational Autoencoder)</b> 的损失里也有一项 KL，把编码分布拉向标准高斯。</p>
     <p>方向很重要。最小化 <span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>)</span>（前向）时，只要 <span class="m"><i>p</i> > 0</span> 的地方 <span class="m"><i>q</i></span> 很小，<span class="m">log(<i>p</i>/<i>q</i>)</span> 就很大，所以 <span class="m"><i>q</i></span> 会尽量覆盖 <span class="m"><i>p</i></span> 的所有峰，宁可摊得太宽，这叫<b>覆盖众数 (Mode-Covering)</b>；最大似然和交叉熵训练就是这个方向。最小化 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>)</span>（反向）时，<span class="m"><i>q</i></span> 只要避开 <span class="m"><i>p</i></span> 很小的地方就行，所以它倾向于挑一个峰贴紧，叫<b>寻找众数 (Mode-Seeking)</b>；RLHF 里的 <span class="m"><i>K</i><i>L</i>(<i>π</i> ‖ <i>π</i><sub>ref</sub>)</span> 是这个方向，被优化的是 <span class="m"><i>π</i></span>。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>p = (0.9, 0.1)，q = (0.5, 0.5)</p>
-      <p><span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = 0.9 <i>l</i><i>n</i>(0.9/0.5) + 0.1 <i>l</i><i>n</i>(0.1/0.5) = 0.368</span> 奈特；反过来 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>) = 0.5 <i>l</i><i>n</i>(0.5/0.9) + 0.5 <i>l</i><i>n</i>(0.5/0.1) = 0.511</span> 奈特。两个方向不一样大：<span class="m"><i>q</i></span> 给了 0.5 的地方 <span class="m"><i>p</i></span> 只有 0.1，这一项在反向里被罚得更重。第 7 集的机器人例子：2.625 − 1.75 = 0.875 比特。</p></div>
+      <p><span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = 0.9 ln(0.9/0.5) + 0.1 ln(0.1/0.5) = 0.368</span> 奈特；反过来 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>) = 0.5 ln(0.5/0.9) + 0.5 ln(0.5/0.1) = 0.511</span> 奈特。两个方向不一样大：<span class="m"><i>q</i></span> 给了 0.5 的地方 <span class="m"><i>p</i></span> 只有 0.1，这一项在反向里被罚得更重。第 7 集的机器人例子：2.625 − 1.75 = 0.875 比特。</p></div>
     
     <p class="refs"><a href="https://www.youtube.com/watch?v=SxGYPqCgJWM" target="_blank" rel="noreferrer">视频：Adian Liusie：Intuitively Understanding the KL Divergence（为什么是这个公式，以及不对称性） · 2021-04-14 ↗</a><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noreferrer">Distilling the Knowledge in a Neural Network（Hinton、Vinyals、Dean） · 2015-03-09 ↗</a><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noreferrer">Training language models to follow instructions with human feedback（InstructGPT，目标里的 KL 惩罚） · 2022-03-04 ↗</a><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">Auto-Encoding Variational Bayes（变分自编码器） · 2013-12-20 ↗</a></p>
   </section>
@@ -6455,10 +6455,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     <p>第 2 集最要紧的一句话：<b>相加的是方差，不是标准差</b>。<span class="m"><i>n</i></span> 个独立、方差为 <span class="m"><i>σ</i><sup>2</sup></span> 的变量之和，方差是 <span class="m"><i>n</i><i>σ</i><sup>2</sup></span>，标准差是 <span class="m">√<i>n</i> · <i>σ</i></span>。神经网络里到处是这种求和。</p>
     <p>线性层的一个输出是 <span class="m"><i>y</i> = Σ<sub><i>i</i></sub> <i>w</i><sub><i>i</i></sub><i>x</i><sub><i>i</i></sub></span>，对 <span class="m"><i>n</i></span> 个输入求和。设 <span class="m"><i>w</i></span>、<span class="m"><i>x</i></span> 独立、均值为 0，每一项的方差是 <span class="m"><i>V</i><i>a</i><i>r</i>(<i>w</i>)<i>V</i><i>a</i><i>r</i>(<i>x</i>)</span>，加起来 <span class="m"><i>V</i><i>a</i><i>r</i>(<i>y</i>) = <i>n</i> · <i>V</i><i>a</i><i>r</i>(<i>w</i>) · <i>V</i><i>a</i><i>r</i>(<i>x</i>)</span>。如果 <span class="m"><i>V</i><i>a</i><i>r</i>(<i>w</i>) = 1</span>，每过一层方差放大 <span class="m"><i>n</i></span> 倍，几十层后数值爆炸；要让方差逐层不变，就取 <span class="m"><i>V</i><i>a</i><i>r</i>(<i>w</i>) = 1/<i>n</i></span>，也就是权重的标准差取 <span class="m">1/√<i>n</i></span>。ReLU 会把一半的输入置零，所以 He 等人 2015 年提出用 <span class="m">2/<i>n</i></span>，这就是 <b>He 初始化</b>。</p>
     <p>注意力里的 <span class="m"><i>Q</i><i>K</i><sup>T</sup>/√<i>d</i><sub><i>k</i></sub></span> 也是同一个道理。<span class="m"><i>q</i> · <i>k</i> = Σ <i>q</i><sub><i>i</i></sub><i>k</i><sub><i>i</i></sub></span> 是 <span class="m"><i>d</i><sub><i>k</i></sub></span> 项之和，每项方差为 1 时，点积的方差是 <span class="m"><i>d</i><sub><i>k</i></sub></span>，标准差是 <span class="m">√<i>d</i><sub><i>k</i></sub></span>。点积太大，softmax 会饱和到几乎 one-hot，梯度变得极小。除以 <span class="m">√<i>d</i><sub><i>k</i></sub></span> 正好把标准差拉回 1。《Attention Is All You Need》在脚注里就是这样解释的。</p>
-    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>d_k = 64</p>
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>d<sub>k</sub> = 64</p>
       <p>不缩放时点积的标准差是 <span class="m">√64 = 8</span>，经常出现 ±16 这种分数，softmax 之后几乎全压在一个位置上。除以 8 之后标准差是 1。线性层同理：输入维度 4096 时，标准差为 1 的权重会让输出标准差放大 64 倍，所以权重的标准差要取 <span class="m">1/64</span> 量级。</p></div>
     
-    <p class="refs"><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noreferrer">Delving Deep into Rectifiers（He 初始化） · 2015-02-06 ↗</a><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need（3.2.1 节脚注解释 √d_k） · 2017-06-12 ↗</a></p>
+    <p class="refs"><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noreferrer">Delving Deep into Rectifiers（He 初始化） · 2015-02-06 ↗</a><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need（3.2.1 节脚注解释 √d<sub>k</sub>） · 2017-06-12 ↗</a></p>
   </section>
 <section class="aisec" id="aip-mean">
     <h2><span class="n">10</span><span>样本平均：小批量梯度与评测的误差条</span></h2>
@@ -6484,7 +6484,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
     <section class="aisec" id="aip-map"><h2>对照表</h2>
       <div class="tbl"><table><thead><tr><th>概念</th><th>在 AI 里</th><th>对应</th></tr></thead>
-    <tbody><tr><td>条件概率、链式法则</td><td>自回归：整段文本的概率拆成逐 token 的条件概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>贝叶斯的赔率形式</td><td>logit 就是对数赔率，sigmoid 把它换回概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a></td></tr><tr><td>先验</td><td>L2 正则化 / 权重衰减 = 高斯先验</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>似然</td><td>最大似然 = 最小化负对数似然 = 最小化交叉熵</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>信息量 −log p</td><td>每个 token 的损失，模型有多意外</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>熵</td><td>输出分布的不确定性；未训练模型的损失 ≈ ln V</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>2^H 个等可能结果</td><td>困惑度</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a></td></tr><tr><td>交叉熵</td><td>预训练损失、标签平滑、蒸馏</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></td></tr><tr><td>KL 散度</td><td>蒸馏、RLHF 的 KL 惩罚、VAE；前向与反向</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>softmax 与温度</td><td>把 logit 变成分布，温度调熵</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a></td></tr><tr><td>方差相加</td><td>He 初始化、注意力除以 √d_k</td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a><a class="chref ai" href="#ai-attention">线代：注意力</a></td></tr><tr><td>平均值的标准差 σ/√n</td><td>小批量梯度噪声、评测误差条</td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>高斯加高斯还是高斯</td><td>扩散模型一步加噪到任意 t</td><td><a class="chref" href="#prob4">第 4 集 · 高斯加高斯还是高斯</a></td></tr></tbody></table></div></section>
+    <tbody><tr><td>条件概率、链式法则</td><td>自回归：整段文本的概率拆成逐 token 的条件概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>贝叶斯的赔率形式</td><td>logit 就是对数赔率，sigmoid 把它换回概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a></td></tr><tr><td>先验</td><td>L2 正则化 / 权重衰减 = 高斯先验</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>似然</td><td>最大似然 = 最小化负对数似然 = 最小化交叉熵</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>信息量 −log p</td><td>每个 token 的损失，模型有多意外</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>熵</td><td>输出分布的不确定性；未训练模型的损失 ≈ ln V</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>2<sup>H</sup> 个等可能结果</td><td>困惑度</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a></td></tr><tr><td>交叉熵</td><td>预训练损失、标签平滑、蒸馏</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></td></tr><tr><td>KL 散度</td><td>蒸馏、RLHF 的 KL 惩罚、VAE；前向与反向</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>softmax 与温度</td><td>把 logit 变成分布，温度调熵</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a></td></tr><tr><td>方差相加</td><td>He 初始化、注意力除以 √d<sub>k</sub></td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a><a class="chref ai" href="#ai-attention">线代：注意力</a></td></tr><tr><td>平均值的标准差 σ/√n</td><td>小批量梯度噪声、评测误差条</td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>高斯加高斯还是高斯</td><td>扩散模型一步加噪到任意 t</td><td><a class="chref" href="#prob4">第 4 集 · 高斯加高斯还是高斯</a></td></tr></tbody></table></div></section>
   </article>
 </div></div>
 </main>
@@ -6557,7 +6557,9 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   /* ── 截图大图，左右键切同一集的图 ── */
   var lb=document.getElementById('lightbox'),list=[],at=-1;
   function show(i){at=(i+list.length)%list.length;var im=list[at];lb.querySelector('img').src=im.src;
-    lb.querySelector('figcaption').textContent=im.alt+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
+    // 说明取图下面排好版的 figcaption（上下标、斜体都在），alt 是纯文本，只留给读屏
+    var cap=im.closest('.shot').querySelector('figcaption').cloneNode(true),ts=cap.querySelector('.ts');if(ts)ts.remove();
+    lb.querySelector('figcaption').innerHTML=cap.innerHTML+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
     lb.querySelectorAll('.lb-nav').forEach(function(n){n.hidden=list.length<2;});}
   document.addEventListener('click',function(e){
     var im=e.target.closest('.shot img');
