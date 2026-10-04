@@ -1,0 +1,31 @@
+{
+  "id": "cs231n",
+  "kind": "paper",
+  "title": "CS231n 计算机视觉",
+  "subtitle": "斯坦福 Spring 2025 全部 18 讲的分节笔记，时间码点了跳到录像那一秒",
+  "topics": [
+    "计算机视觉",
+    "课程",
+    "视频笔记"
+  ],
+  "date": "2025-04",
+  "studied": "2026-10",
+  "published": "2026-10-04",
+  "summary": "李飞飞、Ehsan Adeli、Justin Johnson 主讲的 CS231n，按 Spring 2025 公开录像写的 18 讲笔记，533 个小节、约 12.5 万字，配 707 张课件截图。从图像分类、线性分类器、反向传播、卷积网络、训练技巧讲到循环网络和 Transformer、检测与分割、视频理解、大规模分布式训练、自监督学习，再到生成模型的自回归、变分自编码器、生成对抗网络和扩散模型；后几讲是客座：吴佳俊讲三维视觉，Ranjay Krishna 讲 CLIP、多模态语言模型和 SAM，李韫竹讲机器人学习，最后李飞飞讲以人为本的 AI。每讲有导语、可点的时间轴、逐节正文和要点，课件链官网 2025、2026 两期。",
+  "source": {
+    "name": "CS231n · Stanford Online",
+    "url": "https://www.youtube.com/playlist?list=PLoROMvodv4rOmsNzYBMe0gJY2XS8AQg16"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>18</b> 讲笔记",
+    "<b>12.5</b> 万字",
+    "<b>707</b> 张截图"
+  ],
+  "build": {
+    "note": "输入在 14_CS231n/ 下（笔记 lectures/*.mjs、截图工具、B 站原片），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品；14_CS231n/ 在的时候构建会先重新生成它们，不在就直接发成品。站点版的播放器只用 B 站官方播放器，不放字幕和转录。",
+    "tool": "14_CS231n/build.mjs",
+    "requires": "14_CS231n/build.mjs",
+    "args": []
+  }
+}
