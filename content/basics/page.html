@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>基础概念 · 线性代数、微积分、深度学习、概率的视频笔记，以及它们在 AI 里的用法</title>
-<meta name="description" content="八个 tab。「线性代数的本质」「微积分的本质」「深度学习」「概率与信息论」是 3Blue1Brown 四组视频共 46 集的分节笔记，时间码点了跳到 B 站视频那一秒，配 717 张去掉字幕的截图；B 站合集里缺的集已经补上。深度学习一组按 YouTube 播放列表收了 10 集：手写数字网络的结构、梯度下降、反向传播，Transformer 的嵌入、注意力、MLP，外加大语言模型短片、交叉熵和 Welch Labs 讲扩散模型的客座视频，GPT-3 的 1750 亿参数逐项核对。「AI 中的线性代数」「AI 中的微积分」「AI 中的概率」按概念讲这些东西在模型和训练里出现在哪，每节配能手算的小例子并链接回对应的那一集。「线性代数延伸资料」收了杨松琳推荐的 Gilbert Strang 的课和苏剑林讲线性代数的文章。">
+<meta name="description" content="八个 tab。「线性代数的本质」「微积分的本质」「深度学习」「概率与信息论」是 3Blue1Brown 四组视频共 47 集的分节笔记，时间码点了跳到 B 站视频那一秒，配 746 张去掉字幕的截图；B 站合集里缺的集已经补上。深度学习一组是 YouTube 播放列表的 10 集加上不在列表里的「压缩即智能」第 1 部分，讲手写数字网络的结构、梯度下降、反向传播，Transformer 的嵌入、注意力、MLP，外加大语言模型短片、熵与交叉熵、Welch Labs 讲扩散模型的客座视频，GPT-3 的 1750 亿参数逐项核对。「AI 中的线性代数」「AI 中的微积分」「AI 中的概率」按概念讲这些东西在模型和训练里出现在哪，每节配能手算的小例子并链接回对应的那一集。「线性代数延伸资料」收了杨松琳推荐的 Gilbert Strang 的课和苏剑林讲线性代数的文章。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -3867,22 +3867,22 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </div></div>
 <div class="view" id="view-dl">
   <div class="intro"><h2>深度学习 · 3Blue1Brown</h2>
-<p>YouTube 播放列表 Neural networks 目前有 10 集，共 3 小时 40 分。前 4 集是 2017 年 10 月到 11 月发的，用一个认手写数字的小网络讲结构、梯度下降、反向传播和它背后的微积分。隔了六年半，2024 年接着出了第 5 到 7 章讲 Transformer：嵌入和 softmax、注意力、MLP 和叠加，一路用 GPT-3 的真实数字把 1750 亿个参数一项项凑出来。另外三集是番外：给计算机历史博物馆做的 8 分钟大语言模型短片（2024-11-20），Welch Labs 讲扩散模型的客座视频（2025-07-25），「压缩即智能」系列第 2 部分讲交叉熵（2026-07-16）。顺序按 YouTube 播放列表，没有章节号的三集圆圈里写一个字：短片「短」、交叉熵「熵」、扩散模型「扩」。</p>
+<p>YouTube 播放列表 Neural networks 目前有 10 集，这里另补了 1 集，共 11 集、4 小时 12 分。前 4 集是 2017 年 10 月到 11 月发的，用一个认手写数字的小网络讲结构、梯度下降、反向传播和它背后的微积分。隔了六年半，2024 年接着出了第 5 到 7 章讲 Transformer：嵌入和 softmax、注意力、MLP 和叠加，一路用 GPT-3 的真实数字把 1750 亿个参数一项项凑出来。另外四集是番外：给计算机历史博物馆做的 8 分钟大语言模型短片（2024-11-20），「压缩即智能」三部曲的第 1 部分《重新发明熵》（2026-06-07）和第 2 部分讲交叉熵（2026-07-16），Welch Labs 讲扩散模型的客座视频（2025-07-25）。第 1 部分不在播放列表里，第 2 部分处处接着它，所以补在它前面；其余顺序按 YouTube 播放列表。没有章节号的四集圆圈里写一个字：短片「短」、熵「熵」、交叉熵「交」、扩散模型「扩」。</p>
 <p>用法和前两个系列一样：每集一张卡，点标题展开，小节标题前和右侧时间轴上的时间码都能点。这个系列大量用到前面的内容，正文里的链接会跳回去：第 1 章的 σ(Wa + b) 是<a class="ilink" href="#ch3">线代第 3 章</a>的矩阵乘向量，第 4 章的反向传播是<a class="ilink" href="#calc4">微积分第 4 集</a>的链式法则，第 5、6 章的点积和注意力对应「AI 中的线性代数」的<a class="ilink" href="#ai-dot">点积</a>和<a class="ilink" href="#ai-attention">注意力</a>两节。论文本身见本站的 <a class="ilink" href="__HOME__attention-is-all-you-need/">Transformer 论文精读</a>和 <a class="ilink" href="__HOME__gpt-evolution/">GPT 系列精读</a>。</p>
 
 <div class="check">
   <h3>B 站版本和 YouTube 对过了</h3>
   <ul>
-    <li>第 1–7 章和两集番外是 3Blue1Brown 官方号的双语单集投稿，没有合集；第 3、4 章是同一个投稿 <a href="https://www.bilibili.com/video/BV16x411V7Qg" target="_blank" rel="noreferrer">BV16x411V7Qg</a> 的上下两个分 P。第 1 章用的是 ver 2.0，加了屏幕文字注释，修正了原片 14:46 处偏置矩阵的下标。都能到 1080p。</li>
+    <li>第 1–7 章和三集番外是 3Blue1Brown 官方号的双语单集投稿，没有合集；第 3、4 章是同一个投稿 <a href="https://www.bilibili.com/video/BV16x411V7Qg" target="_blank" rel="noreferrer">BV16x411V7Qg</a> 的上下两个分 P。第 1 章用的是 ver 2.0，加了屏幕文字注释，修正了原片 14:46 处偏置矩阵的下标。都能到 1080p。</li>
     <li>有官方字幕（<a href="https://github.com/3b1b/captions" target="_blank" rel="noreferrer">3b1b/captions</a>）的 8 集，每 4 秒抽一帧，用 OCR 读压制的英文字幕、对官方字幕：第 1–7 章全程偏移在 1 秒以内，时间码两边通用。第 1、2、3 章 B 站版末尾多出几十秒到一分多钟，是后来 YouTube 版剪掉的赞助介绍（Amplify Partners、CrowdFlower）。</li>
     <li>「大语言模型的简要解释」B 站版剪掉了开头 43 秒（作者说明这条短片是给计算机历史博物馆做的那段），片尾又少了约 7 秒。这一集的时间码按 B 站版写，比 YouTube 早 43 秒。</li>
-    <li>交叉熵（2026）和扩散模型（2025）两集不在字幕仓库里（仓库最后一次更新是 2024-11-30），时间码来自对 B 站音轨的 Whisper 转写。</li>
+    <li>熵、交叉熵（2026）和扩散模型（2025）三集不在字幕仓库里（仓库最后一次更新是 2024-11-30），时间码来自对 B 站音轨的 Whisper 转写。</li>
     <li>扩散模型那集官方号没有搬运，用的是网友「形上研习社」的双语搬运 <a href="https://www.bilibili.com/video/BV1ZZx9zYEYh" target="_blank" rel="noreferrer">BV1ZZx9zYEYh</a>（2025-10-07），时长和 YouTube 一致，时间码比 YouTube 早约 3 秒。它的字幕压在画面偏上的位置，截图按这个位置避开。</li>
     <li>发布日期按 3blue1brown.com 课程页标的日期。YouTube 页面按北京时间显示，第 2、5 章会晚一天。</li>
   </ul>
 </div>
 </div>
-  <div class="eptools"><span>10 集 · 3 小时 40 分 · 点标题展开</span>
+  <div class="eptools"><span>11 集 · 4 小时 12 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <details class="ep" id="dl1" data-ch="1" data-bv="BV1bx411M7Zx">
   <summary>
@@ -4962,15 +4962,198 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="dl-xent" data-ch="xent" data-bv="BV1u7hQ6rEQB">
+<details class="ep" id="dl-entropy" data-ch="entropy" data-bv="BV1yVNU6xERx">
   <summary>
     <span class="no mk">熵</span>
+    <span class="tt"><b>重新发明熵（压缩即智能 第 1 部分）</b><em>Reinventing Entropy | Compression is Intelligence Part 1</em><span class="hook">完美压缩的输出应该和随机噪声分不开，由此推出：概率为 p 的消息最少要用 −log<sub>2</sub> p 个比特，这就是信息量；每个符号的平均信息量是熵，也是无损压缩的下限。香农让人猜下一个字母，估出英语大约每个字符 1 比特。</span></span>
+    <span class="side"><span class="chip">B 站官方投稿</span><span class="len">32:19</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">「压缩即智能」(Compression is Intelligence) 三部曲的第 1 部分，不在 Neural networks 播放列表里，补在这里是因为<a class="ilink" href="#dl-xent">第 2 部分</a>讲交叉熵时处处接着它。作者的出发点是：大语言模型的预训练损失叫交叉熵，这个词来自信息论，而信息论的一个结论是预测和压缩在数学上等价，所以预训练也可以理解成在造最好的文本压缩器。这一集只打基础，目标是让你觉得<b>信息量</b>和<b>熵</b>这两个定义是自己问「文本最多能压到多小」时一定会撞上的：先用一个月球机器人比较三种编码方案，从「完美压缩看起来像随机噪声」推出 <span class="m">−log<sub>2</sub> <i>p</i></span>，再回到自然语言，看香农怎样用 n-gram、让妻子猜字母、1950 年的论文去估英语的熵。最后点出接下来要重新发现的三个式子：熵、交叉熵、KL 散度。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1yVNU6xERx" target="_blank" rel="noreferrer">B 站官方投稿：压缩即智能：Part1，重新发明熵 ↗</a>
+        <a href="https://www.youtube.com/watch?v=l6DKRf-fAAM" target="_blank" rel="noreferrer">YouTube · 不在播放列表里 · 2026-06-07 ↗</a></p>
+      <section class="sec">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>压缩的极限，和预训练有什么关系</span></h4>
+      <p>把文本编码成二进制时，自然希望用的数据越少越好。那文本压缩有没有某种根本的极限？默认的 ASCII 每个字符用整整 8 比特，很浪费；稍微聪明一点，让常见字符用短的比特串（霍夫曼编码），平均能降到每个字符约 4 比特；利用长序列里的规律的更聪明的方法还能更好，屏幕上神经网络方法到了约 1.1 比特。极限到底是多少？作者会在最后给出一个估计，但比任何一个数字更有意思的是怎样去回答这个问题。</p>
+      <p>这个问题至少要追溯到 20 世纪 40 年代，香农 (Claude Shannon) 开创信息论的工作。有意思的是，他为回答这类问题发展出来的数学，后来对现代机器学习出奇地有用。最显眼的例子是：大语言模型训练时的预训练，通常被描述为预测下一个 token，具体用的是<b>交叉熵损失</b>，而交叉熵这个词就来自信息论。信息论还有一个结论：<b>预测和压缩在数学上等价</b>，是一枚硬币的两面。所以可以把预训练目标完全换个说法：它其实是在造一个尽可能高效的文本压缩器。作者说后面会讲清楚这是怎么回事，到时候交叉熵到底是什么、为什么要用它会清楚得多。</p>
+      <p>有人甚至说「压缩即智能」。智能这个词太含糊，这句话很难严格评判，更稳妥的说法是：压缩的数学理论和人工智能关系密切得出奇。但这句话很引人深思，所以作者做了三部曲来打数学基础，评估它到底在说什么。这一集大约 30 分钟专注于压缩的极限，目标是让你觉得自己也能重新发现<b>香农无噪声编码定理</b>的核心想法，途中会「重新发现」<b>信息量 (Information)</b> 和<b>熵 (Entropy)</b> 两个定义。好的定义往往是某种洞见留下的结晶，太早把公式摆出来会把故事讲坏。最后还希望你注意到：要回答这个问题，香农没法不和某种智能打交道。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-0m22s0.jpg" alt="霍夫曼编码：常见字符用短比特串，平均约每字符 4.2 比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="22">0:22</button>霍夫曼编码：常见字符用短比特串，平均约每字符 4.2 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-0m29s0.jpg" alt="利用长序列规律的方法（屏幕上写的是神经网络方法）约每字符 1.1 比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="29">0:29</button>利用长序列规律的方法（屏幕上写的是神经网络方法）约每字符 1.1 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-1m20s0.jpg" alt="预测和压缩在数学上等价" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="80">1:20</button>预测和压缩在数学上等价</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="198">3:18</button><span>热身：月球机器人的四种指令</span></h4>
+      <p>语言模型很复杂，先用一个包含同样本质的简单例子热身。假设我们往一个遥远的月球上送了一个机器人，它在表面漫游收集数据。我们从地球发指令，只有四种：上、下、左、右，每次走固定步长。关键在于这些指令<b>不是均匀分布</b>的：一半是上，四分之一是下，左、右各八分之一。再为简单起见假设每条指令独立，不管前面是什么都按这个分布抽样。往远处发数据是一串 0 和 1，又慢又贵，所以热身题是：把这些指令编码成比特流，最高效的办法是什么？</p>
+      <p>三个学生各给一个答案：一个直接，一个聪明，一个很理论。<b>直接的学生</b>说四种指令各用 2 比特：00 上、01 下、10 左、11 右。机器人解码很容易，把比特流两个两个切开、逐块翻译就行。</p>
+      <p><b>聪明的学生</b>指出这完全没利用「上」比左右常见得多这一点，提议让不同指令用不同长度：0 表示上，10 表示下，110 表示左，111 表示右。平均每条指令的比特数是一个加权和：一半时间只用 1 比特，四分之一时间 2 比特，其余时间 3 比特：</p>
+      <p><span class="m">1/2·1 + 1/4·2 + 1/8·3 + 1/8·3 = 1.75</span> 比特</p>
+      <p>比固定 2 比特更好。后两种指令多花了比特，但它们出现得少得多，最常见的指令只用 1 比特，赚回来的更多。从这个分布里抽一串指令，用这套编码转成比特串，确实比直接的方法短。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-4m05s0.jpg" alt="四种指令：上 1/2、下 1/4、左右各 1/8" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="245">4:05</button>四种指令：上 1/2、下 1/4、左右各 1/8</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-5m05s0.jpg" alt="直接的方案：每条指令 2 比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="305">5:05</button>直接的方案：每条指令 2 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-6m05s0.jpg" alt="变长编码 0、10、110、111：平均 1.75 比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="365">6:05</button>变长编码 0、10、110、111：平均 1.75 比特</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="402">6:42</button><span>前缀码：怎么切开一串比特</span></h4>
+      <p>一旦允许不同指令用不同的比特数，机器人怎么知道在哪里切开？每个编码指令的比特串叫一个<b>码字 (Codeword)</b>。站在机器人的角度走一遍：收到的第一个比特是 1，还可能是下、左、右里的任何一个；接着是 0，只能是下，没有别的可能，记下一条完整指令。重新开始，下一个是 0，只能是上，因为别的码字都不以 0 开头。再看到 1，又不确定；再一个 1，还是不确定（是后两个码字的前缀）；接着一个 0，这三个比特一定是左。总之机器人只要一直读，读到恰好构成一个完整码字就记下。</p>
+      <p>关键约束是：<b>任何码字都不能是另一个码字的前缀</b>。比如想加第五种指令、码字是 100，就会冲突：读到 10 时，分不清是「下」还是新指令的开头。满足这个约束的编码叫<b>无前缀码 (Prefix-free Code)</b>，容易让人糊涂的是，它更常被叫做<b>前缀码 (Prefix Code)</b>，两个词是同一个意思。</p>
+      <p>有一张很好的图可以表示所有二进制串：每一层是某个长度的全部比特串，以 0 开头的都在图的左半边，以 1 开头的在右半边，这个规律往上一层层递归下去：以 00 开头的都在左边那四分之一上方，以 01 开头的在下一个四分之一上方，依此类推。关键性质是：图里每个比特串都是它正上方所有比特串的前缀。</p>
+      <p>所以聪明的学生把单个比特 0 分给「上」，就占掉了所有可能码字的<b>一半</b>，因为按无前缀的要求，所有以 0 开头的都不能再用了；把 10 分给「下」又占掉四分之一；剩下两种指令各占八分之一，一点不剩。这些比例恰好和每种指令的概率一模一样。这种「数据大小和概率之间有联系」的感觉，正是信息论的奠基洞见。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-8m35s0.jpg" alt="无前缀码（也叫前缀码）：任何码字都不是另一个码字的前缀" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="515">8:35</button>无前缀码（也叫前缀码）：任何码字都不是另一个码字的前缀</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-8m50s0.jpg" alt="所有二进制串排成一张图：每个串都是它上方所有串的前缀" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="530">8:50</button>所有二进制串排成一张图：每个串都是它上方所有串的前缀</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-10m05s0.jpg" alt="每个码字占掉的地盘恰好是 1/2、1/4、1/8、1/8，等于各自的概率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="605">10:05</button>每个码字占掉的地盘恰好是 1/2、1/4、1/8、1/8，等于各自的概率</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="622">10:22</button><span>理论派：完美压缩看起来像随机噪声</span></h4>
+      <p>这种吻合暗示聪明学生的方案也许不只是更好，而是<b>完美</b>的。但这个断言很大胆：你怎么知道没有某种超级聪明的方法，对很长的指令序列做点花样，让平均比特数更低？</p>
+      <p>这就轮到第三个学生，那个不怎么关心具体可实现编码、一直在想<b>完美的最优编码应该有什么性质</b>的理论派。他的想法很巧：随机噪声应该是压不动的，所以完美的压缩算法产生的比特流应该和随机噪声无法区分。听起来简单，却能一路推出香农熵。</p>
+      <p>这里的随机噪声指每个比特以 50% 的概率是 1 或 0，比特之间相互独立。不难看出聪明学生给机器人的编码确实满足这一点：消息以「上」开头的概率是 50%，所以第一个比特有 50% 是 0，否则是 1；如果是 1，下一条是「下」的概率又是 50%，所以下一个比特 50% 是 0；依此类推。每个新比特都像一次独立的抛硬币，对接收方来说，压缩后的比特流确实和随机噪声分不开。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-11m05s0.jpg" alt="随机噪声压不动" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="665">11:05</button>随机噪声压不动</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-11m35s0.jpg" alt="这套编码里，每个新比特都像一次独立的抛硬币" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="695">11:35</button>这套编码里，每个新比特都像一次独立的抛硬币</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="722">12:02</button><span>为什么随机噪声压不动，以及 −log<sub>2</sub> p</span></h4>
+      <p>为什么说随机噪声压不动？站在接收方的角度，按整条消息来想。接收方看到一个代表压缩后消息的 <span class="m"><i>n</i></span> 比特串，它是同样大小的 2<sup>n</sup> 种可能消息之一。关键是：既然假设它看起来像随机噪声，这 2<sup>n</sup> 种消息必须<b>一样可能</b>。理论派想论证的不只是机器人，而是任何数据（语言、图像）的完美压缩，不管用的具体算法是什么。可以粗略想象：所有压缩到 <span class="m"><i>n</i></span> 比特的消息里，有的原本是一大段可预测的数据，有的原本是一小段不可预测的数据。但只要压缩结果看起来像随机噪声，即所有长度为 <span class="m"><i>n</i></span> 的比特串一样可能，被压缩的原始消息就必然一样可能，而且概率都是 1/2<sup>n</sup>。</p>
+      <p>再看那张二进制串的图。这 2<sup>n</sup> 条一样可能的消息的编码，可以看成图上同一层的比特串。如果想让其中一条用更少的比特，它就要往下移一层，于是和另一条消息重叠，那条消息就得挪到别处，至少要和第三条消息共享一块地方，这两条都得往上一层，各多花一个比特来区分。省下一个比特，别处要多花两个，像把地毯上的一个鼓包按下去，另一处鼓得更厉害。一般地，任何编码在图中更低的消息都占了超过自己份额的空间，迫使其他好几条消息挤进更小的区域、被顶到更高的层，编码效率更差。</p>
+      <p>有了「完美压缩看起来像随机噪声」这个洞见，就到了开头说的「洞见引出定义」：在完美方案里，用 <span class="m"><i>n</i></span> 比特的消息概率必须是 1/2<sup>n</sup>，即 2<sup>−n</sup>。两边取以 2 为底的对数再取负，等价于：<b>在完美压缩下，分给一条消息的比特数是 <span class="m">−log<sub>2</sub> <i>p</i></span></b>，<span class="m"><i>p</i></span> 是它出现的概率。这个负对数是整个信息论的基本公式。前面的一切，都是为了让这个值显得是你追问完美压缩时必然会撞上的东西，而不是凭空给的定义。</p>
+      <p>负对数需要适应一下，乍看分数取对数应该是负的。直观的读法是：要把可能性的空间<b>对半切几次</b>才能切到这个量。也有作者写成 <span class="m">log<sub>2</sub>(1/<i>p</i>)</span>；还可以想成以 1/2 为底的对数，作者说没见过谁这么用，但他自己很喜欢这个约定。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-12m35s0.jpg" alt="压缩后的 n 比特串看起来像随机噪声，原始消息就必须一样可能，概率都是 1/2^n" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="755">12:35</button>压缩后的 n 比特串看起来像随机噪声，原始消息就必须一样可能，概率都是 1/2<sup>n</sup></figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-14m20s0.jpg" alt="想让一条消息少用一个比特，另外两条就得各多用一个" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="860">14:20</button>想让一条消息少用一个比特，另外两条就得各多用一个</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-15m20s0.jpg" alt="概率 1/2^n 的消息用 n 比特：−log₂ p = n" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="921">15:21</button>概率 1/2<sup>n</sup> 的消息用 n 比特：−log<sub>2</sub> p = n</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="974">16:14</button><span>香农的定义：信息量</span></h4>
+      <p>无论怎么写，香农意识到：即使真正的完美压缩做不到、<span class="m"><i>p</i></span> 也不是 2 的整数次幂、结果是个分数，这个量仍然是思考一条消息含多少信息的好办法。他把它<b>定义</b>为一个事件的<b>信息量</b>：</p>
+      <p><span class="m"><i>I</i> = −log<sub>2</sub> <i>p</i></span></p>
+      <p>作者脑子里的图像是：用一个小饼图表示事件的概率，信息量是饼图上方的一根柱子，概率越被挤向 0，柱子越被撑高，<b>不太可能的消息信息量很大</b>；概率接近 100% 时柱子缩短，<b>意料之中的消息信息量很低</b>。</p>
+      <p>这个定义不只是把概率换个单位。核心想法前面已经看到：在完美的压缩方案里，分给一条完整消息的比特数<b>恰好等于</b>它的信息量。当然完美压缩不总能做到，概率很可能不是 2 的整数次幂。所以更一般的说法是：一条消息的信息量给出了它<b>能被压缩到多小的下界</b>，至少在对所有可能消息取平均时是这样（你完全可以把一个压缩算法过度拟合到某一个特定情形上）。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-16m50s0.jpg" alt="信息量 −log₂ p：概率越小，柱子越高" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1010">16:50</button>信息量 −log<sub>2</sub> p：概率越小，柱子越高</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-17m35s0.jpg" alt="信息量是平均意义上压缩长度的下界：−log₂ p ≤ 比特数" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1055">17:35</button>信息量是平均意义上压缩长度的下界：−log<sub>2</sub> p ≤ 比特数</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1060">17:40</button><span>自然语言：小数比特，以及信息量相加</span></h4>
+      <p>机器人例子里的概率太干净了，都是 2 的整数次幂，每个符号的信息量正好是整数比特。香农更关心自然语言这种现实得多、复杂得多的情形。作者拿一个在本地跑的小 GPT，给一句示例里每个新字母的概率。（如果你怀疑模型给的概率和真实语言的概率不是一回事，这个怀疑是对的，记住它，后面会很要紧。）</p>
+      <p>语言有两点关键不同。一是<b>极度依赖上下文</b>：每个新字母的分布高度取决于前面的所有内容。二是这些概率显然不会是 2 的整数次幂，所以对每个字母算香农信息量（取 <span class="m">−log<sub>2</sub></span>），得到的都是小数。粗略的解释不难：可预测的字母信息量低，不可预测的高。但要解释为什么这些值配得上「比特」这个单位，就不能指望存在某种完美编码，让字母 I 的码字是 4.19 比特、让一个很好猜的 o 只用一小片比特。</p>
+      <p>真正的含义在于编码<b>整条消息</b>、给出它的压缩下界。一整句话的概率，是逐个乘上每个新字母的概率，而且每个字母的概率都以前面的内容为条件，这本质上就是概率的链式法则。注意它和对数配合得多好：求整条消息的信息量时，对数把乘法变成加法，于是它正好拆成<b>每个字母信息量之和</b>：</p>
+      <p><span class="m">−log<sub>2</sub> <i>P</i>(整句) = −log<sub>2</sub> <i>p</i><sub>1</sub> − log<sub>2</sub> <i>p</i><sub>2</sub> − ⋯ − log<sub>2</sub> <i>p</i><sub><i>n</i></sub></span></p>
+      <p>三部曲的最后一部分会讲一个具体的压缩算法，能把这段文字压到和这个值只差一两个比特。它不再是给每个字符一个预先定好的码字，但仍然能直接感到：把每个字母的小数信息量加起来，就决定了最终编码的长度。这是关键想法：即使和实际数据大小挂钩时最后要取整，香农意识到，在这个更高的抽象层上工作非常有用：信息可以自由地取连续值，相继事件的信息量直接相加。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-19m05s0.jpg" alt="每个字母的信息量都是小数，很好猜的字母只有零点几比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1145">19:05</button>每个字母的信息量都是小数，很好猜的字母只有零点几比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-19m50s0.jpg" alt="整句的概率是各个条件概率相乘，取负对数就变成信息量相加" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1190">19:50</button>整句的概率是各个条件概率相乘，取负对数就变成信息量相加</figcaption></figure></div>
+      
+      <div class="note"><p><span class="lbl">补充</span>这正是语言模型预训练损失的形状：对每个位置取模型给真实下一个 token 的概率的负对数，加起来再平均。<a class="ilink" href="#dl-xent">第 2 部分</a>会说明为什么它叫交叉熵，<a class="ilink" href="#dl5">第 5 章</a>讲的是模型怎样给出这些概率。</p></div>
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1247">20:47</button><span>香农怎样估计语言的概率</span></h4>
+      <p>如果认真评估语言的根本可压缩性，一切都取决于：每个后续字母的概率从哪来？前面的动画都用语言模型演示，但一来它未必等于语言背后真正的概率，二来连「语言的真实概率」指什么都不清楚。所以作者认为最有启发的是退回过去，看香农自己在语言模型和现代数据分析出现之前怎么想这件事。</p>
+      <p>他最早的一些实验看的是特定的短字符序列，也就是常说的 <b>n-gram</b>，统计它们后面通常接什么。比如翻几本书，每次 TH 出现就记下后面的字母，建一张表，用这些统计代表关心的概率。问题是一到更长的字母串就完全失效，尤其是在你分析的所有书里都没出现过的串。可是谈论这样的长串后面该接什么完全合理，而且恰恰更重要，因为上下文越长越可预测，能靠可预测性压缩得最多。</p>
+      <p>于是稍后香农分析了手边的另一个英语模型：他的妻子 <b>Betty</b>。据说香农拿出一本书，让 Betty 逐个猜下一个字母，他逐字记录：猜错时写下正确的字母，猜对时只画一道横线。这份记录的字母比原文少，但他的论点是它含有同样多的信息：如果能造一个和妻子一模一样的复制品，再玩一次猜字游戏，只要给她这份删减过的文本，这些字母本身就足以提示复制品准确还原原文。当然实际上人不会两次猜得一样，而且这只是定性地说明了「可预测性带来压缩」，还算不上对信息量的测量。</p>
+      <p>再晚一些，在 1950 年的论文《Prediction and Entropy of Printed English》里，香农改进了实验设计，更稳地测这个难以捉摸的量：英语的平均信息量。这次他访谈了更多人，不只记录每次猜对猜错，而是记录<b>要猜几次</b>才能猜出正确的下一个字母，再用一套方法把猜的次数对应到猜的人隐含地给真实下一个字母的概率。作者要强调的是：分析语言时，香农并不只是翻书做数据分析，他是在探测一个潜在的语言模型，也就是受访者的大脑。这些大脑被当成黑箱，对语言有复杂而说不清的理解，能根据上下文预测字符。到了 2020 年代，我们已经从审问处理语言的黑箱，走到了<b>设计</b>它们。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-21m35s0.jpg" alt="n-gram：统计短字符序列后面接什么，长串就失效了" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1295">21:35</button>n-gram：统计短字符序列后面接什么，长串就失效了</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-22m35s0.jpg" alt="让妻子 Betty 猜下一个字母，猜对画横线，猜错写下正确字母" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1355">22:35</button>让妻子 Betty 猜下一个字母，猜对画横线，猜错写下正确字母</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-23m50s0.jpg" alt="1950 年的论文：记录猜几次才猜中，再换算成隐含的概率" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1430">23:50</button>1950 年的论文：记录猜几次才猜中，再换算成隐含的概率</figcaption></figure></div>
+      
+      <div class="note"><p><span class="lbl">补充</span>这篇论文 1950-09-15 投稿，1951 年 1 月刊在《Bell System Technical Journal》第 30 卷，视频按投稿年份说「1950 年」。</p></div>
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1482">24:42</button><span>熵：平均信息量，也是压缩的下限</span></h4>
+      <p>之所以回到信息论的源头，是因为现代机器学习大量用到这个领域里出现的公式。除了信息量本身，还有三个关键表达式，作者希望你觉得自己也能重新发现：熵、交叉熵、KL 散度。不只是因为重新发现更好记，也因为看到它们从压缩里自然冒出来，才有坚实的立足点去评估压缩与智能之间的关系。</p>
+      <p>第一个，<b>熵</b>，你已经有了全部材料。设想任何可以看成一串符号的信号，四种机器人指令、英语或者别的什么。熵问的是<b>每个符号的平均信息量</b>。根据前面的讨论：完美压缩看起来像随机噪声，这时一条消息用的比特数等于它的信息量，而信息量又拆成各个符号信息量之和，所以测每个符号的平均信息量，基本就是在问压缩的极限，它给出一个信号<b>能被压缩到多高效的下界</b>。</p>
+      <p>机器人例子里其实已经算过：算完美编码平均每条指令几个比特的那个加权和。因为编码完美，每个符号的码字长度恰好等于它的信息量，所以算的就是每个符号的平均信息量。推广到任意概率分布：</p>
+      <p><span class="m"><i>H</i>(<i>P</i>) = Σ<sub><i>i</i></sub> <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>p</i><sub><i>i</i></sub>)</span></p>
+      <p>图示：一直用并排的水平条表示概率分布，每条宽度等于它的概率，合起来是 1；每条上面放一个矩形，高度锁定为对应的信息量 <span class="m">−log<sub>2</sub> <i>p</i><sub><i>i</i></sub></span>。上面的加权和就是所有矩形的<b>总面积</b>。这个式子还不完全一般，它只描述每个新符号都服从<b>同一个分布</b>时的压缩极限。机器人满足，英语不满足。</p>
+      <p>它重要到值得一个名字。有个好玩的故事：冯·诺伊曼 (John von Neumann) 据说建议香农把它叫熵，一来它像统计力学里已有的熵的表达式，二来「没人真正知道熵是什么，所以争论时你总能占上风」。作者查过，这大概是杜撰的，但似乎有几分真实。无论如何，香农确实把这个量叫熵，记作 <span class="m"><i>H</i></span>。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-24m50s0.jpg" alt="接下来要重新发现的式子：信息量、熵、交叉熵、KL 散度" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1490">24:50</button>接下来要重新发现的式子：信息量、熵、交叉熵、KL 散度</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-26m05s0.jpg" alt="机器人例子：码字长度恰好等于信息量，平均 1.75 比特就是熵" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1565">26:05</button>机器人例子：码字长度恰好等于信息量，平均 1.75 比特就是熵</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-26m50s0.jpg" alt="熵 = 宽为 pᵢ、高为 −log₂ pᵢ 的矩形的总面积" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1610">26:50</button>熵 = 宽为 p<sub><i>i</i></sub>、高为 −log<sub>2</sub> p<sub><i>i</i></sub> 的矩形的总面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-27m35s0.jpg" alt="冯·诺伊曼的传说：「没人真正知道熵是什么」" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1655">27:35</button>冯·诺伊曼的传说：「没人真正知道熵是什么」</figcaption></figure></div>
+      
+      
+      
+    </section>
+<section class="sec">
+      <h4><button class="ts" type="button" data-t="1666">27:46</button><span>熵的直觉、无噪声编码定理和英语的熵</span></h4>
+      <p>拖动这张图培养直觉：分布越均匀，总熵越高；把它挤得很不均匀，比如一个事件占了几乎全部概率，熵就很低，因为那个压倒性的事件信息量相应很小；把概率空间分给更多可能的符号，每个的信息量都更大，总熵也更高。粗略的定性理解是熵衡量分布里的<b>不确定性</b>；更精确、也说明为什么单位是比特的理解是：它描述了<b>编码服从这个分布的消息时，每个符号最少需要的比特数</b>。</p>
+      <p>这句话以及前面的一切，大体就是香农 1948 年开创信息论的论文里一个核心定理的内容，<b>无噪声编码定理 (Noiseless Coding Theorem)</b>：没有任何编码能比这个极限更高效；而且更强的是，总能做到任意接近这个极限。</p>
+      <p>如前所说，这个式子只适用于每个符号服从同一分布的情形，香农当然更关心一般情形，尤其花了大量时间思考自然语言的可压缩性。这需要更一般的熵，叫随机过程的<b>熵率 (Entropy Rate)</b>，问的仍然是「每个符号的平均信息量」，只是现在要对所有可能的消息平均：</p>
+      <p><span class="m"><i>l</i><i>i</i><i>m</i><sub><i>n</i>→∞</sub> (1/<i>n</i>) <i>H</i>(<i>X</i><sub>1</sub>, <i>X</i><sub>2</sub>, ⋯, <i>X</i><sub><i>n</i></sub>)</span></p>
+      <p>这几乎从来不是能干净算出来的东西，毕竟什么公式能描述语言的概率分布？所以听到「语言的熵」时，那远超任何精确计算能给的，这就是香农转向基于观察的估计的原因。他的方法不只是对一堆文本跑一个函数，要得到令人满意的可压缩性估计，他发现自己不可避免地需要去探测<b>有智能的语言模型</b>。当受访者有至少 100 个字母的上文时，他估计英语的熵大约是<b>每个字符 1 比特</b>。想想这个数很疯狂：它说英语可以压缩到每个字符只需要一个是或否的回答。第三部分会讲那个算法：如果编码和解码都能用一个高质量的语言模型，实践中可以出奇地接近这个极限。在那之前，<a class="ilink" href="#dl-xent">第 2 部分</a>讲熵的一个变体，交叉熵：它怎样、为什么被用来训练大语言模型，以及大模型怎样蒸馏成小模型、gzip 为什么能恢复语言之间的结构。</p>
+      
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/entropy-28m05s0.jpg" alt="一个事件占了几乎全部概率时，熵很低" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1685">28:05</button>一个事件占了几乎全部概率时，熵很低</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-29m05s0.jpg" alt="无噪声编码定理：没有编码能低于熵，但总能任意接近" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1745">29:05</button>无噪声编码定理：没有编码能低于熵，但总能任意接近</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-29m35s0.jpg" alt="熵率：符号分布会随上文变化时的一般定义" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1775">29:35</button>熵率：符号分布会随上文变化时的一般定义</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/entropy-30m35s0.jpg" alt="香农的估计：英语每个字符约 1 比特" loading="lazy" decoding="async">
+      <figcaption><button class="ts" type="button" data-t="1835">30:35</button>香农的估计：英语每个字符约 1 比特</figcaption></figure></div>
+      
+      <div class="note"><p><span class="lbl">补充</span>香农在论文里给的其实是一个范围：上文长到 100 个字母时，英语的熵在每字符 0.6 到 1.3 比特之间，「约 1 比特」是视频的概括。对照一下：ASCII 每字符 8 比特，开头屏幕上的霍夫曼编码约 4.2 比特、神经网络方法约 1.1 比特。片尾（31:14 起）是 3b1b talent 的介绍。</p></div>
+      
+    </section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>前缀码：任何码字都不是别的码字的前缀；在二进制串图上，每个码字占掉的空间就是它的「预算」。</li><li>完美压缩的输出和随机噪声分不开，由此推出：概率为 <span class="m"><i>p</i></span> 的消息最少用 <span class="m">−log<sub>2</sub> <i>p</i></span> 比特，即信息量。</li><li>整条消息的信息量 = 各符号（条件）信息量之和，对数把概率的连乘变成相加。</li><li>熵 <span class="m"><i>H</i>(<i>P</i>) = Σ <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>p</i><sub><i>i</i></sub>)</span> 是每个符号的平均信息量，也是无损压缩的下限（无噪声编码定理）。</li><li>估计语言的熵离不开一个会预测的模型；香农用人，估出英语约每字符 1 比特。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/entropy-0m22s0.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
+        <a class="plbili" href="https://www.bilibili.com/video/BV1yVNU6xERx" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>文本最多能压缩到多小？</span></button></li><li><button type="button" data-t="59"><b>0:59</b><span>预训练用的交叉熵损失来自信息论</span></button></li><li><button type="button" data-t="75"><b>1:15</b><span>预测和压缩在数学上等价</span></button></li><li><button type="button" data-t="115"><b>1:55</b><span>「压缩即智能」：三部曲的第一集</span></button></li><li><button type="button" data-t="198"><b>3:18</b><span>热身：给月球上的机器人发四种指令</span></button></li><li><button type="button" data-t="269"><b>4:29</b><span>三个学生：直接派、聪明派、理论派</span></button></li><li><button type="button" data-t="278"><b>4:38</b><span>直接的方案：每条 2 比特</span></button></li><li><button type="button" data-t="302"><b>5:02</b><span>变长编码：0、10、110、111，平均 1.75 比特</span></button></li><li><button type="button" data-t="402"><b>6:42</b><span>机器人怎么解码：码字不能是别的码字的前缀</span></button></li><li><button type="button" data-t="519"><b>8:39</b><span>用一张二进制串的图看前缀码</span></button></li><li><button type="button" data-t="602"><b>10:02</b><span>每个码字占的地盘恰好等于它的概率</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>理论派：完美压缩的输出应该像随机噪声</span></button></li><li><button type="button" data-t="722"><b>12:02</b><span>为什么随机噪声压不动</span></button></li><li><button type="button" data-t="887"><b>14:47</b><span>推出 −log<sub>2</sub> p：信息量</span></button></li><li><button type="button" data-t="991"><b>16:31</b><span>香农的定义：不太可能的消息信息量大</span></button></li><li><button type="button" data-t="1060"><b>17:40</b><span>自然语言：每个字母的概率都依赖上文</span></button></li><li><button type="button" data-t="1170"><b>19:30</b><span>整句的信息量 = 各个字母信息量之和</span></button></li><li><button type="button" data-t="1247"><b>20:47</b><span>真实语言的概率从哪来？</span></button></li><li><button type="button" data-t="1283"><b>21:23</b><span>香农的 n-gram 统计</span></button></li><li><button type="button" data-t="1336"><b>22:16</b><span>让妻子 Betty 猜下一个字母</span></button></li><li><button type="button" data-t="1400"><b>23:20</b><span>1950 年的论文：记录猜几次才猜中</span></button></li><li><button type="button" data-t="1482"><b>24:42</b><span>还有三个式子要重新发现：熵、交叉熵、KL 散度</span></button></li><li><button type="button" data-t="1504"><b>25:04</b><span>熵：每个符号的平均信息量，也是压缩的下限</span></button></li><li><button type="button" data-t="1633"><b>27:13</b><span>冯·诺伊曼起名的传说</span></button></li><li><button type="button" data-t="1666"><b>27:46</b><span>分布越均匀熵越大</span></button></li><li><button type="button" data-t="1730"><b>28:50</b><span>香农的无噪声编码定理</span></button></li><li><button type="button" data-t="1750"><b>29:10</b><span>熵率：符号分布会变时的一般情形</span></button></li><li><button type="button" data-t="1821"><b>30:21</b><span>英语：每个字符约 1 比特</span></button></li><li><button type="button" data-t="1850"><b>30:50</b><span>下一部分：交叉熵</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="dl-xent" data-ch="xent" data-bv="BV1u7hQ6rEQB">
+  <summary>
+    <span class="no mk">交</span>
     <span class="tt"><b>交叉熵是什么（压缩即智能 第 2 部分）</b><em>But what is cross-entropy? | Compression is Intelligence Part 2</em><span class="hook">交叉熵 Σ p<sub><i>i</i></sub>(−log q<sub><i>i</i></sub>) 问的是：按分布 Q 优化的编码，碰上真实分布 P 时平均每个符号花几个比特。它在 Q = P 时最小，最小值就是 P 的熵。语言模型的预训练损失正是这个量；要求「损失只在模型等于数据统计时最小」，函数就只能是对数。</span></span>
     <span class="side"><span class="chip">B 站官方投稿</span><span class="len">33:50</span></span>
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集属于 2026 年的新系列「压缩即智能」(Compression is Intelligence)，是第 2 部分，被放进了深度学习播放列表。第 1 部分《重新发明熵》讲信息量和熵，不在这个播放列表里，笔记见「概率与信息论」tab 的<a class="ilink" href="#prob6">第 6 集</a>，这一集开头会简短回顾。那个 tab 的<a class="ilink" href="#prob7">第 7 集</a>也是这一集，两边笔记各写各的，这里偏重和语言模型训练的关系。前半集在压缩的语境里引出<b>交叉熵 (Cross-Entropy)</b>，给出它的图示和一条关键性质；后半集讲语言模型的预训练：损失函数就是「从模型角度看，每个 token 的平均信息量」，再用约束优化说明为什么非得用对数不可，交叉熵的公式由此自然冒出来；然后讲蒸馏。片尾讲 <b>KL 散度</b>，留了三个思考题。第 1 章到第 7 章一直没细讲的「语言模型用什么代价函数」，在这一集讲清楚了。</p>
+      <p class="lede">这一集属于 2026 年的新系列「压缩即智能」(Compression is Intelligence)，是第 2 部分，被放进了深度学习播放列表。第 1 部分《重新发明熵》讲信息量和熵，不在这个播放列表里，补在了<a class="ilink" href="#dl-entropy">前一张卡</a>（「概率与信息论」tab 的<a class="ilink" href="#prob6">第 6 集</a>也是它），这一集开头会简短回顾。那个 tab 的<a class="ilink" href="#prob7">第 7 集</a>也是这一集，两边笔记各写各的，这里偏重和语言模型训练的关系。前半集在压缩的语境里引出<b>交叉熵 (Cross-Entropy)</b>，给出它的图示和一条关键性质；后半集讲语言模型的预训练：损失函数就是「从模型角度看，每个 token 的平均信息量」，再用约束优化说明为什么非得用对数不可，交叉熵的公式由此自然冒出来；然后讲蒸馏。片尾讲 <b>KL 散度</b>，留了三个思考题。第 1 章到第 7 章一直没细讲的「语言模型用什么代价函数」，在这一集讲清楚了。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1u7hQ6rEQB" target="_blank" rel="noreferrer">B 站官方投稿：压缩即智能：Part 2，究竟什么是交叉熵？ ↗</a>
         <a href="https://www.youtube.com/watch?v=GlYgs6v2YfU" target="_blank" rel="noreferrer">YouTube · 2026-07-16 ↗</a></p>
       <section class="sec">
