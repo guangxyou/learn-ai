@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>基础概念 · 线性代数、微积分、深度学习、概率的视频笔记，以及它们在 AI 里的用法</title>
-<meta name="description" content="八个 tab。「线性代数的本质」「微积分的本质」「深度学习」「概率与信息论」是 3Blue1Brown 四组视频共 47 集的分节笔记，时间码点了跳到 B 站视频那一秒，配 746 张去掉字幕的截图；B 站合集里缺的集已经补上。深度学习一组是 YouTube 播放列表的 10 集加上不在列表里的「压缩即智能」第 1 部分，讲手写数字网络的结构、梯度下降、反向传播，Transformer 的嵌入、注意力、MLP，外加大语言模型短片、熵与交叉熵、Welch Labs 讲扩散模型的客座视频，GPT-3 的 1750 亿参数逐项核对。「AI 中的线性代数」「AI 中的微积分」「AI 中的概率」按概念讲这些东西在模型和训练里出现在哪，每节配能手算的小例子并链接回对应的那一集。「线性代数延伸资料」收了杨松琳推荐的 Gilbert Strang 的课和苏剑林讲线性代数的文章。">
+<meta name="description" content="八个 tab。「线性代数的本质」「微积分的本质」「深度学习」「概率与信息论」是 3Blue1Brown 四组视频共 45 集的分节笔记，时间码点了跳到 B 站视频那一秒，配 706 张去掉字幕的截图；B 站合集里缺的集已经补上。深度学习一组是 YouTube 播放列表的 10 集加上不在列表里的「压缩即智能」第 1 部分，讲手写数字网络的结构、梯度下降、反向传播，Transformer 的嵌入、注意力、MLP，外加大语言模型短片、熵与交叉熵、Welch Labs 讲扩散模型的客座视频，GPT-3 的 1750 亿参数逐项核对。「AI 中的线性代数」「AI 中的微积分」「AI 中的概率」按概念讲这些东西在模型和训练里出现在哪，每节配能手算的小例子并链接回对应的那一集。「线性代数延伸资料」收了杨松琳推荐的 Gilbert Strang 的课和苏剑林讲线性代数的文章。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -5153,7 +5153,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </summary>
   <div class="epb">
     <div class="epmain">
-      <p class="lede">这一集属于 2026 年的新系列「压缩即智能」(Compression is Intelligence)，是第 2 部分，被放进了深度学习播放列表。第 1 部分《重新发明熵》讲信息量和熵，不在这个播放列表里，补在了<a class="ilink" href="#dl-entropy">前一张卡</a>（「概率与信息论」tab 的<a class="ilink" href="#prob6">第 6 集</a>也是它），这一集开头会简短回顾。那个 tab 的<a class="ilink" href="#prob7">第 7 集</a>也是这一集，两边笔记各写各的，这里偏重和语言模型训练的关系。前半集在压缩的语境里引出<b>交叉熵 (Cross-Entropy)</b>，给出它的图示和一条关键性质；后半集讲语言模型的预训练：损失函数就是「从模型角度看，每个 token 的平均信息量」，再用约束优化说明为什么非得用对数不可，交叉熵的公式由此自然冒出来；然后讲蒸馏。片尾讲 <b>KL 散度</b>，留了三个思考题。第 1 章到第 7 章一直没细讲的「语言模型用什么代价函数」，在这一集讲清楚了。</p>
+      <p class="lede">这一集属于 2026 年的新系列「压缩即智能」(Compression is Intelligence)，是第 2 部分，被放进了深度学习播放列表。第 1 部分《重新发明熵》讲信息量和熵，不在这个播放列表里，补在了<a class="ilink" href="#dl-entropy">前一张卡</a>，这一集开头会简短回顾。前半集在压缩的语境里引出<b>交叉熵 (Cross-Entropy)</b>，给出它的图示和一条关键性质；后半集讲语言模型的预训练：损失函数就是「从模型角度看，每个 token 的平均信息量」，再用约束优化说明为什么非得用对数不可，交叉熵的公式由此自然冒出来；然后讲蒸馏。片尾讲 <b>KL 散度</b>，留了三个思考题。第 1 章到第 7 章一直没细讲的「语言模型用什么代价函数」，在这一集讲清楚了。</p>
       <p class="links"><a href="https://www.bilibili.com/video/BV1u7hQ6rEQB" target="_blank" rel="noreferrer">B 站官方投稿：压缩即智能：Part 2，究竟什么是交叉熵？ ↗</a>
         <a href="https://www.youtube.com/watch?v=GlYgs6v2YfU" target="_blank" rel="noreferrer">YouTube · 2026-07-16 ↗</a></p>
       <section class="sec">
@@ -5576,26 +5576,25 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </div>
 <div class="view" id="view-prob">
   <div class="intro"><h2>概率与信息论 · 3Blue1Brown</h2>
-<p>3Blue1Brown 没有像「线性代数的本质」「微积分的本质」那样成体系的概率课，他讲概率和信息论的视频散在频道各处。这一页从中挑了 7 集、共 3 小时 3 分，按学 AI 用得上的顺序排：先是概率（贝叶斯定理、正态分布为什么常见、为什么是它），再是信息论（信息量、熵、交叉熵、KL 散度）。集号是这一页自己排的，不是 3b1b 的编号。</p>
+<p>3Blue1Brown 没有像「线性代数的本质」「微积分的本质」那样成体系的概率课，他讲概率和信息论的视频散在频道各处。这一页从中挑了 5 集、共 1 小时 57 分，按学 AI 用得上的顺序排：先是概率（贝叶斯定理、正态分布为什么常见、为什么是它），再是信息论（信息量和熵）。集号是这一页自己排的，不是 3b1b 的编号。</p>
 <ul class="picks">
   <li>第 1 集：贝叶斯定理。条件概率、先验、似然、后验，后面读到 P(x<sub>t</sub> | x<sub>&lt;t</sub>) 这类写法会顺很多。</li>
   <li>第 2 到 4 集是 2023 年连着发的一组：中心极限定理、正态分布里为什么有 π、高斯加高斯还是高斯。第 3 集把「为什么中心极限是高斯」留到了第 4 集，所以三集一起收。权重初始化、扩散模型的加噪公式都用到这里的结论。</li>
   <li>第 5 集：用 Wordle 讲信息量和熵。</li>
-  <li>第 6、7 集是 2026 年的「压缩即智能」：从压缩的极限重新推出熵，再讲交叉熵为什么是语言模型预训练的损失、蒸馏和 KL 散度。之前以为 3b1b 没讲的交叉熵、KL 散度，这两集补上了。第三集（讲怎么把语言模型变成压缩器）截至 2026-09-30 还没出。</li>
+  <li>接着该看的是 2026 年的「压缩即智能」两集：从压缩的极限重新推出熵，再讲交叉熵为什么是语言模型预训练的损失、蒸馏和 KL 散度。第 2 部分在 3b1b 的深度学习播放列表里，两集都收在「深度学习」tab：<a class="ilink" href="#dl-entropy">重新发明熵</a>、<a class="ilink" href="#dl-xent">交叉熵是什么</a>。</li>
 </ul>
 <p>没收的几集：《医检阳性≠得了病？》（贝叶斯的赔率形式，和第 1 集重叠，「AI 中的概率」里讲 logit 时会链过去）、《概率的概率》两集（二项分布、概率密度，离 LLM 远）、两集卷积（第 4 集会用到卷积的结论，看不懂可以回头补）。最大似然、困惑度、温度采样这些 3b1b 没专门讲的，放在下一个 tab「AI 中的概率」里用别的资料补。</p>
 
 <div class="check">
   <h3>B 站版本和 YouTube 对过了</h3>
   <ul>
-    <li>7 集都是 3Blue1Brown 官方号在 B 站的单独投稿（官方双语，1080p），没有合集。第 4 集 B 站标题是「到底为什么“中心极限”是正态分布啊」。</li>
-    <li>前 5 集的时间轴用 <a href="https://github.com/3b1b/captions" target="_blank" rel="noreferrer">3b1b/captions</a> 的官方英文字幕，每 4 秒抽一帧，用 OCR 读 B 站画面里压制的英文字幕去对，偏移都在 1 秒以内。</li>
+    <li>5 集都是 3Blue1Brown 官方号在 B 站的单独投稿（官方双语，1080p），没有合集。第 4 集 B 站标题是「到底为什么“中心极限”是正态分布啊」。</li>
+    <li>时间轴用 <a href="https://github.com/3b1b/captions" target="_blank" rel="noreferrer">3b1b/captions</a> 的官方英文字幕，每 4 秒抽一帧，用 OCR 读 B 站画面里压制的英文字幕去对，偏移都在 1 秒以内。</li>
     <li>例外是第 3 集：B 站投稿用的是较早的剪辑，在 23:52 到 24:40 多了约 49 秒的回顾，YouTube 现在的版本剪掉了。这一集 23:50 以后的时间码按 B 站计。</li>
-    <li>第 6、7 集太新，官方字幕仓库里没有（仓库 2024-11-30 之后没再更新），YouTube 字幕又要登录才能拿到。时间轴是用本地 Whisper 转写 B 站原片的英文音轨得到的，所以本来就是 B 站的时间。</li>
   </ul>
 </div>
 </div>
-  <div class="eptools"><span>7 集 · 3 小时 3 分 · 点标题展开</span>
+  <div class="eptools"><span>5 集 · 1 小时 57 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <details class="ep" id="prob1" data-ch="1" data-bv="BV1R7411a76r">
   <summary>
@@ -6244,312 +6243,17 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </aside>
   </div>
 </details>
-<details class="ep" id="prob6" data-ch="6" data-bv="BV1yVNU6xERx">
-  <summary>
-    <span class="no">6</span>
-    <span class="tt"><b>压缩即智能（上）：重新发明熵</b><em>Reinventing Entropy | Compression is Intelligence Part 1</em><span class="hook">完美的压缩结果看起来就像随机噪声，由此推出：概率为 p 的消息最少要用 −log<sub>2</sub> p 个比特；熵是每个符号平均信息量，也是压缩的极限。</span></span>
-    <span class="side"><span class="chip">B 站官方投稿</span><span class="len">32:20</span></span>
-  </summary>
-  <div class="epb">
-    <div class="epmain">
-      <p class="lede">「压缩即智能」三部曲的第一集（B 站官方号投稿时第三集还没出）。作者说大语言模型预训练用的交叉熵损失来自信息论，而信息论的一个结论是预测和压缩在数学上等价，所以预训练也可以看成在造最好的文本压缩器。这一集只打基础：从「文本最多能压缩到多小」出发，让你觉得自己也能重新发明<b>信息量</b>和<b>熵</b>这两个定义。先用一个接收四种指令的月球机器人热身，比较三个学生的方案：每条 2 比特、变长的前缀码（平均 1.75 比特）、以及一个理论派学生的论证：完美压缩的输出应该和随机噪声无法区分。由此推出 <span class="m">−log<sub>2</sub> <i>p</i></span>。然后转到自然语言：香农用 n-gram 统计、让妻子猜下一个字母、1950 年的论文估计英语的熵约每个字符 1 比特。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1yVNU6xERx" target="_blank" rel="noreferrer">B 站官方投稿：压缩即智能：Part1，重新发明熵 ↗</a>
-        <a href="https://www.youtube.com/watch?v=l6DKRf-fAAM" target="_blank" rel="noreferrer">YouTube · 2026-06-07 ↗</a></p>
-      <section class="sec">
-      <h4><button class="ts" type="button" data-t="0">0:00</button><span>为什么要从压缩讲起</span></h4>
-      <p>把文本编成二进制时，数据越少越好。ASCII 每个字符 8 比特，很浪费；给常见字符分配更短的比特串，能降到平均约 4 比特；利用长序列里规律的更聪明的方法还能更低。那么极限在哪？这个问题至少可以追溯到 1940 年代香农 (Claude Shannon) 开创信息论的工作。</p>
-      <p>作者说有意思的是，香农为回答这类问题发展的数学，后来在机器学习里格外有用。最典型的是：大语言模型的<b>预训练</b>通常被描述为预测下一个 token，用的是<b>交叉熵损失 (Cross-Entropy Loss)</b>，这个名字就来自信息论。信息论还有一个结论：<b>预测和压缩在数学上是等价的</b>，同一枚硬币的两面。所以预训练的目标也可以重新理解为：造一个尽可能高效的文本压缩器。有人甚至说「压缩即智能」。作者认为「智能」这个词太模糊，这话难以严格评判，更稳妥的说法是：压缩的数学理论和人工智能有着出奇紧密的关系。</p>
-      <p>这一集要做的，是让你觉得自己也能重新发现香农无噪声编码定理背后的核心想法，途中「重新发明」信息量和熵这两个定义。作者说好的定义往往是某种洞见留下的结晶，太早把公式给出来会剧透一个好故事。他还希望你注意到：回答这个问题，绕不开某种关于「智能」的概念。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-1m05s0.jpg" alt="预训练：对下一个词元的预测" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="65">1:05</button>预训练：对下一个词元的预测</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="198">3:18</button><span>热身：给月球机器人发指令</span></h4>
-      <p>我们往一颗遥远卫星上的机器人发移动指令，只有上、下、左、右四种，步长固定。指令不是均匀分布的：一半是上，四分之一是下，左、右各八分之一。为简单起见，假设每条指令相互独立，和前面的指令无关。发送是逐比特进行的，又慢又贵，所以问题是：怎样把这些指令编成比特流最省？</p>
-      <p>三个学生来答。直接派说：每条指令 2 比特，00 上、01 下、10 左、11 右，机器人每两位一切，很好解码。聪明派指出这没利用「上」出现得多这一点，提议变长编码：0 表示上，10 表示下，110 表示左，111 表示右。平均比特数按概率加权：<span class="m">½ × 1 + ¼ × 2 + ⅛ × 3 + ⅛ × 3 = 1.75</span> 比特，比 2 比特少。后两条指令多花了比特，但它们出现得少，被最常见的指令只用 1 比特弥补回来还有余。</p>
-      <p>变长编码的问题是机器人怎么知道在哪里切开？站在机器人的角度走一遍：收到 1，可能是下、左、右；接着是 0，只能是下，记下一条完整指令。再收到 0，只能是上，因为别的码字都不以 0 开头。收到 1、1 仍不确定，再来一个 0，确定是左。机器人只需一直读，读到恰好组成一个完整码字就记下。关键约束是：<b>没有哪个码字是另一个码字的前缀</b>。比如再加一个码字 100 就会冲突。满足这个约束的编码叫<b>前缀码 (Prefix Code)</b>，严格说是无前缀码，但通常叫前缀码。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-3m52s0.jpg" alt="四种指令：上 1/2，下 1/4，左、右各 1/8" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="232">3:52</button>四种指令：上 1/2，下 1/4，左、右各 1/8</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-5m45s0.jpg" alt="直接方案每条 2 比特；聪明方案用 0、10、110、111" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="345">5:45</button>直接方案每条 2 比特；聪明方案用 0、10、110、111</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-6m05s0.jpg" alt="加权平均：1.75 比特每条指令" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="365">6:05</button>加权平均：1.75 比特每条指令</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="519">8:39</button><span>二叉树图：码字吃掉多少空间</span></h4>
-      <p>有一张图能直观地选前缀码：每一层列出某个长度的所有比特串，以 0 开头的都在左半边，以 1 开头的都在右半边，往上一层递归地再对半分。每个比特串都是它上方所有串的前缀。</p>
-      <p>聪明派把单个比特 0 分给「上」，就等于占掉了一半空间，因为以 0 开头的都不能再用了。10 给「下」又占掉四分之一，最后两条各占八分之一，一点不剩。你会注意到，这些比例和各指令的概率完全一样。数据大小和概率之间的这种对应，正是信息论的奠基洞见。这让人猜想聪明派的方案不只是更好，也许是完美的。可凭什么说没有某种对长序列做花样的超级方法，能把平均比特数压得更低？</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-9m05s0.jpg" alt="二叉树图：每一层是一种长度的所有比特串" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="545">9:05</button>二叉树图：每一层是一种长度的所有比特串</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-9m55s0.jpg" alt="0 占掉一半空间，10 占掉四分之一，和概率一一对应" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="595">9:55</button>0 占掉一半空间，10 占掉四分之一，和概率一一对应</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="645">10:45</button><span>理论派：完美压缩像随机噪声</span></h4>
-      <p>第三个学生不想具体的编码，而在想完美、最优的编码应该有什么性质。他的想法是：随机噪声是不可压缩的，所以完美的压缩算法输出的比特流，应该和随机噪声无法区分。这里的随机噪声指每一位以 50% 的概率是 0 或 1，各位相互独立。</p>
-      <p>聪明派的编码确实满足这一点：消息以「上」开头的概率是 50%，所以第一位有 50% 是 0；如果是 1，接下来是「下」的概率又是 50%，下一位是 0，以此类推。每一位都像一次独立的抛硬币。</p>
-      <p>为什么随机噪声不能再压缩？从接收方看整条消息：收到 <span class="m"><i>n</i></span> 位的压缩消息，它是 <span class="m">2<sup><i>n</i></sup></span> 种同样长度的可能消息之一；既然看起来像随机噪声，这 <span class="m">2<sup><i>n</i></sup></span> 种必然等可能，所以被压缩的原始消息出现的概率都是 <span class="m">1/2<sup><i>n</i></sup></span>。这对任何数据类型、任何压缩算法都成立。在二叉树图上，这 <span class="m">2<sup><i>n</i></sup></span> 条消息的编码就是同一层上的所有串。想让其中一条少用一位，它就要往下挪一层，和另一条冲突，那条消息只能挪到别处，至少又和第三条共用空间，这两条就得往上挪一层，各多用一位。省下 1 位，别处多花 2 位，像按下地毯上的一个鼓包，它在别处鼓得更高。等可能的消息，最省的方案就是都用同样多的位。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-11m50s0.jpg" alt="每一位都像一次独立的抛硬币" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="710">11:50</button>每一位都像一次独立的抛硬币</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-13m50s0.jpg" alt="让一条消息少用一位，就会挤占别的消息的空间" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="830">13:50</button>让一条消息少用一位，就会挤占别的消息的空间</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="887">14:47</button><span>重新发明信息量：−log<sub>2</sub> p</span></h4>
-      <p>有了「完美压缩像随机噪声」，定义就被逼出来了：在完美方案里用 <span class="m"><i>n</i></span> 位的消息，概率必然是 <span class="m">2<sup>−<i>n</i></sup></span>。两边取以 2 为底的对数再取负：完美压缩下分配给一条消息的比特数是 <span class="m">−log<sub>2</sub> <i>p</i></span>，<span class="m"><i>p</i></span> 是它出现的概率。这个负对数表达式是整个信息论最基本的公式。</p>
-      <p>负对数初看有点别扭，好像应该是负数，其实分数取对数本来就是负的。直观的读法是：要对半砍几次才能砍到这个量。也有人写成 <span class="m">log(1/<i>p</i>)</span>；作者说他个人偏爱 <span class="m">log<sub>½</sub> <i>p</i></span> 这个写法，虽然没人这么用。香农意识到，即使完美压缩做不到、<span class="m"><i>p</i></span> 也不是 2 的整数次幂、结果是个小数，这仍然是衡量一条消息所含信息的有用方式。他把它定义为事件的<b>信息量 (Information)</b>。作者脑中的图像是：一个表示概率的小饼图，上面一根柱子，概率越接近 0 柱子越高，越接近 1 柱子越低。不太可能的消息信息多，意料之中的消息信息少。</p>
-      <p>这个定义有实质内容，不只是给概率换个单位：完美压缩方案里，整条消息分到的比特数恰好等于它的信息量。更一般的说法是，信息量给出了压缩的下界，至少在对所有可能消息取平均时如此（针对某一个特例过拟合压缩算法是可能的）。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-15m15s0.jpg" alt="完美压缩：任意 n 位消息的概率是 1/2ⁿ，即 −log₂ p = n" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="915">15:15</button>完美压缩：任意 n 位消息的概率是 1/2<sup><i>n</i></sup>，即 −log<sub>2</sub> p = n</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-16m45s0.jpg" alt="信息量 := −log₂ p，概率越接近 0 柱子越高" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1005">16:45</button>信息量 := −log<sub>2</sub> p，概率越接近 0 柱子越高</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1060">17:40</button><span>小数比特：语言的例子</span></h4>
-      <p>机器人的概率太干净了，都是 2 的整数次幂。香农关心的是更真实复杂的情形，比如自然语言。作者用本地跑的一个小 GPT 给一句话里每个新字母算概率（并提醒：模型给的概率和语言「真实」的概率未必一样，这一点后面很重要）。和机器人的区别有二：每个字母的分布高度依赖前文；概率不再是 2 的整数次幂，所以每个字母的信息量 <span class="m">−log<sub>2</sub> <i>p</i></span> 都是小数。可预测的字母信息少，难预测的信息多。</p>
-      <p>但总不能有一种编码让字母 I 的码字长 4.19 比特吧？真正的含义要放在整条消息上看。整句话的概率是每个新字母的条件概率依次相乘（每个都以前面的内容为条件），这就是概率的<b>链式法则</b>。取负对数，乘法变加法，整条消息的信息量就是每个字母信息量之和。第三集会讲一个具体的压缩算法，能把这段文本压到只比这个值多一两位。香农意识到，在这个更高的抽象层上工作非常有用：信息可以是连续的，相继事件的信息可以相加，最后对应到实际数据大小时再取整。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-18m15s0.jpg" alt="小 GPT 给每个新字母的概率，信息量都是小数" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1095">18:15</button>小 GPT 给每个新字母的概率，信息量都是小数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-19m48s0.jpg" alt="整句话的概率 = 各字母条件概率之积，取对数后变成求和" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1188">19:48</button>整句话的概率 = 各字母条件概率之积，取对数后变成求和</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1247">20:47</button><span>香农怎么估计语言的概率</span></h4>
-      <p>要严肃评估语言的可压缩性，一切取决于你怎么知道每个字母的概率。语言模型给的概率不一定是「真实」的，甚至「语言的真实概率」指什么都不清楚。作者说回到香农自己的做法最有启发。</p>
-      <p>香农早期的实验看短字母序列，也就是 <b>n-gram</b>，统计后面跟什么。比如扫几本书，记下每次 TH 后面跟的字母，用这些频率当概率的样本。问题是序列一长就完全失效，没在书里出现过的字符串就没有统计，可谈论它们后面跟什么完全合理，而且上下文越长越好预测，能压缩得越多。</p>
-      <p>于是香农分析了他手边的另一个英语模型：他的妻子 Betty。据说香农拿出一本书，让 Betty 逐个猜下一个字母，猜错就写下正确的字母，猜对就画一道短横线。转写出来的字母比原文少，但在一个意义上信息一样多：如果能复制一个一模一样的 Betty，只给她这份简化文本，她就能完全还原原文。当然，人不会两次猜得一样，这只是定性地展示了可预测性带来的可压缩性。</p>
-      <p>1950 年的论文《印刷英语的预测与熵》(Prediction and Entropy of Printed English) 里，香农改进了实验：找更多人，不只记对错，而是记猜对下一个字母需要猜几次，再用一套方法把猜测次数换算成猜测者隐含地给正确字母的概率。作者要强调的是：香农分析语言时并不只是看书做数据分析，他在探测一个底层的语言模型，也就是受访者的大脑，当作黑箱对待。到了 2020 年代，我们从审问处理语言的黑箱，变成了设计它们。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-21m40s0.jpg" alt="n-gram：统计 th 后面跟什么字母" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1300">21:40</button>n-gram：统计 th 后面跟什么字母</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-22m40s0.jpg" alt="Betty 猜对时，香农就画一道横线" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1360">22:40</button>Betty 猜对时，香农就画一道横线</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-23m30s0.jpg" alt="1950 年的论文：记下猜对需要几次" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1410">23:30</button>1950 年的论文：记下猜对需要几次</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1482">24:42</button><span>重新发明熵</span></h4>
-      <p>除了信息量本身，作者还要你觉得自己能重新发现三个关键表达式，这一集讲第一个：熵。设想任何可以看成符号序列的信号：机器人指令、英语，或者别的。熵问的是每个符号的平均信息量。根据前面的讨论，完美压缩下消息的比特数等于它的信息量，而信息量是各符号信息量之和，所以问「每个符号平均多少信息」，就是在问压缩的极限，它给出一个信号最多能压缩到多小的下界。</p>
-      <p>机器人例子里的加权平均 1.75 比特算的正是这个：完美编码下每个符号的码长就是它的信息量。推广到任意分布：每个符号的平均信息量是对分布里每个概率 <span class="m"><i>p</i></span> 求 <span class="m"><i>p</i> × (−log<sub>2</sub> <i>p</i>)</span> 再相加。可视化：把分布画成一排宽度等于概率的横条（总宽 1），每条上面放一个高度是 <span class="m">−log<sub>2</sub> <i>p</i></span> 的矩形，加权和就是这些矩形的总面积。</p>
-      <p>这个式子只描述每个新符号都服从同一个分布时的压缩极限，机器人满足，英语不满足。但它重要到值得一个名字。据说冯·诺依曼告诉香农，就叫它熵吧：统计力学里有个类似的式子叫这个名字；而且没人知道熵到底是什么，辩论时你总占上风。作者查过，这故事大概是杜撰的，但似乎有几分真。不管怎样，香农把这个量叫<b>熵 (Entropy)</b>，记作 <span class="m"><i>H</i></span>。</p>
-      <p>拖动这个图能建立直觉：分布越均匀，熵越高；如果一个事件占据了大部分概率，熵就很低，因为那个极可能的事件信息量很少；把概率分给更多的符号，每个符号信息更多，熵也更高。定性地说熵衡量分布的不确定性；更精确的理解是：它是按这个分布编码消息时，每个符号所需的<b>最少比特数</b>。这基本就是香农 1948 年论文里的核心定理，<b>无噪声编码定理</b>：没有任何编码能比这个极限更高效，而且总可以任意接近这个极限。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-26m20s0.jpg" alt="每个符号的平均信息量" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1580">26:20</button>每个符号的平均信息量</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-26m55s0.jpg" alt="平均信息量 = Σ pᵢ(−log₂ pᵢ)，即所有矩形的总面积" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1615">26:55</button>平均信息量 = Σ p<sub><i>i</i></sub>(−log<sub>2</sub> p<sub><i>i</i></sub>)，即所有矩形的总面积</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-28m00s0.jpg" alt="一个事件占据大部分概率时，熵很低（2.32 比特）" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1680">28:00</button>一个事件占据大部分概率时，熵很低（2.32 比特）</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1750">29:10</button><span>英语的熵：约每个字符 1 比特</span></h4>
-      <p>香农当然更关心一般情形：每个新符号的分布不一定相同，比如自然语言。这需要一个更一般的概念，叫随机过程的<b>熵率 (Entropy Rate)</b>，问的还是每个符号的平均信息量，只是要对所有可能消息取平均。这几乎从来算不出一个干净的结果，毕竟什么公式能描述语言的概率分布？所以「语言的熵」远超任何精确计算的范围，香农只能靠观察来估计，而且他发现，要得到令人满意的估计，就不得不去探测有智能的语言模型。</p>
-      <p>当受访者至少有前 100 个字母作为上下文时，香农估计英语的熵约为<b>每个字符 1 比特</b>。这意味着英语大约可以压缩到每个字符只用一个「是或否」的回答。作者说第三集会展示那个算法：如果编码和解码时都能用一个高质量的语言模型，实践中可以出奇地接近这个极限。在那之前，要先理解熵的一个变体，交叉熵：它是什么，为什么用来训练大语言模型，以及大模型如何蒸馏成小模型、gzip 为什么能还原语言之间的亲缘结构，这些是第二集的内容。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-1-28m55s0.jpg" alt="香农 1948 年的论文：无噪声编码定理" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1735">28:55</button>香农 1948 年的论文：无噪声编码定理</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-1-30m25s0.jpg" alt="有 100 个字母的上下文时，英语约每字符 1 比特" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1825">30:25</button>有 100 个字母的上下文时，英语约每字符 1 比特</figcaption></figure></div>
-      
-      
-      
-    </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>完美的压缩输出和随机噪声无法区分，由此推出：概率为 <span class="m"><i>p</i></span> 的消息最少需要 <span class="m">−log<sub>2</sub> <i>p</i></span> 比特，这就是香农的信息量。</li><li>前缀码：没有码字是另一个码字的前缀；码字占掉的空间比例和概率对应时最优（机器人例子 1.75 比特）。</li><li>熵 <span class="m"><i>H</i> = Σ <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>p</i><sub><i>i</i></sub>)</span> 是每个符号的平均信息量，也是无噪声编码定理给出的压缩极限。</li><li>整条消息的概率是逐个条件概率之积，信息量是逐个之和；香农估计英语约每字符 1 比特。</li></ul></section>
-    </div>
-    <aside class="epside">
-      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/compression-1-1m05s0.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
-        <a class="plbili" href="https://www.bilibili.com/video/BV1yVNU6xERx" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>文本最多能压缩到多小？</span></button></li><li><button type="button" data-t="59"><b>0:59</b><span>大语言模型预训练与交叉熵损失</span></button></li><li><button type="button" data-t="75"><b>1:15</b><span>预测和压缩在数学上等价</span></button></li><li><button type="button" data-t="115"><b>1:55</b><span>「压缩即智能」：三部曲的第一集</span></button></li><li><button type="button" data-t="198"><b>3:18</b><span>热身：给月球机器人发四种指令</span></button></li><li><button type="button" data-t="269"><b>4:29</b><span>三个学生：直接派、聪明派、理论派</span></button></li><li><button type="button" data-t="278"><b>4:38</b><span>直接的方案：每条 2 比特</span></button></li><li><button type="button" data-t="302"><b>5:02</b><span>聪明的方案：0、10、110、111，平均 1.75 比特</span></button></li><li><button type="button" data-t="402"><b>6:42</b><span>机器人怎么解码：前缀码</span></button></li><li><button type="button" data-t="519"><b>8:39</b><span>用二叉树图看码字占掉的空间</span></button></li><li><button type="button" data-t="645"><b>10:45</b><span>理论派：完美压缩的输出像随机噪声</span></button></li><li><button type="button" data-t="722"><b>12:02</b><span>为什么随机噪声不能再压缩</span></button></li><li><button type="button" data-t="887"><b>14:47</b><span>推出 −log<sub>2</sub> p：香农的信息量</span></button></li><li><button type="button" data-t="1060"><b>17:40</b><span>比特可以是小数：语言的例子</span></button></li><li><button type="button" data-t="1170"><b>19:30</b><span>整句话的概率是逐字母条件概率相乘，信息相加</span></button></li><li><button type="button" data-t="1247"><b>20:47</b><span>语言的概率从哪来？</span></button></li><li><button type="button" data-t="1283"><b>21:23</b><span>香农的 n-gram 统计</span></button></li><li><button type="button" data-t="1336"><b>22:16</b><span>香农让妻子 Betty 猜下一个字母</span></button></li><li><button type="button" data-t="1400"><b>23:20</b><span>1950 年的论文：用猜测次数估计信息量</span></button></li><li><button type="button" data-t="1482"><b>24:42</b><span>重新发明熵</span></button></li><li><button type="button" data-t="1633"><b>27:13</b><span>冯·诺依曼的故事，香农记作 H</span></button></li><li><button type="button" data-t="1711"><b>28:31</b><span>熵是每个符号所需比特数的下限：无噪声编码定理</span></button></li><li><button type="button" data-t="1750"><b>29:10</b><span>一般情形：熵率</span></button></li><li><button type="button" data-t="1813"><b>30:13</b><span>英语约每个字符 1 比特</span></button></li><li><button type="button" data-t="1838"><b>30:38</b><span>预告第二集：交叉熵、蒸馏、gzip</span></button></li></ol>
-    </aside>
-  </div>
-</details>
-<details class="ep" id="prob7" data-ch="7" data-bv="BV1u7hQ6rEQB">
-  <summary>
-    <span class="no">7</span>
-    <span class="tt"><b>压缩即智能（下）：交叉熵</b><em>But what is cross-entropy? | Compression is Intelligence Part 2</em><span class="hook">交叉熵问的是：为分布 q 优化的编码，用在服从分布 p 的数据上平均要多少比特；它在 q = p 时最小，最小值就是 p 的熵，所以用它当损失，模型会被推向数据的统计分布。</span></span>
-    <span class="side"><span class="chip">B 站官方投稿</span><span class="len">33:51</span></span>
-  </summary>
-  <div class="epb">
-    <div class="epmain">
-      <p class="lede">「压缩即智能」第二集。开头是 2002 年的论文《语言树与压缩》(Language Trees and Zipping)：只用 gzip 就能把不同语言的文档按语言聚类，甚至还原出语言的谱系树。背后的概念是<b>交叉熵</b>。前半集从压缩出发定义交叉熵：还是那个机器人，指令分布变了、编码没变，平均要多花多少比特。关键性质是：固定 p，交叉熵在 q = p 时最小，最小值是 p 的熵。后半集讲语言模型：预训练的损失是「模型视角下每个 token 的平均信息量」，它为什么叫交叉熵？作者不满意常见的 one-hot 解释，给出了更好的理由：如果要求损失只在模型输出等于数据统计分布时最小，函数就只能是对数，平均损失自然就是交叉熵。最后讲蒸馏和 KL 散度。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1u7hQ6rEQB" target="_blank" rel="noreferrer">B 站官方投稿：压缩即智能：Part 2，究竟什么是交叉熵？ ↗</a>
-        <a href="https://www.youtube.com/watch?v=GlYgs6v2YfU" target="_blank" rel="noreferrer">YouTube · 2026-07-16 ↗</a></p>
-      <section class="sec">
-      <h4><button class="ts" type="button" data-t="0">0:00</button><span>只用 gzip 还原语言谱系</span></h4>
-      <p>2002 年有篇很神奇的论文《语言树与压缩》(Language Trees and Zipping)：给你一堆不同语言的文档，要自动按语言聚类；再进一步，还要还原出哪些语言关系最近、它们的共同谱系树。没有任何语言学的先验知识，只能写一个处理每份文本的函数。那是将近四分之一个世纪前，没有现代语言模型。作者们只用了 <b>gzip</b>，就是你电脑上压缩文件用的那个。</p>
-      <p>基本思路：给定文档 A 和 B，把 B 的一小段接在 A 后面一起压缩，和单独压缩 A 的大小比较。这个差可以理解为：压缩器主要是针对 A 优化的，B 的这一小段在它手里能压得多好。B 的语言规律和 A 相近时差很小，差别大时差很大。作者们用这个思路定义了两份文档之间的距离，只看它们一起压缩的效果，就足以还原语言的谱系树，还能用来判断一份文档的作者。</p>
-      <p>这个例子背后的概念是<b>交叉熵 (Cross-Entropy)</b>，它也是现代语言模型训练的核心，暗示训练和压缩之间有意想不到的联系。这一集前半讲交叉熵是什么、怎么从压缩里自然出现、怎么可视化；后半讲预训练和蒸馏，那里交叉熵出现的方式看起来和压缩毫无关系。作者说，同一个公式在两个地方冒出来，是数学在朝你眨眼，暗示背后有联系。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-0m30s0.jpg" alt="语言谱系树：只用处理文本的函数还原出来" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="30">0:30</button>语言谱系树：只用处理文本的函数还原出来</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-1m00s0.jpg" alt="把 B 的一段接在 A 后面，压缩后和单独压缩 A 比较" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="60">1:00</button>把 B 的一段接在 A 后面，压缩后和单独压缩 A 比较</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="182">3:02</button><span>分布变了、编码没变：交叉熵</span></h4>
-      <p>回到第一集的机器人：上 1/2、下 1/4、左右各 1/8，最优编码给上 1 比特、下 2 比特、左右各 3 比特。这是一个更一般事实的具体例子：最优编码给一个符号分配的比特数是 <span class="m">−log<sub>2</sub></span> 它的概率，香农称之为这个事件的<b>信息量</b>。概率不干净时信息量不是整数，编码没法简单地给每个符号一个固定码字；更一般的说法是，整条消息的信息量是各符号信息量之和，最优编码的比特数约等于这个总信息量，所以小数比特有实实在在的意义。</p>
-      <p>现在航天局改了计划，让机器人整体往右走：上、下各 1/8，左 1/4，右 1/2。如果编码和解码系统都写死了旧的方案，现在显然低效，但低效多少？单比特的「上」只在 1/8 的时候出现，两比特的「下」也是 1/8，另外两条各 3 比特，合起来占 75%。加权求和：平均每条 2.625 比特。这个数就是原分布相对于新分布的<b>交叉熵</b>：为一种情形优化的压缩方案，用在另一种情形里表现如何。</p>
-      <p>推广：新分布的概率记作 <span class="m"><i>p</i></span>，原分布的记作 <span class="m"><i>q</i></span>，符号可以是机器人指令、英文字符或别的什么。为 <span class="m"><i>q</i></span> 优化的编码给每个符号分配 <span class="m">−log<sub>2</sub> <i>q</i><sub><i>i</i></sub></span> 比特。如果实际数据也服从 <span class="m"><i>q</i></span>，平均比特数是 <span class="m">Σ <i>q</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>q</i><sub><i>i</i></sub>)</span>，就是 <span class="m"><i>q</i></span> 的熵，可视化成宽 <span class="m"><i>q</i><sub><i>i</i></sub></span>、高 <span class="m">−log<sub>2</sub> <i>q</i><sub><i>i</i></sub></span> 的一排矩形的面积。如果实际服从 <span class="m"><i>p</i></span>，却继续用为 <span class="m"><i>q</i></span> 优化的编码，平均比特数还是加权和，只是权重换成 <span class="m"><i>p</i></span>：<span class="m">Σ <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>q</i><sub><i>i</i></sub>)</span>。这就是 <span class="m"><i>q</i></span> 相对于 <span class="m"><i>p</i></span> 的交叉熵，矩形宽 <span class="m"><i>p</i><sub><i>i</i></sub></span>、高 <span class="m">−log<sub>2</sub> <i>q</i><sub><i>i</i></sub></span>。作者说文献里的记号很乱，各种约定都有，直接记住这个求和就好。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-5m40s0.jpg" alt="新计划：右 1/2、左 1/4、上下各 1/8，编码却还是旧的" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="340">5:40</button>新计划：右 1/2、左 1/4、上下各 1/8，编码却还是旧的</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-6m10s0.jpg" alt="旧编码用在新分布上：平均 2.625 比特" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="370">6:10</button>旧编码用在新分布上：平均 2.625 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-8m25s0.jpg" alt="q 的熵 Σ qᵢ(−log₂ qᵢ) 与 q 相对 p 的交叉熵 Σ pᵢ(−log₂ qᵢ)" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="505">8:25</button>q 的熵 Σ q<sub><i>i</i></sub>(−log<sub>2</sub> q<sub><i>i</i></sub>) 与 q 相对 p 的交叉熵 Σ p<sub><i>i</i></sub>(−log<sub>2</sub> q<sub><i>i</i></sub>)</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="506">8:26</button><span>顺序很重要，最小值在 q = p</span></h4>
-      <p>用只有两个事件的分布建立直觉。<span class="m"><i>q</i></span> 是 50/50，<span class="m"><i>p</i></span> 是 90/10。从 <span class="m"><i>q</i></span> 的角度，每个事件都是 1 比特，<span class="m"><i>q</i></span> 的熵是 1 比特；因为每个符号的信息量都一样，权重怎么变都不影响，交叉熵也是 1 比特。反过来，<span class="m"><i>q</i></span> 是 90/10、<span class="m"><i>p</i></span> 是 50/50：从 <span class="m"><i>q</i></span> 的角度，常见事件信息很少，罕见事件信息很多，<span class="m"><i>q</i></span> 的熵小于 1 比特；但为这个偏斜分布优化的编码遇上两个事件等可能的现实，就真的吃亏了，交叉熵约 1.74 比特。交换 <span class="m"><i>p</i></span> 和 <span class="m"><i>q</i></span>，交叉熵变了，两者在公式里的角色本来就不同。</p>
-      <p>两个事件的分布只有一个自由参数（<span class="m"><i>q</i><sub>1</sub></span>，另一个是 <span class="m">1 − <i>q</i><sub>1</sub></span>），可以画图。固定 <span class="m"><i>p</i></span>，把交叉熵画成 <span class="m"><i>q</i><sub>1</sub></span> 的函数，曲线有一个明显的最小值，恰好在 <span class="m"><i>q</i> = <i>p</i></span> 处。这完全合理：交叉熵问的是为 <span class="m"><i>q</i></span> 优化的编码在 <span class="m"><i>p</i></span> 里表现如何，两者一致时效率当然最高。再拖动 <span class="m"><i>p</i></span>，追踪最小值的位置，描出一条绿色曲线：它是 <span class="m"><i>p</i></span> 的熵，因为现实服从 <span class="m"><i>p</i></span> 时能做到的最好压缩就是 <span class="m"><i>p</i></span> 的熵。</p>
-      <p>作者要你从这一集记住的关键一点：<b>把 <span class="m"><i>p</i></span> 看成固定、<span class="m"><i>q</i></span> 看成变量，交叉熵在 <span class="m"><i>q</i> = <i>p</i></span> 时取最小值，最小值就是 <span class="m"><i>p</i></span> 的熵</b>。多个事件时也一样：固定矩形的宽度 <span class="m"><i>p</i></span>，<span class="m"><i>q</i></span> 决定所有矩形的高度，总面积有下界，<span class="m"><i>q</i> = <i>p</i></span> 时达到，下界是 <span class="m"><i>p</i></span> 的熵。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-9m05s0.jpg" alt="q 是 50/50：交叉熵和熵都是 1 比特" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="545">9:05</button>q 是 50/50：交叉熵和熵都是 1 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-10m08s0.jpg" alt="q 是 90/10、p 是 50/50：交叉熵约 1.74 比特" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="608">10:08</button>q 是 90/10、p 是 50/50：交叉熵约 1.74 比特</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-11m00s0.jpg" alt="固定 p，交叉熵作为 q₁ 的函数在 q = p 处最小" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="660">11:00</button>固定 p，交叉熵作为 q<sub>1</sub> 的函数在 q = p 处最小</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-11m45s0.jpg" alt="最小值的轨迹（绿色）就是 p 的熵" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="705">11:45</button>最小值的轨迹（绿色）就是 p 的熵</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="779">12:59</button><span>回到 gzip</span></h4>
-      <p>开头那个例子基本就是交叉熵的一个应用：gzip 在 A 上基本已经优化好了，算那个差，就是在问「为一个情形优化的压缩方案，用在另一个情形里表现如何」。它不完全是交叉熵：不是在比两个概率分布，而是把一种语言的文档当作某个分布的样本，所以更像交叉熵的经验估计；而且估得也不好，gzip 离香农极限差得远，它的算法只是找出重复的片段，把后面的出现替换成指向前面的指针。但只要它近似了交叉熵，就能得到一个有用的距离，完成一个像样的自然语言处理任务。</p>
-      <p>这是交叉熵在实践中的常见用法：只要你想量化一个情形里的规律和另一个情形有多不同，它就会出现。这里比的是两种语言的规律；接下来是今天的主要应用，训练语言模型，要量化的是模型对语言的理解和语言的真实规律（至少是训练数据所代表的）差多远。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-13m30s0.jpg" alt="gzip(AB) 与 gzip(A) 的差：交叉熵的粗略估计" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="810">13:30</button>gzip(AB) 与 gzip(A) 的差：交叉熵的粗略估计</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="892">14:52</button><span>预训练的损失：模型视角下每个 token 的平均信息量</span></h4>
-      <p>快速回顾：现代语言模型把文本切成 <b>token</b>（词或词的一部分），模型是一个函数，输入任意一段 token 序列，输出所有可能 token 上的一个概率分布，作为对下一个 token 的预测。训练需要一个<b>损失函数 (Loss Function)</b>，量化预测总体上好不好。损失函数的图像常被画成一个找最低点的曲面，但真正的输入是几十亿个参数，这张图应该在几十亿维里。训练就是自动调参数，一步步往下走，靠的是梯度下降和反向传播。对工程师来说，定义好损失函数，基本就完事了，深度学习的标准机器会接手。</p>
-      <p>损失是针对一大堆训练数据定义的（通常是从互联网上采样的大量文本）。关键的设计问题是：写一个什么样的函数，衡量模型在所有数据上表现如何，让最小化它就等于提升模型。一个很好的理解方式是：<b>模型视角下每个 token 的平均信息量</b>。对训练数据里的一段文本，对每个前缀让模型预测下一个 token，看它给真正出现的那个 token 多大概率（模型一次前向就能给出所有位置的这些概率），取负对数，也就是这个事件让模型有多意外。聪明的模型跟得上内容，很少意外，给真实 token 的概率高，信息量低；随机或没训练好的模型总是很困惑，处处意外。</p>
-      <p>负对数的图像表明，模型给真实 token 的概率很低时会受到很重的惩罚，概率高时只贡献很小的损失。机器学习里几乎总用自然对数而不是以 2 为底，两者只差一个常数因子，会被学习率吸收；自然对数求导更干净，而求导是梯度下降的核心。预训练在这个抽象层面就这么简单：遍历训练集里的每个 token，取模型给它的概率的负对数，求平均。当然还有 batching、优化器，以及在那种规模上跑起来的工程壮举。如果训练能把这个损失压到接近语言的熵，你就得到一个强大的通用预测器。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-15m55s0.jpg" alt="语言模型输出下一个 token 的概率分布" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="955">15:55</button>语言模型输出下一个 token 的概率分布</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-18m10s0.jpg" alt="每个位置上，模型给真实下一个 token 的概率" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1090">18:10</button>每个位置上，模型给真实下一个 token 的概率</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-18m55s0.jpg" alt="损失 = −log₂(x)：概率越低，惩罚越重" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1135">18:55</button>损失 = −log<sub>2</sub>(x)：概率越低，惩罚越重</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1237">20:37</button><span>为什么叫交叉熵：对数是被逼出来的</span></h4>
-      <p>你可能以为这个损失会叫「信息损失」或「对数损失」，实际上叫<b>交叉熵损失</b>，可上面的解释里根本没用到交叉熵公式。常见的说法是：这是模型在某个位置的输出和一个完全集中在真实 token 上的分布（one-hot）之间的交叉熵；代进加权和，权重里的 0 把其他项都消掉，只剩模型给真实 token 的概率的负对数。作者觉得这个解释很差：它完全没说明为什么要用交叉熵，既然都消掉了，何不直接叫对数损失？</p>
-      <p>他更满意的解释是：先说明用对数其实不是一个选择，你别无选择；看清这一点，交叉熵公式就自然跳出来了。把概率变成损失，表面上唯一的约束是递减：概率低损失高，概率接近 1 损失低。满足这个形状的函数无穷多，记作 <span class="m"><i>f</i></span>，看看还需要它满足什么。</p>
-      <p>例子：「My name is ___」。这种又短又常见的模式在预训练数据里会出现很多次，常见的名字出现多次，罕见的名字出现少。输入「my name is」，模型输出下一个 token 的分布 <span class="m"><i>q</i></span>。只看一次出现，损失是 <span class="m"><i>f</i>(<i>q</i>)</span>；但同一个名字的每次出现都贡献同样的量，其他名字的每次出现也贡献类似的量，只是代入模型给那些名字的概率。用 <span class="m"><i>p</i></span> 表示每个名字在训练数据里出现的比例，这个模式下所有样本的平均损失就是 <span class="m">Σ <i>p</i><sub><i>i</i></sub> <i>f</i>(<i>q</i><sub><i>i</i></sub>)</span>。选 <span class="m"><i>f</i> = −log <i>q</i></span>，这个平均损失恰好就是交叉熵的定义：模型输出相对于数据统计分布的交叉熵。</p>
-      <p>还记得交叉熵的关键性质：在 <span class="m"><i>p</i> = <i>q</i></span> 时最小。所以这个损失恰好在模型输出的分布等于数据里的统计分布时最小。更关键的是反过来也成立：如果你要求平均损失只在模型输出匹配数据统计时最小，就有一个漂亮的数学论证说明 <span class="m"><i>f</i></span> 必须是对数。细节用到拉格朗日乘数：在 <span class="m">Σ <i>q</i><sub><i>i</i></sub> = 1</span> 的约束下最小化 <span class="m">Σ <i>p</i><sub><i>i</i></sub> <i>f</i>(<i>q</i><sub><i>i</i></sub>)</span>，等价于找两条等高线相切的点，令两个梯度成比例，最后化成条件 <span class="m"><i>f</i>′(<i>q</i>)</span> 必须是某个常数除以 <span class="m"><i>q</i></span>，只有对数有这个性质。所以要一个只在模型匹配数据统计时才最小的损失，你别无选择，只能用负对数，平均损失就恰好是交叉熵。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-21m15s0.jpg" alt="常见解释：和一个 one-hot 分布的交叉熵，0 把其他项都消掉" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1275">21:15</button>常见解释：和一个 one-hot 分布的交叉熵，0 把其他项都消掉</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-23m50s0.jpg" alt="平均损失 = Σ pᵢ f(qᵢ)，p 是训练数据里各名字的比例" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1430">23:50</button>平均损失 = Σ p<sub><i>i</i></sub> f(q<sub><i>i</i></sub>)，p 是训练数据里各名字的比例</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-25m30s0.jpg" alt="拉格朗日乘数：要求在 q = p 处最小，推出 f′(q) ∝ 1/q" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1530">25:30</button>拉格朗日乘数：要求在 q = p 处最小，推出 f′(q) ∝ 1/q</figcaption></figure></div>
-      
-      
-      <details class="pz"><summary><span class="lbl">思考题</span>在 Σq<sub><i>i</i></sub> = 1 的约束下最小化 Σ p<sub><i>i</i></sub> f(q<sub><i>i</i></sub>)，为什么会推出 f′(q) = 常数 / q？</summary><p>拉格朗日条件：对每个 i，p<sub><i>i</i></sub> f′(q<sub><i>i</i></sub>) = λ（λ 是乘数）。要求最小值恰好出现在 q<sub><i>i</i></sub> = p<sub><i>i</i></sub>，就得 p<sub><i>i</i></sub> f′(p<sub><i>i</i></sub>) = λ 对所有 p<sub><i>i</i></sub> 成立，即 f′(p) = λ/p。积分得 f(q) = λ ln q + 常数，递减要求 λ < 0，也就是负对数。</p></details>
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1573">26:13</button><span>蒸馏：用大模型的整个分布当目标</span></h4>
-      <p>最后一个话题是训练语言模型的一个变体，这里交叉熵公式用得更显式，每个训练样本给模型分布的拉力柔和得多，不会全压在一个 token 上。这就是<b>蒸馏 (Distillation)</b>：训练一个比较小的模型，去逼近一个更大、想必更聪明的模型。这很常见，因为靠扩大参数量达到想要的效果之后，最好能用一个小得多、推理时更便宜的模型逼近它。</p>
-      <p>有了大模型，就能做比普通预训练高效得多的事：还是遍历数据，在每个位置看小模型对下一个 token 的完整分布，但不再和数据里真实的下一个 token 比，而是和大模型在同一位置的完整分布比。这个位置的损失定义为<b>小模型分布相对于大模型分布的交叉熵</b>。普通预训练只把全部权重给恰好出现的那一个 token，蒸馏给的信号丰富得多。作者打比方：一个是只靠看棋局学国际象棋，一个是有高手在每一步给你讲所有好棋以及各自多看重。回到「My name is ___」：不用等数据里出现成千上万次、损失才接近一个合理的名字分布，一个样本和好模型的预测比一比就有同样的效果。</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-27m15s0.jpg" alt="蒸馏：小模型的分布和大模型在同一位置的分布比" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1635">27:15</button>蒸馏：小模型的分布和大模型在同一位置的分布比</figcaption></figure></div>
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1690">28:10</button><span>两种来源，同一个公式</span></h4>
-      <p>前半集，交叉熵在压缩的语境里很自然地出现：为一个情形优化的压缩方案，用在另一个情形里表现如何。有点意外的是，这个想法作为「一个情形的规律和另一个有多不同」的度量更普遍地有用，所以它在现代机器学习里常被拿来当损失。</p>
-      <p>但后半集里公式出现的方式和压缩几乎无关，逻辑来自数学的另一个分支：约束优化。作者说，就像 π 只要出现，背后总藏着和圆的联系；交叉熵只要出现，总能连到压缩上。把损失描述成「模型视角下每个 token 的平均信息量」已经为此铺好了路。下一步是说明怎样把一个通用预测器变成压缩器，让一段文本编码后的比特数约等于它在模型视角下的信息量。第三集会讲一个非常直观漂亮的压缩算法，那时就能看清：用交叉熵损失训练，等价于把模型训练成最好的文本压缩器。</p>
-      
-      
-      
-      
-      
-      
-    </section>
-<section class="sec">
-      <h4><button class="ts" type="button" data-t="1811">30:11</button><span>附注：KL 散度</span></h4>
-      <p>作者最后补了一个在机器学习论文里随处可见的相关概念：<b>KL 散度</b>（Kullback-Leibler Divergence）。回忆交叉熵的关键性质：<span class="m"><i>p</i> = <i>q</i></span> 时取最小值，最小值是 <span class="m"><i>p</i></span> 的熵。很自然地想给这两个值的差起个名字，它就叫 KL 散度：<span class="m"><i>D</i><sub>KL</sub> = Σ <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>q</i><sub><i>i</i></sub>) − Σ <i>p</i><sub><i>i</i></sub>(−log<sub>2</sub> <i>p</i><sub><i>i</i></sub>)</span>，交叉熵减熵。</p>
-      <p>用压缩的话说，它是用一个没优化好的编码时，每个符号<b>浪费</b>了多少比特。机器人例子里，没优化的方案每条 2.625 比特减去优化后的 1.75 比特，差 0.875 比特，就是两个分布之间的 KL 散度。机器学习里，KL 散度当作分布之间的一种距离：两个分布相同时是 0，差得越多越大。但它不完全是距离，因为不对称：<span class="m"><i>q</i></span> 相对于 <span class="m"><i>p</i></span> 的 KL 散度和 <span class="m"><i>p</i></span> 相对于 <span class="m"><i>q</i></span> 的不一样。</p>
-      <p>作者留了三个问题。一，实践中 KL 散度常写成更紧凑的 <span class="m">Σ <i>p</i><sub><i>i</i></sub> log(<i>p</i><sub><i>i</i></sub>/<i>q</i><sub><i>i</i></sub>)</span>，验证它和「交叉熵减熵」相等；紧凑的写法藏住了它其实是个差。二，他展示的那张图是交叉熵图的一个变体，想想它在什么意义上表示这个式子。三，蒸馏时用两个分布的交叉熵当损失；如果改用 KL 散度会怎样？既然 KL 散度像距离，它不是更自然吗？</p>
-      
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/compression-2-32m00s0.jpg" alt="KL 散度 = q 相对 p 的交叉熵 − p 的熵" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1920">32:00</button>KL 散度 = q 相对 p 的交叉熵 − p 的熵</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-32m15s0.jpg" alt="机器人例子：2.625 − 1.75 = 0.875 比特，浪费掉的部分" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="1935">32:15</button>机器人例子：2.625 − 1.75 = 0.875 比特，浪费掉的部分</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/compression-2-33m20s0.jpg" alt="问题三：蒸馏时把交叉熵换成 KL 散度会怎样" loading="lazy" decoding="async">
-      <figcaption><button class="ts" type="button" data-t="2000">33:20</button>问题三：蒸馏时把交叉熵换成 KL 散度会怎样</figcaption></figure></div>
-      
-      
-      <details class="pz"><summary><span class="lbl">思考题</span>蒸馏时把损失从交叉熵换成 KL 散度，训练会有什么不同？</summary><p>没有不同。KL 散度 = 交叉熵 − H(p)，这里 p 是大模型的分布，不随小模型的参数变化，H(p) 对小模型是个常数。两个损失只差一个常数，梯度完全一样，最优解也一样。KL 散度的好处只在读数上：它在两个分布相同时正好是 0。</p></details>
-    </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>交叉熵 <span class="m">Σ <i>p</i><sub><i>i</i></sub>(−log <i>q</i><sub><i>i</i></sub>)</span>：为分布 <span class="m"><i>q</i></span> 优化的编码用在服从 <span class="m"><i>p</i></span> 的数据上，每个符号的平均比特数。它不对称。</li><li>固定 <span class="m"><i>p</i></span>，交叉熵在 <span class="m"><i>q</i> = <i>p</i></span> 时最小，最小值是 <span class="m"><i>p</i></span> 的熵。所以拿它当损失，模型会被推向数据的统计分布。</li><li>预训练损失 = 模型给真实下一个 token 的概率取负对数、再对所有 token 求平均；对同一个上下文的所有出现求平均，就是模型分布相对于数据分布的交叉熵。要求「只在 <span class="m"><i>q</i> = <i>p</i></span> 处最小」，损失函数就只能是对数。</li><li>KL 散度 = 交叉熵 − 熵，是用错编码浪费的比特数；两分布相同时为 0，不对称。蒸馏用大模型的完整分布当目标。</li></ul></section>
-    </div>
-    <aside class="epside">
-      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/compression-2-0m30s0.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span>
-        <a class="plbili" href="https://www.bilibili.com/video/BV1u7hQ6rEQB" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>语言树与压缩：只用 gzip 还原语言谱系</span></button></li><li><button type="button" data-t="114"><b>1:54</b><span>背后的概念是交叉熵，它也是语言模型训练的核心</span></button></li><li><button type="button" data-t="182"><b>3:02</b><span>回顾：最优编码里每个符号用 −log<sub>2</sub> p 比特</span></button></li><li><button type="button" data-t="320"><b>5:20</b><span>指令分布变了、编码没变：平均 2.625 比特</span></button></li><li><button type="button" data-t="373"><b>6:13</b><span>这就是交叉熵</span></button></li><li><button type="button" data-t="400"><b>6:40</b><span>一般公式：Σ p<sub><i>i</i></sub>(−log<sub>2</sub> q<sub><i>i</i></sub>)</span></button></li><li><button type="button" data-t="506"><b>8:26</b><span>两个事件的例子：顺序很重要</span></button></li><li><button type="button" data-t="622"><b>10:22</b><span>固定 p 画成 q 的函数：在 q = p 处最小</span></button></li><li><button type="button" data-t="684"><b>11:24</b><span>最小值的轨迹就是 p 的熵</span></button></li><li><button type="button" data-t="779"><b>12:59</b><span>回到 gzip：是交叉熵的经验估计</span></button></li><li><button type="button" data-t="892"><b>14:52</b><span>语言模型：输入一段 token，输出下一个 token 的分布</span></button></li><li><button type="button" data-t="958"><b>15:58</b><span>训练只需要定义好损失函数</span></button></li><li><button type="button" data-t="1048"><b>17:28</b><span>损失：模型视角下每个 token 的平均信息量</span></button></li><li><button type="button" data-t="1160"><b>19:20</b><span>机器学习里用自然对数</span></button></li><li><button type="button" data-t="1237"><b>20:37</b><span>为什么叫交叉熵？常见的 one-hot 解释</span></button></li><li><button type="button" data-t="1297"><b>21:37</b><span>更好的解释：为什么非用对数不可</span></button></li><li><button type="button" data-t="1354"><b>22:34</b><span>例子：My name is ___</span></button></li><li><button type="button" data-t="1429"><b>23:49</b><span>平均损失就是交叉熵</span></button></li><li><button type="button" data-t="1469"><b>24:29</b><span>反过来：要求在 q = p 处最小，就只能是对数</span></button></li><li><button type="button" data-t="1573"><b>26:13</b><span>蒸馏：用大模型的整个分布当目标</span></button></li><li><button type="button" data-t="1690"><b>28:10</b><span>回顾：两种来源，同一个公式</span></button></li><li><button type="button" data-t="1761"><b>29:21</b><span>预告第三集：把预测器变成压缩器</span></button></li><li><button type="button" data-t="1811"><b>30:11</b><span>附注：KL 散度</span></button></li><li><button type="button" data-t="1895"><b>31:35</b><span>KL 散度 = 交叉熵 − 熵，浪费掉的比特</span></button></li><li><button type="button" data-t="1962"><b>32:42</b><span>留给观众的三个问题</span></button></li></ol>
-    </aside>
-  </div>
-</details>
 </div>
 <div class="view" id="view-aiprob"><div class="aiwrap">
   <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#aip-dist">模型的输出是一个概率分布</a></li><li><a href="#aip-chain">条件概率与链式法则</a></li><li><a href="#aip-bayes">贝叶斯与对数赔率</a></li><li><a href="#aip-mle">最大似然</a></li><li><a href="#aip-prior">先验与正则化</a></li><li><a href="#aip-entropy">信息量与熵</a></li><li><a href="#aip-ppl">交叉熵损失与困惑度</a></li><li><a href="#aip-kl">KL 散度</a></li><li><a href="#aip-variance">方差相加</a></li><li><a href="#aip-mean">样本平均</a></li><li><a href="#aip-diffusion">高斯加高斯</a></li>
     <li><a href="#aip-map">对照表</a></li></ol></nav>
   <article class="aidoc">
     <h2 class="aih">AI 中用到的概率与信息论</h2>
-    <p class="lede">语言模型每一步输出的是一个概率分布，训练它用的损失来自信息论，评测它用的困惑度是熵的指数，对齐它时约束的是 KL 散度，扩散模型整个就是在高斯噪声上做文章。前面两个 tab 讲的是模型怎么算，这一页讲的是它算出来的数是什么意思。</p><p class="lede">每节标出对应「概率与信息论」的哪几集（点集名跳过去展开那一集）。3b1b 没专门讲的几个概念，最大似然、先验与正则化、困惑度、温度采样，各节里写清楚，并附上别的讲解资料。</p>
+    <p class="lede">语言模型每一步输出的是一个概率分布，训练它用的损失来自信息论，评测它用的困惑度是熵的指数，对齐它时约束的是 KL 散度，扩散模型整个就是在高斯噪声上做文章。前面两个 tab 讲的是模型怎么算，这一页讲的是它算出来的数是什么意思。</p><p class="lede">每节标出对应「概率与信息论」的哪几集（点集名跳过去展开那一集），讲熵和交叉熵的「压缩即智能」两集收在「深度学习」tab。3b1b 没专门讲的几个概念，最大似然、先验与正则化、困惑度、温度采样，各节里写清楚，并附上别的讲解资料。</p>
     <section class="aisec" id="aip-dist">
     <h2><span class="n">1</span><span>模型的输出是一个概率分布：softmax、温度与采样</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
-    <p>语言模型最后一层给词表里每个 token 打一个分数，叫 <b>logit</b>，一共 <span class="m"><i>V</i></span> 个（GPT-2 的词表 <span class="m"><i>V</i> = 50257</span>）。<b>softmax</b> 把它们变成概率：<span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i><sup><i>z</i><sub><i>i</i></sub></sup> / Σ<sub><i>j</i></sub> <i>e</i><sup><i>z</i><sub><i>j</i></sub></sup></span>，每个都是正数，加起来是 1。这就是第 7 集说的「模型输出下一个 token 上的一个分布 <span class="m"><i>q</i></span>」。</p>
+    <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a><a class="chref ai" href="#ai-dot">线代：点积</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
+    <p>语言模型最后一层给词表里每个 token 打一个分数，叫 <b>logit</b>，一共 <span class="m"><i>V</i></span> 个（GPT-2 的词表 <span class="m"><i>V</i> = 50257</span>）。<b>softmax</b> 把它们变成概率：<span class="m"><i>p</i><sub><i>i</i></sub> = <i>e</i><sup><i>z</i><sub><i>i</i></sub></sup> / Σ<sub><i>j</i></sub> <i>e</i><sup><i>z</i><sub><i>j</i></sub></sup></span>，每个都是正数，加起来是 1。这就是<a class="ilink" href="#dl-xent">交叉熵那集</a>说的「模型输出下一个 token 上的一个分布 <span class="m"><i>q</i></span>」。</p>
     <p>生成文本时，从这个分布里<b>采样</b>一个 token，接到输入后面，再算下一步。采样前常把 logit 除以一个<b>温度 (Temperature)</b> <span class="m"><i>T</i></span>：<span class="m"><i>p</i><sub><i>i</i></sub> ∝ <i>e</i><sup><i>z</i><sub><i>i</i></sub>/<i>T</i></sup></span>。<span class="m"><i>T</i> < 1</span> 把分布压得更尖，高分的更占优；<span class="m"><i>T</i> → 0</span> 就是每步取最大的，叫贪心解码；<span class="m"><i>T</i> > 1</span> 把分布摊平，趋于均匀。用第 5 集的话说，温度调的是输出分布的熵。</p>
     <p>只调温度还不够：词表有几万个 token，长尾里每个概率都很小，但加起来不小，偶尔采到一个就会跑偏。<b>Top-k</b> 只在概率最高的 <span class="m"><i>k</i></span> 个里采；<b>Top-p</b>（也叫 nucleus sampling）按概率从高到低累加，只保留累计概率刚超过 <span class="m"><i>p</i></span> 的那一小撮，再重新归一化。Holtzman 等人 2019 年的论文说明了为什么纯最大化概率的解码会产生重复、乏味的文本，而完全按分布采样又容易胡言乱语。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>三个 logit (2, 1, 0.1)，换不同温度</p>
@@ -6559,10 +6263,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 <section class="aisec" id="aip-chain">
     <h2><span class="n">2</span><span>条件概率与链式法则：自回归语言模型</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a><a class="chref ai" href="#ai-attention">线代：注意力</a></p>
+    <p class="chs">对应 <a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a><a class="chref ai" href="#ai-attention">线代：注意力</a></p>
     <p>第 1 集的竖线 <span class="m"><i>P</i>(<i>H</i>|<i>E</i>)</span> 读作「在 <span class="m"><i>E</i></span> 成立的条件下」，意思是只看 <span class="m"><i>E</i></span> 成立的那部分可能性，再看 <span class="m"><i>H</i></span> 占多少比例。由此有 <span class="m"><i>P</i>(<i>A</i>, <i>B</i>) = <i>P</i>(<i>A</i>) · <i>P</i>(<i>B</i>|<i>A</i>)</span>：两件事同时发生，等于先发生 <span class="m"><i>A</i></span>，再在 <span class="m"><i>A</i></span> 的条件下发生 <span class="m"><i>B</i></span>。反复用这个式子，就是概率的<b>链式法则</b>：<span class="m"><i>P</i>(<i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>, …, <i>x</i><sub><i>n</i></sub>) = <i>P</i>(<i>x</i><sub>1</sub>) · <i>P</i>(<i>x</i><sub>2</sub>|<i>x</i><sub>1</sub>) · <i>P</i>(<i>x</i><sub>3</sub>|<i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>) ⋯ <i>P</i>(<i>x</i><sub><i>n</i></sub>|<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>n</i>−1</sub>)</span>。</p>
-    <p>这就是 GPT 这类<b>自回归 (Autoregressive)</b> 模型的全部建模思路：不直接给整段文本一个概率，而是拆成一串「给定前文，下一个 token 是什么」的条件分布，模型只学这一种条件分布。第 6 集里作者用小 GPT 给一句话逐字母算概率，整句的概率就是这些条件概率相乘。</p>
-    <p>相乘的数很快会小到浮点数表示不了，所以实际都取对数，乘法变加法：<span class="m">log <i>P</i>(<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>n</i></sub>) = Σ<sub><i>t</i></sub> log <i>P</i>(<i>x</i><sub><i>t</i></sub>|<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>t</i>−1</sub>)</span>。取负号就是第 6 集说的「整条消息的信息量是每个符号信息量之和」，也正是训练时要最小化的东西。模型要保证第 <span class="m"><i>t</i></span> 个位置只看到前 <span class="m"><i>t</i> − 1</span> 个 token，靠的是注意力里的因果掩码。</p>
+    <p>这就是 GPT 这类<b>自回归 (Autoregressive)</b> 模型的全部建模思路：不直接给整段文本一个概率，而是拆成一串「给定前文，下一个 token 是什么」的条件分布，模型只学这一种条件分布。<a class="ilink" href="#dl-entropy">重新发明熵那集</a>里作者用小 GPT 给一句话逐字母算概率，整句的概率就是这些条件概率相乘。</p>
+    <p>相乘的数很快会小到浮点数表示不了，所以实际都取对数，乘法变加法：<span class="m">log <i>P</i>(<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>n</i></sub>) = Σ<sub><i>t</i></sub> log <i>P</i>(<i>x</i><sub><i>t</i></sub>|<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>t</i>−1</sub>)</span>。取负号就是<a class="ilink" href="#dl-entropy">重新发明熵那集</a>说的「整条消息的信息量是每个符号信息量之和」，也正是训练时要最小化的东西。模型要保证第 <span class="m"><i>t</i></span> 个位置只看到前 <span class="m"><i>t</i> − 1</span> 个 token，靠的是注意力里的因果掩码。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>一句三个 token 的话</p>
       <p>假设模型给出 <span class="m"><i>P</i>(<i>x</i><sub>1</sub>) = 0.1</span>、<span class="m"><i>P</i>(<i>x</i><sub>2</sub>|<i>x</i><sub>1</sub>) = 0.5</span>、<span class="m"><i>P</i>(<i>x</i><sub>3</sub>|<i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>) = 0.8</span>。整句的概率是 <span class="m">0.1 × 0.5 × 0.8 = 0.04</span>。信息量逐个相加：<span class="m">log<sub>2</sub> 10 + log<sub>2</sub> 2 + log<sub>2</sub> 1.25 = 3.32 + 1 + 0.32 = 4.64</span> 比特，正好等于 <span class="m">log<sub>2</sub>(1/0.04)</span>。</p></div>
     
@@ -6581,12 +6285,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 <section class="aisec" id="aip-mle">
     <h2><span class="n">4</span><span>最大似然：训练就是让训练数据的概率最大</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></p>
-    <p>第 7 集从「损失函数应该在模型分布等于数据分布时最小」推出了交叉熵。统计学里同一件事的标准说法是<b>最大似然估计 (Maximum Likelihood Estimation)</b>：模型参数为 <span class="m"><i>θ</i></span> 时，训练数据出现的概率 <span class="m"><i>P</i>(数据|<i>θ</i>)</span> 叫<b>似然 (Likelihood)</b>，把它当作 <span class="m"><i>θ</i></span> 的函数，找让它最大的 <span class="m"><i>θ</i></span>。注意这里的「似然」和第 1 集里 <span class="m"><i>P</i>(<i>E</i>|<i>H</i>)</span> 是同一个东西，只是现在假设 <span class="m"><i>H</i></span> 换成了参数 <span class="m"><i>θ</i></span>。</p>
+    <p class="chs">对应 <a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a></p>
+    <p><a class="ilink" href="#dl-xent">交叉熵那集</a>从「损失函数应该在模型分布等于数据分布时最小」推出了交叉熵。统计学里同一件事的标准说法是<b>最大似然估计 (Maximum Likelihood Estimation)</b>：模型参数为 <span class="m"><i>θ</i></span> 时，训练数据出现的概率 <span class="m"><i>P</i>(数据|<i>θ</i>)</span> 叫<b>似然 (Likelihood)</b>，把它当作 <span class="m"><i>θ</i></span> 的函数，找让它最大的 <span class="m"><i>θ</i></span>。注意这里的「似然」和第 1 集里 <span class="m"><i>P</i>(<i>E</i>|<i>H</i>)</span> 是同一个东西，只是现在假设 <span class="m"><i>H</i></span> 换成了参数 <span class="m"><i>θ</i></span>。</p>
     <p>样本相互独立时，似然是每个样本概率的乘积，同样取对数变成求和，再取负号变成最小化：<b>负对数似然 (Negative Log-Likelihood, NLL)</b> <span class="m">= −Σ log <i>P</i>(<i>x</i><sub><i>i</i></sub>|<i>θ</i>)</span>。除以样本数，它就是模型分布相对于训练数据经验分布的交叉熵。所以「最小化交叉熵损失」「最大化似然」「最小化负对数似然」是同一件事的三种叫法。再减去数据分布自身的熵（与 <span class="m"><i>θ</i></span> 无关的常数），又等于最小化 <span class="m"><i>K</i><i>L</i>(数据 ‖ 模型)</span>。</p>
     <p>换一个输出类型，同一个原理给出不同的损失。回归任务里假设 <span class="m"><i>y</i> = <i>f</i>(<i>x</i>) + 高斯噪声</span>，<span class="m">−log</span> 高斯密度 <span class="m">= (<i>y</i> − <i>f</i>(<i>x</i>))<sup>2</sup> / 2<i>σ</i><sup>2</sup> + 常数</span>，最大似然就变成最小化<b>均方误差 (Mean Squared Error)</b>。二分类假设伯努利分布，得到二元交叉熵。损失函数不是随便挑的，它对应你假设的输出分布。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>抛 10 次硬币，7 次正面，正面概率 θ 取多少</p>
-      <p>似然 <span class="m"><i>L</i>(<i>θ</i>) = <i>θ</i><sup>7</sup>(1 − <i>θ</i>)<sup>3</sup></span>。<span class="m"><i>θ</i> = 0.5</span> 时 0.00098，<span class="m"><i>θ</i> = 0.6</span> 时 0.00179，<span class="m"><i>θ</i> = 0.7</span> 时 0.00222，<span class="m"><i>θ</i> = 0.8</span> 时 0.00168，最大值在 0.7，就是频率 7/10。平均负对数似然在 <span class="m"><i>θ</i> = 0.7</span> 时是 0.611 奈特，恰好等于经验分布 (0.7, 0.3) 的熵：交叉熵的最小值就是熵，和第 7 集的结论一致。</p></div>
+      <p>似然 <span class="m"><i>L</i>(<i>θ</i>) = <i>θ</i><sup>7</sup>(1 − <i>θ</i>)<sup>3</sup></span>。<span class="m"><i>θ</i> = 0.5</span> 时 0.00098，<span class="m"><i>θ</i> = 0.6</span> 时 0.00179，<span class="m"><i>θ</i> = 0.7</span> 时 0.00222，<span class="m"><i>θ</i> = 0.8</span> 时 0.00168，最大值在 0.7，就是频率 7/10。平均负对数似然在 <span class="m"><i>θ</i> = 0.7</span> 时是 0.611 奈特，恰好等于经验分布 (0.7, 0.3) 的熵：交叉熵的最小值就是熵，和<a class="ilink" href="#dl-xent">交叉熵那集</a>的结论一致。</p></div>
     
     <p class="refs"><a href="https://www.youtube.com/watch?v=XepXtl9YKwc" target="_blank" rel="noreferrer">视频：StatQuest：Maximum Likelihood, clearly explained!!!（最大似然的直观讲解） · 2017-08-01 ↗</a></p>
   </section>
@@ -6602,8 +6306,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 <section class="aisec" id="aip-entropy">
     <h2><span class="n">6</span><span>信息量与熵：奈特、比特，和未训练模型的损失</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></p>
-    <p>第 5、6 集用的是以 2 为底的对数，单位是比特。机器学习几乎总用自然对数，单位叫<b>奈特 (nat)</b>，<span class="m">1 奈特 = 1/ln 2 ≈ 1.443</span> 比特。PyTorch 里 <code>cross_entropy</code> 返回的就是奈特。第 7 集说两者只差一个常数，会被学习率吸收。</p>
+    <p class="chs">对应 <a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a></p>
+    <p>第 5 集和<a class="ilink" href="#dl-entropy">重新发明熵那集</a>用的是以 2 为底的对数，单位是比特。机器学习几乎总用自然对数，单位叫<b>奈特 (nat)</b>，<span class="m">1 奈特 = 1/ln 2 ≈ 1.443</span> 比特。PyTorch 里 <code>cross_entropy</code> 返回的就是奈特。<a class="ilink" href="#dl-xent">交叉熵那集</a>说两者只差一个常数，会被学习率吸收。</p>
     <p>一个 token 的信息量 <span class="m">−log <i>p</i></span> 就是模型看到它时有多意外；模型输出分布的熵 <span class="m"><i>H</i> = −Σ <i>p</i> log <i>p</i></span> 是它在这一步有多拿不准。熵在模型里还有别的用处：PPO 这类强化学习算法常在目标里加一项输出分布的熵（一些 RLHF 实现也保留了它），鼓励策略保持一定的随机性，别太早收缩到一个动作上；给定均值和方差时熵最大的分布是高斯分布，这也是第 4 集结尾提到的「用熵解释为什么是高斯」的思路。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>刚初始化的 GPT-2，损失应该是多少</p>
       <p>刚初始化时 logit 都接近 0，输出接近词表上的均匀分布，每个 token 的概率约 <span class="m">1/50257</span>。损失是 <span class="m">ln 50257 ≈ 10.82</span> 奈特，也就是 15.6 比特，第 5 集说的「<span class="m"><i>n</i></span> 个等可能结果的熵是 <span class="m">log<sub>2</sub> <i>n</i></span>」。训练刚开始时如果损失明显高于这个数，通常说明初始化让模型对某些错误答案很有把握，是一个现成的检查项。</p></div>
@@ -6612,10 +6316,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 <section class="aisec" id="aip-ppl">
     <h2><span class="n">7</span><span>交叉熵损失与困惑度</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
-    <p>预训练的损失就是第 7 集说的：对训练集里每个 token，取模型给它的概率的负对数，求平均。在同一个上下文的所有出现上平均，它就是模型分布相对于数据分布的交叉熵；它的下限是语言本身的熵（第 6 集里香农估计英语约每字符 1 比特），损失永远降不到 0。它对 logit 的梯度是 <span class="m"><i>p</i> − <i>y</i></span>，推导见「AI 中的微积分」。</p>
-    <p>论文里评测语言模型常报的是<b>困惑度 (Perplexity)</b>：<span class="m"><i>P</i><i>P</i><i>L</i> = <i>e</i><sup>平均负对数似然</sup></span>（用比特时是 <span class="m">2<sup><i>H</i></sup></span>）。第 5 集说过，熵为 <span class="m"><i>H</i></span> 比特的分布，不确定性相当于 <span class="m">2<sup><i>H</i></sup></span> 个等可能的结果。所以困惑度 20 读作：模型在每个位置平均像是在 20 个等可能的 token 里犹豫。困惑度只能在同一个分词器下比较，因为 token 切得越细，每个 token 越好猜；跨模型比较时常改用每字节或每字符的比特数 (bits per byte / bits per character)，这就是第 6 集说的压缩率。</p>
-    <p>两个常见的改动也能用这一节的语言解释。<b>标签平滑 (Label Smoothing)</b> 把目标分布从 one-hot 改成「正确答案 0.9，其余平分 0.1」，防止模型把概率推到 1、logit 推向无穷大。蒸馏直接用教师模型的完整分布做目标，第 7 集说它给的信号比 one-hot 丰富得多。</p>
+    <p class="chs">对应 <a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></p>
+    <p>预训练的损失就是<a class="ilink" href="#dl-xent">交叉熵那集</a>说的：对训练集里每个 token，取模型给它的概率的负对数，求平均。在同一个上下文的所有出现上平均，它就是模型分布相对于数据分布的交叉熵；它的下限是语言本身的熵（<a class="ilink" href="#dl-entropy">重新发明熵那集</a>里香农估计英语约每字符 1 比特），损失永远降不到 0。它对 logit 的梯度是 <span class="m"><i>p</i> − <i>y</i></span>，推导见「AI 中的微积分」。</p>
+    <p>论文里评测语言模型常报的是<b>困惑度 (Perplexity)</b>：<span class="m"><i>P</i><i>P</i><i>L</i> = <i>e</i><sup>平均负对数似然</sup></span>（用比特时是 <span class="m">2<sup><i>H</i></sup></span>）。第 5 集说过，熵为 <span class="m"><i>H</i></span> 比特的分布，不确定性相当于 <span class="m">2<sup><i>H</i></sup></span> 个等可能的结果。所以困惑度 20 读作：模型在每个位置平均像是在 20 个等可能的 token 里犹豫。困惑度只能在同一个分词器下比较，因为 token 切得越细，每个 token 越好猜；跨模型比较时常改用每字节或每字符的比特数 (bits per byte / bits per character)，这就是<a class="ilink" href="#dl-entropy">重新发明熵那集</a>说的压缩率。</p>
+    <p>两个常见的改动也能用这一节的语言解释。<b>标签平滑 (Label Smoothing)</b> 把目标分布从 one-hot 改成「正确答案 0.9，其余平分 0.1」，防止模型把概率推到 1、logit 推向无穷大。蒸馏直接用教师模型的完整分布做目标，<a class="ilink" href="#dl-xent">交叉熵那集</a>说它给的信号比 one-hot 丰富得多。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>损失与困惑度的换算</p>
       <p>平均损失 3.0 奈特，困惑度 <span class="m"><i>e</i><sup>3</sup> ≈ 20.1</span>；降到 2.3 奈特，困惑度约 10.0。损失只降了 0.7，困惑度减了一半：损失每降 <span class="m">ln 2 ≈ 0.69</span> 奈特，相当于每个位置的候选数砍半，也就是第 5 集说的多得到 1 比特信息。</p></div>
     
@@ -6623,12 +6327,12 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 <section class="aisec" id="aip-kl">
     <h2><span class="n">8</span><span>KL 散度：蒸馏、RLHF 的约束，以及方向的差别</span></h2>
-    <p class="chs">对应 <a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></p>
-    <p>第 7 集定义了 <span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = Σ <i>p</i> log(<i>p</i>/<i>q</i>)</span>，交叉熵减熵，是用为 <span class="m"><i>q</i></span> 优化的编码去编码服从 <span class="m"><i>p</i></span> 的数据时浪费的比特数。它非负，<span class="m"><i>p</i> = <i>q</i></span> 时为 0，但不对称。</p>
+    <p class="chs">对应 <a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a></p>
+    <p><a class="ilink" href="#dl-xent">交叉熵那集</a>定义了 <span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = Σ <i>p</i> log(<i>p</i>/<i>q</i>)</span>，交叉熵减熵，是用为 <span class="m"><i>q</i></span> 优化的编码去编码服从 <span class="m"><i>p</i></span> 的数据时浪费的比特数。它非负，<span class="m"><i>p</i> = <i>q</i></span> 时为 0，但不对称。</p>
     <p>它在大模型里出现的地方：<b>蒸馏</b>让学生模型的分布贴近教师模型的分布，Hinton 等人 2015 年的论文还把两边的 logit 都除以一个较高的温度，让教师分布里那些小概率（「这张图有点像猫」）也传递给学生。<b>RLHF</b> 里，InstructGPT 的目标是奖励减去 <span class="m"><i>β</i> · <i>K</i><i>L</i>(<i>π</i> ‖ <i>π</i><sub>ref</sub>)</span>：在拿高奖励的同时，别离原来的监督微调模型太远，防止模型钻奖励模型的空子、说话变得怪异。<b>变分自编码器 (Variational Autoencoder)</b> 的损失里也有一项 KL，把编码分布拉向标准高斯。</p>
     <p>方向很重要。最小化 <span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>)</span>（前向）时，只要 <span class="m"><i>p</i> > 0</span> 的地方 <span class="m"><i>q</i></span> 很小，<span class="m">log(<i>p</i>/<i>q</i>)</span> 就很大，所以 <span class="m"><i>q</i></span> 会尽量覆盖 <span class="m"><i>p</i></span> 的所有峰，宁可摊得太宽，这叫<b>覆盖众数 (Mode-Covering)</b>；最大似然和交叉熵训练就是这个方向。最小化 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>)</span>（反向）时，<span class="m"><i>q</i></span> 只要避开 <span class="m"><i>p</i></span> 很小的地方就行，所以它倾向于挑一个峰贴紧，叫<b>寻找众数 (Mode-Seeking)</b>；RLHF 里的 <span class="m"><i>K</i><i>L</i>(<i>π</i> ‖ <i>π</i><sub>ref</sub>)</span> 是这个方向，被优化的是 <span class="m"><i>π</i></span>。</p>
     <div class="ex"><p class="ex-h"><span class="lbl">例子</span>p = (0.9, 0.1)，q = (0.5, 0.5)</p>
-      <p><span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = 0.9 ln(0.9/0.5) + 0.1 ln(0.1/0.5) = 0.368</span> 奈特；反过来 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>) = 0.5 ln(0.5/0.9) + 0.5 ln(0.5/0.1) = 0.511</span> 奈特。两个方向不一样大：<span class="m"><i>q</i></span> 给了 0.5 的地方 <span class="m"><i>p</i></span> 只有 0.1，这一项在反向里被罚得更重。第 7 集的机器人例子：2.625 − 1.75 = 0.875 比特。</p></div>
+      <p><span class="m"><i>K</i><i>L</i>(<i>p</i> ‖ <i>q</i>) = 0.9 ln(0.9/0.5) + 0.1 ln(0.1/0.5) = 0.368</span> 奈特；反过来 <span class="m"><i>K</i><i>L</i>(<i>q</i> ‖ <i>p</i>) = 0.5 ln(0.5/0.9) + 0.5 ln(0.5/0.1) = 0.511</span> 奈特。两个方向不一样大：<span class="m"><i>q</i></span> 给了 0.5 的地方 <span class="m"><i>p</i></span> 只有 0.1，这一项在反向里被罚得更重。<a class="ilink" href="#dl-xent">交叉熵那集</a>的机器人例子：2.625 − 1.75 = 0.875 比特。</p></div>
     
     <p class="refs"><a href="https://www.youtube.com/watch?v=SxGYPqCgJWM" target="_blank" rel="noreferrer">视频：Adian Liusie：Intuitively Understanding the KL Divergence（为什么是这个公式，以及不对称性） · 2021-04-14 ↗</a><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noreferrer">Distilling the Knowledge in a Neural Network（Hinton、Vinyals、Dean） · 2015-03-09 ↗</a><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noreferrer">Training language models to follow instructions with human feedback（InstructGPT，目标里的 KL 惩罚） · 2022-03-04 ↗</a><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">Auto-Encoding Variational Bayes（变分自编码器） · 2013-12-20 ↗</a></p>
   </section>
@@ -6667,7 +6371,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
     <section class="aisec" id="aip-map"><h2>对照表</h2>
       <div class="tbl"><table><thead><tr><th>概念</th><th>在 AI 里</th><th>对应</th></tr></thead>
-    <tbody><tr><td>条件概率、链式法则</td><td>自回归：整段文本的概率拆成逐 token 的条件概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>贝叶斯的赔率形式</td><td>logit 就是对数赔率，sigmoid 把它换回概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a></td></tr><tr><td>先验</td><td>L2 正则化 / 权重衰减 = 高斯先验</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>似然</td><td>最大似然 = 最小化负对数似然 = 最小化交叉熵</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>信息量 −log p</td><td>每个 token 的损失，模型有多意外</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>熵</td><td>输出分布的不确定性；未训练模型的损失 ≈ ln V</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob6">第 6 集 · 压缩即智能（上）：重新发明熵</a></td></tr><tr><td>2<sup>H</sup> 个等可能结果</td><td>困惑度</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a></td></tr><tr><td>交叉熵</td><td>预训练损失、标签平滑、蒸馏</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></td></tr><tr><td>KL 散度</td><td>蒸馏、RLHF 的 KL 惩罚、VAE；前向与反向</td><td><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a></td></tr><tr><td>softmax 与温度</td><td>把 logit 变成分布，温度调熵</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#prob7">第 7 集 · 压缩即智能（下）：交叉熵</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a></td></tr><tr><td>方差相加</td><td>He 初始化、注意力除以 √d<sub>k</sub></td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a><a class="chref ai" href="#ai-attention">线代：注意力</a></td></tr><tr><td>平均值的标准差 σ/√n</td><td>小批量梯度噪声、评测误差条</td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>高斯加高斯还是高斯</td><td>扩散模型一步加噪到任意 t</td><td><a class="chref" href="#prob4">第 4 集 · 高斯加高斯还是高斯</a></td></tr></tbody></table></div></section>
+    <tbody><tr><td>条件概率、链式法则</td><td>自回归：整段文本的概率拆成逐 token 的条件概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a></td></tr><tr><td>贝叶斯的赔率形式</td><td>logit 就是对数赔率，sigmoid 把它换回概率</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a></td></tr><tr><td>先验</td><td>L2 正则化 / 权重衰减 = 高斯先验</td><td><a class="chref" href="#prob1">第 1 集 · 贝叶斯定理：信念更新的几何</a><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>似然</td><td>最大似然 = 最小化负对数似然 = 最小化交叉熵</td><td><a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a></td></tr><tr><td>信息量 −log p</td><td>每个 token 的损失，模型有多意外</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a></td></tr><tr><td>熵</td><td>输出分布的不确定性；未训练模型的损失 ≈ ln V</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-entropy">深度学习 · 重新发明熵（压缩即智能 第 1 部分）</a></td></tr><tr><td>2<sup>H</sup> 个等可能结果</td><td>困惑度</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a></td></tr><tr><td>交叉熵</td><td>预训练损失、标签平滑、蒸馏</td><td><a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a></td></tr><tr><td>KL 散度</td><td>蒸馏、RLHF 的 KL 惩罚、VAE；前向与反向</td><td><a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a></td></tr><tr><td>softmax 与温度</td><td>把 logit 变成分布，温度调熵</td><td><a class="chref" href="#prob5">第 5 集 · 用信息论解 Wordle：信息量与熵</a><a class="chref" href="#dl-xent">深度学习 · 交叉熵是什么（压缩即智能 第 2 部分）</a><a class="chref ai" href="#aic-softmax">微积分：e 与 softmax、交叉熵</a><a class="chref ai" href="#ai-dot">线代：点积</a></td></tr><tr><td>方差相加</td><td>He 初始化、注意力除以 √d<sub>k</sub></td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a><a class="chref ai" href="#ai-attention">线代：注意力</a></td></tr><tr><td>平均值的标准差 σ/√n</td><td>小批量梯度噪声、评测误差条</td><td><a class="chref" href="#prob2">第 2 集 · 中心极限定理</a></td></tr><tr><td>高斯加高斯还是高斯</td><td>扩散模型一步加噪到任意 t</td><td><a class="chref" href="#prob4">第 4 集 · 高斯加高斯还是高斯</a></td></tr></tbody></table></div></section>
   </article>
 </div></div>
 </main>
