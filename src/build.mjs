@@ -10,7 +10,8 @@ import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseTranscript, parseIndex } from './parse.mjs';
-import { renderList, renderEntry, setAssetVersion, wan } from './render.mjs';
+import { renderList, renderEntry, renderSearch, setAssetVersion, wan } from './render.mjs';
+import { indexPage } from './search.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = process.env.BASE_PATH ?? '/learn-ai';
@@ -20,6 +21,39 @@ const SITE = {
 };
 const DIST = join(ROOT, 'dist');
 const j = (...p) => join(...p);
+let VER = '';
+
+/* 详情页上搜索相关的样式。各页样式表不一样，变量名是同一套，取不到就用后面的默认值 */
+const SX_CSS = `<style>
+.sx-link{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line,#E4E1DA);border-radius:999px;font-size:13px;line-height:1.4;color:var(--text-2,#4E5560);background:var(--bg-elev,#fff);text-decoration:none;white-space:nowrap}
+.sx-link:hover{color:var(--accent,#0F766E);border-color:var(--accent-line,#B8DED8)}
+.wrap:has(>.sx-link){display:flex;align-items:center;gap:14px}
+.sx-hl{background:#FDE68A;color:inherit;border-radius:2px;box-shadow:0 0 0 1px #F2CC5B}
+.sx-focus{outline:2px solid var(--accent,#0F766E);outline-offset:5px;border-radius:3px;animation:sx-in 1.4s ease-out}
+@keyframes sx-in{0%{outline-color:transparent;box-shadow:0 0 0 14px rgba(15,118,110,.18)}40%{outline-color:var(--accent,#0F766E)}100%{box-shadow:0 0 0 0 rgba(15,118,110,0)}}
+.sx-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:90;display:flex;align-items:center;gap:2px;padding:4px;max-width:calc(100vw - 32px);background:#14161A;color:#fff;border-radius:999px;box-shadow:0 8px 32px rgba(20,22,26,.25);font:13px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",system-ui,sans-serif}
+.sx-bar.sx-bar-up{bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+.sx-bar a,.sx-bar button{color:#fff;font:inherit;background:none;border:0;cursor:pointer;padding:6px 11px;border-radius:999px;white-space:nowrap;text-decoration:none}
+.sx-bar a:hover,.sx-bar button:hover{background:rgba(255,255,255,.14)}
+.sx-bar .sx-q{overflow:hidden;text-overflow:ellipsis;max-width:42vw}
+.sx-bar .sx-pos{font-variant-numeric:tabular-nums;color:rgba(255,255,255,.72);padding:0 2px;min-width:3.6em;text-align:center}
+.sx-bar .sx-pos:empty{display:none}
+.sx-bar .sx-x{color:rgba(255,255,255,.6);font-size:16px;padding:4px 11px}
+@media print{.sx-link,.sx-bar{display:none}}
+</style>`;
+
+/** 每个详情页都接上搜索：段落补 id 收进索引，顶栏「全部条目」旁边加一个搜索入口，
+ *  页尾挂 search.js —— 从搜索结果点进来时，它负责切 tab、展开、高亮、上一处 / 下一处。 */
+function withSearch(html, { base, id, entry, index }) {
+  const { html: tagged, chunks } = indexPage(html);
+  index.push({ id, title: entry.title, subtitle: entry.subtitle, chunks });
+  const link = `<a class="sx-link" href="${base}/search/" aria-label="全站搜索"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>搜索</a>`;
+  let out = tagged.replace(/(<a class="back" href="[^"]*">[^<]*<\/a>)/, `$1${link}`);
+  if (out === tagged) console.warn(`[build] ${id} · 没找到「全部条目」链接，搜索入口没加上`);
+  out = out.replace(/<\/head>/i, `${SX_CSS}\n</head>`);
+  const end = out.lastIndexOf('</body>');
+  return out.slice(0, end) + `<script src="${base}/assets/search.js${VER}" defer></script>\n` + out.slice(end);
+}
 
 
 /** 内联图拆成独立文件，发布时才拆。
@@ -72,7 +106,7 @@ async function unInline(html, { id, base, dist }) {
  *  这样页面一变 git 就是脏的，deploy-remote.sh 会逼着先提交，线上不会落后于本地。
  *
  *  页面里跟环境有关的两处（返回链接、canonical）写成占位符，发布时才替换。 */
-async function buildPaper({ dir, id, entry, base, dist }) {
+async function buildPaper({ dir, id, entry, base, dist, index }) {
   const page = j(dir, entry.page);
   // 只有本地（npm run build 带 PAPER_REBUILD=1）才重新生成。
   // 服务器上一律发仓库里的成品 —— 那边没有 ImageMagick，现场生成会把附录三张图转不正。
@@ -85,10 +119,10 @@ async function buildPaper({ dir, id, entry, base, dist }) {
     console.log(`[build] ${id} · 用仓库里的成品 ${entry.page}`);
   }
 
-  const html = await unInline((await readFile(page, 'utf8'))
+  const html = withSearch(await unInline((await readFile(page, 'utf8'))
     .replaceAll('__HOME__', `${base}/`)
     .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`)
-    .replaceAll('__ASSETS__', `${base}/${id}/assets`), { id, base, dist });
+    .replaceAll('__ASSETS__', `${base}/${id}/assets`), { id, base, dist }), { base, id, entry, index });
   await mkdir(j(dist, id), { recursive: true });
   await writeFile(j(dist, id, 'index.html'), html, 'utf8');
 
@@ -119,9 +153,11 @@ async function build() {
   // assets 是固定文件名 + nginx 7 天长缓存，页面引用必须带内容哈希，
   // 否则改完发布，回头客拿到的是「新 HTML + 旧 JS」——2026-08-06 就这么白过一次页
   const assetHash = createHash('sha256');
-  for (const f of ['app.css', 'app.js']) assetHash.update(await readFile(j(ROOT, 'public', f)));
-  const VER = assetHash.digest('hex').slice(0, 8);
-  setAssetVersion(VER);
+  for (const f of ['app.css', 'app.js', 'search.js']) assetHash.update(await readFile(j(ROOT, 'public', f)));
+  const hash = assetHash.digest('hex').slice(0, 8);
+  VER = `?v=${hash}`;
+  setAssetVersion(hash);
+  const index = [];          // 全站搜索索引，每个条目一项
 
   const ids = (await readdir(j(ROOT, 'content'), { withFileTypes: true }))
     .filter((d) => d.isDirectory()).map((d) => d.name);
@@ -133,7 +169,7 @@ async function build() {
     // 还没定稿的条目标 "draft": true：线上构建直接跳过，不进首页也不出页面。
     // 本地想连草稿一起看，DRAFTS=1 npm run dev
     if (entry.draft && !process.env.DRAFTS) { console.log(`[build] ${id} · 草稿，跳过`); continue; }
-    if (entry.kind === 'paper') { entries.push(await buildPaper({ dir, id, entry, base: BASE, dist: DIST })); continue; }
+    if (entry.kind === 'paper') { entries.push(await buildPaper({ dir, id, entry, base: BASE, dist: DIST, index })); continue; }
     const chronicle = JSON.parse(await readFile(j(dir, 'chronicle.json'), 'utf8'));
     const { sections, chars, turns } = parseTranscript(
       await readFile(j(dir, 'transcript.md'), 'utf8'), [entry.host, entry.guest]);
@@ -188,7 +224,7 @@ async function build() {
       },
     });
     await mkdir(j(DIST, id), { recursive: true });
-    await writeFile(j(DIST, id, 'index.html'), html, 'utf8');
+    await writeFile(j(DIST, id, 'index.html'), withSearch(html, { base: BASE, id, entry, index }), 'utf8');
 
     entries.push({ ...entry, chars, turns, papers: papers.length });
     console.log(`[build] ${id} · ${sections.length} 节 / ${turns} 段 / ${chars} 字 / ${papers.length} 篇 / 包 ${mb(zipSize)}`);
@@ -203,6 +239,30 @@ async function build() {
 
   await cp(j(ROOT, 'public', 'app.css'), j(DIST, 'assets', 'app.css'));
   await cp(j(ROOT, 'public', 'app.js'), j(DIST, 'assets', 'app.js'));
+  await cp(j(ROOT, 'public', 'search.js'), j(DIST, 'assets', 'search.js'));
+
+  /* --- 全站搜索：索引 + 搜索页 ---
+     按首页的顺序排条目。重复的 tab 名、路径、类型收进字符串表，每块只存下标。
+     文件名带内容哈希：索引一年变不了几次，挂长缓存；搜索页是 no-cache，总拿到最新的文件名 */
+  const order = new Map(entries.map((e, i) => [e.id, i]));
+  index.sort((a, b) => order.get(a.id) - order.get(b.id));
+  const strs = [], at = new Map();
+  const s = (v) => { if (!at.has(v)) { at.set(v, strs.length); strs.push(v); } return at.get(v); };
+  const sx = {
+    entries: index.map((e) => ({ id: e.id, title: e.title, subtitle: e.subtitle })),
+    strs,
+    items: index.flatMap((e, ei) => e.chunks.map((c) => {
+      const row = [ei, s(c.tab ?? ''), s(c.crumb.join(' › ')), s(c.kind), c.id, c.text];
+      if (c.title || c.sub) row.push(c.title || '', c.sub || '');
+      return row;
+    })),
+  };
+  const sxJson = JSON.stringify(sx);
+  const sxName = `search-${createHash('sha256').update(sxJson).digest('hex').slice(0, 10)}.json`;
+  await writeFile(j(DIST, 'assets', sxName), sxJson, 'utf8');
+  await mkdir(j(DIST, 'search'), { recursive: true });
+  await writeFile(j(DIST, 'search', 'index.html'), renderSearch({ base: BASE, site: SITE, index: `${BASE}/assets/${sxName}` }), 'utf8');
+  console.log(`[build] 搜索索引 ${sx.items.length} 块 / ${(Buffer.byteLength(sxJson) / 1048576).toFixed(1)} MB（${sxName}）`);
 
   const urls = [`${SITE.url}${BASE}/`, ...entries.map((e) => `${SITE.url}${BASE}/${e.id}/`)];
   await writeFile(j(DIST, 'sitemap.xml'),

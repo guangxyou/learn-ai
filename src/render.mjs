@@ -74,6 +74,7 @@ export function renderList({ base, entries, site }) {
     body: `<header class="topbar">
   <div class="wrap">
     <a class="brand" href="${base}/">${LOGO}<span class="bn">learn-ai</span><small>${SLOGAN}</small></a>
+    ${searchBox(base, '')}
   </div>
 </header>
 
@@ -83,7 +84,48 @@ ${cards}
   </div>
 </main>
 
-<script src="${base}/assets/app.js${VER}" defer></script>`,
+<script src="${base}/assets/app.js${VER}" defer></script>
+<script src="${base}/assets/search.js${VER}" defer></script>`,
+    bodyClass: 'no-player',
+  });
+}
+
+/* ---------------- 搜索 ---------------- */
+const SEARCH_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+  stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>`;
+
+/* 顶栏里的搜索框：不靠 JS 也能用，回车就是一个 GET 到搜索页 */
+function searchBox(base, q) {
+  return `<form class="sx-box" action="${base}/search/" method="get" role="search">
+      ${SEARCH_ICON}<input name="q" type="search" value="${esc(q)}" placeholder="搜索论文、批注、笔记" aria-label="全站搜索" autocomplete="off" enterkeyhint="search">
+      <kbd class="hide-s">/</kbd>
+    </form>`;
+}
+
+/* 搜索页：结果全在浏览器里算。索引按需取，只有打开这一页才下载 */
+export function renderSearch({ base, site, index }) {
+  return layout({
+    base, title: '搜索 · learn-ai', desc: '在 learn-ai 的全部论文精读、批注、视频笔记里搜索。',
+    canonical: `${site.url}${base}/search/`,
+    body: `<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="${base}/">${LOGO}<span class="bn">learn-ai</span></a>
+    <a class="back sx-home" href="${base}/">‹ 全部条目</a>
+  </div>
+</header>
+
+<main class="wrap sx-page" id="sx-app" data-index="${index}">
+  <form class="sx-main" role="search" action="" method="get">
+    ${SEARCH_ICON}<input id="sx-q" name="q" type="search" placeholder="搜论文原文、批注、笔记，比如：正则化" aria-label="搜索词"
+      autocomplete="off" autofocus enterkeyhint="search">
+  </form>
+  <p class="sx-tip" id="sx-tip">空格隔开多个词，要同时出现在一段里才算。常见术语会顺带搜英文写法（正则化 → regulariz…），论文原文是英文。</p>
+  <div class="sx-status" id="sx-status" aria-live="polite"></div>
+  <div class="sx-filters" id="sx-filters"></div>
+  <div id="sx-results"></div>
+</main>
+
+<script src="${base}/assets/search.js${VER}" defer></script>`,
     bodyClass: 'no-player',
   });
 }
