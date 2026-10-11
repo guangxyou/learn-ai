@@ -3234,8 +3234,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <section class="sec">
       <h4><button class="ts" type="button" data-t="77">1:17</button><span>导数的正式定义</span></h4>
       <p>回顾：求 <span class="m"><i>f</i></span> 在 <span class="m"><i>x</i> = 2</span> 处的导数，把输入推一点点 <span class="m"><i>d</i><i>x</i></span>，看输出的变化 <span class="m"><i>d</i><i>f</i></span>。比值 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i></span> 是起点和推后那一点之间的斜率，导数是 <span class="m"><i>d</i><i>x</i></span> 趋近于 0 时它趋近的值。<span class="m"><i>d</i><i>f</i></span> 就是 <span class="m"><i>f</i>(2 + <i>d</i><i>x</i>) − <i>f</i>(2)</span>。</p>
-      <p>「趋近于 0 时的值」写作 <span class="m"><i>l</i><i>i</i><i>m</i></span>，下面标 <span class="m"><i>d</i><i>x</i> → 0</span>。不过极限表达式里几乎从不写带小写 d 的 <span class="m"><i>d</i><i>x</i></span>，而是换一个变量，比如 <span class="m">Δ<i>x</i></span>，或者常用的 <span class="m"><i>h</i></span>。作者的理解是：带小写 d 的记号本身就隐含着「最后要趋近于 0」。左边的 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i></span> 是简写，右边把 <span class="m"><i>d</i><i>f</i></span> 和取极限的过程写全了：</p>
-      <p><span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i>(2) = <i>l</i><i>i</i><i>m</i>(<i>h</i>→0) (<i>f</i>(2 + <i>h</i>) − <i>f</i>(2)) / <i>h</i></span>，这就是教科书里导数的正式定义。</p>
+      <p>「趋近于 0 时的值」写作 <span class="m">lim</span>，下面标 <span class="m"><i>d</i><i>x</i> → 0</span>。不过极限表达式里几乎从不写带小写 d 的 <span class="m"><i>d</i><i>x</i></span>，而是换一个变量，比如 <span class="m">Δ<i>x</i></span>，或者常用的 <span class="m"><i>h</i></span>。作者的理解是：带小写 d 的记号本身就隐含着「最后要趋近于 0」。左边的 <span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i></span> 是简写，右边把 <span class="m"><i>d</i><i>f</i></span> 和取极限的过程写全了：</p>
+      <p><span class="m"><i>d</i><i>f</i>/<i>d</i><i>x</i>(2) = lim(<i>h</i>→0) (<i>f</i>(2 + <i>h</i>) − <i>f</i>(2)) / <i>h</i></span>，这就是教科书里导数的正式定义。</p>
       <p>作者强调，这个定义里没有任何「无穷小」。<span class="m"><i>h</i></span> 和前几集的 <span class="m"><i>d</i><i>x</i></span> 完全一样，是一个有限的非零小量，比如 0.001，只是我们在分析 <span class="m"><i>h</i></span> 任意小时会发生什么。引入新变量名 <span class="m"><i>h</i></span>，正是为了说清楚这些都是普通的数，和无穷小无关。也有人把 <span class="m"><i>d</i><i>x</i></span> 理解成无穷小，或者说它只是不必当真的符号，作者两种看法都不喜欢：把 <span class="m"><i>d</i><i>x</i></span> 当成具体的有限小量，只要记得问它趋近于 0 时的情况，就既能建立直觉，又完全符合正式定义。</p>
       
       
@@ -3284,7 +3284,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       
       
     </section>
-      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>导数的正式定义：<span class="m"><i>f</i>′(<i>a</i>) = <i>l</i><i>i</i><i>m</i>(<i>h</i>→0) (<i>f</i>(<i>a</i> + <i>h</i>) − <i>f</i>(<i>a</i>))/<i>h</i></span>；<span class="m"><i>h</i></span> 是有限的非零小量，不是无穷小。</li><li>ε-δ：对任意 ε > 0，都存在 δ > 0，使 <span class="m">0 < |<i>h</i>| < <i>δ</i></span> 时输出离极限值不超过 ε。</li><li>洛必达法则：<span class="m"><i>f</i>(<i>a</i>) = <i>g</i>(<i>a</i>) = 0</span> 时，<span class="m"><i>l</i><i>i</i><i>m</i> <i>f</i>/<i>g</i> = <i>f</i>′(<i>a</i>)/<i>g</i>′(<i>a</i>)</span>，因为两者在 <span class="m"><i>a</i></span> 附近都近似为「导数 × dx」。</li></ul></section>
+      <section class="sec keys"><h4>这一集记住这几条</h4><ul><li>导数的正式定义：<span class="m"><i>f</i>′(<i>a</i>) = lim(<i>h</i>→0) (<i>f</i>(<i>a</i> + <i>h</i>) − <i>f</i>(<i>a</i>))/<i>h</i></span>；<span class="m"><i>h</i></span> 是有限的非零小量，不是无穷小。</li><li>ε-δ：对任意 ε > 0，都存在 δ > 0，使 <span class="m">0 < |<i>h</i>| < <i>δ</i></span> 时输出离极限值不超过 ε。</li><li>洛必达法则：<span class="m"><i>f</i>(<i>a</i>) = <i>g</i>(<i>a</i>) = 0</span> 时，<span class="m">lim <i>f</i>/<i>g</i> = <i>f</i>′(<i>a</i>)/<i>g</i>′(<i>a</i>)</span>，因为两者在 <span class="m"><i>a</i></span> 附近都近似为「导数 × dx」。</li></ul></section>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/limits-1m40s0.jpg')"><span class="tri"></span></button></div>
@@ -5122,7 +5122,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>拖动这张图培养直觉：分布越均匀，总熵越高；把它挤得很不均匀，比如一个事件占了几乎全部概率，熵就很低，因为那个压倒性的事件信息量相应很小；把概率空间分给更多可能的符号，每个的信息量都更大，总熵也更高。粗略的定性理解是熵衡量分布里的<b>不确定性</b>；更精确、也说明为什么单位是比特的理解是：它描述了<b>编码服从这个分布的消息时，每个符号最少需要的比特数</b>。</p>
       <p>这句话以及前面的一切，大体就是香农 1948 年开创信息论的论文里一个核心定理的内容，<b>无噪声编码定理 (Noiseless Coding Theorem)</b>：没有任何编码能比这个极限更高效；而且更强的是，总能做到任意接近这个极限。</p>
       <p>如前所说，这个式子只适用于每个符号服从同一分布的情形，香农当然更关心一般情形，尤其花了大量时间思考自然语言的可压缩性。这需要更一般的熵，叫随机过程的<b>熵率 (Entropy Rate)</b>，问的仍然是「每个符号的平均信息量」，只是现在要对所有可能的消息平均：</p>
-      <p><span class="m"><i>l</i><i>i</i><i>m</i><sub><i>n</i>→∞</sub> (1/<i>n</i>) <i>H</i>(<i>X</i><sub>1</sub>, <i>X</i><sub>2</sub>, ⋯, <i>X</i><sub><i>n</i></sub>)</span></p>
+      <p><span class="m">lim<sub><i>n</i>→∞</sub> (1/<i>n</i>) <i>H</i>(<i>X</i><sub>1</sub>, <i>X</i><sub>2</sub>, ⋯, <i>X</i><sub><i>n</i></sub>)</span></p>
       <p>这几乎从来不是能干净算出来的东西，毕竟什么公式能描述语言的概率分布？所以听到「语言的熵」时，那远超任何精确计算能给的，这就是香农转向基于观察的估计的原因。他的方法不只是对一堆文本跑一个函数，要得到令人满意的可压缩性估计，他发现自己不可避免地需要去探测<b>有智能的语言模型</b>。当受访者有至少 100 个字母的上文时，他估计英语的熵大约是<b>每个字符 1 比特</b>。想想这个数很疯狂：它说英语可以压缩到每个字符只需要一个是或否的回答。第三部分会讲那个算法：如果编码和解码都能用一个高质量的语言模型，实践中可以出奇地接近这个极限。在那之前，<a class="ilink" href="#dl-xent">第 2 部分</a>讲熵的一个变体，交叉熵：它怎样、为什么被用来训练大语言模型，以及大模型怎样蒸馏成小模型、gzip 为什么能恢复语言之间的结构。</p>
       
       

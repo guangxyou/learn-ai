@@ -799,7 +799,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="1602">26:42</button><span>策略二：沿着坡度走</span></h4>
       <p>第二种策略是一直往下坡的方向走。这门课的所有模型、几乎所有深度学习模型都是这样训练的。</p>
-      <p>一维时，坡度就是导数 <span class="m"><i>d</i><i>f</i>(<i>x</i>)/<i>d</i><i>x</i> = <i>l</i><i>i</i><i>m</i><sub><i>h</i>→0</sub> (<i>f</i>(<i>x</i> + <i>h</i>) − <i>f</i>(<i>x</i>)) / <i>h</i></span>。多维时对每个维度分别求偏导，组成一个向量，叫<b>梯度</b>。某个方向上的坡度是梯度和这个方向的点积；梯度指向上坡最陡的方向，<b>负梯度</b>就是下坡最陡的方向，也就是我们要走的方向。</p>
+      <p>一维时，坡度就是导数 <span class="m"><i>d</i><i>f</i>(<i>x</i>)/<i>d</i><i>x</i> = lim<sub><i>h</i>→0</sub> (<i>f</i>(<i>x</i> + <i>h</i>) − <i>f</i>(<i>x</i>)) / <i>h</i></span>。多维时对每个维度分别求偏导，组成一个向量，叫<b>梯度</b>。某个方向上的坡度是梯度和这个方向的点积；梯度指向上坡最陡的方向，<b>负梯度</b>就是下坡最陡的方向，也就是我们要走的方向。</p>
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec03-1695.jpg" alt="一维的导数定义；多维时梯度是各个偏导组成的向量，负梯度是最陡的下坡" loading="lazy"><figcaption><button class="ts" type="button" data-t="1695">28:15</button>一维的导数定义；多维时梯度是各个偏导组成的向量，负梯度是最陡的下坡</figcaption></figure></div>
       
@@ -870,7 +870,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>效果是：一直有大梯度的那些维度，分母大，步子变小；平坦的维度分母小，步子变大。这正好回应了前面「能不能改变下山方向」的问题，它改变的就是每个维度的有效步长。窄长峡谷里，它会少走陡的方向、多走平的方向。</p>
       <p>三种方法的动画对比：随机梯度下降一直按固定方向慢慢走；动量会冲过头再折回来；RMSProp 很快转向峡谷中央更平坦的方向。</p>
       
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec03-3005.jpg" alt="RMSProp：维护梯度平方的滑动平均，更新时逐元素除以它的平方根" loading="lazy"><figcaption><button class="ts" type="button" data-t="3005">50:05</button>RMSProp：维护梯度平方的滑动平均，更新时逐元素除以它的平方根</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/lec03-3140.jpg" alt="随机梯度下降（黑）、动量（蓝）、RMSProp（红）的轨迹对比" loading="lazy"><figcaption><button class="ts" type="button" data-t="3140">52:20</button>随机梯度下降（黑）、动量（蓝）、RMSProp（红）的轨迹对比</figcaption></figure></div>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec03-3005.jpg" alt="RMSProp：维护梯度平方的滑动平均，更新时逐元素除以它的平方根" loading="lazy"><figcaption><button class="ts" type="button" data-t="3005">50:05</button>RMSProp：维护梯度平方的滑动平均，更新时逐元素除以它的平方根</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/lec03-3176.jpg" alt="随机梯度下降（黑）、动量（蓝）、RMSProp（红）的轨迹对比" loading="lazy"><figcaption><button class="ts" type="button" data-t="3176">52:56</button>随机梯度下降（黑）、动量（蓝）、RMSProp（红）的轨迹对比</figcaption></figure></div>
       
     </section>
 <section class="sec">
@@ -1776,7 +1776,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec">
       <h4><button class="ts" type="button" data-t="737">12:17</button><span>普通循环网络</span></h4>
-      <p>通常说的<b>普通循环网络 (Vanilla Recurrent Neural Network)</b> 就是：<span class="m"><i>h</i><sub><i>t</i></sub> = <i>t</i><i>a</i><i>n</i><i>h</i>(<i>W</i><sub>hh</sub> <i>h</i><sub><i>t</i>−1</sub> + <i>W</i><sub>xh</sub> <i>x</i><sub><i>t</i></sub>)</span>，<span class="m"><i>y</i><sub><i>t</i></sub> = <i>W</i><sub>hy</sub> <i>h</i><sub><i>t</i></sub></span>。用 tanh 是因为它的输出在 −1 到 1 之间，反复迭代时数值不会跑出范围，而且以零为中心、能表示正负两种值。</p>
+      <p>通常说的<b>普通循环网络 (Vanilla Recurrent Neural Network)</b> 就是：<span class="m"><i>h</i><sub><i>t</i></sub> = tanh(<i>W</i><sub>hh</sub> <i>h</i><sub><i>t</i>−1</sub> + <i>W</i><sub>xh</sub> <i>x</i><sub><i>t</i></sub>)</span>，<span class="m"><i>y</i><sub><i>t</i></sub> = <i>W</i><sub>hy</sub> <i>h</i><sub><i>t</i></sub></span>。用 tanh 是因为它的输出在 −1 到 1 之间，反复迭代时数值不会跑出范围，而且以零为中心、能表示正负两种值。</p>
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec07-825.jpg" alt="普通循环网络：h_t = tanh(W_hh h_{t−1} + W_xh x_t)，y_t = W_hy h_t" loading="lazy"><figcaption><button class="ts" type="button" data-t="825">13:45</button>普通循环网络：h<sub>t</sub> = tanh(W<sub>hh</sub> h<sub>t−1</sub> + W<sub>xh</sub> x<sub>t</sub>)，y<sub>t</sub> = W<sub>hy</sub> h<sub>t</sub></figcaption></figure></div>
       
@@ -1931,7 +1931,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="3882">1:04:42</button><span>长短期记忆网络</span></h4>
       <p>长短期记忆网络的大意（细节相当复杂）：不只一个隐藏状态，而是先算出四个门，决定怎么改隐藏状态、哪些信息走另一条通路。<b>输入门</b> i 决定是否往记忆单元里写；<b>遗忘门</b> f 决定忘掉多少以前的内容；<b>输出门</b> o 决定输出多少；还有一个门 g 决定写入什么。</p>
-      <p>记忆单元按 <span class="m"><i>c</i><sub><i>t</i></sub> = <i>f</i> ⊙ <i>c</i><sub><i>t</i>−1</sub> + <i>i</i> ⊙ <i>g</i></span> 更新，隐藏状态 <span class="m"><i>h</i><sub><i>t</i></sub> = <i>o</i> ⊙ <i>t</i><i>a</i><i>n</i><i>h</i>(<i>c</i><sub><i>t</i></sub>)</span>。</p>
+      <p>记忆单元按 <span class="m"><i>c</i><sub><i>t</i></sub> = <i>f</i> ⊙ <i>c</i><sub><i>t</i>−1</sub> + <i>i</i> ⊙ <i>g</i></span> 更新，隐藏状态 <span class="m"><i>h</i><sub><i>t</i></sub> = <i>o</i> ⊙ tanh(<i>c</i><sub><i>t</i></sub>)</span>。</p>
       <p>可以把上面那条记忆单元的通路看成一条<b>高速公路</b>：上面没有 tanh 这类激活，反向传播时只乘遗忘门，只要不是每步都把信息全忘掉，梯度就能顺利往前传，避开了 tanh 让梯度消失的问题。它也给长期信息开了一条单独的通路，不必全部装进隐藏状态。</p>
       <p>长短期记忆网络不能保证完全解决梯度消失，但让长期依赖容易学得多，经验上效果很好，至今仍是一些深度学习论文里常用的基线。走循环模型路线的话，人们通常训长短期记忆网络而不是普通循环网络，不过这类模型整体已经过时了。</p>
       
