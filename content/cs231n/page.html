@@ -887,9 +887,9 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <section class="sec">
       <h4><button class="ts" type="button" data-t="3428">57:08</button><span>AdamW</span></h4>
       <p>正则化怎么和优化器结合，并不只有一种做法。默认的 Adam 把 L2 正则项算进梯度，于是它也参与一阶矩、二阶矩的计算。<b>AdamW</b> 只用数据损失的梯度算各种矩，把正则项单独加在最后一步，这种做法叫<b>权重衰减 (Weight Decay)</b>。</p>
-      <p>有人问明明只有一个要优化的函数，为什么要拆成两部分。原因是不希望速度和动量受权重大小的影响，只希望它们反映损失地形；正则项还要，但别干扰矩的计算。很多设置下 AdamW 略好一些，Meta 的 Llama 系列都用 AdamW。归根结底是经验问题，两种都试试。</p>
+      <p>有人问明明只有一个要优化的函数，为什么要把数据损失和正则项拆开处理。原因是不希望一阶矩、二阶矩受权重大小的影响，只希望它们反映损失地形；正则项还要，但别掺进矩的计算。很多设置下 AdamW 略好一些，课件右边引了 fast.ai 的对比，权重衰减的 ImageNet 准确率比 L2 略高；Meta 的 Llama 系列都用 AdamW。归根结底是经验问题，两种都试试。</p>
       
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec03-3483.jpg" alt="Adam 把 L2 正则算进梯度；AdamW 把权重衰减单独加在最后" loading="lazy"><figcaption><button class="ts" type="button" data-t="3483">58:03</button>Adam 把 L2 正则算进梯度；AdamW 把权重衰减单独加在最后</figcaption></figure></div>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec03-3520.jpg" alt="标准 Adam 在算梯度时加 L2，正则项会进入一阶矩、二阶矩；AdamW 在最后一步才加权重衰减。右图：权重衰减（wd）比 L2 的准确率略高" loading="lazy"><figcaption><button class="ts" type="button" data-t="3520">58:40</button>标准 Adam 在算梯度时加 L2，正则项会进入一阶矩、二阶矩；AdamW 在最后一步才加权重衰减。右图：权重衰减（wd）比 L2 的准确率略高</figcaption></figure></div>
       
     </section>
 <section class="sec">
