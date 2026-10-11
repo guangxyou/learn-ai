@@ -3525,7 +3525,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>没有标签怎么训练：最简单的办法是重建输入。再加一个解码器，输入 z，输出 x，训练让输出和输入一致。这看起来是最傻的损失函数，在学恒等函数，而恒等函数我们本来就知道。</p>
       <p>关键是加约束：传统自编码器的约束是<b>瓶颈</b>，z 比 x 小得多，比如 x 是三百多万个数的高分辨率图，z 只有 128 维。要通过这个瓶颈重建数据，希望能迫使模型学到数据里非平凡的结构。训练完可以像自监督学习那样扔掉解码器，用 z 初始化下游的有监督模型。</p>
       
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec13-2900.jpg" alt="自编码器：无监督地从 x 提取特征 z，编码器可以是多层感知机、卷积网络或 Transformer" loading="lazy"><figcaption><button class="ts" type="button" data-t="2900">48:20</button>自编码器：无监督地从 x 提取特征 z，编码器可以是多层感知机、卷积网络或 Transformer</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/lec13-3039.jpg" alt="瓶颈：z 比 x 小得多，迫使模型学到数据的结构" loading="lazy"><figcaption><button class="ts" type="button" data-t="3039">50:39</button>瓶颈：z 比 x 小得多，迫使模型学到数据的结构</figcaption></figure></div>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec13-2925.jpg" alt="自编码器：无监督地从 x 提取特征 z，编码器可以是多层感知机、卷积网络或 Transformer" loading="lazy"><figcaption><button class="ts" type="button" data-t="2925">48:45</button>自编码器：无监督地从 x 提取特征 z，编码器可以是多层感知机、卷积网络或 Transformer</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/lec13-3039.jpg" alt="瓶颈：z 比 x 小得多，迫使模型学到数据的结构" loading="lazy"><figcaption><button class="ts" type="button" data-t="3039">50:39</button>瓶颈：z 比 x 小得多，迫使模型学到数据的结构</figcaption></figure></div>
       
     </section>
 <section class="sec">
