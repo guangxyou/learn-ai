@@ -24,7 +24,7 @@ export function addResources(html, resources) {
     }
   }
   html = html.replace(/<!--cs231n-resources-(tab|view|style|script)-->[\s\S]*?<!--\/cs231n-resources-\1-->/g, '');
-  const block = (kind, body) => `<!--cs231n-resources-${kind}-->${body}<!--/cs231n-resources-${kind}-->`;
+  const block = (kind, body) => `<!--cs231n-resources-${kind}-->${body.replace(/^[\t ]+$/gm, '')}<!--/cs231n-resources-${kind}-->`;
   const tab = block('tab', '<button class="tb" type="button" role="tab" data-v="resources" aria-selected="false">资源</button>');
   const view = block('view', `<div class="view" id="view-resources">
     <div class="intro"><h2>补充视频</h2><p>逐字稿与分节解析可切换，时间码点了跳播，截图点了放大。</p></div>
