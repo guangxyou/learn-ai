@@ -1,0 +1,228 @@
+[
+  {
+    "id": "vae",
+    "mark": "01",
+    "bvid": "BV1wx421k74m",
+    "title": "一个视频看懂VAE的原理以及关于latent diffusion的思考",
+    "author": "Nik_Li",
+    "date": "2024-03-17",
+    "duration": 2639,
+    "lecture": 13,
+    "poster": "vae-0241.jpg",
+    "description": "Variational Autoencoder 的概率解释、Evidence Lower Bound 推导，以及与 Latent Diffusion 的比较。",
+    "lede": "先从 Latent Diffusion 的编码与解码谈起，再说明 Autoencoder 为何难以直接采样生成。随后推导近似后验与 Evidence Lower Bound 的关系，解释两项训练损失，最后讨论隐空间和图像模糊。",
+    "editorial": "逐字稿由本地语音识别生成，已校正常见术语，保留重复和口头自我修正，未逐句人工听校。解析中的补充说明单独标注。",
+    "transcript": "assets/resources/vae-transcript.json",
+    "downloads": {
+      "text": "vae-transcript.md",
+      "srt": "vae.srt",
+      "vtt": "vae.vtt"
+    },
+    "sections": [
+      {
+        "t": 0,
+        "title": "Latent Diffusion 为什么在隐空间计算",
+        "paragraphs": [
+          "像素空间维度高，反复加噪和去噪的计算开销很大。Latent Diffusion 先将图像编码成较小的表示，在这个空间里训练扩散模型，生成后再解码回图像。"
+        ]
+      },
+      {
+        "t": 158,
+        "title": "编码器、解码器与 Variational Autoencoder",
+        "paragraphs": [
+          "视频用图像压缩引出 Variational Autoencoder：编码和解码承担表示转换，扩散过程学习隐表示的生成。讲者的问题是，类似的编码与解码结构为何能支持比传统模型更清晰的生成。"
+        ],
+        "shot": {
+          "t": 241,
+          "file": "vae-0241.jpg",
+          "caption": "Latent Diffusion 的整体路径：图像编码、隐空间扩散和图像解码。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 315,
+        "title": "Autoencoder：从重建学习特征",
+        "paragraphs": [
+          "Autoencoder 将输入 x 编码为 z，再由 Decoder 重建输入。训练时比较重建结果与原图，使隐表示携带重建所需的信息。"
+        ]
+      },
+      {
+        "t": 385,
+        "title": "重建之外，还缺少可采样的分布",
+        "paragraphs": [
+          "从训练样本得到一批隐向量，并没有自动得到一个容易采样的生成分布。若随意选一个新向量，它可能落在 Decoder 没有学好的区域。讲者据此引入对隐空间分布的建模。"
+        ],
+        "shot": {
+          "t": 469,
+          "file": "vae-0469.jpg",
+          "caption": "Autoencoder 产生训练样本的隐向量，新样本对应的隐向量仍然需要确定。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 565,
+        "title": "从寻找单个隐向量转为近似后验",
+        "paragraphs": [
+          "给定图像 x，考虑哪些 z 能解释它，也就是后验分布 pθ(z|x)。若能从与该图像有关的后验中取样，就能把取出的 z 交给 Decoder，并对原图计算重建损失。"
+        ],
+        "shot": {
+          "t": 649,
+          "file": "vae-0649.jpg",
+          "caption": "给定图像后，从后验取样，再通过 Decoder 重建图像。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 784,
+        "title": "Variational Bayes：选择一个可计算的分布家族",
+        "paragraphs": [
+          "真实后验通常难以计算。Variational Bayes 选择一个可处理的近似家族，调整其中的参数，让 qφ(z|x) 接近真实后验。视频用高斯分布家族作示意。"
+        ],
+        "shot": {
+          "t": 924,
+          "file": "vae-0924.jpg",
+          "caption": "在选定分布家族内寻找近似后验。示意图中的点代表分布。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 930,
+        "title": "用 Kullback-Leibler divergence 衡量近似",
+        "paragraphs": [
+          "目标写成 qφ(z|x) 到 pθ(z|x) 的 Kullback-Leibler divergence。这个量一般不对称，视频也指出它并非严格意义上的距离。真实后验不可算，直接优化这个表达式仍有困难。"
+        ]
+      },
+      {
+        "t": 996,
+        "title": "展开定义，并代入 Bayes 公式",
+        "paragraphs": [
+          "展开对数比值后，用联合分布与边缘分布表示真实后验。对 z 求期望时，log pθ(x) 可以从期望中提出，因为它与被积分的 z 无关。剩余两项组成 Evidence Lower Bound。"
+        ]
+      },
+      {
+        "t": 1250,
+        "title": "Evidence Lower Bound 与对数似然的恒等式",
+        "paragraphs": [
+          "推导得到：对数似然等于下界与后验近似误差之和。后验近似误差非负，因此下界不超过对数似然。固定生成模型参数时，增大下界等价于减小这个近似误差。"
+        ],
+        "shot": {
+          "t": 1250,
+          "file": "vae-1250.jpg",
+          "caption": "白板完成恒等式：log p(x) 等于 Kullback-Leibler divergence 加 Evidence Lower Bound。",
+          "width": 852,
+          "height": 480
+        },
+        "note": "固定 θ 时，log pθ(x) 对变分参数 φ 是常数。联合训练 θ 和 φ 时，log pθ(x) 会随 θ 改变；仅凭表达式里没有 z，不能推出它对全部可训练参数都不变。",
+        "formula": "log <i>p</i><sub>θ</sub>(<i>x</i>) = ℒ(θ, φ; <i>x</i>) + D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub>θ</sub>(<i>z</i>|<i>x</i>))"
+      },
+      {
+        "t": 1346,
+        "title": "将下界拆成重建项与先验约束",
+        "paragraphs": [
+          "再将联合分布拆成似然和先验，下界可写成期望重建对数似然减去近似后验到先验的 Kullback-Leibler divergence。这一步给出了训练目标的两个组成部分。"
+        ],
+        "shot": {
+          "t": 1540,
+          "file": "vae-1540.jpg",
+          "caption": "下界展开为负的先验约束项，加上重建对数似然的期望。",
+          "width": 852,
+          "height": 480
+        },
+        "formula": "ℒ = E<sub><i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub>θ</sub>(<i>x</i>|<i>z</i>)] − D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))"
+      },
+      {
+        "t": 1541,
+        "title": "两项损失必须一起看",
+        "paragraphs": [
+          "重建项要求隐表示保留输入信息；先验约束项使近似后验受到所选先验的限制。两项共同决定优化方向。视频接着回顾了从后验近似到这一训练目标的推导。"
+        ],
+        "note": "让近似后验接近真实后验，通常不能单独等同于让它接近先验。只有把重建项一起纳入下界，才是这里推导出的完整目标。"
+      },
+      {
+        "t": 1684,
+        "title": "训练：输出分布参数，再取样重建",
+        "paragraphs": [
+          "Encoder 输出高斯分布的参数，从该分布取出 z，再由 Decoder 重建输入。训练同时计算重建损失和先验约束。视频用这个流程说明，编码器输出的是一个条件分布的参数。"
+        ],
+        "shot": {
+          "t": 1810,
+          "file": "vae-1810.jpg",
+          "caption": "训练示意：Encoder 输出 μ 和 σ，取样后重建，另计算与标准正态先验的差异。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 1855,
+        "title": "反复取样用于估计期望",
+        "paragraphs": [
+          "重建项对 qφ(z|x) 求期望。每次重新取样，是用 Monte Carlo 方法估计这个期望的做法。讲者还讨论了随机取样对 Decoder 泛化的可能帮助。"
+        ],
+        "note": "最大化期望不要求每一个样本的重建概率同时达到最大。取样是在估计平均目标，仍会存在方差。"
+      },
+      {
+        "t": 1939,
+        "title": "隐空间：比较两项损失的作用",
+        "paragraphs": [
+          "视频比较只保留重建损失、只保留先验约束，以及同时保留两者的情况。图中不同颜色代表不同数字，用来观察特征是否能区分，以及整体表示是否便于采样。"
+        ],
+        "shot": {
+          "t": 2213,
+          "file": "vae-2213.jpg",
+          "caption": "手写数字隐空间的三组对照：重建、先验约束和两项共同训练。",
+          "width": 852,
+          "height": 480
+        },
+        "note": "这类可视化提供训练行为的例子，不保证每个样本的近似后验都变成同一个标准正态分布，也不保证所有数据都能形成清晰类别区域。"
+      },
+      {
+        "t": 2253,
+        "title": "与 Latent Diffusion 比较：讲者的推测",
+        "paragraphs": [
+          "讲者明确将后半段比较标为自己的思考。他认为，受限的近似分布可能带来偏差，而扩散模型能用逐步去噪学习更复杂的生成分布。"
+        ],
+        "shot": {
+          "t": 2366,
+          "file": "vae-2366.jpg",
+          "caption": "讲者比较 Variational Autoencoder 与 Latent Diffusion，并讨论高斯近似的限制。",
+          "width": 852,
+          "height": 480
+        },
+        "note": "Latent Diffusion 的生成过程学习数据隐表示的分布，通常不是直接拟合单张图像的后验 p(z|x)。原论文还使用专门训练的压缩模型和重建目标，不能把效果差异全归结为去掉一个高斯假设。"
+      },
+      {
+        "t": 2383,
+        "title": "扩散模型如何得到可解码的隐表示",
+        "paragraphs": [
+          "生成时从噪声出发，通过逐步去噪得到隐表示，再交给 Decoder 得到图像。视频借这一路径解释，在隐空间学习生成分布的作用。"
+        ],
+        "shot": {
+          "t": 2510,
+          "file": "vae-2510.jpg",
+          "caption": "噪声经扩散模型得到隐表示，再经过 Decoder 回到图像。",
+          "width": 852,
+          "height": 480
+        }
+      },
+      {
+        "t": 2529,
+        "title": "重建目标与模糊：均值和中位数的区别",
+        "paragraphs": [
+          "最后讨论多个可能输入在重建时产生的折中。讲者以重叠的隐分布作直观说明，认为逐像素重建的折中会损失高频细节。"
+        ],
+        "shot": {
+          "t": 2602,
+          "file": "vae-2602.jpg",
+          "caption": "讲者用重叠分布和 average 标记说明重建折中与模糊。",
+          "width": 852,
+          "height": 480
+        },
+        "note": "在不确定输出的条件风险最小化中，平方误差 L² 对应条件均值，绝对误差 L¹ 对应条件中位数。视频把 L¹ 与取平均直接相连，这里需要区分。图像模糊也受解码分布、模型容量和训练目标等因素影响。"
+      }
+    ]
+  }
+]
