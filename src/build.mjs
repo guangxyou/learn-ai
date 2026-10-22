@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { parseTranscript, parseIndex } from './parse.mjs';
 import { renderList, renderEntry, renderSearch, setAssetVersion, wan } from './render.mjs';
 import { indexPage } from './search.mjs';
+import { addResources } from './cs231n-resources.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = process.env.BASE_PATH ?? '/learn-ai';
@@ -119,7 +120,14 @@ async function buildPaper({ dir, id, entry, base, dist, index }) {
     console.log(`[build] ${id} · 用仓库里的成品 ${entry.page}`);
   }
 
-  const html = withSearch(await unInline((await readFile(page, 'utf8'))
+  let source = await readFile(page, 'utf8');
+  if (id === 'cs231n' && existsSync(j(dir, 'resources.json'))) {
+    const resources = JSON.parse(await readFile(j(dir, 'resources.json'), 'utf8'));
+    for (const r of resources) r.transcriptData = JSON.parse(await readFile(j(dir, r.transcript), 'utf8'));
+    source = addResources(source, resources);
+    if (process.env.PAPER_REBUILD) await writeFile(page, source, 'utf8');
+  }
+  const html = withSearch(await unInline(source
     .replaceAll('__HOME__', `${base}/`)
     .replaceAll('__CANONICAL__', `${SITE.url}${base}/${id}/`)
     .replaceAll('__ASSETS__', `${base}/${id}/assets`), { id, base, dist }), { base, id, entry, index });
