@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>变分自编码器 (Variational Autoencoder) · 先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照和 21 个常见问题</title>
+<meta name="description" content="变分自编码器的专题页，五个 tab。「KL 散度」补推导要用的概率：符号表、贝叶斯公式里的先验似然后验证据、期望、KL 散度的定义和 ≥ 0 的证明、两个方向为什么拟合出不同的形状、两个高斯之间 KL 的解析解、蒙特卡洛估计和重参数化，配三张按数值积分画的示意图。「CS231n 的讲法」把第 13 讲 Justin Johnson 讲变分自编码器的 27 分钟按他的思路扩写：从最大似然出发，边缘化和贝叶斯公式都走不通，加编码器近似后验，对角高斯和 L2 的关系，log p(x) 拆三项、扔掉算不出的 KL 得到证据下界，训练流程和两项损失的拉扯，每一步式子写全，配课件截图；另收第 14 讲回头提到变分自编码器的两段（Latent Diffusion 加判别器、扩散模型也是变分下界）。「白板推导视频」是 Nik_Li 的 44 分钟推导，从近似后验出发推到同一个目标，并讨论 Latent Diffusion 为什么比变分自编码器清晰。「两种讲法对照」用同一个恒等式把两条路合起来，讲编码器和解码器一起更新时下界怎么变、为什么糊的几种回答。「常见问题」21 问，从 xᵢ 指什么、z ∼ q 是什么意思，到后验坍缩、β 变分自编码器、Stable Diffusion 里的变分自编码器。约 3 万字，32 张截图。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+.mats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline;margin:14px 0 0;font-size:12.5px}
+.mats .lbl{font-size:11.5px;font-weight:700;color:var(--text-3);letter-spacing:.04em;margin-right:2px}
+.mats a{color:var(--text-2);border:1px solid var(--line);border-radius:var(--r-full);padding:1px 9px;background:var(--bg)}
+.mats a:hover{color:var(--accent-ink);border-color:var(--accent-line);background:var(--accent-soft)}
+.epmain .lede+.lede{margin-top:10px}
+.tl button b{width:7ch}
+.sec,.aisec,.faq{scroll-margin-top:calc(var(--bar-h) + 12px)}
+.intro p{margin:0 0 10px}
+/* 逐行推导：式子一列，说明一列；手机上说明换到式子下面，长式子横向滚动 */
+.deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df{white-space:nowrap}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.aidoc .tbl{margin:14px 0}
+/* 示意图在手机上按 680 宽画、横向滑动，否则 940 宽的图缩到 343 宽，12px 的字只剩 4px */
+@media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:680px}}
+/* 常见问题 */
+.faqdoc{max-width:820px;margin:0 auto}
+.faqgrp h2{font-size:16px;margin:30px 0 10px;color:var(--text)}
+.faq{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);margin:8px 0}
+.faq>summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:600;font-size:15px;line-height:1.6}
+.faq>summary::-webkit-details-marker{display:none}
+.faq>summary::before{content:'问';display:inline-block;font-size:11.5px;color:var(--accent);font-weight:700;margin-right:10px}
+.faq[open]>summary{border-bottom:1px solid var(--line)}
+.faqa{padding:6px 16px 10px;font-size:15px;line-height:1.85}
+.faqa p{margin:10px 0}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">专题</span><span>Kingma 和 Welling，arXiv 2013-12-20</span></div>
+  <h1>变分自编码器 (Variational Autoencoder)</h1>
+</header></div>
+<nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
+  <button class="tb on" type="button" role="tab" data-v="kl" aria-selected="true">KL 散度</button>
+  <button class="tb" type="button" role="tab" data-v="cs231n" aria-selected="false">CS231n 的讲法</button>
+  <button class="tb" type="button" role="tab" data-v="video" aria-selected="false">白板推导视频</button>
+  <button class="tb" type="button" role="tab" data-v="compare" aria-selected="false">两种讲法对照</button>
+  <button class="tb" type="button" role="tab" data-v="faq" aria-selected="false">常见问题</button>
+</div></div></nav>
+<main class="wrap">
+<div class="view on" id="view-kl">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#kl-symbols">符号</a></li><li><a href="#kl-bayes">贝叶斯公式</a></li><li><a href="#kl-expect">期望</a></li><li><a href="#kl-def">KL 散度的定义</a></li><li><a href="#kl-nonneg">KL ≥ 0</a></li><li><a href="#kl-dir">方向</a></li><li><a href="#kl-gauss">高斯的 KL</a></li><li><a href="#kl-mc">采样估计期望</a></li><li><a href="#kl-map">对照表</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">KL 散度和要用到的概率</h2>
+    <p class="lede">变分自编码器的推导几乎只用两样东西：期望和 KL 散度。CS231n 第 13 讲把 KL 散度当成已知，一句「熟悉概率的话会认出这两项是 KL」就过去了。这一页把后面要用的先补齐：符号、贝叶斯公式里的四个名字、期望、KL 散度的定义和性质、两个高斯之间的 KL、靠采样估计期望。</p><p class="lede">基础概念页「AI 中的概率」有一节讲 KL 散度在蒸馏、RLHF 里怎么用，这里偏重变分自编码器要的部分：连续分布、按 q 取期望、高斯的解析解。</p>
+    <section class="aisec" id="kl-symbols">
+    <h2><span class="n">1</span><span>先认符号：这几页公式里的字母</span></h2>
+    <p>变分自编码器的公式字母多，下标还经常省略。先列一张表，后面几个 tab 都按这个写法。</p>
+    <div class="tbl"><table><thead><tr><th>写法</th><th>读作</th><th>是什么</th></tr></thead><tbody><tr><td><span class="m"><i>x</i></span>、<span class="m"><i>x</i><sub><i>i</i></sub></span></td><td>一张图</td><td>一个样本。<span class="m"><i>x</i><sub><i>i</i></sub></span> 是数据集 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span> 里的第 i 张，下标只是编号，不代表整个数据集。CS231n 课件写成上标 <span class="m"><i>x</i><sup>(<i>i</i>)</sup></span>，意思一样</td></tr><tr><td><span class="m"><i>z</i></span></td><td>隐变量</td><td>隐变量 (Latent Variable)，一个低维向量，比如 2 维、128 维。看不到，只能推</td></tr><tr><td><span class="m"><i>p</i>(<i>z</i>)</span></td><td>先验</td><td>还没看到图时对 z 的假设，变分自编码器里几乎总是标准正态分布 <span class="m"><i>N</i>(0, <i>I</i>)</span></td></tr><tr><td><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span></td><td>似然</td><td>给定 z 时图是 x 的概率密度，由解码器算。θ 是解码器的参数</td></tr><tr><td><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span></td><td>后验</td><td>看到图 x 以后 z 的分布。由先验和解码器一起决定，算不出来</td></tr><tr><td><span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span></td><td>近似后验</td><td>用来近似后验的高斯，由编码器算，φ 是编码器的参数。每张图输出一个 <span class="m"><i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>)</span></td></tr><tr><td><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span></td><td>证据</td><td>也叫边际似然：这个模型生成出 x 的概率密度，训练最终想让它变大</td></tr><tr><td><span class="m"><i>z</i> ∼ <i>q</i></span></td><td>z 服从 q</td><td>z 是从分布 q 里抽出来的一个样本</td></tr><tr><td><span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>(<i>z</i>)]</span></td><td>按 q 取期望</td><td>z 按 q 的概率取值时 f(z) 的平均，也写成 <span class="m"><i>E</i><sub><i>z</i>∼<i>q</i></sub>[<i>f</i>(<i>z</i>)]</span></td></tr><tr><td><span class="m">KL(<i>q</i> ‖ <i>p</i>)</span></td><td>q 相对 p 的 KL 散度</td><td>两个分布差多少，第 4 节细讲</td></tr><tr><td><span class="m"><i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>)</span></td><td>正态分布</td><td>均值 μ、方差 σ<sup>2</sup>（σ 是标准差）。多维时 σ<sup>2</sup> 换成协方差矩阵，变分自编码器里只用对角的</td></tr></tbody></table></div>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="kl-bayes">
+    <h2><span class="n">2</span><span>先验、似然、后验、证据：贝叶斯公式里的四个名字</span></h2>
+    <p>隐变量模型假设每张图是这样来的：先从先验 p(z) 抽一个 z，再从 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 生成图。z 和 x 的联合分布就是两者相乘：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>, <i>z</i>) = <i>p</i>(<i>z</i>) <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span></span><span class="dc">先抽 z，再按 z 生成 x</span></div></div>
+    <p>同一个联合分布也能反过来拆：先有 x，再看 z。两种拆法相等，整理一下就是贝叶斯公式：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>) = <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span></span><span class="dc">后验 = 似然 × 先验 / 证据</span></div><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>) = ∫ <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) <i>d</i><i>z</i></span></span><span class="dc">证据：把所有 z 的可能性加起来</span></div></div>
+    <p>四个量里，先验是自己定的，似然由解码器算，都没问题。麻烦在证据：要对所有 z 积分，z 有上百维，解码器又是神经网络，这个积分没有解析解，也没法暴力数值积分。证据算不出来，后验的分母就没有，后验也就算不出来。变分自编码器后面的所有绕路都从这里开始。</p>
+    
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>z 只有两个取值时</p>
+      <p>假设 z 只有两个取值，「猫」的先验是 0.3，「狗」是 0.7。看到一张图 x，解码器说猫生成这张图的可能性是 0.8，狗是 0.1。</p>
+      <p>证据 p(x) = 0.3 × 0.8 + 0.7 × 0.1 = 0.31；后验 p(猫|x) = 0.24 / 0.31 ≈ 0.774，p(狗|x) = 0.07 / 0.31 ≈ 0.226。z 只有两个值时证据是两项求和，一下就算完；z 是 128 维的连续向量时，求和变成 128 重积分，就算不动了。</p></div>
+    
+    <p class="refs"><a href="https://xslaoxu.cn/learn-ai/basics/#aip-bayes" target="_blank" rel="noreferrer">基础概念页：贝叶斯与对数赔率 ↗</a></p>
+  </section>
+<section class="aisec" id="kl-expect">
+    <h2><span class="n">3</span><span>期望：按概率加权的平均</span></h2>
+    <p>随机变量 z 服从分布 q，记作 <span class="m"><i>z</i> ∼ <i>q</i></span>。函数 f(z) 的期望是按 q 的概率给每个取值加权再求和：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>(<i>z</i>)] = Σ<sub><i>z</i></sub> <i>q</i>(<i>z</i>) <i>f</i>(<i>z</i>)</span></span><span class="dc">z 只取有限个值</span></div><div><span class="df"><span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>(<i>z</i>)] = ∫ <i>q</i>(<i>z</i>) <i>f</i>(<i>z</i>) <i>d</i><i>z</i></span></span><span class="dc">z 连续，q(z) 是概率密度</span></div></div>
+    <p>两行是一个意思。z 连续时没法逐个列出取值，只能对密度积分，求和号就换成了积分号。掷一个公平骰子，f(z) = z，期望是 (1 + 2 + … + 6) / 6 = 3.5；z ∼ N(0, 1)，f(z) = z<sup>2</sup>，期望就是方差 1。</p>
+    <p>期望的下标说的是「按哪个分布取平均」，换一个分布结果就不同。后面推导里同一个 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span>，按编码器的 q 取期望和按先验 p(z) 取期望是两回事，所以下标不能随手省。</p>
+    <p>推导 ELBO 时每一步都在用期望的两条性质：</p>
+    <ul><li>线性：<span class="m"><i>E</i><sub><i>q</i></sub>[<i>a</i> <i>f</i> + <i>b</i> <i>g</i>] = <i>a</i> <i>E</i><sub><i>q</i></sub>[<i>f</i>] + <i>b</i> <i>E</i><sub><i>q</i></sub>[<i>g</i>]</span>。一个期望里的减号可以拆成两个期望相减。</li><li>常数的期望是它自己：f 里没有 z 时 <span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>] = <i>f</i></span>。log p(x) 不含 z，所以推导里可以随时给它套上或去掉对 z 的期望。</li></ul>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="kl-def">
+    <h2><span class="n">4</span><span>KL 散度：log(q/p) 按 q 取平均</span></h2>
+    <p><b>KL 散度 (Kullback-Leibler Divergence)</b> 衡量两个分布差多少。q 相对 p 的 KL 散度定义为：</p>
+    <div class="deriv"><div><span class="df"><span class="m">KL(<i>q</i> ‖ <i>p</i>) = Σ<sub><i>z</i></sub> <i>q</i>(<i>z</i>) log [<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>)]</span></span><span class="dc">离散</span></div><div><span class="df"><span class="m">KL(<i>q</i> ‖ <i>p</i>) = ∫ <i>q</i>(<i>z</i>) log [<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>)] <i>d</i><i>z</i></span></span><span class="dc">连续</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) − log <i>p</i>(<i>z</i>)]</span></span><span class="dc">对照上一节：就是 log(q/p) 按 q 取期望</span></div></div>
+    <p>逐项看：对每个 z，log(q/p) 比较两个分布给它的概率，q 给得多就是正数，给得少就是负数；然后按 q(z) 加权平均。所以它关心的是：q 认为常见的那些 z，p 给的概率够不够。</p>
+    <p>它衡量的是差异：两个分布完全相同时为 0，差得越多越大，没有上限。用自然对数时单位是奈特 (nat)，以 2 为底时是比特。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 760 444" width="760" height="444" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .cq{fill:none;stroke:#0F766E;stroke-width:2.2;stroke-linejoin:round}
+  .cp{fill:none;stroke:#B45309;stroke-width:2.2;stroke-linejoin:round}
+  .cpd{fill:none;stroke:#B45309;stroke-width:2;stroke-dasharray:6 4}
+  .fpos{fill:#0F766E;fill-opacity:.22;stroke:none}
+  .fneg{fill:#B45309;fill-opacity:.28;stroke:none}
+  .fp{fill:#868D98;fill-opacity:.18;stroke:#868D98;stroke-width:1.2}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tq{font-size:12px;fill:#0F766E}
+  .tp{font-size:12px;fill:#B45309}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10.5px}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10.5px}
+</style>
+<defs>
+  <marker id="kl-area-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+</defs>
+<rect x="-20" y="-20" width="760" height="444" fill="#fff"/>
+<text x="0" y="0" class="ph">上：两个分布的密度</text><text x="720" y="0" class="xs" text-anchor="end">曲线由数值积分画出</text><path d="M40.0 170.0 L41.8 170.0 L43.7 169.9 L45.5 169.9 L47.3 169.9 L49.2 169.9 L51.0 169.9 L52.8 169.9 L54.7 169.9 L56.5 169.9 L58.3 169.9 L60.2 169.9 L62.0 169.9 L63.8 169.8 L65.7 169.8 L67.5 169.8 L69.3 169.8 L71.2 169.8 L73.0 169.8 L74.8 169.7 L76.7 169.7 L78.5 169.7 L80.3 169.7 L82.2 169.6 L84.0 169.6 L85.8 169.6 L87.7 169.5 L89.5 169.5 L91.3 169.4 L93.2 169.4 L95.0 169.3 L96.8 169.3 L98.7 169.2 L100.5 169.1 L102.3 169.1 L104.2 169.0 L106.0 168.9 L107.8 168.8 L109.7 168.7 L111.5 168.6 L113.3 168.5 L115.2 168.4 L117.0 168.3 L118.8 168.2 L120.7 168.0 L122.5 167.9 L124.3 167.7 L126.2 167.5 L128.0 167.4 L129.8 167.2 L131.7 167.0 L133.5 166.8 L135.3 166.5 L137.2 166.3 L139.0 166.0 L140.8 165.8 L142.7 165.5 L144.5 165.2 L146.3 164.9 L148.2 164.5 L150.0 164.2 L151.8 163.8 L153.7 163.4 L155.5 163.0 L157.3 162.5 L159.2 162.1 L161.0 161.6 L162.8 161.1 L164.7 160.6 L166.5 160.0 L168.3 159.4 L170.2 158.8 L172.0 158.2 L173.8 157.5 L175.7 156.8 L177.5 156.1 L179.3 155.3 L181.2 154.6 L183.0 153.7 L184.8 152.9 L186.7 152.0 L188.5 151.1 L190.3 150.1 L192.2 149.1 L194.0 148.1 L195.8 147.1 L197.7 146.0 L199.5 144.8 L201.3 143.7 L203.2 142.5 L205.0 141.2 L206.8 140.0 L208.7 138.7 L210.5 137.3 L212.3 135.9 L214.2 134.5 L216.0 133.0 L217.8 131.5 L219.7 130.0 L221.5 128.4 L223.3 126.8 L225.2 125.2 L227.0 123.5 L228.8 121.8 L230.7 120.1 L232.5 118.3 L234.3 116.5 L236.2 114.7 L238.0 112.9 L239.8 111.0 L241.7 109.1 L243.5 107.2 L245.3 105.3 L247.2 103.3 L249.0 101.4 L250.8 99.4 L252.7 97.4 L254.5 95.4 L256.3 93.4 L258.2 91.4 L260.0 89.3 L261.8 87.3 L263.7 85.3 L265.5 83.3 L267.3 81.3 L269.2 79.3 L271.0 77.3 L272.8 75.4 L274.7 73.4 L276.5 71.5 L278.3 69.6 L280.2 67.8 L282.0 65.9 L283.8 64.1 L285.7 62.3 L287.5 60.6 L289.3 58.9 L291.2 57.3 L293.0 55.7 L294.8 54.1 L296.7 52.6 L298.5 51.2 L300.3 49.8 L302.2 48.5 L304.0 47.2 L305.8 46.0 L307.7 44.9 L309.5 43.9 L311.3 42.9 L313.2 42.0 L315.0 41.1 L316.8 40.3 L318.7 39.7 L320.5 39.0 L322.3 38.5 L324.2 38.1 L326.0 37.7 L327.8 37.4 L329.7 37.2 L331.5 37.1 L333.3 37.0 L335.2 37.1 L337.0 37.2 L338.8 37.4 L340.7 37.7 L342.5 38.1 L344.3 38.5 L346.2 39.0 L348.0 39.7 L349.8 40.3 L351.7 41.1 L353.5 42.0 L355.3 42.9 L357.2 43.9 L359.0 44.9 L360.8 46.0 L362.7 47.2 L364.5 48.5 L366.3 49.8 L368.2 51.2 L370.0 52.6 L371.8 54.1 L373.7 55.7 L375.5 57.3 L377.3 58.9 L379.2 60.6 L381.0 62.3 L382.8 64.1 L384.7 65.9 L386.5 67.8 L388.3 69.6 L390.2 71.5 L392.0 73.4 L393.8 75.4 L395.7 77.3 L397.5 79.3 L399.3 81.3 L401.2 83.3 L403.0 85.3 L404.8 87.3 L406.7 89.3 L408.5 91.4 L410.3 93.4 L412.2 95.4 L414.0 97.4 L415.8 99.4 L417.7 101.4 L419.5 103.3 L421.3 105.3 L423.2 107.2 L425.0 109.1 L426.8 111.0 L428.7 112.9 L430.5 114.7 L432.3 116.5 L434.2 118.3 L436.0 120.1 L437.8 121.8 L439.7 123.5 L441.5 125.2 L443.3 126.8 L445.2 128.4 L447.0 130.0 L448.8 131.5 L450.7 133.0 L452.5 134.5 L454.3 135.9 L456.2 137.3 L458.0 138.7 L459.8 140.0 L461.7 141.2 L463.5 142.5 L465.3 143.7 L467.2 144.8 L469.0 146.0 L470.8 147.1 L472.7 148.1 L474.5 149.1 L476.3 150.1 L478.2 151.1 L480.0 152.0 L481.8 152.9 L483.7 153.7 L485.5 154.6 L487.3 155.3 L489.2 156.1 L491.0 156.8 L492.8 157.5 L494.7 158.2 L496.5 158.8 L498.3 159.4 L500.2 160.0 L502.0 160.6 L503.8 161.1 L505.7 161.6 L507.5 162.1 L509.3 162.5 L511.2 163.0 L513.0 163.4 L514.8 163.8 L516.7 164.2 L518.5 164.5 L520.3 164.9 L522.2 165.2 L524.0 165.5 L525.8 165.8 L527.7 166.0 L529.5 166.3 L531.3 166.5 L533.2 166.8 L535.0 167.0 L536.8 167.2 L538.7 167.4 L540.5 167.5 L542.3 167.7 L544.2 167.9 L546.0 168.0 L547.8 168.2 L549.7 168.3 L551.5 168.4 L553.3 168.5 L555.2 168.6 L557.0 168.7 L558.8 168.8 L560.7 168.9 L562.5 169.0 L564.3 169.1 L566.2 169.1 L568.0 169.2 L569.8 169.3 L571.7 169.3 L573.5 169.4 L575.3 169.4 L577.2 169.5 L579.0 169.5 L580.8 169.6 L582.7 169.6 L584.5 169.6 L586.3 169.7 L588.2 169.7 L590.0 169.7 L591.8 169.7 L593.7 169.8 L595.5 169.8 L597.3 169.8 L599.2 169.8 L601.0 169.8 L602.8 169.8 L604.7 169.9 L606.5 169.9 L608.3 169.9 L610.2 169.9 L612.0 169.9 L613.8 169.9 L615.7 169.9 L617.5 169.9 L619.3 169.9 L621.2 169.9 L623.0 169.9 L624.8 170.0 L626.7 170.0 L628.5 170.0 L630.3 170.0 L632.2 170.0 L634.0 170.0 L635.8 170.0 L637.7 170.0 L639.5 170.0 L641.3 170.0 L643.2 170.0 L645.0 170.0 L646.8 170.0 L648.7 170.0 L650.5 170.0 L652.3 170.0 L654.2 170.0 L656.0 170.0 L657.8 170.0 L659.7 170.0 L661.5 170.0 L663.3 170.0 L665.2 170.0 L667.0 170.0 L668.8 170.0 L670.7 170.0 L672.5 170.0 L674.3 170.0 L676.2 170.0 L678.0 170.0 L679.8 170.0 L681.7 170.0 L683.5 170.0 L685.3 170.0 L687.2 170.0 L689.0 170.0 L690.8 170.0 L692.7 170.0 L694.5 170.0 L696.3 170.0 L698.2 170.0 L700.0 170.0" class="cq"/><path d="M40.0 169.7 L41.8 169.6 L43.7 169.6 L45.5 169.6 L47.3 169.6 L49.2 169.5 L51.0 169.5 L52.8 169.5 L54.7 169.5 L56.5 169.4 L58.3 169.4 L60.2 169.4 L62.0 169.3 L63.8 169.3 L65.7 169.3 L67.5 169.2 L69.3 169.2 L71.2 169.2 L73.0 169.1 L74.8 169.1 L76.7 169.0 L78.5 169.0 L80.3 168.9 L82.2 168.9 L84.0 168.8 L85.8 168.7 L87.7 168.7 L89.5 168.6 L91.3 168.5 L93.2 168.5 L95.0 168.4 L96.8 168.3 L98.7 168.2 L100.5 168.2 L102.3 168.1 L104.2 168.0 L106.0 167.9 L107.8 167.8 L109.7 167.7 L111.5 167.6 L113.3 167.5 L115.2 167.4 L117.0 167.2 L118.8 167.1 L120.7 167.0 L122.5 166.8 L124.3 166.7 L126.2 166.6 L128.0 166.4 L129.8 166.3 L131.7 166.1 L133.5 165.9 L135.3 165.8 L137.2 165.6 L139.0 165.4 L140.8 165.2 L142.7 165.0 L144.5 164.8 L146.3 164.6 L148.2 164.4 L150.0 164.2 L151.8 163.9 L153.7 163.7 L155.5 163.5 L157.3 163.2 L159.2 162.9 L161.0 162.7 L162.8 162.4 L164.7 162.1 L166.5 161.8 L168.3 161.5 L170.2 161.2 L172.0 160.9 L173.8 160.6 L175.7 160.2 L177.5 159.9 L179.3 159.5 L181.2 159.2 L183.0 158.8 L184.8 158.4 L186.7 158.0 L188.5 157.6 L190.3 157.2 L192.2 156.8 L194.0 156.3 L195.8 155.9 L197.7 155.4 L199.5 155.0 L201.3 154.5 L203.2 154.0 L205.0 153.5 L206.8 153.0 L208.7 152.5 L210.5 151.9 L212.3 151.4 L214.2 150.8 L216.0 150.3 L217.8 149.7 L219.7 149.1 L221.5 148.5 L223.3 147.9 L225.2 147.3 L227.0 146.6 L228.8 146.0 L230.7 145.4 L232.5 144.7 L234.3 144.0 L236.2 143.3 L238.0 142.6 L239.8 141.9 L241.7 141.2 L243.5 140.5 L245.3 139.8 L247.2 139.0 L249.0 138.3 L250.8 137.5 L252.7 136.7 L254.5 135.9 L256.3 135.2 L258.2 134.4 L260.0 133.6 L261.8 132.7 L263.7 131.9 L265.5 131.1 L267.3 130.3 L269.2 129.4 L271.0 128.6 L272.8 127.7 L274.7 126.8 L276.5 126.0 L278.3 125.1 L280.2 124.2 L282.0 123.4 L283.8 122.5 L285.7 121.6 L287.5 120.7 L289.3 119.8 L291.2 118.9 L293.0 118.0 L294.8 117.1 L296.7 116.2 L298.5 115.3 L300.3 114.4 L302.2 113.5 L304.0 112.6 L305.8 111.8 L307.7 110.9 L309.5 110.0 L311.3 109.1 L313.2 108.2 L315.0 107.4 L316.8 106.5 L318.7 105.6 L320.5 104.8 L322.3 103.9 L324.2 103.1 L326.0 102.2 L327.8 101.4 L329.7 100.6 L331.5 99.8 L333.3 99.0 L335.2 98.2 L337.0 97.5 L338.8 96.7 L340.7 96.0 L342.5 95.2 L344.3 94.5 L346.2 93.8 L348.0 93.1 L349.8 92.4 L351.7 91.8 L353.5 91.1 L355.3 90.5 L357.2 89.9 L359.0 89.3 L360.8 88.7 L362.7 88.2 L364.5 87.6 L366.3 87.1 L368.2 86.6 L370.0 86.1 L371.8 85.7 L373.7 85.2 L375.5 84.8 L377.3 84.4 L379.2 84.1 L381.0 83.7 L382.8 83.4 L384.7 83.1 L386.5 82.8 L388.3 82.6 L390.2 82.3 L392.0 82.1 L393.8 81.9 L395.7 81.8 L397.5 81.7 L399.3 81.5 L401.2 81.5 L403.0 81.4 L404.8 81.4 L406.7 81.3 L408.5 81.4 L410.3 81.4 L412.2 81.5 L414.0 81.5 L415.8 81.7 L417.7 81.8 L419.5 81.9 L421.3 82.1 L423.2 82.3 L425.0 82.6 L426.8 82.8 L428.7 83.1 L430.5 83.4 L432.3 83.7 L434.2 84.1 L436.0 84.4 L437.8 84.8 L439.7 85.2 L441.5 85.7 L443.3 86.1 L445.2 86.6 L447.0 87.1 L448.8 87.6 L450.7 88.2 L452.5 88.7 L454.3 89.3 L456.2 89.9 L458.0 90.5 L459.8 91.1 L461.7 91.8 L463.5 92.4 L465.3 93.1 L467.2 93.8 L469.0 94.5 L470.8 95.2 L472.7 96.0 L474.5 96.7 L476.3 97.5 L478.2 98.2 L480.0 99.0 L481.8 99.8 L483.7 100.6 L485.5 101.4 L487.3 102.2 L489.2 103.1 L491.0 103.9 L492.8 104.8 L494.7 105.6 L496.5 106.5 L498.3 107.4 L500.2 108.2 L502.0 109.1 L503.8 110.0 L505.7 110.9 L507.5 111.8 L509.3 112.6 L511.2 113.5 L513.0 114.4 L514.8 115.3 L516.7 116.2 L518.5 117.1 L520.3 118.0 L522.2 118.9 L524.0 119.8 L525.8 120.7 L527.7 121.6 L529.5 122.5 L531.3 123.4 L533.2 124.2 L535.0 125.1 L536.8 126.0 L538.7 126.8 L540.5 127.7 L542.3 128.6 L544.2 129.4 L546.0 130.3 L547.8 131.1 L549.7 131.9 L551.5 132.7 L553.3 133.6 L555.2 134.4 L557.0 135.2 L558.8 135.9 L560.7 136.7 L562.5 137.5 L564.3 138.3 L566.2 139.0 L568.0 139.8 L569.8 140.5 L571.7 141.2 L573.5 141.9 L575.3 142.6 L577.2 143.3 L579.0 144.0 L580.8 144.7 L582.7 145.4 L584.5 146.0 L586.3 146.6 L588.2 147.3 L590.0 147.9 L591.8 148.5 L593.7 149.1 L595.5 149.7 L597.3 150.3 L599.2 150.8 L601.0 151.4 L602.8 151.9 L604.7 152.5 L606.5 153.0 L608.3 153.5 L610.2 154.0 L612.0 154.5 L613.8 155.0 L615.7 155.4 L617.5 155.9 L619.3 156.3 L621.2 156.8 L623.0 157.2 L624.8 157.6 L626.7 158.0 L628.5 158.4 L630.3 158.8 L632.2 159.2 L634.0 159.5 L635.8 159.9 L637.7 160.2 L639.5 160.6 L641.3 160.9 L643.2 161.2 L645.0 161.5 L646.8 161.8 L648.7 162.1 L650.5 162.4 L652.3 162.7 L654.2 162.9 L656.0 163.2 L657.8 163.5 L659.7 163.7 L661.5 163.9 L663.3 164.2 L665.2 164.4 L667.0 164.6 L668.8 164.8 L670.7 165.0 L672.5 165.2 L674.3 165.4 L676.2 165.6 L678.0 165.8 L679.8 165.9 L681.7 166.1 L683.5 166.3 L685.3 166.4 L687.2 166.6 L689.0 166.7 L690.8 166.8 L692.7 167.0 L694.5 167.1 L696.3 167.2 L698.2 167.4 L700.0 167.5" class="cp"/><line x1="40" y1="170" x2="700" y2="170" class="ax"/><line x1="40" y1="170" x2="40" y2="174" class="ax"/><text x="40" y="187" class="xs" text-anchor="middle">−4</text><line x1="113.33333333333333" y1="170" x2="113.33333333333333" y2="174" class="ax"/><text x="113.33333333333333" y="187" class="xs" text-anchor="middle">−3</text><line x1="186.66666666666666" y1="170" x2="186.66666666666666" y2="174" class="ax"/><text x="186.66666666666666" y="187" class="xs" text-anchor="middle">−2</text><line x1="260" y1="170" x2="260" y2="174" class="ax"/><text x="260" y="187" class="xs" text-anchor="middle">−1</text><line x1="333.3333333333333" y1="170" x2="333.3333333333333" y2="174" class="ax"/><text x="333.3333333333333" y="187" class="xs" text-anchor="middle">0</text><line x1="406.6666666666667" y1="170" x2="406.6666666666667" y2="174" class="ax"/><text x="406.6666666666667" y="187" class="xs" text-anchor="middle">1</text><line x1="480" y1="170" x2="480" y2="174" class="ax"/><text x="480" y="187" class="xs" text-anchor="middle">2</text><line x1="553.3333333333334" y1="170" x2="553.3333333333334" y2="174" class="ax"/><text x="553.3333333333334" y="187" class="xs" text-anchor="middle">3</text><line x1="626.6666666666666" y1="170" x2="626.6666666666666" y2="174" class="ax"/><text x="626.6666666666666" y="187" class="xs" text-anchor="middle">4</text><line x1="700" y1="170" x2="700" y2="174" class="ax"/><text x="700" y="187" class="xs" text-anchor="middle">5</text><text x="293" y="34.99999999999997" class="tq" text-anchor="end">q = N(0, 1)</text><text x="516.6666666666667" y="103.33333333333333" class="tp">p = N(1, 1.5²)</text><line x1="149.8" y1="30" x2="149.8" y2="352" class="thin" stroke-dasharray="3 4"/><line x1="399.5" y1="30" x2="399.5" y2="352" class="thin" stroke-dasharray="3 4"/><text x="0" y="214" class="ph">下：被积函数 q(z)·log(q(z)/p(z))</text><path d="M149.8 320.6 L150.0 320.6 L151.8 320.5 L153.7 320.3 L155.5 320.2 L157.3 320.0 L159.2 319.8 L161.0 319.6 L162.8 319.3 L164.7 319.0 L166.5 318.8 L168.3 318.4 L170.2 318.1 L172.0 317.7 L173.8 317.4 L175.7 316.9 L177.5 316.5 L179.3 316.0 L181.2 315.5 L183.0 315.0 L184.8 314.4 L186.7 313.8 L188.5 313.1 L190.3 312.5 L192.2 311.7 L194.0 311.0 L195.8 310.2 L197.7 309.4 L199.5 308.5 L201.3 307.6 L203.2 306.6 L205.0 305.6 L206.8 304.6 L208.7 303.5 L210.5 302.4 L212.3 301.3 L214.2 300.1 L216.0 298.8 L217.8 297.5 L219.7 296.2 L221.5 294.9 L223.3 293.5 L225.2 292.0 L227.0 290.6 L228.8 289.1 L230.7 287.5 L232.5 286.0 L234.3 284.4 L236.2 282.8 L238.0 281.1 L239.8 279.4 L241.7 277.7 L243.5 276.0 L245.3 274.3 L247.2 272.6 L249.0 270.8 L250.8 269.1 L252.7 267.3 L254.5 265.6 L256.3 263.8 L258.2 262.1 L260.0 260.4 L261.8 258.7 L263.7 257.0 L265.5 255.3 L267.3 253.7 L269.2 252.1 L271.0 250.5 L272.8 249.0 L274.7 247.5 L276.5 246.1 L278.3 244.7 L280.2 243.3 L282.0 242.1 L283.8 240.9 L285.7 239.7 L287.5 238.7 L289.3 237.7 L291.2 236.7 L293.0 235.9 L294.8 235.2 L296.7 234.5 L298.5 233.9 L300.3 233.5 L302.2 233.1 L304.0 232.8 L305.8 232.6 L307.7 232.5 L309.5 232.5 L311.3 232.6 L313.2 232.9 L315.0 233.2 L316.8 233.6 L318.7 234.2 L320.5 234.8 L322.3 235.5 L324.2 236.4 L326.0 237.3 L327.8 238.4 L329.7 239.6 L331.5 240.8 L333.3 242.1 L335.2 243.6 L337.0 245.1 L338.8 246.7 L340.7 248.4 L342.5 250.2 L344.3 252.0 L346.2 254.0 L348.0 256.0 L349.8 258.0 L351.7 260.1 L353.5 262.3 L355.3 264.5 L357.2 266.8 L359.0 269.1 L360.8 271.5 L362.7 273.8 L364.5 276.2 L366.3 278.7 L368.2 281.1 L370.0 283.6 L371.8 286.0 L373.7 288.5 L375.5 290.9 L377.3 293.4 L379.2 295.8 L381.0 298.2 L382.8 300.6 L384.7 303.0 L386.5 305.3 L388.3 307.6 L390.2 309.9 L392.0 312.1 L393.8 314.2 L395.7 316.4 L397.5 318.4 L399.3 320.4 L399.5 320.6 L399.5 320.6 L149.8 320.6 Z" class="fpos"/><path d="M399.5 320.6 L401.2 322.4 L403.0 324.3 L404.8 326.1 L406.7 327.8 L408.5 329.5 L410.3 331.1 L412.2 332.7 L414.0 334.1 L415.8 335.5 L417.7 336.8 L419.5 338.1 L421.3 339.3 L423.2 340.4 L425.0 341.4 L426.8 342.3 L428.7 343.2 L430.5 344.0 L432.3 344.7 L434.2 345.4 L436.0 345.9 L437.8 346.5 L439.7 346.9 L441.5 347.3 L443.3 347.6 L445.2 347.9 L447.0 348.1 L448.8 348.2 L450.7 348.3 L452.5 348.3 L454.3 348.3 L456.2 348.2 L458.0 348.1 L459.8 347.9 L461.7 347.7 L463.5 347.5 L465.3 347.2 L467.2 346.9 L469.0 346.5 L470.8 346.1 L472.7 345.7 L474.5 345.3 L476.3 344.8 L478.2 344.4 L480.0 343.9 L481.8 343.4 L483.7 342.8 L485.5 342.3 L487.3 341.8 L489.2 341.2 L491.0 340.6 L492.8 340.1 L494.7 339.5 L496.5 338.9 L498.3 338.3 L500.2 337.8 L502.0 337.2 L503.8 336.6 L505.7 336.1 L507.5 335.5 L509.3 335.0 L511.2 334.4 L513.0 333.9 L514.8 333.4 L516.7 332.8 L518.5 332.3 L520.3 331.8 L522.2 331.4 L524.0 330.9 L525.8 330.4 L527.7 330.0 L529.5 329.6 L531.3 329.1 L533.2 328.7 L535.0 328.3 L536.8 328.0 L538.7 327.6 L540.5 327.2 L542.3 326.9 L544.2 326.6 L546.0 326.2 L547.8 325.9 L549.7 325.6 L551.5 325.4 L553.3 325.1 L555.2 324.8 L557.0 324.6 L558.8 324.4 L560.7 324.2 L562.5 323.9 L564.3 323.7 L566.2 323.5 L568.0 323.4 L569.8 323.2 L571.7 323.0 L573.5 322.9 L575.3 322.7 L577.2 322.6 L579.0 322.5 L580.8 322.3 L582.7 322.2 L584.5 322.1 L586.3 322.0 L588.2 321.9 L590.0 321.8 L591.8 321.7 L593.7 321.7 L595.5 321.6 L597.3 321.5 L599.2 321.5 L601.0 321.4 L602.8 321.3 L604.7 321.3 L606.5 321.2 L608.3 321.2 L610.2 321.2 L612.0 321.1 L613.8 321.1 L615.7 321.0 L617.5 321.0 L619.3 321.0 L621.2 321.0 L623.0 320.9 L624.8 320.9 L626.7 320.9 L628.5 320.9 L630.3 320.8 L632.2 320.8 L634.0 320.8 L635.8 320.8 L637.7 320.8 L639.5 320.8 L641.3 320.8 L643.2 320.8 L645.0 320.7 L646.8 320.7 L648.7 320.7 L650.5 320.7 L652.3 320.7 L654.2 320.7 L656.0 320.7 L657.8 320.7 L659.7 320.7 L661.5 320.7 L663.3 320.7 L665.2 320.7 L667.0 320.7 L668.8 320.7 L670.7 320.7 L672.5 320.7 L674.3 320.7 L676.2 320.7 L678.0 320.7 L679.8 320.7 L681.7 320.7 L683.5 320.7 L685.3 320.7 L687.2 320.7 L689.0 320.7 L690.8 320.7 L692.7 320.7 L694.5 320.7 L696.3 320.7 L698.2 320.7 L700.0 320.7 L700.0 320.6 L399.5 320.6 Z" class="fneg"/><path d="M40.0 320.7 L41.8 320.7 L43.7 320.7 L45.5 320.8 L47.3 320.8 L49.2 320.8 L51.0 320.8 L52.8 320.8 L54.7 320.8 L56.5 320.8 L58.3 320.8 L60.2 320.8 L62.0 320.9 L63.8 320.9 L65.7 320.9 L67.5 320.9 L69.3 320.9 L71.2 320.9 L73.0 320.9 L74.8 321.0 L76.7 321.0 L78.5 321.0 L80.3 321.0 L82.2 321.0 L84.0 321.1 L85.8 321.1 L87.7 321.1 L89.5 321.1 L91.3 321.2 L93.2 321.2 L95.0 321.2 L96.8 321.2 L98.7 321.2 L100.5 321.3 L102.3 321.3 L104.2 321.3 L106.0 321.3 L107.8 321.3 L109.7 321.4 L111.5 321.4 L113.3 321.4 L115.2 321.4 L117.0 321.4 L118.8 321.4 L120.7 321.4 L122.5 321.4 L124.3 321.4 L126.2 321.4 L128.0 321.4 L129.8 321.4 L131.7 321.4 L133.5 321.3 L135.3 321.3 L137.2 321.2 L139.0 321.2 L140.8 321.1 L142.7 321.1 L144.5 321.0 L146.3 320.9 L148.2 320.8 L149.8 320.6 L149.8 320.6 L40.0 320.6 Z" class="fneg"/><line x1="40" y1="320.6" x2="700" y2="320.6" class="ax"/><path d="M40.0 320.7 L41.8 320.7 L43.7 320.7 L45.5 320.8 L47.3 320.8 L49.2 320.8 L51.0 320.8 L52.8 320.8 L54.7 320.8 L56.5 320.8 L58.3 320.8 L60.2 320.8 L62.0 320.9 L63.8 320.9 L65.7 320.9 L67.5 320.9 L69.3 320.9 L71.2 320.9 L73.0 320.9 L74.8 321.0 L76.7 321.0 L78.5 321.0 L80.3 321.0 L82.2 321.0 L84.0 321.1 L85.8 321.1 L87.7 321.1 L89.5 321.1 L91.3 321.2 L93.2 321.2 L95.0 321.2 L96.8 321.2 L98.7 321.2 L100.5 321.3 L102.3 321.3 L104.2 321.3 L106.0 321.3 L107.8 321.3 L109.7 321.4 L111.5 321.4 L113.3 321.4 L115.2 321.4 L117.0 321.4 L118.8 321.4 L120.7 321.4 L122.5 321.4 L124.3 321.4 L126.2 321.4 L128.0 321.4 L129.8 321.4 L131.7 321.4 L133.5 321.3 L135.3 321.3 L137.2 321.2 L139.0 321.2 L140.8 321.1 L142.7 321.1 L144.5 321.0 L146.3 320.9 L148.2 320.8 L150.0 320.6 L151.8 320.5 L153.7 320.3 L155.5 320.2 L157.3 320.0 L159.2 319.8 L161.0 319.6 L162.8 319.3 L164.7 319.0 L166.5 318.8 L168.3 318.4 L170.2 318.1 L172.0 317.7 L173.8 317.4 L175.7 316.9 L177.5 316.5 L179.3 316.0 L181.2 315.5 L183.0 315.0 L184.8 314.4 L186.7 313.8 L188.5 313.1 L190.3 312.5 L192.2 311.7 L194.0 311.0 L195.8 310.2 L197.7 309.4 L199.5 308.5 L201.3 307.6 L203.2 306.6 L205.0 305.6 L206.8 304.6 L208.7 303.5 L210.5 302.4 L212.3 301.3 L214.2 300.1 L216.0 298.8 L217.8 297.5 L219.7 296.2 L221.5 294.9 L223.3 293.5 L225.2 292.0 L227.0 290.6 L228.8 289.1 L230.7 287.5 L232.5 286.0 L234.3 284.4 L236.2 282.8 L238.0 281.1 L239.8 279.4 L241.7 277.7 L243.5 276.0 L245.3 274.3 L247.2 272.6 L249.0 270.8 L250.8 269.1 L252.7 267.3 L254.5 265.6 L256.3 263.8 L258.2 262.1 L260.0 260.4 L261.8 258.7 L263.7 257.0 L265.5 255.3 L267.3 253.7 L269.2 252.1 L271.0 250.5 L272.8 249.0 L274.7 247.5 L276.5 246.1 L278.3 244.7 L280.2 243.3 L282.0 242.1 L283.8 240.9 L285.7 239.7 L287.5 238.7 L289.3 237.7 L291.2 236.7 L293.0 235.9 L294.8 235.2 L296.7 234.5 L298.5 233.9 L300.3 233.5 L302.2 233.1 L304.0 232.8 L305.8 232.6 L307.7 232.5 L309.5 232.5 L311.3 232.6 L313.2 232.9 L315.0 233.2 L316.8 233.6 L318.7 234.2 L320.5 234.8 L322.3 235.5 L324.2 236.4 L326.0 237.3 L327.8 238.4 L329.7 239.6 L331.5 240.8 L333.3 242.1 L335.2 243.6 L337.0 245.1 L338.8 246.7 L340.7 248.4 L342.5 250.2 L344.3 252.0 L346.2 254.0 L348.0 256.0 L349.8 258.0 L351.7 260.1 L353.5 262.3 L355.3 264.5 L357.2 266.8 L359.0 269.1 L360.8 271.5 L362.7 273.8 L364.5 276.2 L366.3 278.7 L368.2 281.1 L370.0 283.6 L371.8 286.0 L373.7 288.5 L375.5 290.9 L377.3 293.4 L379.2 295.8 L381.0 298.2 L382.8 300.6 L384.7 303.0 L386.5 305.3 L388.3 307.6 L390.2 309.9 L392.0 312.1 L393.8 314.2 L395.7 316.4 L397.5 318.4 L399.3 320.4 L401.2 322.4 L403.0 324.3 L404.8 326.1 L406.7 327.8 L408.5 329.5 L410.3 331.1 L412.2 332.7 L414.0 334.1 L415.8 335.5 L417.7 336.8 L419.5 338.1 L421.3 339.3 L423.2 340.4 L425.0 341.4 L426.8 342.3 L428.7 343.2 L430.5 344.0 L432.3 344.7 L434.2 345.4 L436.0 345.9 L437.8 346.5 L439.7 346.9 L441.5 347.3 L443.3 347.6 L445.2 347.9 L447.0 348.1 L448.8 348.2 L450.7 348.3 L452.5 348.3 L454.3 348.3 L456.2 348.2 L458.0 348.1 L459.8 347.9 L461.7 347.7 L463.5 347.5 L465.3 347.2 L467.2 346.9 L469.0 346.5 L470.8 346.1 L472.7 345.7 L474.5 345.3 L476.3 344.8 L478.2 344.4 L480.0 343.9 L481.8 343.4 L483.7 342.8 L485.5 342.3 L487.3 341.8 L489.2 341.2 L491.0 340.6 L492.8 340.1 L494.7 339.5 L496.5 338.9 L498.3 338.3 L500.2 337.8 L502.0 337.2 L503.8 336.6 L505.7 336.1 L507.5 335.5 L509.3 335.0 L511.2 334.4 L513.0 333.9 L514.8 333.4 L516.7 332.8 L518.5 332.3 L520.3 331.8 L522.2 331.4 L524.0 330.9 L525.8 330.4 L527.7 330.0 L529.5 329.6 L531.3 329.1 L533.2 328.7 L535.0 328.3 L536.8 328.0 L538.7 327.6 L540.5 327.2 L542.3 326.9 L544.2 326.6 L546.0 326.2 L547.8 325.9 L549.7 325.6 L551.5 325.4 L553.3 325.1 L555.2 324.8 L557.0 324.6 L558.8 324.4 L560.7 324.2 L562.5 323.9 L564.3 323.7 L566.2 323.5 L568.0 323.4 L569.8 323.2 L571.7 323.0 L573.5 322.9 L575.3 322.7 L577.2 322.6 L579.0 322.5 L580.8 322.3 L582.7 322.2 L584.5 322.1 L586.3 322.0 L588.2 321.9 L590.0 321.8 L591.8 321.7 L593.7 321.7 L595.5 321.6 L597.3 321.5 L599.2 321.5 L601.0 321.4 L602.8 321.3 L604.7 321.3 L606.5 321.2 L608.3 321.2 L610.2 321.2 L612.0 321.1 L613.8 321.1 L615.7 321.0 L617.5 321.0 L619.3 321.0 L621.2 321.0 L623.0 320.9 L624.8 320.9 L626.7 320.9 L628.5 320.9 L630.3 320.8 L632.2 320.8 L634.0 320.8 L635.8 320.8 L637.7 320.8 L639.5 320.8 L641.3 320.8 L643.2 320.8 L645.0 320.7 L646.8 320.7 L648.7 320.7 L650.5 320.7 L652.3 320.7 L654.2 320.7 L656.0 320.7 L657.8 320.7 L659.7 320.7 L661.5 320.7 L663.3 320.7 L665.2 320.7 L667.0 320.7 L668.8 320.7 L670.7 320.7 L672.5 320.7 L674.3 320.7 L676.2 320.7 L678.0 320.7 L679.8 320.7 L681.7 320.7 L683.5 320.7 L685.3 320.7 L687.2 320.7 L689.0 320.7 L690.8 320.7 L692.7 320.7 L694.5 320.7 L696.3 320.7 L698.2 320.7 L700.0 320.7" class="ink"/><text x="241.66666666666669" y="261.08108108108104" class="tq" text-anchor="end">q 比 p 大：这一段为正</text><text x="700" y="351.37297297297295" class="tp" text-anchor="end">q 比 p 小：为负，被 q(z) 压得很浅</text><text x="289.3333333333333" y="306.5405405405405" class="sm" text-anchor="middle">面积合计 ≈ 0.350</text><text x="149.79151103923994" y="368" class="xs" text-anchor="middle">z ≈ −2.50</text><text x="399.5418222940935" y="368" class="xs" text-anchor="middle">z ≈ 0.90</text><text x="0" y="398" class="sm">正的部分 0.472，负的部分 -0.123，加起来就是 KL(q‖p)；虚线是 q = p 的两个交点。</text>
+</svg>
+<figcaption>q = N(0, 1)、p = N(1, 1.5<sup>2</sup>)。下半是被积函数，青色面积减去橙色面积就是 KL(q‖p) ≈ 0.350。q 比 p 大的区间（−2.50 到 0.90）被积函数为正；两侧 q 比 p 小，为负，但乘了一个很小的 q(z)，面积很浅。</figcaption></figure>
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>两枚硬币</p>
+      <p>q 是一枚公平硬币，正反各 0.5；p 偏向正面，正面 0.9、反面 0.1。</p>
+      <p>KL(q ‖ p) = 0.5 × ln(0.5/0.9) + 0.5 × ln(0.5/0.1) = 0.5 × (−0.588) + 0.5 × 1.609 ≈ 0.511 奈特。正面那项是负的，q 给正面的概率比 p 少；反面那项是正的，而且大得多，因为 q 有一半时间出反面，p 却认为反面很少见。</p></div>
+    <div class="note"><p><span class="lbl">补充</span>信息论的读法：数据实际来自 q，却用为 p 设计的最优编码去压缩，平均每个样本多花 KL(q ‖ p) 奈特。所以 KL(q ‖ p) = 交叉熵 H(q, p) − 熵 H(q)。基础概念页「压缩即智能」第 2 部分讲的就是这件事。</p></div>
+    <p class="refs"><a href="https://xslaoxu.cn/learn-ai/basics/#aip-kl" target="_blank" rel="noreferrer">基础概念页：KL 散度在蒸馏、RLHF 里的用法 ↗</a></p>
+  </section>
+<section class="aisec" id="kl-nonneg">
+    <h2><span class="n">5</span><span>KL ≥ 0：扔掉它就得到下界</span></h2>
+    <p>被积函数有正有负，加起来却总是 ≥ 0，当且仅当 q 和 p 处处相等时为 0。证明要用 log 是凹函数：琴生不等式 (Jensen's Inequality) 说凹函数的期望不超过期望的凹函数，<span class="m"><i>E</i>[log <i>Y</i>] ≤ log <i>E</i>[<i>Y</i>]</span>。</p>
+    <div class="deriv"><div><span class="df"><span class="m">−KL(<i>q</i> ‖ <i>p</i>) = <i>E</i><sub><i>q</i></sub>[log (<i>p</i>(<i>z</i>) / <i>q</i>(<i>z</i>))]</span></span><span class="dc">把 log(q/p) 翻成 log(p/q)，前面加负号</span></div><div><span class="df"><span class="m">≤ log <i>E</i><sub><i>q</i></sub>[<i>p</i>(<i>z</i>) / <i>q</i>(<i>z</i>)]</span></span><span class="dc">琴生不等式</span></div><div><span class="df"><span class="m">= log ∫ <i>q</i>(<i>z</i>) · <i>p</i>(<i>z</i>) / <i>q</i>(<i>z</i>) <i>d</i><i>z</i> = log ∫ <i>p</i>(<i>z</i>) <i>d</i><i>z</i></span></span><span class="dc">按期望的定义展开，q 约掉</span></div><div><span class="df"><span class="m">= log 1 = 0</span></span><span class="dc">p 是概率分布，积分为 1</span></div></div>
+    <p>所以 KL(q ‖ p) ≥ 0。等号要求 p/q 是常数，两个分布都积分为 1，这个常数只能是 1，也就是 q = p。</p>
+    <p>这一条在变分自编码器里用了两次。CS231n 推导时 log p(x) 拆出一项算不出的 KL，它 ≥ 0，扔掉以后剩下的就是 log p(x) 的下界。视频的推导里，同一项 KL 是「近似后验离真实后验多远」，它 ≥ 0 保证 ELBO 永远不超过 log p(x)。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="kl-dir">
+    <h2><span class="n">6</span><span>两个方向不一样：为什么用 KL(q ‖ p)</span></h2>
+    <p>交换两个分布，KL 一般会变。还是两枚硬币：KL(q ‖ p) ≈ 0.511，反过来 KL(p ‖ q) = 0.9 × ln(0.9/0.5) + 0.1 × ln(0.1/0.5) ≈ 0.368。不对称，所以它算不上距离，只叫散度。</p>
+    <p>变分自编码器要用 q 去近似真实后验，写成 <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))</span>，q 在前。选这个方向是因为只有它算得动：</p>
+    <ul><li>期望按 q 取。q 是编码器给的高斯，能从里面采样，也能算 log q。</li><li>真实后验只出现在 log 里，可以拆成 log p(z, x) − log p(x)：前一项能算，后一项和 z 无关，从期望里提出来就是常数。两种推导都靠这一步。</li><li>反过来的 <span class="m">KL(<i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>q</i>)</span> 要按真实后验取期望，得先能从后验里采样，而这正是做不到的事。</li></ul>
+    <p>方向不同，拟合出来的样子也不同。下图用一个高斯去拟合一个双峰分布：</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 940 358" width="940" height="358" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .cq{fill:none;stroke:#0F766E;stroke-width:2.2;stroke-linejoin:round}
+  .cp{fill:none;stroke:#B45309;stroke-width:2.2;stroke-linejoin:round}
+  .cpd{fill:none;stroke:#B45309;stroke-width:2;stroke-dasharray:6 4}
+  .fpos{fill:#0F766E;fill-opacity:.22;stroke:none}
+  .fneg{fill:#B45309;fill-opacity:.28;stroke:none}
+  .fp{fill:#868D98;fill-opacity:.18;stroke:#868D98;stroke-width:1.2}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tq{font-size:12px;fill:#0F766E}
+  .tp{font-size:12px;fill:#B45309}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10.5px}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10.5px}
+</style>
+<defs>
+  <marker id="kl-direction-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+</defs>
+<rect x="-20" y="-20" width="940" height="358" fill="#fff"/>
+<text x="0" y="16" class="ph">最小化 KL(q‖p)：q 缩在一个峰上</text><path d="M0.0 230.0 L1.1 230.0 L2.1 230.0 L3.2 230.0 L4.2 230.0 L5.3 230.0 L6.3 230.0 L7.3 230.0 L8.4 230.0 L9.4 230.0 L10.5 230.0 L11.6 230.0 L12.6 230.0 L13.7 230.0 L14.7 230.0 L15.8 230.0 L16.8 230.0 L17.8 230.0 L18.9 230.0 L19.9 230.0 L21.0 230.0 L22.1 230.0 L23.1 230.0 L24.2 230.0 L25.2 230.0 L26.3 230.0 L27.3 230.0 L28.3 229.9 L29.4 229.9 L30.4 229.9 L31.5 229.9 L32.6 229.9 L33.6 229.9 L34.7 229.9 L35.7 229.8 L36.8 229.8 L37.8 229.8 L38.8 229.7 L39.9 229.7 L40.9 229.7 L42.0 229.6 L43.0 229.5 L44.1 229.5 L45.2 229.4 L46.2 229.3 L47.3 229.2 L48.3 229.1 L49.3 229.0 L50.4 228.9 L51.5 228.7 L52.5 228.5 L53.6 228.4 L54.6 228.1 L55.7 227.9 L56.7 227.7 L57.8 227.4 L58.8 227.1 L59.8 226.7 L60.9 226.4 L62.0 225.9 L63.0 225.5 L64.0 225.0 L65.1 224.5 L66.2 223.9 L67.2 223.3 L68.3 222.6 L69.3 221.8 L70.3 221.0 L71.4 220.2 L72.5 219.3 L73.5 218.3 L74.5 217.2 L75.6 216.1 L76.7 214.9 L77.7 213.7 L78.8 212.3 L79.8 210.9 L80.8 209.4 L81.9 207.8 L83.0 206.2 L84.0 204.4 L85.0 202.6 L86.1 200.7 L87.2 198.7 L88.2 196.7 L89.3 194.6 L90.3 192.4 L91.3 190.1 L92.4 187.8 L93.5 185.5 L94.5 183.0 L95.5 180.6 L96.6 178.1 L97.7 175.5 L98.7 173.0 L99.8 170.4 L100.8 167.8 L101.8 165.2 L102.9 162.6 L104.0 160.0 L105.0 157.5 L106.0 155.0 L107.1 152.6 L108.2 150.2 L109.2 147.9 L110.3 145.6 L111.3 143.5 L112.3 141.4 L113.4 139.5 L114.5 137.6 L115.5 135.9 L116.5 134.4 L117.6 133.0 L118.7 131.7 L119.7 130.6 L120.7 129.6 L121.8 128.8 L122.8 128.2 L123.9 127.8 L124.9 127.5 L126.0 127.4 L127.0 127.5 L128.1 127.8 L129.2 128.2 L130.2 128.8 L131.3 129.6 L132.3 130.6 L133.3 131.7 L134.4 133.0 L135.5 134.4 L136.5 135.9 L137.6 137.6 L138.6 139.5 L139.7 141.4 L140.7 143.5 L141.8 145.6 L142.8 147.9 L143.8 150.2 L144.9 152.6 L146.0 155.0 L147.0 157.5 L148.0 160.0 L149.1 162.6 L150.2 165.2 L151.2 167.8 L152.3 170.4 L153.3 173.0 L154.3 175.5 L155.4 178.1 L156.4 180.6 L157.5 183.0 L158.6 185.5 L159.6 187.8 L160.7 190.1 L161.7 192.4 L162.8 194.6 L163.8 196.7 L164.8 198.7 L165.9 200.7 L167.0 202.6 L168.0 204.4 L169.1 206.2 L170.1 207.8 L171.2 209.4 L172.2 210.9 L173.3 212.3 L174.3 213.7 L175.3 214.9 L176.4 216.1 L177.4 217.2 L178.5 218.3 L179.6 219.3 L180.6 220.2 L181.7 221.0 L182.7 221.8 L183.8 222.6 L184.8 223.3 L185.8 223.9 L186.9 224.5 L187.9 225.0 L189.0 225.5 L190.1 225.9 L191.1 226.3 L192.2 226.7 L193.2 227.0 L194.3 227.4 L195.3 227.6 L196.3 227.9 L197.4 228.1 L198.4 228.3 L199.5 228.5 L200.6 228.6 L201.6 228.8 L202.7 228.9 L203.7 229.0 L204.8 229.1 L205.8 229.2 L206.8 229.2 L207.9 229.3 L208.9 229.3 L210.0 229.3 L211.1 229.4 L212.1 229.4 L213.2 229.3 L214.2 229.3 L215.2 229.3 L216.3 229.2 L217.3 229.2 L218.4 229.1 L219.4 229.0 L220.5 228.9 L221.6 228.8 L222.6 228.7 L223.6 228.6 L224.7 228.4 L225.8 228.2 L226.8 228.0 L227.8 227.8 L228.9 227.5 L229.9 227.3 L231.0 227.0 L232.0 226.7 L233.1 226.3 L234.2 225.9 L235.2 225.5 L236.3 225.0 L237.3 224.6 L238.3 224.0 L239.4 223.5 L240.5 222.8 L241.5 222.2 L242.6 221.5 L243.6 220.7 L244.7 219.9 L245.7 219.1 L246.8 218.2 L247.8 217.3 L248.9 216.3 L249.9 215.2 L250.9 214.1 L252.0 212.9 L253.1 211.7 L254.1 210.5 L255.2 209.2 L256.2 207.8 L257.3 206.4 L258.3 204.9 L259.3 203.4 L260.4 201.9 L261.4 200.3 L262.5 198.7 L263.6 197.0 L264.6 195.4 L265.7 193.7 L266.7 192.0 L267.8 190.2 L268.8 188.5 L269.8 186.8 L270.9 185.1 L271.9 183.4 L273.0 181.7 L274.1 180.0 L275.1 178.4 L276.1 176.8 L277.2 175.2 L278.3 173.7 L279.3 172.3 L280.3 170.9 L281.4 169.6 L282.4 168.4 L283.5 167.3 L284.6 166.3 L285.6 165.3 L286.6 164.5 L287.7 163.7 L288.8 163.1 L289.8 162.6 L290.9 162.1 L291.9 161.8 L292.9 161.7 L294.0 161.6 L295.1 161.7 L296.1 161.8 L297.2 162.1 L298.2 162.6 L299.3 163.1 L300.3 163.7 L301.4 164.5 L302.4 165.3 L303.4 166.3 L304.5 167.3 L305.6 168.4 L306.6 169.6 L307.7 170.9 L308.7 172.3 L309.8 173.7 L310.8 175.2 L311.8 176.8 L312.9 178.4 L313.9 180.0 L315.0 181.7 L316.1 183.4 L317.1 185.1 L318.2 186.8 L319.2 188.5 L320.3 190.2 L321.3 192.0 L322.3 193.7 L323.4 195.4 L324.4 197.0 L325.5 198.7 L326.6 200.3 L327.6 201.9 L328.6 203.4 L329.7 204.9 L330.8 206.4 L331.8 207.8 L332.8 209.2 L333.9 210.5 L334.9 211.7 L336.0 212.9 L337.1 214.1 L338.1 215.2 L339.1 216.3 L340.2 217.3 L341.3 218.2 L342.3 219.1 L343.4 219.9 L344.4 220.7 L345.4 221.5 L346.5 222.2 L347.6 222.8 L348.6 223.5 L349.6 224.0 L350.7 224.6 L351.8 225.1 L352.8 225.5 L353.9 225.9 L354.9 226.3 L355.9 226.7 L357.0 227.0 L358.1 227.3 L359.1 227.6 L360.1 227.8 L361.2 228.0 L362.3 228.3 L363.3 228.4 L364.4 228.6 L365.4 228.8 L366.4 228.9 L367.5 229.0 L368.6 229.1 L369.6 229.2 L370.6 229.3 L371.7 229.4 L372.8 229.5 L373.8 229.5 L374.9 229.6 L375.9 229.7 L376.9 229.7 L378.0 229.7 L379.1 229.8 L380.1 229.8 L381.1 229.8 L382.2 229.9 L383.3 229.9 L384.3 229.9 L385.4 229.9 L386.4 229.9 L387.4 229.9 L388.5 229.9 L389.6 229.9 L390.6 230.0 L391.6 230.0 L392.7 230.0 L393.8 230.0 L394.8 230.0 L395.9 230.0 L396.9 230.0 L397.9 230.0 L399.0 230.0 L400.1 230.0 L401.1 230.0 L402.1 230.0 L403.2 230.0 L404.3 230.0 L405.3 230.0 L406.4 230.0 L407.4 230.0 L408.4 230.0 L409.5 230.0 L410.6 230.0 L411.6 230.0 L412.6 230.0 L413.7 230.0 L414.8 230.0 L415.8 230.0 L416.9 230.0 L417.9 230.0 L418.9 230.0 L420.0 230.0 L420.0 230.0 L0.0 230.0 Z" class="fp"/><path d="M0.0 230.0 L1.1 230.0 L2.1 230.0 L3.2 230.0 L4.2 230.0 L5.3 230.0 L6.3 230.0 L7.3 230.0 L8.4 230.0 L9.4 230.0 L10.5 230.0 L11.6 230.0 L12.6 230.0 L13.7 230.0 L14.7 230.0 L15.8 230.0 L16.8 230.0 L17.8 230.0 L18.9 230.0 L19.9 230.0 L21.0 230.0 L22.1 230.0 L23.1 230.0 L24.2 230.0 L25.2 229.9 L26.3 229.9 L27.3 229.9 L28.3 229.9 L29.4 229.9 L30.4 229.9 L31.5 229.8 L32.6 229.8 L33.6 229.8 L34.7 229.8 L35.7 229.7 L36.8 229.7 L37.8 229.6 L38.8 229.6 L39.9 229.5 L40.9 229.4 L42.0 229.3 L43.0 229.2 L44.1 229.1 L45.2 229.0 L46.2 228.9 L47.3 228.7 L48.3 228.5 L49.3 228.3 L50.4 228.1 L51.5 227.8 L52.5 227.6 L53.6 227.3 L54.6 226.9 L55.7 226.5 L56.7 226.1 L57.8 225.6 L58.8 225.1 L59.8 224.5 L60.9 223.9 L62.0 223.2 L63.0 222.5 L64.0 221.7 L65.1 220.8 L66.2 219.8 L67.2 218.8 L68.3 217.6 L69.3 216.4 L70.3 215.1 L71.4 213.6 L72.5 212.1 L73.5 210.5 L74.5 208.7 L75.6 206.9 L76.7 204.9 L77.7 202.8 L78.8 200.5 L79.8 198.2 L80.8 195.7 L81.9 193.0 L83.0 190.3 L84.0 187.4 L85.0 184.3 L86.1 181.2 L87.2 177.9 L88.2 174.5 L89.3 171.0 L90.3 167.3 L91.3 163.6 L92.4 159.7 L93.5 155.8 L94.5 151.7 L95.5 147.6 L96.6 143.4 L97.7 139.2 L98.7 134.9 L99.8 130.6 L100.8 126.3 L101.8 122.0 L102.9 117.7 L104.0 113.4 L105.0 109.2 L106.0 105.0 L107.1 100.9 L108.2 97.0 L109.2 93.1 L110.3 89.4 L111.3 85.8 L112.3 82.4 L113.4 79.1 L114.5 76.1 L115.5 73.2 L116.5 70.6 L117.6 68.3 L118.7 66.1 L119.7 64.3 L120.7 62.7 L121.8 61.4 L122.8 60.4 L123.9 59.6 L124.9 59.2 L126.0 59.0 L127.0 59.2 L128.1 59.6 L129.2 60.4 L130.2 61.4 L131.3 62.7 L132.3 64.3 L133.3 66.1 L134.4 68.3 L135.5 70.6 L136.5 73.2 L137.6 76.1 L138.6 79.1 L139.7 82.4 L140.7 85.8 L141.8 89.4 L142.8 93.1 L143.8 97.0 L144.9 100.9 L146.0 105.0 L147.0 109.2 L148.0 113.4 L149.1 117.7 L150.2 122.0 L151.2 126.3 L152.3 130.6 L153.3 134.9 L154.3 139.2 L155.4 143.4 L156.4 147.6 L157.5 151.7 L158.6 155.8 L159.6 159.7 L160.7 163.6 L161.7 167.3 L162.8 171.0 L163.8 174.5 L164.8 177.9 L165.9 181.2 L167.0 184.3 L168.0 187.4 L169.1 190.3 L170.1 193.0 L171.2 195.7 L172.2 198.2 L173.3 200.5 L174.3 202.8 L175.3 204.9 L176.4 206.9 L177.4 208.7 L178.5 210.5 L179.6 212.1 L180.6 213.6 L181.7 215.1 L182.7 216.4 L183.8 217.6 L184.8 218.8 L185.8 219.8 L186.9 220.8 L187.9 221.7 L189.0 222.5 L190.1 223.2 L191.1 223.9 L192.2 224.5 L193.2 225.1 L194.3 225.6 L195.3 226.1 L196.3 226.5 L197.4 226.9 L198.4 227.3 L199.5 227.6 L200.6 227.8 L201.6 228.1 L202.7 228.3 L203.7 228.5 L204.8 228.7 L205.8 228.9 L206.8 229.0 L207.9 229.1 L208.9 229.2 L210.0 229.3 L211.1 229.4 L212.1 229.5 L213.2 229.6 L214.2 229.6 L215.2 229.7 L216.3 229.7 L217.3 229.8 L218.4 229.8 L219.4 229.8 L220.5 229.8 L221.6 229.9 L222.6 229.9 L223.6 229.9 L224.7 229.9 L225.8 229.9 L226.8 229.9 L227.8 230.0 L228.9 230.0 L229.9 230.0 L231.0 230.0 L232.0 230.0 L233.1 230.0 L234.2 230.0 L235.2 230.0 L236.3 230.0 L237.3 230.0 L238.3 230.0 L239.4 230.0 L240.5 230.0 L241.5 230.0 L242.6 230.0 L243.6 230.0 L244.7 230.0 L245.7 230.0 L246.8 230.0 L247.8 230.0 L248.9 230.0 L249.9 230.0 L250.9 230.0 L252.0 230.0 L253.1 230.0 L254.1 230.0 L255.2 230.0 L256.2 230.0 L257.3 230.0 L258.3 230.0 L259.3 230.0 L260.4 230.0 L261.4 230.0 L262.5 230.0 L263.6 230.0 L264.6 230.0 L265.7 230.0 L266.7 230.0 L267.8 230.0 L268.8 230.0 L269.8 230.0 L270.9 230.0 L271.9 230.0 L273.0 230.0 L274.1 230.0 L275.1 230.0 L276.1 230.0 L277.2 230.0 L278.3 230.0 L279.3 230.0 L280.3 230.0 L281.4 230.0 L282.4 230.0 L283.5 230.0 L284.6 230.0 L285.6 230.0 L286.6 230.0 L287.7 230.0 L288.8 230.0 L289.8 230.0 L290.9 230.0 L291.9 230.0 L292.9 230.0 L294.0 230.0 L295.1 230.0 L296.1 230.0 L297.2 230.0 L298.2 230.0 L299.3 230.0 L300.3 230.0 L301.4 230.0 L302.4 230.0 L303.4 230.0 L304.5 230.0 L305.6 230.0 L306.6 230.0 L307.7 230.0 L308.7 230.0 L309.8 230.0 L310.8 230.0 L311.8 230.0 L312.9 230.0 L313.9 230.0 L315.0 230.0 L316.1 230.0 L317.1 230.0 L318.2 230.0 L319.2 230.0 L320.3 230.0 L321.3 230.0 L322.3 230.0 L323.4 230.0 L324.4 230.0 L325.5 230.0 L326.6 230.0 L327.6 230.0 L328.6 230.0 L329.7 230.0 L330.8 230.0 L331.8 230.0 L332.8 230.0 L333.9 230.0 L334.9 230.0 L336.0 230.0 L337.1 230.0 L338.1 230.0 L339.1 230.0 L340.2 230.0 L341.3 230.0 L342.3 230.0 L343.4 230.0 L344.4 230.0 L345.4 230.0 L346.5 230.0 L347.6 230.0 L348.6 230.0 L349.6 230.0 L350.7 230.0 L351.8 230.0 L352.8 230.0 L353.9 230.0 L354.9 230.0 L355.9 230.0 L357.0 230.0 L358.1 230.0 L359.1 230.0 L360.1 230.0 L361.2 230.0 L362.3 230.0 L363.3 230.0 L364.4 230.0 L365.4 230.0 L366.4 230.0 L367.5 230.0 L368.6 230.0 L369.6 230.0 L370.6 230.0 L371.7 230.0 L372.8 230.0 L373.8 230.0 L374.9 230.0 L375.9 230.0 L376.9 230.0 L378.0 230.0 L379.1 230.0 L380.1 230.0 L381.1 230.0 L382.2 230.0 L383.3 230.0 L384.3 230.0 L385.4 230.0 L386.4 230.0 L387.4 230.0 L388.5 230.0 L389.6 230.0 L390.6 230.0 L391.6 230.0 L392.7 230.0 L393.8 230.0 L394.8 230.0 L395.9 230.0 L396.9 230.0 L397.9 230.0 L399.0 230.0 L400.1 230.0 L401.1 230.0 L402.1 230.0 L403.2 230.0 L404.3 230.0 L405.3 230.0 L406.4 230.0 L407.4 230.0 L408.4 230.0 L409.5 230.0 L410.6 230.0 L411.6 230.0 L412.6 230.0 L413.7 230.0 L414.8 230.0 L415.8 230.0 L416.9 230.0 L417.9 230.0 L418.9 230.0 L420.0 230.0" class="cq"/><line x1="0" y1="230" x2="420" y2="230" class="ax"/><line x1="42" y1="230" x2="42" y2="234" class="ax"/><text x="42" y="247" class="xs" text-anchor="middle">−4</text><line x1="126" y1="230" x2="126" y2="234" class="ax"/><text x="126" y="247" class="xs" text-anchor="middle">−2</text><line x1="210" y1="230" x2="210" y2="234" class="ax"/><text x="210" y="247" class="xs" text-anchor="middle">0</text><line x1="294" y1="230" x2="294" y2="234" class="ax"/><text x="294" y="247" class="xs" text-anchor="middle">2</text><line x1="378" y1="230" x2="378" y2="234" class="ax"/><text x="378" y="247" class="xs" text-anchor="middle">4</text><text x="0" y="268" class="sm">结果 q = N(−2, 0.6²)，正好是左边那个峰。</text><text x="0" y="288" class="sm">右峰 q 几乎为 0，没被罚；q 放出去的地方 p 都不小。</text><text x="0" y="312" class="tq">KL(q‖p) ≈ 0.510；换个方向 KL(p‖q) ≈ 8.2</text><text x="480" y="16" class="ph">最小化 KL(p‖q)：q 摊开盖住两个峰</text><path d="M480.0 230.0 L481.1 230.0 L482.1 230.0 L483.2 230.0 L484.2 230.0 L485.3 230.0 L486.3 230.0 L487.3 230.0 L488.4 230.0 L489.4 230.0 L490.5 230.0 L491.6 230.0 L492.6 230.0 L493.6 230.0 L494.7 230.0 L495.8 230.0 L496.8 230.0 L497.9 230.0 L498.9 230.0 L499.9 230.0 L501.0 230.0 L502.1 230.0 L503.1 230.0 L504.1 230.0 L505.2 230.0 L506.3 230.0 L507.3 230.0 L508.3 229.9 L509.4 229.9 L510.4 229.9 L511.5 229.9 L512.6 229.9 L513.6 229.9 L514.6 229.9 L515.7 229.8 L516.8 229.8 L517.8 229.8 L518.9 229.7 L519.9 229.7 L520.9 229.7 L522.0 229.6 L523.0 229.5 L524.1 229.5 L525.1 229.4 L526.2 229.3 L527.3 229.2 L528.3 229.1 L529.4 229.0 L530.4 228.9 L531.5 228.7 L532.5 228.5 L533.5 228.4 L534.6 228.1 L535.6 227.9 L536.7 227.7 L537.8 227.4 L538.8 227.1 L539.9 226.7 L540.9 226.4 L542.0 225.9 L543.0 225.5 L544.0 225.0 L545.1 224.5 L546.1 223.9 L547.2 223.3 L548.3 222.6 L549.3 221.8 L550.4 221.0 L551.4 220.2 L552.5 219.3 L553.5 218.3 L554.5 217.2 L555.6 216.1 L556.6 214.9 L557.7 213.7 L558.8 212.3 L559.8 210.9 L560.9 209.4 L561.9 207.8 L563.0 206.2 L564.0 204.4 L565.0 202.6 L566.1 200.7 L567.1 198.7 L568.2 196.7 L569.3 194.6 L570.3 192.4 L571.4 190.1 L572.4 187.8 L573.5 185.5 L574.5 183.0 L575.5 180.6 L576.6 178.1 L577.6 175.5 L578.7 173.0 L579.8 170.4 L580.8 167.8 L581.9 165.2 L582.9 162.6 L584.0 160.0 L585.0 157.5 L586.0 155.0 L587.1 152.6 L588.1 150.2 L589.2 147.9 L590.3 145.6 L591.3 143.5 L592.4 141.4 L593.4 139.5 L594.5 137.6 L595.5 135.9 L596.5 134.4 L597.6 133.0 L598.6 131.7 L599.7 130.6 L600.8 129.6 L601.8 128.8 L602.9 128.2 L603.9 127.8 L605.0 127.5 L606.0 127.4 L607.0 127.5 L608.1 127.8 L609.1 128.2 L610.2 128.8 L611.3 129.6 L612.3 130.6 L613.4 131.7 L614.4 133.0 L615.5 134.4 L616.5 135.9 L617.5 137.6 L618.6 139.5 L619.6 141.4 L620.7 143.5 L621.8 145.6 L622.8 147.9 L623.9 150.2 L624.9 152.6 L626.0 155.0 L627.0 157.5 L628.0 160.0 L629.1 162.6 L630.1 165.2 L631.2 167.8 L632.3 170.4 L633.3 173.0 L634.4 175.5 L635.4 178.1 L636.5 180.6 L637.5 183.0 L638.5 185.5 L639.6 187.8 L640.6 190.1 L641.7 192.4 L642.8 194.6 L643.8 196.7 L644.9 198.7 L645.9 200.7 L647.0 202.6 L648.0 204.4 L649.0 206.2 L650.1 207.8 L651.1 209.4 L652.2 210.9 L653.3 212.3 L654.3 213.7 L655.4 214.9 L656.4 216.1 L657.5 217.2 L658.5 218.3 L659.5 219.3 L660.6 220.2 L661.6 221.0 L662.7 221.8 L663.8 222.6 L664.8 223.3 L665.9 223.9 L666.9 224.5 L668.0 225.0 L669.0 225.5 L670.0 225.9 L671.1 226.3 L672.1 226.7 L673.2 227.0 L674.3 227.4 L675.3 227.6 L676.4 227.9 L677.4 228.1 L678.5 228.3 L679.5 228.5 L680.5 228.6 L681.6 228.8 L682.6 228.9 L683.7 229.0 L684.8 229.1 L685.8 229.2 L686.9 229.2 L687.9 229.3 L689.0 229.3 L690.0 229.3 L691.0 229.4 L692.1 229.4 L693.2 229.3 L694.2 229.3 L695.3 229.3 L696.3 229.2 L697.4 229.2 L698.4 229.1 L699.5 229.0 L700.5 228.9 L701.6 228.8 L702.6 228.7 L703.6 228.6 L704.7 228.4 L705.8 228.2 L706.8 228.0 L707.9 227.8 L708.9 227.5 L710.0 227.3 L711.0 227.0 L712.0 226.7 L713.1 226.3 L714.1 225.9 L715.2 225.5 L716.3 225.0 L717.3 224.6 L718.4 224.0 L719.4 223.5 L720.5 222.8 L721.5 222.2 L722.5 221.5 L723.6 220.7 L724.6 219.9 L725.7 219.1 L726.8 218.2 L727.8 217.3 L728.9 216.3 L729.9 215.2 L730.9 214.1 L732.0 212.9 L733.0 211.7 L734.1 210.5 L735.1 209.2 L736.2 207.8 L737.3 206.4 L738.3 204.9 L739.3 203.4 L740.4 201.9 L741.5 200.3 L742.5 198.7 L743.5 197.0 L744.6 195.4 L745.7 193.7 L746.7 192.0 L747.8 190.2 L748.8 188.5 L749.8 186.8 L750.9 185.1 L752.0 183.4 L753.0 181.7 L754.0 180.0 L755.1 178.4 L756.1 176.8 L757.2 175.2 L758.3 173.7 L759.3 172.3 L760.3 170.9 L761.4 169.6 L762.5 168.4 L763.5 167.3 L764.5 166.3 L765.6 165.3 L766.6 164.5 L767.7 163.7 L768.8 163.1 L769.8 162.6 L770.9 162.1 L771.9 161.8 L773.0 161.7 L774.0 161.6 L775.0 161.7 L776.1 161.8 L777.2 162.1 L778.2 162.6 L779.3 163.1 L780.3 163.7 L781.4 164.5 L782.4 165.3 L783.5 166.3 L784.5 167.3 L785.5 168.4 L786.6 169.6 L787.7 170.9 L788.7 172.3 L789.8 173.7 L790.8 175.2 L791.8 176.8 L792.9 178.4 L794.0 180.0 L795.0 181.7 L796.0 183.4 L797.1 185.1 L798.2 186.8 L799.2 188.5 L800.3 190.2 L801.3 192.0 L802.3 193.7 L803.4 195.4 L804.5 197.0 L805.5 198.7 L806.5 200.3 L807.6 201.9 L808.6 203.4 L809.7 204.9 L810.8 206.4 L811.8 207.8 L812.8 209.2 L813.9 210.5 L815.0 211.7 L816.0 212.9 L817.0 214.1 L818.1 215.2 L819.1 216.3 L820.2 217.3 L821.3 218.2 L822.3 219.1 L823.4 219.9 L824.4 220.7 L825.5 221.5 L826.5 222.2 L827.5 222.8 L828.6 223.5 L829.6 224.0 L830.7 224.6 L831.8 225.1 L832.8 225.5 L833.9 225.9 L834.9 226.3 L836.0 226.7 L837.0 227.0 L838.0 227.3 L839.1 227.6 L840.1 227.8 L841.2 228.0 L842.3 228.3 L843.3 228.4 L844.4 228.6 L845.4 228.8 L846.5 228.9 L847.5 229.0 L848.5 229.1 L849.6 229.2 L850.6 229.3 L851.7 229.4 L852.8 229.5 L853.8 229.5 L854.9 229.6 L855.9 229.7 L857.0 229.7 L858.0 229.7 L859.0 229.8 L860.1 229.8 L861.1 229.8 L862.2 229.9 L863.3 229.9 L864.3 229.9 L865.4 229.9 L866.4 229.9 L867.5 229.9 L868.5 229.9 L869.5 229.9 L870.6 230.0 L871.6 230.0 L872.7 230.0 L873.8 230.0 L874.8 230.0 L875.9 230.0 L876.9 230.0 L878.0 230.0 L879.0 230.0 L880.0 230.0 L881.1 230.0 L882.1 230.0 L883.2 230.0 L884.3 230.0 L885.3 230.0 L886.4 230.0 L887.4 230.0 L888.5 230.0 L889.5 230.0 L890.5 230.0 L891.6 230.0 L892.6 230.0 L893.7 230.0 L894.8 230.0 L895.8 230.0 L896.9 230.0 L897.9 230.0 L899.0 230.0 L900.0 230.0 L900.0 230.0 L480.0 230.0 Z" class="fp"/><path d="M480.0 226.0 L481.1 225.9 L482.1 225.7 L483.2 225.6 L484.2 225.5 L485.3 225.4 L486.3 225.3 L487.3 225.1 L488.4 225.0 L489.4 224.9 L490.5 224.7 L491.6 224.6 L492.6 224.5 L493.6 224.3 L494.7 224.2 L495.8 224.0 L496.8 223.9 L497.9 223.7 L498.9 223.6 L499.9 223.4 L501.0 223.2 L502.1 223.1 L503.1 222.9 L504.1 222.7 L505.2 222.5 L506.3 222.4 L507.3 222.2 L508.3 222.0 L509.4 221.8 L510.4 221.6 L511.5 221.4 L512.6 221.2 L513.6 221.0 L514.6 220.8 L515.7 220.6 L516.8 220.4 L517.8 220.2 L518.9 220.0 L519.9 219.8 L520.9 219.5 L522.0 219.3 L523.0 219.1 L524.1 218.8 L525.1 218.6 L526.2 218.4 L527.3 218.1 L528.3 217.9 L529.4 217.6 L530.4 217.4 L531.5 217.1 L532.5 216.8 L533.5 216.6 L534.6 216.3 L535.6 216.0 L536.7 215.8 L537.8 215.5 L538.8 215.2 L539.9 214.9 L540.9 214.6 L542.0 214.3 L543.0 214.1 L544.0 213.8 L545.1 213.5 L546.1 213.2 L547.2 212.9 L548.3 212.5 L549.3 212.2 L550.4 211.9 L551.4 211.6 L552.5 211.3 L553.5 211.0 L554.5 210.6 L555.6 210.3 L556.6 210.0 L557.7 209.7 L558.8 209.3 L559.8 209.0 L560.9 208.6 L561.9 208.3 L563.0 208.0 L564.0 207.6 L565.0 207.3 L566.1 206.9 L567.1 206.6 L568.2 206.2 L569.3 205.9 L570.3 205.5 L571.4 205.1 L572.4 204.8 L573.5 204.4 L574.5 204.1 L575.5 203.7 L576.6 203.3 L577.6 203.0 L578.7 202.6 L579.8 202.2 L580.8 201.9 L581.9 201.5 L582.9 201.1 L584.0 200.8 L585.0 200.4 L586.0 200.0 L587.1 199.6 L588.1 199.3 L589.2 198.9 L590.3 198.5 L591.3 198.2 L592.4 197.8 L593.4 197.4 L594.5 197.1 L595.5 196.7 L596.5 196.3 L597.6 196.0 L598.6 195.6 L599.7 195.2 L600.8 194.9 L601.8 194.5 L602.9 194.2 L603.9 193.8 L605.0 193.4 L606.0 193.1 L607.0 192.7 L608.1 192.4 L609.1 192.0 L610.2 191.7 L611.3 191.4 L612.3 191.0 L613.4 190.7 L614.4 190.4 L615.5 190.0 L616.5 189.7 L617.5 189.4 L618.6 189.1 L619.6 188.8 L620.7 188.4 L621.8 188.1 L622.8 187.8 L623.9 187.5 L624.9 187.2 L626.0 186.9 L627.0 186.7 L628.0 186.4 L629.1 186.1 L630.1 185.8 L631.2 185.6 L632.3 185.3 L633.3 185.0 L634.4 184.8 L635.4 184.5 L636.5 184.3 L637.5 184.1 L638.5 183.8 L639.6 183.6 L640.6 183.4 L641.7 183.2 L642.8 183.0 L643.8 182.8 L644.9 182.6 L645.9 182.4 L647.0 182.2 L648.0 182.0 L649.0 181.9 L650.1 181.7 L651.1 181.6 L652.2 181.4 L653.3 181.3 L654.3 181.1 L655.4 181.0 L656.4 180.9 L657.5 180.8 L658.5 180.7 L659.5 180.6 L660.6 180.5 L661.6 180.4 L662.7 180.3 L663.8 180.2 L664.8 180.2 L665.9 180.1 L666.9 180.1 L668.0 180.0 L669.0 180.0 L670.0 180.0 L671.1 180.0 L672.1 179.9 L673.2 179.9 L674.3 179.9 L675.3 180.0 L676.4 180.0 L677.4 180.0 L678.5 180.0 L679.5 180.1 L680.5 180.1 L681.6 180.2 L682.6 180.2 L683.7 180.3 L684.8 180.4 L685.8 180.5 L686.9 180.6 L687.9 180.7 L689.0 180.8 L690.0 180.9 L691.0 181.0 L692.1 181.1 L693.2 181.3 L694.2 181.4 L695.3 181.6 L696.3 181.7 L697.4 181.9 L698.4 182.0 L699.5 182.2 L700.5 182.4 L701.6 182.6 L702.6 182.8 L703.6 183.0 L704.7 183.2 L705.8 183.4 L706.8 183.6 L707.9 183.8 L708.9 184.1 L710.0 184.3 L711.0 184.5 L712.0 184.8 L713.1 185.0 L714.1 185.3 L715.2 185.6 L716.3 185.8 L717.3 186.1 L718.4 186.4 L719.4 186.7 L720.5 186.9 L721.5 187.2 L722.5 187.5 L723.6 187.8 L724.6 188.1 L725.7 188.4 L726.8 188.8 L727.8 189.1 L728.9 189.4 L729.9 189.7 L730.9 190.0 L732.0 190.4 L733.0 190.7 L734.1 191.0 L735.1 191.4 L736.2 191.7 L737.3 192.0 L738.3 192.4 L739.3 192.7 L740.4 193.1 L741.5 193.4 L742.5 193.8 L743.5 194.2 L744.6 194.5 L745.7 194.9 L746.7 195.2 L747.8 195.6 L748.8 196.0 L749.8 196.3 L750.9 196.7 L752.0 197.1 L753.0 197.4 L754.0 197.8 L755.1 198.2 L756.1 198.5 L757.2 198.9 L758.3 199.3 L759.3 199.6 L760.3 200.0 L761.4 200.4 L762.5 200.8 L763.5 201.1 L764.5 201.5 L765.6 201.9 L766.6 202.2 L767.7 202.6 L768.8 203.0 L769.8 203.3 L770.9 203.7 L771.9 204.1 L773.0 204.4 L774.0 204.8 L775.0 205.1 L776.1 205.5 L777.2 205.9 L778.2 206.2 L779.3 206.6 L780.3 206.9 L781.4 207.3 L782.4 207.6 L783.5 208.0 L784.5 208.3 L785.5 208.6 L786.6 209.0 L787.7 209.3 L788.7 209.7 L789.8 210.0 L790.8 210.3 L791.8 210.6 L792.9 211.0 L794.0 211.3 L795.0 211.6 L796.0 211.9 L797.1 212.2 L798.2 212.5 L799.2 212.9 L800.3 213.2 L801.3 213.5 L802.3 213.8 L803.4 214.1 L804.5 214.3 L805.5 214.6 L806.5 214.9 L807.6 215.2 L808.6 215.5 L809.7 215.8 L810.8 216.0 L811.8 216.3 L812.8 216.6 L813.9 216.8 L815.0 217.1 L816.0 217.4 L817.0 217.6 L818.1 217.9 L819.1 218.1 L820.2 218.4 L821.3 218.6 L822.3 218.8 L823.4 219.1 L824.4 219.3 L825.5 219.5 L826.5 219.8 L827.5 220.0 L828.6 220.2 L829.6 220.4 L830.7 220.6 L831.8 220.8 L832.8 221.0 L833.9 221.2 L834.9 221.4 L836.0 221.6 L837.0 221.8 L838.0 222.0 L839.1 222.2 L840.1 222.4 L841.2 222.5 L842.3 222.7 L843.3 222.9 L844.4 223.1 L845.4 223.2 L846.5 223.4 L847.5 223.6 L848.5 223.7 L849.6 223.9 L850.6 224.0 L851.7 224.2 L852.8 224.3 L853.8 224.5 L854.9 224.6 L855.9 224.7 L857.0 224.9 L858.0 225.0 L859.0 225.1 L860.1 225.3 L861.1 225.4 L862.2 225.5 L863.3 225.6 L864.3 225.7 L865.4 225.9 L866.4 226.0 L867.5 226.1 L868.5 226.2 L869.5 226.3 L870.6 226.4 L871.6 226.5 L872.7 226.6 L873.8 226.7 L874.8 226.8 L875.9 226.9 L876.9 227.0 L878.0 227.0 L879.0 227.1 L880.0 227.2 L881.1 227.3 L882.1 227.4 L883.2 227.4 L884.3 227.5 L885.3 227.6 L886.4 227.7 L887.4 227.7 L888.5 227.8 L889.5 227.9 L890.5 227.9 L891.6 228.0 L892.6 228.1 L893.7 228.1 L894.8 228.2 L895.8 228.2 L896.9 228.3 L897.9 228.3 L899.0 228.4 L900.0 228.4" class="cq"/><line x1="480" y1="230" x2="900" y2="230" class="ax"/><line x1="522" y1="230" x2="522" y2="234" class="ax"/><text x="522" y="247" class="xs" text-anchor="middle">−4</text><line x1="606" y1="230" x2="606" y2="234" class="ax"/><text x="606" y="247" class="xs" text-anchor="middle">−2</text><line x1="690" y1="230" x2="690" y2="234" class="ax"/><text x="690" y="247" class="xs" text-anchor="middle">0</text><line x1="774" y1="230" x2="774" y2="234" class="ax"/><text x="774" y="247" class="xs" text-anchor="middle">2</text><line x1="858" y1="230" x2="858" y2="234" class="ax"/><text x="858" y="247" class="xs" text-anchor="middle">4</text><text x="480" y="268" class="sm">结果 q = N(−0.4, 2.05²)，均值方差和 p 一样。</text><text x="480" y="288" class="sm">两峰之间 p 很小，q 却很大，这一方向不罚。</text><text x="480" y="312" class="tq">KL(p‖q) ≈ 0.557；换个方向 KL(q‖p) ≈ 1.28</text><text x="310.8" y="142.57142857142856" class="xs">p 的右峰</text><text x="96.6" y="60.28571428571428" class="tq" text-anchor="end">q</text><text x="799.2" y="137.42857142857142" class="xs">p（灰色）</text><text x="673.2" y="173.42857142857142" class="tq" text-anchor="middle">q</text>
+</svg>
+<figcaption>p = 0.6·N(−2, 0.6<sup>2</sup>) + 0.4·N(2, 0.6<sup>2</sup>)。左：最小化 KL(q‖p)，q 落在较重的那个峰上，KL ≈ 0.510，正好是 ln(1/0.6)。右：最小化 KL(p‖q)，q 的均值、方差和 p 相同，横跨两峰。数值都由数值积分算出。</figcaption></figure>
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>为什么会这样</p>
+      <p>KL(q ‖ p) 罚的是 q 放错地方：p 几乎为 0 的地方 q 还有概率，log(q/p) 会非常大。所以 q 宁可缩在 p 的一个峰里，漏掉另一个峰也无所谓，这叫寻找众数 (Mode-Seeking)。</p>
+      <p>KL(p ‖ q) 罚的是 q 漏掉地方：p 有概率的地方 q 不能太小，q 就会摊开盖住所有峰，叫覆盖质量 (Mass-Covering)。代价是两峰之间那片 p 几乎为 0 的地方，q 也给了不少概率。</p>
+      <p>放到变分自编码器里：编码器给出的高斯往往比真实后验更窄。后验如果有几种可能的解释，q 通常只抓住其中一种。</p></div>
+    
+    
+  </section>
+<section class="aisec" id="kl-gauss">
+    <h2><span class="n">7</span><span>两个高斯之间的 KL 有解析解</span></h2>
+    <p>q 和 p 都是高斯时，KL 可以直接积出来，不用采样。先看一维，设 <span class="m"><i>q</i> = <i>N</i>(<i>μ</i><sub>1</sub>, <i>σ</i><sub>1</sub><sup>2</sup>)</span>，<span class="m"><i>p</i> = <i>N</i>(<i>μ</i><sub>2</sub>, <i>σ</i><sub>2</sub><sup>2</sup>)</span>。高斯密度取对数：</p>
+    <div class="deriv"><div><span class="df"><span class="m">log <i>N</i>(<i>z</i>; <i>μ</i>, <i>σ</i><sup>2</sup>) = −½ log(2<i>π</i><i>σ</i><sup>2</sup>) − (<i>z</i> − <i>μ</i>)<sup>2</sup> / (2<i>σ</i><sup>2</sup>)</span></span></div></div>
+    <p>代进 <span class="m">KL = <i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) − log <i>p</i>(<i>z</i>)]</span>，只需要两个期望：<span class="m"><i>E</i><sub><i>q</i></sub>[(<i>z</i> − <i>μ</i><sub>1</sub>)<sup>2</sup>] = <i>σ</i><sub>1</sub><sup>2</sup></span>，这是方差的定义；<span class="m"><i>E</i><sub><i>q</i></sub>[(<i>z</i> − <i>μ</i><sub>2</sub>)<sup>2</sup>] = <i>σ</i><sub>1</sub><sup>2</sup> + (<i>μ</i><sub>1</sub> − <i>μ</i><sub>2</sub>)<sup>2</sup></span>，离另一个中心远了一段，多出均值差的平方。</p>
+    <div class="deriv"><div><span class="df"><span class="m">KL(<i>q</i> ‖ <i>p</i>) = <i>E</i><sub><i>q</i></sub>[−½ log(2<i>π</i><i>σ</i><sub>1</sub><sup>2</sup>) − (<i>z</i> − <i>μ</i><sub>1</sub>)<sup>2</sup>/(2<i>σ</i><sub>1</sub><sup>2</sup>) + ½ log(2<i>π</i><i>σ</i><sub>2</sub><sup>2</sup>) + (<i>z</i> − <i>μ</i><sub>2</sub>)<sup>2</sup>/(2<i>σ</i><sub>2</sub><sup>2</sup>)]</span></span><span class="dc">两个对数密度相减</span></div><div><span class="df"><span class="m">= log(<i>σ</i><sub>2</sub>/<i>σ</i><sub>1</sub>) − ½ + [<i>σ</i><sub>1</sub><sup>2</sup> + (<i>μ</i><sub>1</sub> − <i>μ</i><sub>2</sub>)<sup>2</sup>] / (2<i>σ</i><sub>2</sub><sup>2</sup>)</span></span><span class="dc">代入两个期望</span></div></div>
+    <p>变分自编码器里 p 是标准正态 N(0, 1)，代入 <span class="m"><i>μ</i><sub>2</sub> = 0</span>、<span class="m"><i>σ</i><sub>2</sub> = 1</span>，μ、σ 换成编码器的输出：</p>
+    <div class="deriv"><div><span class="df"><span class="m">KL(<i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>) ‖ <i>N</i>(0, 1)) = ½ (<i>μ</i><sup>2</sup> + <i>σ</i><sup>2</sup> − 1 − log <i>σ</i><sup>2</sup>)</span></span><span class="dc">一维</span></div><div><span class="df"><span class="m">KL(<i>N</i>(<i>μ</i>, diag(<i>σ</i><sup>2</sup>)) ‖ <i>N</i>(0, <i>I</i>)) = ½ Σ<sub><i>j</i></sub> (<i>μ</i><sub><i>j</i></sub><sup>2</sup> + <i>σ</i><sub><i>j</i></sub><sup>2</sup> − 1 − log <i>σ</i><sub><i>j</i></sub><sup>2</sup>)</span></span><span class="dc">z 有 d 维、各维独立，逐维相加</span></div></div>
+    
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>代几个数</p>
+      <p>上面那张图里 q = N(0, 1)、p = N(1, 1.5<sup>2</sup>)：ln 1.5 − 0.5 + (1 + 1) / 4.5 ≈ 0.350，和数值积分一致。</p>
+      <p>μ = 0.5、σ = 0.8：½ × (0.25 + 0.64 − 1 + 0.446) ≈ 0.168。μ = 0、σ = 1：0，正好就是先验。</p>
+      <p>对 μ 求导是 μ，对 σ 求导是 σ − 1/σ。梯度下降把 μ 往 0 推；σ &lt; 1 时导数为负，σ 会变大，σ &gt; 1 时为正，σ 会变小。CS231n 说「先验项希望均值都是 0、标准差都是 1」，指的就是这两个导数。</p>
+      <p>σ 趋于 0 时 −log σ<sup>2</sup> 趋于正无穷。编码器想把每张图的 z 压成一个确定的点，KL 项就会无限大，这是它和重建项拉扯的地方。</p></div>
+    <div class="note"><p><span class="lbl">补充</span>实现时编码器一般输出 log σ<sup>2</sup>，不直接输出 σ：网络的输出可正可负，log σ<sup>2</sup> 取任何实数都对应一个合法的方差，KL 公式里本来也要用 log σ<sup>2</sup>。</p></div>
+    
+  </section>
+<section class="aisec" id="kl-mc">
+    <h2><span class="n">8</span><span>积不出来就采样：蒙特卡洛估计与重参数化</span></h2>
+    <p>重建项 <span class="m"><i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)]</span> 里有解码器，没有解析解。这时用<b>蒙特卡洛估计 (Monte Carlo Estimation)</b>：从 q 里抽 S 个样本，取平均。</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>(<i>z</i>)] ≈ (1/<i>S</i>) Σ<sub><i>s</i>=1</sub><sup><i>S</i></sup> <i>f</i>(<i>z</i><sup>(<i>s</i>)</sup>),   <i>z</i><sup>(<i>s</i>)</sup> ∼ <i>q</i></span></span><span class="dc">样本平均</span></div></div>
+    <p>这个估计没有偏差，平均起来等于真值，只是带噪声，样本越多噪声越小。比如 z ∼ N(0, 1)、f(z) = z<sup>2</sup>，真值是 1；在一次模拟里，抽 10 个样本估出 0.72，抽 100 个估出 1.29，抽 10000 个估出 0.998。</p>
+    <p>变分自编码器训练时每张图每一步只抽一个 z（S = 1）。单次估计噪声很大，但每一步换图、换样本，几万步平均下来就够了。原论文第 2.3 节说批量取 100 时，每个样本抽一次就行。</p>
+    <p>还有一个问题：训练要对 φ 求梯度，可期望 <span class="m"><i>E</i><sub><i>q</i><sub><i>φ</i></sub></sub></span> 的分布本身依赖 φ，「抽一个 z」这个动作没法求导。<b>重参数化技巧 (Reparameterization Trick)</b> 把随机性挪到外面：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>ε</i> ∼ <i>N</i>(0, 1),   <i>z</i> = <i>μ</i> + <i>σ</i> · <i>ε</i></span></span><span class="dc">先抽一个和 φ 无关的 ε，再用编码器的输出变换它</span></div><div><span class="df"><span class="m"><i>E</i><sub><i>q</i><sub><i>φ</i></sub></sub>[<i>f</i>(<i>z</i>)] = <i>E</i><sub><i>ε</i></sub>[<i>f</i>(<i>μ</i> + <i>σ</i><i>ε</i>)]</span></span><span class="dc">期望改按 ε 取，分布里不再有 φ</span></div><div><span class="df"><span class="m">∇ <i>E</i><sub><i>ε</i></sub>[<i>f</i>(<i>μ</i> + <i>σ</i><i>ε</i>)] = <i>E</i><sub><i>ε</i></sub>[∇ <i>f</i>(<i>μ</i> + <i>σ</i><i>ε</i>)]</span></span><span class="dc">梯度可以挪进期望里，采样以后照常反向传播</span></div></div>
+    
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>验证一下</p>
+      <p>取 f(z) = z<sup>2</sup>，q = N(μ, σ<sup>2</sup>)。精确结果是 <span class="m"><i>E</i>[<i>z</i><sup>2</sup>] = <i>μ</i><sup>2</sup> + <i>σ</i><sup>2</sup></span>，对 μ 的导数 2μ，对 σ 的导数 2σ。</p>
+      <p>重参数化以后，每个样本的梯度是 <span class="m">∂<i>f</i>/∂<i>μ</i> = 2(<i>μ</i> + <i>σ</i><i>ε</i>)</span>、<span class="m">∂<i>f</i>/∂<i>σ</i> = 2(<i>μ</i> + <i>σ</i><i>ε</i>)<i>ε</i></span>。μ = 0.5、σ = 0.8 时抽一百万个 ε 取平均，得到 1.002 和 1.603，精确值是 1 和 1.6。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">Auto-Encoding Variational Bayes（第 2.3、2.4 节） ↗</a></p>
+  </section>
+<section class="aisec" id="kl-map">
+    <h2><span class="n">9</span><span>这些概念在变分自编码器里用在哪</span></h2>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>在变分自编码器里</th><th>见</th></tr></thead><tbody><tr><td>贝叶斯公式、证据的积分</td><td>后验算不出来，所以要加一个编码器去近似</td><td><a class="ilink" href="#l13-s5">CS231n：边缘化行不通</a>、<a class="ilink" href="#l13-s6">贝叶斯公式</a></td></tr><tr><td>期望的线性、常数的期望</td><td>把 log p(x) 拆成三项、套上对 z 的期望</td><td><a class="ilink" href="#l13-s8">CS231n：推导</a>、<a class="ilink" href="#v-s7">视频：展开 KL</a></td></tr><tr><td>KL ≥ 0</td><td>扔掉算不出的那项得到下界；ELBO 不超过 log p(x)</td><td><a class="ilink" href="#l13-s10">CS231n：扔掉第三项</a>、<a class="ilink" href="#v-s8">视频：最大化 ELBO</a></td></tr><tr><td>KL(q ‖ p) 的方向</td><td>只有 q 在前才算得动；q 偏窄</td><td><a class="ilink" href="#v-s6">视频：用 KL 量最近</a></td></tr><tr><td>两个高斯的 KL</td><td>KL 损失项的公式</td><td><a class="ilink" href="#l13-s11">CS231n：训练一步</a></td></tr><tr><td>蒙特卡洛、重参数化</td><td>重建项每步采一个 z，梯度传回编码器</td><td><a class="ilink" href="#l13-s11">CS231n：训练一步</a>、<a class="ilink" href="#v-s12">视频：重新采样</a></td></tr></tbody></table></div>
+    
+    
+    
+    
+  </section>
+  </article>
+</div>
+</div>
+<div class="view" id="view-cs231n">
+<div class="intro"><p>Justin Johnson 讲变分自编码器只用了 27 分钟，推导集中在一张幻灯片上，几个关键步骤一句话带过。下面按他的顺序走一遍：先说为什么要变分自编码器、它和自编码器什么关系，再推证据下界，最后讲训练流程和两项损失。每一步课件上的式子都写全了，课上没讲的推导、性质和数值例子补在「注」里。</p><p>他的出发点是<b>最大似然</b>：想最大化 log p(x)，算不出来，一路绕到一个能算的下界。这和白板推导视频方向相反，两者的关系在「两种讲法对照」tab 里专门说。KL 散度、期望这些基础在第一个 tab。</p></div>
+  <div class="eptools"><span>2 段 · 点标题展开</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <details class="ep" id="l13" data-bv="BV1b1agz5ERC" data-p="13" data-start="2084">
+  <summary>
+    <span class="no">13</span>
+    <span class="tt"><b>变分自编码器：从最大似然推到证据下界</b><em>CS231n 第 13 讲 · Justin Johnson · 课堂 2025-05-15 · 这一段 34:44–1:12:20</em><span class="hook">自编码器为什么不能生成；把 z 积掉行不通、贝叶斯公式也行不通，于是加一个编码器去近似后验；log p(x) 拆成三项，扔掉算不出的 KL 得到 ELBO；训练流程和两项损失的拉扯。</span></span>
+    <span class="side"><span class="chip">Justin Johnson</span><span class="len">34:44–1:12:20</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">第 13 讲前半讲生成模型的总框架和自回归模型，这里从 34:44 讲最大似然开始截，到下课。中间讲自回归模型的六分钟略过，只在注里留了一个相关的问答：变分自编码器是拿「放弃精确密度」去换隐变量，先要知道精确密度是怎么来的。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1b1agz5ERC?p=13&amp;t=2084" target="_blank" rel="noreferrer">B 站 P13 ↗</a><a href="https://www.youtube.com/watch?v=zbHXQRUNlH0&amp;t=2084" target="_blank" rel="noreferrer">YouTube ↗</a><a href="https://xslaoxu.cn/learn-ai/cs231n/#l13" target="_blank" rel="noreferrer">CS231n 页第 13 讲 ↗</a></p>
+      <p class="mats"><span class="lbl">资料</span><a href="https://cs231n.stanford.edu/slides/2025/lecture_13.pdf" target="_blank" rel="noreferrer">2025 课件</a></p>
+      <section class="sec" id="l13-s0">
+      <h4><button class="ts" type="button" data-t="2084">34:44</button><span>出发点：最大似然</span></h4>
+      <p>生成模型的目标是学一个分布 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>，让训练数据在它下面尽量可能。θ 是神经网络的权重，网络输入一张图，输出它的概率密度。<b>最大似然估计 (Maximum Likelihood Estimation)</b> 就是找让训练数据概率最大的 θ。</p>
+      <p>训练数据 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span> 假设独立同分布，联合概率是各自概率的乘积。乘积不好优化，取对数变成求和，log 单调，最大值的位置不变：</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>θ</i>* = <i>a</i><i>r</i><i>g</i><i>m</i><i>a</i><i>x</i><sub><i>θ</i></sub> Π<sub><i>i</i></sub> <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc">让整个数据集的概率最大</span></div><div><span class="df"><span class="m">= <i>a</i><i>r</i><i>g</i><i>m</i><i>a</i><i>x</i><sub><i>θ</i></sub> Σ<sub><i>i</i></sub> log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc">取对数，乘积变求和</span></div></div>
+      <p>这就是后面所有推导的目标：让每张训练图的 log p(x) 变大。自回归模型能精确算出 log p(x)，直接最大化；变分自编码器算不出来，只能最大化它的一个下界。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-2155.jpg" alt="最大似然估计：用神经网络表示密度，找使训练数据最可能出现的权重" loading="lazy"><figcaption><button class="ts" type="button" data-t="2155">35:55</button>最大似然估计：用神经网络表示密度，找使训练数据最可能出现的权重</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c13-2314.jpg" alt="独立同分布假设把联合概率拆成乘积，取对数变成求和" loading="lazy"><figcaption><button class="ts" type="button" data-t="2314">38:34</button>独立同分布假设把联合概率拆成乘积，取对数变成求和</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="l13-s1">
+      <h4><button class="ts" type="button" data-t="2698">44:58</button><span>放弃精确密度，换来隐向量</span></h4>
+      <p>自回归模型把数据拆成序列，用概率的链式法则逐个预测，log p(x) 是精确的。变分自编码器仍然是显式密度方法，但它算的只是一个近似，准确说是真实密度的下界。</p>
+      <p>有精确的方法，为什么要换成近似的。他的回答是：换来的东西是<b>隐向量 (Latent Vector)</b>。训练过程中，每张图自然得到一个表示它的向量，这些向量本身就有用，值得拿精确密度去换。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>课上这里插了一个问答：自回归为什么要拆成序列。V 个词的词表上，长度为 T 的序列有 V<sup>T</sup> 种，直接建模联合分布，参数量随长度指数增长；拆成「已知前面预测下一个」，每一步只要一个 V 维的分布。实际都在对数空间里算，数值更稳。</p></div>
+    </section>
+<section class="sec" id="l13-s2">
+      <h4><button class="ts" type="button" data-t="2881">48:01</button><span>自编码器：通过瓶颈学特征</span></h4>
+      <p>先去掉「变分」，讲普通的<b>自编码器 (Autoencoder)</b>。它是无监督方法：编码器从输入 x 提取特征 z，希望 z 装着有用的信息，比如图里有什么物体、有几个、什么颜色。编码器可以是多层感知机、卷积网络、Transformer，什么结构都行。</p>
+      <p>没有标签怎么训练。最简单的办法是让模型重建输入：再接一个解码器，输入 z、输出 x̂，损失是 x̂ 和 x 的 L2 距离 <span class="m">‖<i>x̂</i> − <i>x</i>‖<sup>2</sup></span>。他说这是「史上最蠢的损失函数」，等于在训练一个恒等函数，而恒等函数谁都会写。</p>
+      <p>关键在于加约束，最常见的是<b>瓶颈 (Bottleneck)</b>：z 比 x 小得多。1024×1024 的彩色图有三百多万个数，z 可能只有 128 维。要把三百万个数挤过 128 维再还原回来，模型只能学到数据里真正的结构。</p>
+      <p>训练完以后，自监督的用法是扔掉解码器，拿编码器给下游任务初始化，和上一讲讲的自监督学习一样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-2925.jpg" alt="自编码器：编码器提取特征 z，解码器重建 x̂，损失是两者的 L2 距离，不需要任何标签" loading="lazy"><figcaption><button class="ts" type="button" data-t="2925">48:45</button>自编码器：编码器提取特征 z，解码器重建 x̂，损失是两者的 L2 距离，不需要任何标签</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c13-3039.jpg" alt="瓶颈：z 比 x 小得多，迫使模型学到数据的结构" loading="lazy"><figcaption><button class="ts" type="button" data-t="3039">50:39</button>瓶颈：z 比 x 小得多，迫使模型学到数据的结构</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="l13-s3">
+      <h4><button class="ts" type="button" data-t="3064">51:04</button><span>想生成，就得会采样 z</span></h4>
+      <p>如果想拿自编码器生成数据，做法正好反过来：扔掉编码器，留下解码器。只要能采样出「像模型编码出来的那种 z」，送进解码器就是一张新图。</p>
+      <p>问题是这只是把难题往后推了一步。原来要生成 x，手上有一堆 x；现在要生成 z，手上有一堆 z，难度一点没减。普通自编码器对 z 的分布没有任何约束，编码出来的点散成什么形状都有可能，没法从里面采样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3115.jpg" alt="想用解码器生成：需要能采样新的 z，但生成 z 不比生成 x 容易" loading="lazy"><figcaption><button class="ts" type="button" data-t="3115">51:55</button>想用解码器生成：需要能采样新的 z，但生成 z 不比生成 x 容易</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="l13-s4">
+      <h4><button class="ts" type="button" data-t="3124">52:04</button><span>隐变量模型：每张图背后有一个 z</span></h4>
+      <p>变分自编码器的想法：如果能强制 z 服从一个已知的分布，比如高斯，训练完就能从这个分布采样，再送进解码器。它是自编码器的概率化版本，「变分」这个名字有很长的历史，课上没展开。</p>
+      <p>具体的假设是：训练数据 <span class="m"><i>x</i><sup>(<i>i</i>)</sup></span> 的每一张，背后都有一个看不见的隐向量 <span class="m"><i>z</i><sup>(<i>i</i>)</sup></span>。生成数据的过程是先生成 z，再由 z 生成 x，生成这张图需要的全部信息都在 z 里。上标 i 只是编号，表示不同的独立样本。</p>
+      <p>z 永远观测不到，没有它的数据集。另一个约束是 z 来自一个已知的<b>先验 (Prior)</b> p(z)，几乎总是取单位高斯 N(0, I)。训练好以后：从先验采一个 z，过解码器，就是一个样本。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3235.jpg" alt="变分自编码器的假设：每个 x 背后有一个看不见的隐向量 z，z 服从已知的先验" loading="lazy"><figcaption><button class="ts" type="button" data-t="3235">53:55</button>变分自编码器的假设：每个 x 背后有一个看不见的隐向量 z，z 服从已知的先验</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「变分」来自变分推断 (Variational Inference)：真实后验算不出来时，在一族简单分布（比如所有对角高斯）里挑一个最接近的去近似，把「求一个分布」变成「优化分布族的参数」。白板推导视频就是从这个角度讲的。</p></div>
+    </section>
+<section class="sec" id="l13-s5">
+      <h4><button class="ts" type="button" data-t="3246">54:06</button><span>第一次尝试：把 z 积掉</span></h4>
+      <p>怎么训练。z 看不到，似乎无从下手。他的办法是回到最大似然：如果手上有 (x, z) 成对的数据集，直接最大化 log p(x|z) 就能训练一个条件生成模型。可是没有 z。</p>
+      <p>没有 z，可以把它积掉。x 和 z 一定有一个联合分布，哪怕看不到；对 z 积分就得到 x 的边缘分布，这叫<b>边缘化 (Marginalization)</b>：</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>) = ∫ <i>p</i><sub><i>θ</i></sub>(<i>x</i>, <i>z</i>) <i>d</i><i>z</i> = ∫ <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) <i>d</i><i>z</i></span></span><span class="dc">联合分布用链式法则拆成似然乘先验</span></div></div>
+      <p>积分里两项都能算：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 是解码器，p(z) 是自己选的高斯。但积分本身算不了：z 是高维向量，<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 是一个神经网络，没有解析解。</p>
+      <p>用有限个样本近似这个积分呢。他说一般不行：z 维度很高，在训练的内层循环里做数值积分不是个好主意。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3355.jpg" alt="边缘化：p(x) = ∫ p(x|z) p(z) dz，积分没法算" loading="lazy"><figcaption><button class="ts" type="button" data-t="3355">55:55</button>边缘化：p(x) = ∫ p(x|z) p(z) dz，积分没法算</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>为什么从先验里采样估这个积分行不通，补一个直观的理由。<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>) ≈ (1/<i>S</i>) Σ<sub><i>s</i></sub> <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i><sub><i>s</i></sub>)</span>，<span class="m"><i>z</i><sub><i>s</i></sub> ∼ <i>p</i>(<i>z</i>)</span>。对一张具体的图 x，先验里随便抽的 z 绝大多数解码出来和 x 毫不相干，<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 几乎为 0；只有极小一片 z 能生成这张图。要碰到那一片，需要的样本数随 z 的维度指数增长。</p><p>如果知道「哪一片 z 能生成 x」，只在那一片里采样就高效多了。这一片正是后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span>，也就是下一步要用编码器去近似的东西。</p></div>
+    </section>
+<section class="sec" id="l13-s6">
+      <h4><button class="ts" type="button" data-t="3427">57:07</button><span>第二次尝试：贝叶斯公式，再加一个网络</span></h4>
+      <p>概率里另一个常用工具是贝叶斯公式，它给出 p(x) 的另一种写法，里面没有积分：</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>) = <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span></span><span class="dc">对任何一个 z 都成立</span></div></div>
+      <p>分子两项都能算。分母的<b>后验 (Posterior)</b> <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span> 算不出来，因为算它同样需要那个积分，又卡住了。</p>
+      <p>变分自编码器的办法是：算不出来的那一项，就再放一个神经网络去算。另一个网络 q，权重 φ，学习条件分布 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span>，希望它近似真实后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span>。课件写的是：如果能保证 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ≈ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)</span>，就有</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>) ≈ <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span></span><span class="dc">分母换成编码器</span></div></div>
+      <p>于是要联合训练两个网络，各有独立的权重。<b>解码器</b>输入 z，输出 x 上的分布；<b>编码器</b>输入 x，输出 z 上的分布。他也承认，q 能不能近似好后验，一般没法强制保证。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3475.jpg" alt="贝叶斯公式：分母的后验 p(z|x) 算不出来" loading="lazy"><figcaption><button class="ts" type="button" data-t="3475">57:55</button>贝叶斯公式：分母的后验 p(z|x) 算不出来</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c13-3522.jpg" alt="再加一个编码器网络 q(z|x) 去近似后验，和解码器联合训练" loading="lazy"><figcaption><button class="ts" type="button" data-t="3522">58:42</button>再加一个编码器网络 q(z|x) 去近似后验，和解码器联合训练</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="l13-s7">
+      <h4><button class="ts" type="button" data-t="3487">58:07</button><span>神经网络怎么输出一个分布</span></h4>
+      <p>网络输出的是一组数，怎么能是一个分布。办法是把所有分布都定成正态分布，让网络输出它的参数。</p>
+      <p><b>编码器</b>：输入 x，输出两个和 z 同样形状的向量，一个是均值 <span class="m"><i>μ</i><sub><i>z</i>|<i>x</i></sub></span>，一个是对角协方差的对角线 <span class="m">Σ<sub><i>z</i>|<i>x</i></sub></span>。合起来 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) = <i>N</i>(<i>μ</i><sub><i>z</i>|<i>x</i></sub>, Σ<sub><i>z</i>|<i>x</i></sub>)</span>。</p>
+      <p>为什么一定要对角。完整协方差矩阵要描述每两维之间的相关性，d 维就有 d<sup>2</sup> 个数。用在图像上，h×w 的图就是 h<sup>2</sup>w<sup>2</sup> 个数，大到没法输出。只取对角线，就等于假设各维互相独立，协方差变成一个和数据本身一样大的向量。</p>
+      <p><b>解码器</b>：输入 z，输出像素上的对角高斯的均值 <span class="m"><i>μ</i><sub><i>x</i>|<i>z</i></sub></span>，方差固定成一个常数 σ<sup>2</sup>：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) = <i>N</i>(<i>μ</i><sub><i>x</i>|<i>z</i></sub>, <i>σ</i><sup>2</sup>)</span>。他说这里其实「作了点弊」：名义上输出一个分布，实际从不从里面采样，总是直接拿均值当输出图。</p>
+      <p>解码器的方差为什么不学。如果每个像素各学一个方差，又没有像素间的协方差，从这个分布采样就等于在均值图上每个像素各自加独立噪声，得到的只是一张带雪花的图，没有意义。</p>
+      <p>方差固定以后，最大化高斯的对数似然就等价于最小化 L2 距离：</p>
+      <div class="deriv"><div><span class="df"><span class="m">log <i>N</i>(<i>x</i>; <i>μ</i><sub><i>x</i>|<i>z</i></sub>, <i>σ</i><sup>2</sup> <i>I</i>) = −‖<i>x</i> − <i>μ</i><sub><i>x</i>|<i>z</i></sub>‖<sup>2</sup> / (2<i>σ</i><sup>2</sup>) − (<i>D</i>/2) log(2<i>π</i><i>σ</i><sup>2</sup>)</span></span><span class="dc">D 是像素数</span></div><div><span class="df"><span class="m">max log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)  ⇔  min ‖<i>x</i> − <i>μ</i><sub><i>x</i>|<i>z</i></sub>‖<sup>2</sup></span></span><span class="dc">σ<sup>2</sup> 固定，后一项是常数</span></div></div>
+      <p>所以「解码器输出一个高斯」和「自编码器用 L2 重建损失」其实是一回事，σ<sup>2</sup> 只决定重建项相对 KL 项的权重。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3605.jpg" alt="编码器输出隐变量高斯的均值和对角方差，解码器输出像素高斯的均值（方差固定）" loading="lazy"><figcaption><button class="ts" type="button" data-t="3605">1:00:05</button>编码器输出隐变量高斯的均值和对角方差，解码器输出像素高斯的均值（方差固定）</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>有学生问像素平移这类不变性怎么办。他说那是网络结构的事，比如卷积天然对平移等变，损失函数这一层不管。</p></div>
+    </section>
+<section class="sec" id="l13-s8">
+      <h4><button class="ts" type="button" data-t="3734">1:02:14</button><span>推导：把 log p(x) 拆成三项</span></h4>
+      <p>现在有了编码器和解码器，训练目标是什么。他说这是整节课唯一一张推导的幻灯片，原则还是最大似然：最大化 log p(x)。</p>
+      <p>第一步，用贝叶斯公式写出 log p(x)，这是精确的等式。第二步做一件看起来多余的事：分子分母同乘 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span>。第三步用对数的性质，按一个特定的顺序拆成三项：</p>
+      <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>) = log [<i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)]</span></span><span class="dc">贝叶斯公式</span></div><div><span class="df"><span class="m">= log [<i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) / (<i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>) <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>))]</span></span><span class="dc">分子分母同乘 q，值不变</span></div><div><span class="df"><span class="m">= log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) − log [<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) / <i>p</i>(<i>z</i>)] + log [<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)]</span></span><span class="dc">重新分组：p(x|z)，q 配 p(z)，q 配后验</span></div></div>
+      <p>课件上三种颜色标出了每一项来自哪里。到这一步，右边还带着 z，左边却没有。</p>
+      <p>关键观察：log p(x) 不依赖 z。上面三项各自含 z，加起来以后 z 全部消掉。一个不依赖 z 的量，可以在外面套上对 z 的期望，按任何分布取都成立。这里选按编码器 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span> 取：</p>
+      <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>) = <i>E</i><sub><i>z</i>∼<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>)]</span></span><span class="dc">常数的期望是它自己</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>z</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)] − <i>E</i><sub><i>z</i></sub>[log (<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) / <i>p</i>(<i>z</i>))] + <i>E</i><sub><i>z</i></sub>[log (<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))]</span></span><span class="dc">期望是线性的，分别作用到三项上</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>z</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>)) + KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))</span></span><span class="dc">后两项按定义就是 KL 散度</span></div></div>
+      <p>他说熟悉概率的话会认出后两项是 KL 散度，衡量两个分布有多不同。这一串都是精确的等式，没有任何近似。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-3825.jpg" alt="推导：对 log p(x) 用贝叶斯公式，上下同乘 q(z|x)，拆成三项" loading="lazy"><figcaption><button class="ts" type="button" data-t="3825">1:03:45</button>推导：对 log p(x) 用贝叶斯公式，上下同乘 q(z|x)，拆成三项</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c13-3925.jpg" alt="套上对 z 的期望，后两项是 KL 散度：log p(x) = 重建项 − KL(q‖先验) + KL(q‖后验)" loading="lazy"><figcaption><button class="ts" type="button" data-t="3925">1:05:25</button>套上对 z 的期望，后两项是 KL 散度：log p(x) = 重建项 − KL(q‖先验) + KL(q‖后验)</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>为什么偏偏选按 q 取期望，课上没说。按别的分布取，等式同样成立，但只有按 q 取，后两项才正好是 KL 散度的定义（KL(q ‖ ·) 的期望就是按 q 取的），第一项也才能用编码器采样来估计。期望和 KL 的定义见第一个 tab。</p><p>「三项各自含 z、加起来不含 z」可以直接验证：把三项的 log 合并回去，就是 <span class="m">log [<i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>)]</span>，这正是贝叶斯公式里的 log p(x)，和 z 无关。</p></div>
+    </section>
+<section class="sec" id="l13-s9">
+      <h4><button class="ts" type="button" data-t="3918">1:05:18</button><span>三项各是什么</span></h4>
+      <p>式子看着吓人，每一项都能读出含义。</p>
+      <p><b>第一项，重建项</b> <span class="m"><i>E</i><sub><i>z</i>∼<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)]</span>。读法：拿一张图 x 过编码器，得到 z 上的分布；从这个分布里采一个 z，过解码器，看还原出 x 的对数概率有多大。对所有这样的 z 取平均，所以叫数据重建项。</p>
+      <p><b>第二项，先验项</b> <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span>。编码器对每张图预测一个 z 上的分布，p(z) 是事先选好的先验，通常是对角高斯。这一项衡量模型学到的隐空间和先验有多像，要它们尽量一致。</p>
+      <p><b>第三项</b> <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))</span>。编码器的分布和真实后验有多像。这一项算不出来：当初引入 q，就是因为后验算不出来，现在它又出现了。</p>
+      
+      
+    </section>
+<section class="sec" id="l13-s10">
+      <h4><button class="ts" type="button" data-t="4099">1:08:19</button><span>扔掉第三项：证据下界</span></h4>
+      <p>第三项怎么办。扔掉。KL 散度总是 ≥ 0，这两个分布虽然算不出来，KL 一定不小于 0。扔掉以后左边只会更大：</p>
+      <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>) ≥ <i>E</i><sub><i>z</i>∼<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">重建项减先验项</span></div></div>
+      <p>右边就是训练变分自编码器用的目标，叫<b>变分下界 (Variational Lower Bound)</b>，也叫<b>证据下界 (Evidence Lower Bound, ELBO)</b>，「证据」指的就是 log p(x)。联合训练编码器 q 和解码器 p 去最大化它。</p>
+      <p>他的说法是：这是真实对数似然的一个近似，准确说是下界；最大化下界，希望真实对数似然也跟着变大，虽然并不精确。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-4133.jpg" alt="证据下界：重建项减去编码器分布与先验的 KL 散度" loading="lazy"><figcaption><button class="ts" type="button" data-t="4133">1:08:53</button>证据下界：重建项减去编码器分布与先验的 KL 散度</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「希望」可以说得更具体。扔掉的第三项正好是下界和真实值之间的差：<span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>) − ELBO = KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))</span>。</p><p>对编码器 φ 来说，log p(x) 和 φ 无关，抬高 ELBO 只能靠缩小这个差，也就是让 q 更贴近真实后验，下界越来越紧。对解码器 θ 来说，抬高 ELBO 是在抬高 log p(x) 的一个下界。两者一起更新，下界既在变紧，又在被往上推。白板推导视频就是从「缩小这个差」这一侧讲起的，见「两种讲法对照」。</p></div>
+    </section>
+<section class="sec" id="l13-s11">
+      <h4><button class="ts" type="button" data-t="4161">1:09:21</button><span>训练一步</span></h4>
+      <p>那一大页数学落到训练上，流程并不复杂：</p>
+      <ul><li>编码器输入 x，输出 z 上的分布：μ 和 σ。</li><li>对这个分布算 KL 项，它鼓励预测的均值为 0、标准差为 1。</li><li>从预测的分布里采一个 z，用<b>重参数化技巧 (Reparameterization Trick)</b>，梯度才能穿过采样传回编码器。</li><li>把 z 过解码器，得到解码器预测的分布（其实就是均值图），对它算重建项。</li></ul>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-4205.jpg" alt="训练流程：编码器输出分布，KL 项拉向先验，重参数化采样 z，解码器重建，算重建损失" loading="lazy"><figcaption><button class="ts" type="button" data-t="4205">1:10:05</button>训练流程：编码器输出分布，KL 项拉向先验，重参数化采样 z，解码器重建，算重建损失</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>两项损失写成公式（课上没写）。z 有 d 维，编码器输出 μ 和 σ，先验是 N(0, I)，KL 项有解析解，不用采样：<span class="m">KL = ½ Σ<sub><i>j</i></sub> (<i>μ</i><sub><i>j</i></sub><sup>2</sup> + <i>σ</i><sub><i>j</i></sub><sup>2</sup> − 1 − log <i>σ</i><sub><i>j</i></sub><sup>2</sup>)</span>。推导见第一个 tab 的「两个高斯之间的 KL」。</p><p>重参数化：先抽 ε ∼ N(0, I)，再算 z = μ + σ ⊙ ε。随机性全在 ε 里，z 对 μ、σ 可导。重建项用这一个 z 估计期望，解码器方差固定时就是 <span class="m">‖<i>x</i> − <i>μ</i><sub><i>x</i>|<i>z</i></sub>‖<sup>2</sup> / (2<i>σ</i><sup>2</sup>)</span>。每张图每一步只采一个 z，原论文说批量够大时这样就够了。</p><p>所以一个批次的损失是：每张图的 L2 重建误差（乘一个由 σ<sup>2</sup> 决定的系数）加上 KL 项，再对批次取平均。</p></div>
+    </section>
+<section class="sec" id="l13-s12">
+      <h4><button class="ts" type="button" data-t="4222">1:10:22</button><span>两项损失互相拉扯</span></h4>
+      <p>他觉得变分自编码器最有意思的地方在于两项损失在隐空间上互相拉扯。模型被迫把信息挤过 z，而两项对 z 的要求不一样。</p>
+      <p>重建项希望 σ 为 0，每个 x 有一个各不相同的均值向量。那样每张图有一个独一无二的 z，没有任何随机性，就能完美重建。</p>
+      <p>先验项希望所有 σ 都是 1、所有均值都是 0，也就是每张图的分布都和单位高斯一模一样。这和重建项想要的正好相反。</p>
+      <p>训练就是在两者之间找平衡：既要把数据重建好，又要让隐空间接近先验。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-4265.jpg" alt="重建项希望每个 x 有独特的隐向量，先验项希望隐分布都是单位高斯，两者互相拉扯" loading="lazy"><figcaption><button class="ts" type="button" data-t="4265">1:11:05</button>重建项希望每个 x 有独特的隐向量，先验项希望隐分布都是单位高斯，两者互相拉扯</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>两个极端都能用公式看出来。σ 趋于 0 时 KL 项里的 −log σ<sup>2</sup> 趋于正无穷，所以 z 不可能被压成一个点；q 如果完全等于 N(0, I)，z 和 x 就毫无关系，解码器只能对所有图输出同一张平均图，重建项很差。</p><p>平衡点的位置取决于两项的相对权重，也就是解码器的 σ<sup>2</sup>。σ<sup>2</sup> 越小，重建项越重，图越清楚、隐空间越不规整；越大则相反。给 KL 项单独乘一个系数 β 的做法叫 β 变分自编码器，见「常见问题」。</p></div>
+    </section>
+<section class="sec" id="l13-s13">
+      <h4><button class="ts" type="button" data-t="4283">1:11:23</button><span>训练好以后：采样与隐空间</span></h4>
+      <p>训练好以后，从先验采 z，过解码器，就得到一个样本。</p>
+      <p>另一个好处：隐空间是对角高斯，各维之间统计独立，可以分别改变。不同维度常常对应数据里某种有意义、互相独立的变化。在手写数字上训练的变分自编码器，沿隐空间两个维度改变 z，数字会平滑地从一类变到另一类，这是变分自编码器很常见的性质。</p>
+      <p>最后的小结：有监督与无监督；三种概率生成模型；家族树的一半，自回归和变分自编码器。下一讲讲另一半，生成对抗网络和扩散模型。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c13-4322.jpg" alt="在手写数字上训练的变分自编码器：沿隐空间两个维度变化，数字平滑地变形" loading="lazy"><figcaption><button class="ts" type="button" data-t="4322">1:12:02</button>在手写数字上训练的变分自编码器：沿隐空间两个维度变化，数字平滑地变形</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「各维统计独立」严格说只对先验成立。编码器给每张图的 q 是对角高斯，但把所有训练图的 q 合在一起，整体分布未必各维独立，也未必正好是 N(0, I)。生成时从 N(0, I) 采到的 z，如果落在训练数据很少覆盖的区域，解码出来就不太像样。</p></div>
+    </section>
+      <section class="sec keys"><h4>这一段记住这几条</h4><ul><li>目标始终是最大似然：最大化每张训练图的 log p(x)。变分自编码器算不出它，只能最大化一个下界。</li><li>自编码器靠瓶颈学特征，但 z 的分布没有约束，不能拿来生成；变分自编码器要求 z 服从先验 N(0, I)。</li><li>把 z 积掉要算高维积分，用贝叶斯公式又要算后验，都算不了；于是加一个编码器 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)</span> 去近似后验。</li><li>编码器输出对角高斯的 μ 和 σ；解码器输出像素的均值、方差固定，最大化它的对数似然就是最小化 L2。</li><li><span class="m">log <i>p</i>(<i>x</i>) = <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>x</i>|<i>z</i>)] − KL(<i>q</i> ‖ <i>p</i>(<i>z</i>)) + KL(<i>q</i> ‖ <i>p</i>(<i>z</i>|<i>x</i>))</span> 是精确的；最后一项 ≥ 0 又算不出，扔掉得到证据下界。</li><li>训练一步：编码器出 μ、σ，算 KL，重参数化采 z，解码，算重建；两项在隐空间上互相拉扯，平衡点由两者的权重决定。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/lec13.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1b1agz5ERC?p=13" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="2084"><b>34:44</b><span>出发点：最大似然</span></button></li><li><button type="button" data-t="2698"><b>44:58</b><span>放弃精确密度，换来隐向量</span></button></li><li><button type="button" data-t="2881"><b>48:01</b><span>自编码器：通过瓶颈学特征</span></button></li><li><button type="button" data-t="3064"><b>51:04</b><span>想生成，就得会采样 z</span></button></li><li><button type="button" data-t="3124"><b>52:04</b><span>隐变量模型：每张图背后有一个 z</span></button></li><li><button type="button" data-t="3246"><b>54:06</b><span>第一次尝试：把 z 积掉</span></button></li><li><button type="button" data-t="3427"><b>57:07</b><span>第二次尝试：贝叶斯公式，再加一个网络</span></button></li><li><button type="button" data-t="3487"><b>58:07</b><span>神经网络怎么输出一个分布</span></button></li><li><button type="button" data-t="3734"><b>1:02:14</b><span>推导：把 log p(x) 拆成三项</span></button></li><li><button type="button" data-t="3918"><b>1:05:18</b><span>三项各是什么</span></button></li><li><button type="button" data-t="4099"><b>1:08:19</b><span>扔掉第三项：证据下界</span></button></li><li><button type="button" data-t="4161"><b>1:09:21</b><span>训练一步</span></button></li><li><button type="button" data-t="4222"><b>1:10:22</b><span>两项损失互相拉扯</span></button></li><li><button type="button" data-t="4283"><b>1:11:23</b><span>训练好以后：采样与隐空间</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+<details class="ep" id="l14" data-bv="BV1b1agz5ERC" data-p="14" data-start="3195">
+  <summary>
+    <span class="no">14</span>
+    <span class="tt"><b>第 14 讲回头提到变分自编码器的两处</b><em>CS231n 第 14 讲 · Justin Johnson · 课堂 2025-05-20 · 这一段 53:15–1:08:25</em><span class="hook">Latent Diffusion 的编码器解码器就是变分自编码器，KL 权重很小，再加一个判别器去掉模糊；扩散模型本身也是隐变量模型，训练目标同样是变分下界。</span></span>
+    <span class="side"><span class="chip">Justin Johnson</span><span class="len">53:15–1:08:25</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">第 14 讲讲生成对抗网络和扩散模型，有两处回到变分自编码器，正好回答白板推导视频最后的问题：变分自编码器本身发糊，为什么 Latent Diffusion 里用它的编码器解码器就很清楚。时间轴只列这两处。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1b1agz5ERC?p=14&amp;t=3195" target="_blank" rel="noreferrer">B 站 P14 ↗</a><a href="https://www.youtube.com/watch?v=Edr4uZFh4EE&amp;t=3195" target="_blank" rel="noreferrer">YouTube ↗</a><a href="https://xslaoxu.cn/learn-ai/cs231n/#l14" target="_blank" rel="noreferrer">CS231n 页第 14 讲 ↗</a></p>
+      <p class="mats"><span class="lbl">资料</span><a href="https://cs231n.stanford.edu/slides/2025/lecture_14.pdf" target="_blank" rel="noreferrer">2025 课件</a><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noreferrer">Latent Diffusion 原论文</a></p>
+      <section class="sec" id="l14-s0">
+      <h4><button class="ts" type="button" data-t="3195">53:15</button><span>在隐空间里做扩散</span></h4>
+      <p>现在多数扩散模型都在隐空间里做，分两个阶段训练。第一阶段训练一个编码器和一个解码器，把图像转成隐表示：H×W×3 的图变成 H/D × W/D × C 的隐张量。</p>
+      <p>第二阶段训练扩散模型：取一张图，过编码器得到隐表示，加噪，让扩散模型去噪。这时编码器是冻结的，梯度不传回去，它只负责提取隐表示。</p>
+      <p>推理时，随机取一个隐表示，用扩散模型反复去噪，得到干净的隐表示，最后过解码器变成图。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c14-3257.jpg" alt="Latent Diffusion：先训练编码器和解码器，再在冻结的编码器给出的隐空间里训练扩散模型" loading="lazy"><figcaption><button class="ts" type="button" data-t="3257">54:17</button>Latent Diffusion：先训练编码器和解码器，再在冻结的编码器给出的隐空间里训练扩散模型</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="l14-s1">
+      <h4><button class="ts" type="button" data-t="3256">54:16</button><span>编码器解码器是变分自编码器，再加一个判别器</span></h4>
+      <p>编码器解码器怎么训练。他问学生见过什么编码器解码器，答案是变分自编码器：实际训练 Latent Diffusion 时，这个编码器解码器通常就是一个变分自编码器，而且 KL 先验项的权重非常小。</p>
+      <p>可是上一讲刚说过变分自编码器的输出发糊。解码器的重建质量是整个系统的上限：重建都是糊的，下游扩散模型生成得再好也没用。</p>
+      <p>怎么在解码器后面把图变清楚。答案是让它同时是一个生成对抗网络：再训练一个判别器，区分真图和解码器重建的图。所以现代的生成流程同时要训练变分自编码器、生成对抗网络和扩散模型，他自嘲说「一团乱」。</p>
+      <p>他举的例子是开源的 FLUX.1 [dev]：文本编码器用 T5 和 CLIP，编码器做 8 倍下采样，扩散模型是 120 亿参数的 Transformer。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c14-3301.jpg" alt="编码器解码器怎么训练：它就是一个变分自编码器，通常 KL 先验项的权重很小" loading="lazy"><figcaption><button class="ts" type="button" data-t="3301">55:01</button>编码器解码器怎么训练：它就是一个变分自编码器，通常 KL 先验项的权重很小</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c14-3321.jpg" alt="问题：解码器的输出常常发糊。办法：再加一个判别器，区分真图和重建图" loading="lazy"><figcaption><button class="ts" type="button" data-t="3321">55:21</button>问题：解码器的输出常常发糊。办法：再加一个判别器，区分真图和重建图</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>这就是白板推导视频最后那个问题的答案，课上一句话，原论文写得更细。Latent Diffusion 的自编码器用感知损失加基于图块的对抗损失训练，论文说这样能保证局部真实感，避免只用 L1、L2 像素损失带来的模糊；KL 项权重约 10<sup>−6</sup>（附录 G），另一个版本用向量量化代替 KL。</p><p>把 KL 权重压到 10<sup>−6</sup>，等于几乎不要求隐空间服从 N(0, 1)，这个自编码器很接近普通自编码器，重建自然清楚；隐向量服从什么分布交给扩散模型去学，不再从 N(0, 1) 里直接采 z。两边加起来，糊的问题就没了。</p></div>
+    </section>
+<section class="sec" id="l14-s2">
+      <h4><button class="ts" type="button" data-t="4044">1:07:24</button><span>扩散模型也是隐变量模型</span></h4>
+      <p>讲扩散模型的几种理解时，第一种就和变分自编码器有关：每个干净样本背后，都对应一串加了噪声的版本，这串噪声版本看不到，是隐变量。</p>
+      <p>这和变分自编码器的设定一样：有 z 和 x，z 观测不到，要想办法训练。可以用非常相似的数学技巧，最大化数据似然的一个变分下界。课件写的是「优化变分下界，和变分自编码器一样」。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c14-4105.jpg" alt="扩散模型是隐变量模型：前向过程逐步加高斯噪声，学一个网络近似反向过程，优化变分下界" loading="lazy"><figcaption><button class="ts" type="button" data-t="4105">1:08:25</button>扩散模型是隐变量模型：前向过程逐步加高斯噪声，学一个网络近似反向过程，优化变分下界</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>区别在于：扩散模型的「编码器」，也就是加噪的前向过程，是固定的，不用学；只学「解码器」，也就是一步步去噪的反向过程。DDPM 的损失就是从这个变分下界化简出来的。</p></div>
+    </section>
+      <section class="sec keys"><h4>这一段记住这几条</h4><ul><li>Latent Diffusion 分两阶段：先训练编码器解码器，再冻结编码器、在隐空间里训练扩散模型，生成后用解码器还原。</li><li>这个编码器解码器是 KL 权重很小的变分自编码器，再加一个判别器把重建变清楚。</li><li>扩散模型本身也是隐变量模型，训练目标和变分自编码器一样是变分下界。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/lec14.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1b1agz5ERC?p=14" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="3195"><b>53:15</b><span>在隐空间里做扩散</span></button></li><li><button type="button" data-t="3256"><b>54:16</b><span>编码器解码器是变分自编码器，再加一个判别器</span></button></li><li><button type="button" data-t="4044"><b>1:07:24</b><span>扩散模型也是隐变量模型</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+<div class="view" id="view-video">
+<div class="intro"><p>这个视频从另一头讲：不从最大似然出发，而是从「找一个和每张图对应的 z」出发，用变分贝叶斯去近似后验，KL 散度展开以后得到 ELBO，再拆成两项损失。白板手写，每一步为什么这么做都交代了，正好补上 CS231n 跳过的地方。</p><p>笔记按视频顺序分节转述，板书的推导逐行誊清。板书笔误、讲者没讲的公式、后半段猜想和原论文的对照写在「注」里。站点不放逐字稿：B 站页面写着未经作者授权禁止转载。</p></div>
+<details class="ep" id="v" data-bv="BV1wx421k74m" data-p="1" data-start="0">
+  <summary>
+    <span class="no">视</span>
+    <span class="tt"><b>一个视频看懂VAE的原理以及关于latent diffusion的思考</b><em>Nik_Li · B 站 · 2024-03-17 发布</em><span class="hook">44 分钟白板推导：自编码器为什么不能生成，变分贝叶斯怎么把「找后验」变成「最大化 ELBO」，ELBO 怎么拆成重建项和 KL 项；最后讨论 Latent Diffusion 为什么比变分自编码器清晰。</span></span>
+    <span class="side"><span class="chip">Nik_Li</span><span class="len">43:59</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">Nik<sub>Li</sub> 在 B 站「图像生成」系列的第 4 期，2024-03-17 发布，前面几期讲过 DDPM、DDIM 和引导。起因是他读 Latent Diffusion 时的疑问：编码器和解码器来自 2013 年的变分自编码器，变分自编码器自己生成的图很糊，中间换成扩散模型以后却很清晰，问题出在哪。</p>
+      <p class="lede">主体是推导，方向和第 13 讲相反。课上 Justin Johnson 从最大似然 log p(x) 出发，写出三项，扔掉算不出的那项 KL 得到下界；这里从「用一个高斯 q 去近似算不出的后验」出发，把 KL 散度展开成 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span>，左边和 q 无关，压低 KL 只能抬高 ELBO。</p>
+      <p class="lede">两条路通向同一个目标函数。这个视频的好处是每一步为什么这样做都交代了，正好补上课上跳过的地方。</p>
+      <p class="lede">推导之后讲两个问题：二维隐空间里只用重建损失、只用 KL、两者都用分别长什么样；Latent Diffusion 和变分自编码器到底差在哪。后半段讲者说明是自己的思考，笔记按 Latent Diffusion 原论文补了对照。</p>
+      <p class="lede">板书有几处笔误（期望的下标漏了 <span class="m"><i>x</i><sub><i>i</i></sub></span>，有一行把 <span class="m">log(<i>q</i>/<i>p</i>)</span> 写成了 <span class="m">log <i>q</i> / log <i>p</i></span>），正文按正确写法誊清，注里写明原板书哪里不同。讲者没讲的重参数化技巧、两项损失的具体公式也补在注里。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1wx421k74m/" target="_blank" rel="noreferrer">B 站原视频 ↗</a></p>
+      <p class="mats"><span class="lbl">资料</span><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">Auto-Encoding Variational Bayes</a><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noreferrer">Latent Diffusion 原论文</a><a href="https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf" target="_blank" rel="noreferrer">隐空间三张图的出处</a></p>
+      <section class="sec" id="v-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>Latent Diffusion：先压缩，再在隐空间里扩散</span></h4>
+      <p>近两年的扩散模型基本都换成了 Latent Diffusion 的做法。Diffusion Transformer 也是，它只是把去噪网络从 U-Net 换成了 Transformer。普通的扩散模型直接在像素上加噪、去噪，所有计算都在像素空间 (Pixel Space) 里做。</p>
+      <p>像素空间很大：256×256 的三通道图有 196,608 个数，每一步去噪都在这么大的张量上算，而且要走很多步。Latent Diffusion 先用编码器把图压进一个小得多的隐空间 (Latent Space)，扩散只在隐空间里做，最后由解码器还原成图。板书上举的隐空间大小是 32×32。</p>
+      <p>压缩一定丢信息。Latent Diffusion 论文把压缩分成两种：感知压缩 (Perceptual Compression) 去掉高频细节，语义压缩 (Semantic Compression) 去掉的是图里有什么、怎么组成。作者认为细节之间相关性强，比较容易学回来，难学的是整体语义。</p>
+      <p>于是分工是：编码器和解码器负责感知层面的压缩和还原，中间的扩散模型在隐空间里学语义。整个系统分两步训练，先训练编码器和解码器，再在它们给出的隐空间上训练扩散模型。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-155.jpg" alt="上面一行是像素空间里的扩散（256×256×3），下面一行先编码成 z，在 32×32 的隐空间里加噪去噪，再解码" loading="lazy"><figcaption><button class="ts" type="button" data-t="155">2:35</button>上面一行是像素空间里的扩散（256×256×3），下面一行先编码成 z，在 32×32 的隐空间里加噪去噪，再解码</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>原论文 (Rombach 等，arXiv 2021-12-20) 用下采样倍数 f 描述压缩程度，主要用 f = 4 和 f = 8。f = 8 时 256×256 的图压成 32×32，另有若干通道，Stable Diffusion 用 4 个，总数 32×32×4 = 4,096，比像素少 48 倍。</p></div>
+    </section>
+<section class="sec" id="v-s1">
+      <h4><button class="ts" type="button" data-t="158">2:38</button><span>编码器和解码器来自变分自编码器</span></h4>
+      <p>Latent Diffusion 里的编码器和解码器来自<b>变分自编码器 (Variational Autoencoder)</b>。它从普通的自编码器 (Autoencoder) 出发，用一套概率上的办法把自编码器变成了生成模型，2013 年提出（Kingma 和 Welling，arXiv 2013-12-20）。</p>
+      <p>讲者的疑问：变分自编码器作为生成模型效果一般，很多生成结果都比较糊，这是它出了名的缺点。可是把编码器和解码器之间的部分换成扩散模型，图就变得非常清晰。这说明编码器和解码器的能力是够的，问题出在中间。</p>
+      <p>要回答它，先得把变分自编码器的原理弄清楚。他说网上的博客要么讲得笼统、跳过了细节，要么前后对不上，所以做了这期。Latent Diffusion 本身概念不复杂，变分自编码器牵涉贝叶斯推断，值得单独讲。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-315.jpg" alt="整页板书：Latent Diffusion 的编码器和解码器来自变分自编码器 (Variational Autoencoder, 2013)" loading="lazy"><figcaption><button class="ts" type="button" data-t="315">5:15</button>整页板书：Latent Diffusion 的编码器和解码器来自变分自编码器 (Variational Autoencoder, 2013)</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「沿用 2013 年的编码器和解码器」要打个折扣。Latent Diffusion 的自编码器结构和变分自编码器一样，训练目标却改了不少，这正是它重建清晰的主要原因之一，见<a class="ilink" href="#v-s15">倒数第二节的注</a>。</p></div>
+    </section>
+<section class="sec" id="v-s2">
+      <h4><button class="ts" type="button" data-t="315">5:15</button><span>自编码器：能学特征，不能生成</span></h4>
+      <p>自编码器是一种自监督的图像特征学习方法。输入 <span class="m"><i>x</i><sub><i>i</i></sub></span>，编码器把它压成 <span class="m"><i>z</i><sub><i>i</i></sub></span>，解码器再从 <span class="m"><i>z</i><sub><i>i</i></sub></span> 还原出 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，用 <span class="m"><i>x̂</i><sub><i>i</i></sub></span> 和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 之间的重建损失同时训练编码器和解码器。</p>
+      <p>训练好以后，只给 <span class="m"><i>z</i><sub><i>i</i></sub></span> 就能还原出很像 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的图，说明 <span class="m"><i>z</i><sub><i>i</i></sub></span> 装下了 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的大部分信息，所以 z 可以当特征用。这是自编码器能做特征提取的原因。它为什么不能直接当生成模型，是下一节的内容。</p>
+      
+      
+    </section>
+<section class="sec" id="v-s3">
+      <h4><button class="ts" type="button" data-t="385">6:25</button><span>想生成新图，就要一个新的 z</span></h4>
+      <p>设数据集里有 N 张图 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span>，编码后得到 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span>。生成模型要生成数据集里没有的新图，所以需要一个新的 <span class="m"><i>z</i><sub><i>N</i>+1</sub></span>。它不能从已有的 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span> 里取，那样解码出来的都是见过的图；也不能随便取，随手一个点解码出来多半不像图。</p>
+      <p>所以希望 z 服从某个已知的分布，这样就能从分布里采样新的 z。自编码器做不到：训练时没有对 z 的分布做任何约束，编码出来的点散成什么形状都有可能，找不到一个合理 (reasonable) 的新 z。</p>
+      <p>直接的想法是给 z 规定一个分布，比如标准正态分布 <span class="m"><i>p</i>(<i>z</i>) ∼ <i>N</i>(0, 1)</span>，训练完让所有 <span class="m"><i>z</i><sub><i>i</i></sub></span> 整体服从它。讲者说这很难做，原因有两个：</p>
+      <ul><li>不知道 <span class="m"><i>x</i><sub>1</sub></span> 应该落在这个分布的哪个点上，没有目标值，也就没法监督编码器把点放到该放的位置。</li><li>解码器也难训：从 N(0, 1) 里随便采一个 z 去解码，这个 z 对应哪张 <span class="m"><i>x</i><sub><i>i</i></sub></span> 是不确定的，拿它和某张图算重建损失没有意义。</li></ul>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-560.jpg" alt="左上是自编码器；右边是数据集 x_1 … x_N、编码 z_1 … z_N、想要的新点 z_{N+1} 和先验 p(z) ∼ N(0, 1)，以及「x_1 对应哪个 z_1」的难处" loading="lazy"><figcaption><button class="ts" type="button" data-t="560">9:20</button>左上是自编码器；右边是数据集 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span>、编码 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span>、想要的新点 <span class="m"><i>z</i><sub><i>N</i>+1</sub></span> 和先验 p(z) ∼ N(0, 1)，以及「<span class="m"><i>x</i><sub>1</sub></span> 对应哪个 <span class="m"><i>z</i><sub>1</sub></span>」的难处</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="v-s4">
+      <h4><button class="ts" type="button" data-t="565">9:25</button><span>换个问题：去找后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span></span></h4>
+      <p>变分自编码器换了个角度：给定 <span class="m"><i>x</i><sub><i>i</i></sub></span> 以后，z 的条件分布 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是什么样。这个分布叫<b>后验 (Posterior)</b>。它是不是高斯、参数是多少，都不知道。</p>
+      <p>先假设它已知，往后看一步：从 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 里采一个 z，送进解码器得到 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算重建损失来训练解码器。这个损失是合理的，因为 z 就是从 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的条件分布里来的，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对得上。上一节的第二个难处就这样解决了。</p>
+      <p>于是任务从「给每个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 找一个确定的 <span class="m"><i>z</i><sub><i>i</i></sub></span>」变成了「给每个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 找 z 的一个分布」。讲者认为这是整个推导里最关键的一步转换。</p>
+      <p>他在这里回顾了一遍：自编码器学到了特征，但没有约束特征的分布，所以采不到新的隐向量；隐变量本来就观测不到，先验可以自己假设，但假设了先验，又找不到数据点和分布里的点怎么对应，编码器没法训。现在不找确切的 z，改为找后验。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-790.jpg" alt="这一页写满：下方从后验 p_θ(z|x_i) 采样 z_i，解码得到 x̂_i，再和 x_i 算重建损失" loading="lazy"><figcaption><button class="ts" type="button" data-t="790">13:10</button>这一页写满：下方从后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 采样 <span class="m"><i>z</i><sub><i>i</i></sub></span>，解码得到 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，再和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算重建损失</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>p(z) 是<b>先验 (Prior)</b>，看到 x 之前对 z 的假设；<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是后验，看到 <span class="m"><i>x</i><sub><i>i</i></sub></span> 之后 z 的分布。θ 是解码器的参数，后验由先验和解码器一起决定：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>) = <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>。分母 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span> 要对所有 z 积分，算不出来，这就是第 13 讲说后验不可算的原因。</p></div>
+    </section>
+<section class="sec" id="v-s5">
+      <h4><button class="ts" type="button" data-t="784">13:04</button><span>变分贝叶斯：在高斯分布族里找离后验最近的那个</span></h4>
+      <p>后验算不出来，就找一个近似。<b>变分贝叶斯 (Variational Bayes)</b> 是贝叶斯推断里的一种近似方法。讲者说不必非要掌握它，讲它是为了说明「变分」这个名字从哪来。</p>
+      <p>板书上的大圆代表所有分布构成的集合，真实后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是其中一个点。里面的小圈是一族我们会算的分布，比如高斯分布族。做法是在这一族里找一个和后验最接近的分布 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 去近似它：从族里某个分布出发，通过优化一步步挪到离后验最近的位置。</p>
+      <p>这样问题就变成了优化 φ。φ 是这个高斯分布的参数，也就是均值 μ 和标准差 σ。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>讲者说 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 里写不写 <span class="m"><i>x</i><sub><i>i</i></sub></span> 无所谓，为了形式统一才写上。在变分自编码器里这个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 很要紧：每张图有自己的后验，近似也得每张图一个。</p><p>变分自编码器不为每张图单独优化一组 μ、σ，而是训练一个网络，输入 <span class="m"><i>x</i><sub><i>i</i></sub></span>、输出这张图的 μ 和 σ，这个网络就是编码器，这种做法叫摊销推断 (Amortized Inference)。所以「优化 φ」就是训练编码器。</p></div>
+    </section>
+<section class="sec" id="v-s6">
+      <h4><button class="ts" type="button" data-t="930">15:30</button><span>用 KL 散度衡量「最近」</span></h4>
+      <p>「最近」要有一个度量，这里用 <b>KL 散度 (Kullback-Leibler Divergence)</b>，目标是最小化 <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>))</span>。KL 散度不对称，两个分布交换位置结果就不同，严格说它不是距离，但可以当作衡量近似程度的标准。用 KL 散度做这件事，就是变分贝叶斯法。</p>
+      <p>难点在于 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 本身不知道，这个 KL 写不出表达式，没法直接算。下一节的推导绕开它，得到一个能算的替代目标，叫变分下界，也就是 ELBO。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-990.jpg" alt="大圆是所有分布，小圈是高斯分布族 (Gaussian)，在族里找离后验 p_θ(z|x_i) 最近的 q_φ(z|x_i)；左边开始写 KL" loading="lazy"><figcaption><button class="ts" type="button" data-t="990">16:30</button>大圆是所有分布，小圈是高斯分布族 (Gaussian)，在族里找离后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 最近的 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>；左边开始写 KL</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>定义：<span class="m">KL(<i>q</i> ‖ <i>p</i>) = ∫ <i>q</i>(<i>z</i>) log [<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>)] <i>d</i><i>z</i> = <i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) − log <i>p</i>(<i>z</i>)]</span>。后面要用到两条性质。KL ≥ 0，当且仅当两个分布处处相等时为 0。KL(q ‖ p) 和 KL(p ‖ q) 一般不相等，变分推断用 q 在前的这个，期望按 q 取，只需要能从 q 里采样。</p></div>
+    </section>
+<section class="sec" id="v-s7">
+      <h4><button class="ts" type="button" data-t="997">16:37</button><span>展开 KL：<span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span></span></h4>
+      <p>从 KL 散度的定义出发，只用两个工具：对数的性质 <span class="m">log(<i>a</i>/<i>b</i>) = log <i>a</i> − log <i>b</i></span>，以及条件概率的定义 <span class="m"><i>p</i>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) = <i>p</i>(<i>z</i>, <i>x</i><sub><i>i</i></sub>) / <i>p</i>(<i>x</i><sub><i>i</i></sub>)</span>。下面的期望 <span class="m"><i>E</i><sub><i>q</i></sub></span> 都按 <span class="m"><i>z</i> ∼ <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 取。</p>
+      <div class="deriv"><div><span class="df"><span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) = ∫ <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) log [<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] <i>d</i><i>z</i></span></span><span class="dc">KL 散度的定义</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">对数拆成相减，积分写成期望</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] + <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">代入 p(z|x<sub>i</sub>) = p(z, x<sub>i</sub>) / p(x<sub>i</sub>)，前面的减号让最后一项变成加</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 里没有 z，期望就是它本身</span></div><div><span class="df"><span class="m">= −ELBO + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc">前两项记作 −ELBO</span></div></div>
+      <p>其中 <span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span>。移项得到一个恒等式：</p>
+      <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>) = KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) + ELBO</span></span></div></div>
+      <p><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 叫<b>边际似然 (Marginal Likelihood)</b>，也叫证据 (Evidence)，做生成模型时说的最大似然就是最大化它。这个式子对任何 q 都成立，中间没有任何近似。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>板书和这里有两处不同。期望的下标写成了 <span class="m"><i>E</i><sub><i>q</i>(<i>z</i>)</sub></span>，省掉了 <span class="m"><i>x</i><sub><i>i</i></sub></span>，和上一节「写不写 <span class="m"><i>x</i><sub><i>i</i></sub></span> 无所谓」一致，但 q 实际依赖 <span class="m"><i>x</i><sub><i>i</i></sub></span>；θ 和 φ 也时写时不写。推导本身没有错。</p></div>
+    </section>
+<section class="sec" id="v-s8">
+      <h4><button class="ts" type="button" data-t="1250">20:50</button><span>为什么最大化 ELBO 就是最小化 KL</span></h4>
+      <p>回到最初的目标：用 q 近似后验，也就是最小化上面那个 KL。恒等式左边的 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 里没有 z，和 q 也无关，调 φ 改变 q 的时候它是一个常数。</p>
+      <p>常数等于 KL 加 ELBO，两项此消彼长，ELBO 涨多少 KL 就降多少。所以最小化那个算不出来的 KL，等价于最大化能算出来的 ELBO。讲者强调这一步是整件事的核心，不少博客没讲明白为什么要最大化 ELBO。</p>
+      <p>名字也从这里来。KL ≥ 0，所以 <span class="m">ELBO ≤ log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span>，ELBO 是证据（对数边际似然）的一个下界，Evidence Lower Bound。只有 q 恰好等于真实后验时等号才成立。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-1344.jpg" alt="KL 推导整页：最后一行 log p(x_i) = KL + ELBO，右边注着 max ELBO、min KL，因为 log p(x_i) 是常数" loading="lazy"><figcaption><button class="ts" type="button" data-t="1344">22:24</button>KL 推导整页：最后一行 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span>，右边注着 max ELBO、min KL，因为 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>)</span> 是常数</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>和<a class="ilink" href="#l13-s8">CS231n 的推导</a>对照。课上从最大似然出发：想最大化 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>，写出同样的三项，扔掉算不出的 KL 得到下界，再最大化下界。这个视频从近似后验出发，固定 θ 只看 φ。</p><p>实际训练时编码器 φ 和解码器 θ 一起更新：对 φ 来说，抬高 ELBO 就是让 q 贴近后验；对 θ 来说，抬高 ELBO 会把 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span> 一起往上推。两种讲法优化的是同一个式子。</p></div>
+    </section>
+<section class="sec" id="v-s9">
+      <h4><button class="ts" type="button" data-t="1346">22:26</button><span>把 ELBO 拆成两项</span></h4>
+      <p>接着把 ELBO 化成能直接当损失用的形式。这次换一种方式拆联合分布：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>) = <i>p</i>(<i>z</i>) <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)</span>，先验乘解码器给出的似然。</p>
+      <div class="deriv"><div><span class="df"><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>z</i>) + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">联合分布拆成先验乘似然，乘积的对数变成相加</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − (<i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>z</i>)])</span></span><span class="dc">把含 q 和 p(z) 的两项放到一起</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − <i>E</i><sub><i>q</i></sub>[log (<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) / <i>p</i>(<i>z</i>))]</span></span><span class="dc">对数相减变成对数里相除</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">按 KL 散度的定义</span></div></div>
+      <p>ELBO 由此分成两项。第一项：从 q 里采 z，解码器还原出 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的对数似然，取期望。第二项：近似后验 q 和先验 p(z) 之间的 KL 散度。最大化 ELBO 就是同时最大化第一项、最小化第二项。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-1540.jpg" alt="ELBO 的化简：最后一行是 −KL(q(z) ‖ p(z)) + E_q[log p_θ(x_i|z)]；倒数第二行把 log(q/p) 误写成了 log q / log p" loading="lazy"><figcaption><button class="ts" type="button" data-t="1540">25:40</button>ELBO 的化简：最后一行是 <span class="m">−KL(<i>q</i>(<i>z</i>) ‖ <i>p</i>(<i>z</i>)) + <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)]</span>；倒数第二行把 log(q/p) 误写成了 log q / log p</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>板书倒数第二行写的是 <span class="m">−<i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) / log <i>p</i>(<i>z</i>)]</span>，应为 <span class="m">log (<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>))</span>，两个对数相除和对数里面相除是两回事。下一行写成 KL 的结果是对的。</p></div>
+    </section>
+<section class="sec" id="v-s10">
+      <h4><button class="ts" type="button" data-t="1542">25:42</button><span>两个目标：贴近先验，重建得好</span></h4>
+      <p>损失函数到这里就出来了。先验 p(z) 一开始就假设好了，是标准正态分布 N(0, 1)；q 从高斯分布族里取，<span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) = <i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>)</span>。于是训练要做两件事：</p>
+      <ul><li>最小化 <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span>：编码器给每张图输出的高斯，要靠近标准正态分布。</li><li>最大化 <span class="m"><i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)]</span>：给定 z 时 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的似然要大。生成模型里这个似然由网络来学，这个网络就是解码器。</li></ul>
+      <p>讲者把整条链又走了一遍：想找和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对应的 z 来训练解码器，所以要后验；后验算不出，用变分贝叶斯取一个高斯 q 去近似；近似得好不好用 KL 量；这个 KL 算不出，转成最大化 ELBO；ELBO 再拆成上面两项。按原论文这条推导，q 往 N(0, 1) 靠是推出来的结论，出发点是近似后验。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-1680.jpg" alt="左下是推导的来龙去脉：后验、变分贝叶斯 (VB)、q(z)、KL、ELBO；右边 q(z|x_i) ∼ N(μ, σ²)，p(z) ∼ N(0, 1)" loading="lazy"><figcaption><button class="ts" type="button" data-t="1680">28:00</button>左下是推导的来龙去脉：后验、变分贝叶斯 (VB)、q(z)、KL、ELBO；右边 q(z|x<sub>i</sub>) ∼ N(μ, σ<sup>2</sup>)，p(z) ∼ N(0, 1)</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者有一句说，q 和真实后验越近越好，等价于 q 和先验越近越好。这句说过头了。KL(q ‖ p(z)) 只是 ELBO 里的一项，它和重建项互相牵制：q 如果完全等于 N(0, 1)，z 里就不带任何关于 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的信息，重建项会很差。最大化的是两项之和，最终的 q 落在两者之间。</p></div>
+    </section>
+<section class="sec" id="v-s11">
+      <h4><button class="ts" type="button" data-t="1684">28:04</button><span>训练流程：编码器输出 μ 和 σ，采样，解码</span></h4>
+      <p>第一项前面有一个按 q 取的期望。所以每次编码得到 q 以后，都要从 q 里重新采一个 z（蒙特卡洛方法），希望每次采到的 z 都能把 <span class="m"><i>x</i><sub><i>i</i></sub></span> 还原好。训练一步是这样：</p>
+      <ul><li>输入 x，编码器输出 μ 和 σ，确定一个高斯分布 N(μ, σ<sup>2</sup>)。</li><li>从这个高斯里采一个 z。</li><li>解码器把 z 还原成 x̂，和 x 算 L1 或 L2 重建损失。</li><li>同时算 KL(N(μ, σ<sup>2</sup>) ‖ N(0, 1)) 这一项损失，把每张图的高斯往标准正态分布拉。</li></ul>
+      <p>回头对照推导：编码器输出的 N(μ, σ<sup>2</sup>) 就是 q，在近似真实后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>；N(0, 1) 是先验 p(z)。从 q 里采出的 z 可以看作来自 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的后验，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对得上，所以拿它重建 <span class="m"><i>x</i><sub><i>i</i></sub></span> 是合理的。</p>
+      <p>两项损失具体怎么算，讲者没有展开，这里补上。KL 项在两个高斯之间有解析解，不用采样。z 有 d 维、各维独立时：</p>
+      <div class="deriv"><div><span class="df"><span class="m">KL(<i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>) ‖ <i>N</i>(0, 1)) = ½ Σ<sub><i>j</i></sub> (<i>μ</i><sub><i>j</i></sub><sup>2</sup> + <i>σ</i><sub><i>j</i></sub><sup>2</sup> − 1 − log <i>σ</i><sub><i>j</i></sub><sup>2</sup>)</span></span><span class="dc">对 d 个维度求和</span></div></div>
+      <p>比如某一维 μ = 0.5、σ = 0.8，这一维的 KL 是 ½ × (0.25 + 0.64 − 1 + 0.446) ≈ 0.168；μ = 0、σ = 1 时是 0，正好就是先验本身。</p>
+      <p>重建项取决于解码器假设的分布。假设 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 是均值为 x̂、方差固定为 s<sup>2</sup> 的高斯，那么 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) = −‖<i>x</i> − <i>x̂</i>‖<sup>2</sup> / (2<i>s</i><sup>2</sup>) + 常数</span>，最大化它就是最小化 L2 损失；假设成拉普拉斯分布，就对应 L1 损失。讲者说的「L1 或 L2 重建损失」就是这么来的。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-1850.jpg" alt="训练流程：编码器输出 μ、σ，采样 z，解码后和 x_i 算 L1；KL(N(μ, σ²) ‖ N(0, 1)) 把 q 拉向先验" loading="lazy"><figcaption><button class="ts" type="button" data-t="1850">30:50</button>训练流程：编码器输出 μ、σ，采样 z，解码后和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算 L1；KL(N(μ, σ<sup>2</sup>) ‖ N(0, 1)) 把 q 拉向先验</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>还有一处讲者没提：z 是采样得到的，采样这一步没法直接对 μ、σ 求梯度。变分自编码器用<b>重参数化技巧 (Reparameterization Trick)</b>：先从 N(0, 1) 采 ε，再算 z = μ + σ ε。随机性都放进 ε，z 对 μ 和 σ 可导，梯度就能传回编码器。</p><p><a class="ilink" href="#l13-s11">CS231n 的训练一步</a>讲过这一步，公式推导见 <a class="ilink" href="#kl-mc">KL 散度 tab</a>。</p></div>
+    </section>
+<section class="sec" id="v-s12">
+      <h4><button class="ts" type="button" data-t="1855">30:55</button><span>为什么每次都重新采样</span></h4>
+      <p>每次都从 q 里重新采样，是因为重建项是一个期望，期望一般用蒙特卡洛估计。讲者的说法是，希望从 q 里采到的每一个 z 都能把 <span class="m"><i>x</i><sub><i>i</i></sub></span> 还原好，所以不断采、不断重建。</p>
+      <p>他还提到另一种看法：从同一个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的高斯里采出 <span class="m"><i>z</i><sub>1</sub></span>、<span class="m"><i>z</i><sub>2</sub></span> 等好几个点，都要求还原成 <span class="m"><i>x</i><sub><i>i</i></sub></span>，相当于在隐空间里做数据增强，解码器会更鲁棒，泛化更好。</p>
+      <p>最后他把主线收拢了一遍：变分自编码器的出发点是找一个和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对应的 z 去做重建，为此用变分贝叶斯假设了一个 q，最小化 KL，推成最大化 ELBO，再推出两项损失。网上有的讲法直接规定隐空间要服从正态分布，出发点不同，结论一样。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>实际训练中通常每张图每一步只采一个 z，靠大量迭代把期望平均出来。原论文第 2.3 节说，只要批量够大（他们用 100），每个样本采一次就够了。</p></div>
+    </section>
+<section class="sec" id="v-s13">
+      <h4><button class="ts" type="button" data-t="1939">32:19</button><span>隐空间长什么样：只有重建、只有 KL、两者都有</span></h4>
+      <p>板书上贴了三张图：在 MNIST（0 到 9 的手写数字）上训练，把隐空间画成二维，十种颜色对应十个数字。讲者说实际的隐空间维度可能很高，这是投影到二维的样子。</p>
+      <ul><li>只有重建损失，也就是普通自编码器：同一个数字聚成一块，有区域性；但整体没有规则，各块的形状和位置很随意，块之间有大片空白，很难找到一个合理的新 z。这就是自编码器不能当生成模型的原因。</li><li>只有 KL 散度、不做重建：所有点挤成一个中间密、四周疏的圆，明显是正态分布，有规则；但不同数字混在一起，没有区域性。</li><li>两者都用，即变分自编码器：既有区域，又有规则。</li></ul>
+      <p>讲者的对应关系是：重建损失管区域性，KL 散度管规则。后者好理解，KL 本来就是把隐空间往假设的标准正态分布上拉。前者是因为隐空间也是特征空间，自编码器学的就是特征，相似的图特征相近，投影以后也挨在一起。</p>
+      <p>图上还能看到数字之间的过渡是连续的：从「1」的区域往「2」的区域走，中间的点解码出来会从 1 慢慢变成 2。讲者把解码器的作用概括为在 KL 给出的那团正态分布上做了一次聚类，特征相近的图聚到一起，又没有打破整体分布，所以能从里面采新的 z 来生成新图。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-2250.jpg" alt="隐空间整页：右上三张 MNIST 二维隐空间图（只有重建、只有 KL、两者结合），下面总结 L1 对应区域、KL 对应规则" loading="lazy"><figcaption><button class="ts" type="button" data-t="2250">37:30</button>隐空间整页：右上三张 MNIST 二维隐空间图（只有重建、只有 KL、两者结合），下面总结 L1 对应区域、KL 对应规则</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>三张图标题是 Only reconstruction loss、Only KL divergence、Combination，出自 Irhum Shafkat 的博客文章 Intuitively Understanding Variational Autoencoders。</p><p>讲者口头说的「L1 损失对应区域性」指的是重建损失，用 L1 还是 L2 不影响这个结论。</p></div>
+    </section>
+<section class="sec" id="v-s14">
+      <h4><button class="ts" type="button" data-t="2253">37:33</button><span>Latent Diffusion 为什么更清晰：第一个猜想</span></h4>
+      <p>回到开头的问题。两者结构差不多，都是一个编码器加一个解码器，Latent Diffusion 只是中间多了扩散。讲者说网上没找到相关的讨论，下面是他自己的思考，可能有错。</p>
+      <p>第一个猜想和变分贝叶斯有关。两者都假设先验 p(z) 是 N(0, 1)。变分自编码器靠最小化 KL(q ‖ p(z)) 让数据的隐向量服从先验，而 q 是从高斯族里取来近似后验的，真实后验未必是高斯。这一步近似本身就带来偏差，最后拟合出来的正态分布不如想象中好，生成效果也跟着打折。</p>
+      
+      
+    </section>
+<section class="sec" id="v-s15">
+      <h4><button class="ts" type="button" data-t="2383">39:43</button><span>扩散模型学的是噪声到任意分布的映射</span></h4>
+      <p>先看普通的像素扩散：一张图一步步加噪，最后变成服从标准正态分布的噪声；生成时随便取一个噪声，就能一步步还原成图。它学到的是标准正态分布和真实数据分布 p(x) 之间的映射，而且真实分布不需要是高斯。</p>
+      <p>变分自编码器的问题出在用高斯 q 去假设后验 <span class="m"><i>p</i>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>。既然扩散模型能学任意未知分布和标准正态分布之间的映射，这个假设就可以不做：隐向量服从什么分布不用知道，交给扩散模型去学它和 N(0, 1) 之间的映射。</p>
+      <p>生成时从 N(0, 1) 取一个 ε，扩散模型把它变成一个服从隐空间分布的 z，解码器再把 z 解成图。少了一步高斯假设，效果可能就更好。这是他的第一个思考。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-2520.jpg" alt="对比变分自编码器和 Latent Diffusion：右下是扩散模型把 ε ∼ N(0, 1) 映射成服从后验分布 p(z|x_i) 的 z，这个分布本身未知 (unknown)" loading="lazy"><figcaption><button class="ts" type="button" data-t="2520">42:00</button>对比变分自编码器和 Latent Diffusion：右下是扩散模型把 ε ∼ N(0, 1) 映射成服从后验分布 p(z|x<sub>i</sub>) 的 z，这个分布本身未知 (unknown)</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>对照 Latent Diffusion 原论文第 3.1 节和附录 G：猜想的方向大体对，但还有一个更直接的原因讲者没提。</p><p>原论文的自编码器用感知损失 (Perceptual Loss) 加基于图块的对抗损失 (Patch-based Adversarial Objective) 训练，论文说这样能保证重建的局部真实感，避免只用 L1、L2 这类像素损失带来的模糊。</p><p>隐空间的正则也很弱：KL 版本的 KL 项权重只有约 10<sup>−6</sup>，另一个版本用向量量化代替 KL，隐空间几乎不被拉向 N(0, 1)，接近一个普通自编码器，所以重建清楚。</p><p>隐向量的分布交给扩散模型去学，这一点和讲者的猜想一致。所以 Latent Diffusion 的清晰来自两处：解码器本身用感知和对抗损失训练；生成时 z 由扩散模型给出，不再直接从 N(0, 1) 里采。</p></div>
+    </section>
+<section class="sec" id="v-s16">
+      <h4><button class="ts" type="button" data-t="2529">42:09</button><span>第二个原因：重叠处取平均，图就糊了</span></h4>
+      <p>第二个思考是变分自编码器的老毛病，讲者说这个说法是别人提过的。两张图各自的高斯 q 可能有重叠，两张图都可能采到重叠区域里的同一个 z，虽然概率很小。解码器面对这个 z，不知道该还原成哪一张，为了让重建损失最小，训练中就会取两者的平均。平均的结果是高频细节变差，图就糊了。</p>
+      <p>举个数字的例子：同一个 z 在一张图里对应某个像素值 0（黑），在另一张里对应 1（白）。用 L2 损失时最优输出是均值 0.5，一片灰；用 L1 时最优输出是中位数，只有两个样本时 0 到 1 之间任何值损失都一样，同样给不出一条清楚的边。边缘、纹理这些高频部分在不同样本之间最容易对不齐，也最容易被平均掉。</p>
+      <p>讲者最后的总结：Latent Diffusion 比变分自编码器好，主要因为它利用了扩散模型的长处，能学到任意未知的复杂分布和标准正态分布之间的关系。隐空间的后验正好是一个未知分布，扩散模型绕开了用变分贝叶斯去近似它这一步，所以效果更好。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/v-2637.jpg" alt="整页：左边第二点，两个高斯的重叠处采到同一个 z，解码器只能学成平均 (average)，重建就糊" loading="lazy"><figcaption><button class="ts" type="button" data-t="2637">43:57</button>整页：左边第二点，两个高斯的重叠处采到同一个 z，解码器只能学成平均 (average)，重建就糊</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>第二个原因也解释了为什么改训练目标有用：只要重建损失是逐像素的 L1、L2，多个可能答案之间就会被平均。Latent Diffusion 的自编码器加了对抗损失，判别器会惩罚看起来模糊的重建，解码器就不能靠取平均来压低损失。</p></div>
+    </section>
+      <section class="sec keys"><h4>这个视频记住这几条</h4><ul><li>自编码器能学特征但不能生成：隐空间没有约束，采不到合理的新 z。</li><li>变分自编码器把「给每张图找一个 z」换成「给每张图找 z 的后验分布」。后验算不出，就用一个高斯 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 去近似，这是变分贝叶斯；编码器输出的 μ、σ 就是这个高斯的参数。</li><li>恒等式 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>) = KL(<i>q</i> ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) + ELBO</span> 对任何 q 都成立。左边和 q 无关，所以最小化算不出的 KL 等价于最大化能算的 ELBO；又因为 KL ≥ 0，ELBO 是对数似然的下界。</li><li><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span>：前一项是重建损失（高斯解码器对应 L2），后一项把每张图的高斯拉向 N(0, 1)，有解析解；采样那一步靠重参数化技巧传梯度。</li><li>二维隐空间上，重建损失让同类聚成区域，KL 让整体成为规则的正态分布，两者缺一不可。</li><li>变分自编码器发糊，是因为逐像素重建损失在重叠的后验之间取平均。Latent Diffusion 的自编码器改用感知加对抗损失、KL 权重压到约 10<sup>−6</sup>，隐向量的分布交给扩散模型去学。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/v-poster.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1wx421k74m/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>Latent Diffusion：先压缩，再在隐空间里扩散</span></button></li><li><button type="button" data-t="158"><b>2:38</b><span>编码器和解码器来自变分自编码器</span></button></li><li><button type="button" data-t="315"><b>5:15</b><span>自编码器：能学特征，不能生成</span></button></li><li><button type="button" data-t="385"><b>6:25</b><span>想生成新图，就要一个新的 z</span></button></li><li><button type="button" data-t="565"><b>9:25</b><span>换个问题：去找后验</span></button></li><li><button type="button" data-t="784"><b>13:04</b><span>变分贝叶斯：在高斯分布族里找最近的</span></button></li><li><button type="button" data-t="930"><b>15:30</b><span>用 KL 散度衡量「最近」</span></button></li><li><button type="button" data-t="997"><b>16:37</b><span>展开 KL：log p(x) = KL + ELBO</span></button></li><li><button type="button" data-t="1250"><b>20:50</b><span>为什么最大化 ELBO 就是最小化 KL</span></button></li><li><button type="button" data-t="1346"><b>22:26</b><span>把 ELBO 拆成两项</span></button></li><li><button type="button" data-t="1542"><b>25:42</b><span>两个目标：贴近先验，重建得好</span></button></li><li><button type="button" data-t="1684"><b>28:04</b><span>训练流程：输出 μ 和 σ，采样，解码</span></button></li><li><button type="button" data-t="1855"><b>30:55</b><span>为什么每次都重新采样</span></button></li><li><button type="button" data-t="1939"><b>32:19</b><span>隐空间：只有重建、只有 KL、两者都有</span></button></li><li><button type="button" data-t="2253"><b>37:33</b><span>Latent Diffusion 为什么更清晰：第一个猜想</span></button></li><li><button type="button" data-t="2383"><b>39:43</b><span>扩散模型学的是噪声到任意分布的映射</span></button></li><li><button type="button" data-t="2529"><b>42:09</b><span>第二个原因：重叠处取平均，图就糊了</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+<div class="view" id="view-compare">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#cmp-identity">同一个恒等式</a></li><li><a href="#cmp-joint">一起更新</a></li><li><a href="#cmp-split">拆 ELBO</a></li><li><a href="#cmp-blur">为什么糊</a></li><li><a href="#cmp-gaps">各自没讲到的</a></li><li><a href="#cmp-order">读法</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">两种讲法对照</h2>
+    <p class="lede">两种讲法推出来的是同一个目标函数，但起点不同，强调的东西也不同。CS231n 从最大似然出发，把 log p(x) 拆开，扔掉算不出的那项得到下界；视频从「用一个高斯近似后验」出发，把 KL 散度展开，发现最小化它等于最大化 ELBO。这一页把两条路放在一起。</p>
+    <section class="aisec" id="cmp-identity">
+    <h2><span class="n">1</span><span>同一个恒等式，两个起点</span></h2>
+    <p>两边推导的核心都是这个恒等式，对任何 q 都成立，没有近似：</p>
+    <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>) = ELBO + KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>))</span></span><span class="dc">证据 = 下界 + 间隙</span></div><div><span class="df"><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">重建项减先验项</span></div></div>
+    <p>读法不同，取决于从哪一项出发：</p>
+    <div class="tbl"><table><thead><tr><th></th><th>CS231n（Justin Johnson）</th><th>白板推导视频（Nik<sub>Li</sub>）</th></tr></thead><tbody><tr><td>想要什么</td><td>最大化 log p(x)，也就是最大似然</td><td>给每张图找一个对应的 z，好训练解码器</td></tr><tr><td>卡在哪</td><td>p(x) 要对 z 积分；换贝叶斯公式又要后验，都算不了</td><td>不知道 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对应哪个 z，于是要找后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>，也算不了</td></tr><tr><td>引入 q 的理由</td><td>算不了的后验，放一个网络去近似</td><td>变分贝叶斯：在高斯族里找离后验最近的分布</td></tr><tr><td>怎么推</td><td>log p(x) 用贝叶斯公式写开，上下同乘 q，拆三项，套期望</td><td>从 KL(q ‖ 后验) 的定义展开，代入条件概率</td></tr><tr><td>恒等式里那项 KL</td><td>算不出，KL ≥ 0，扔掉，得到下界</td><td>这就是要最小化的目标；log p(x) 和 q 无关，所以最小化它等于最大化 ELBO</td></tr><tr><td>对 ELBO 的态度</td><td>希望最大化下界也能推高真实似然</td><td>最大化 ELBO 就是让 q 贴近后验</td></tr><tr><td>q 往 N(0, 1) 靠</td><td>先验项，要求隐空间符合先验</td><td>推出来的结论，出发点是近似后验</td></tr></tbody></table></div>
+    <p>两种说法都对，各说了一半。CS231n 只看恒等式左边：log p(x) 是要最大化的东西，KL 是个碍事的项。视频只看右边：KL 是要最小化的东西，log p(x) 是个常数。合起来才完整，见下一节。</p>
+    
+    
+    
+    <p class="refs"><a href="#l13-s8">CS231n：推导 →</a><a href="#l13-s10">CS231n：扔掉第三项 →</a><a href="#v-s7">视频：展开 KL →</a><a href="#v-s8">视频：为什么最大化 ELBO →</a></p>
+  </section>
+<section class="aisec" id="cmp-joint">
+    <h2><span class="n">2</span><span>合起来看：编码器和解码器一起更新</span></h2>
+    <p>实际训练时 θ（解码器）和 φ（编码器）同时更新，同一个 ELBO 对两者的作用不一样：</p>
+    <ul><li>对 φ：log p(x) 和 φ 无关，是常数。抬高 ELBO 只能靠缩小间隙 KL(q ‖ 后验)，也就是让编码器给出的 q 更贴近真实后验。这是视频讲的那一半。</li><li>对 θ：ELBO 是 log p(x) 的下界，抬高它会把 log p(x) 一起往上推。这是 CS231n 讲的那一半。θ 变了，真实后验也跟着变，间隙不一定保持不变。</li></ul>
+    <p>所以最大化 ELBO 一举两得：下界在变紧，同时在被往上推。两种讲法各自固定了一个参数在看，视频固定 θ 只看 φ，CS231n 没区分两者，一句「希望」带过。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 800 420" width="800" height="420" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .cq{fill:none;stroke:#0F766E;stroke-width:2.2;stroke-linejoin:round}
+  .cp{fill:none;stroke:#B45309;stroke-width:2.2;stroke-linejoin:round}
+  .cpd{fill:none;stroke:#B45309;stroke-width:2;stroke-dasharray:6 4}
+  .fpos{fill:#0F766E;fill-opacity:.22;stroke:none}
+  .fneg{fill:#B45309;fill-opacity:.28;stroke:none}
+  .fp{fill:#868D98;fill-opacity:.18;stroke:#868D98;stroke-width:1.2}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tq{font-size:12px;fill:#0F766E}
+  .tp{font-size:12px;fill:#B45309}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10.5px}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10.5px}
+</style>
+<defs>
+  <marker id="elbo-gap-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+</defs>
+<rect x="-20" y="-20" width="800" height="420" fill="#fff"/>
+<rect x="40" y="170" width="120" height="130" class="mW"/><rect x="40" y="70" width="120" height="100" class="mWarm"/><text x="100" y="240" class="ph" text-anchor="middle">ELBO</text><text x="100" y="125" class="tp" text-anchor="middle">间隙 = KL</text><text x="100" y="324" class="ph" text-anchor="middle">某一步</text><text x="100" y="344" class="sm" text-anchor="middle">当前的 θ 和 φ</text><line x1="32" y1="70" x2="168" y2="70" class="ink"/><rect x="320" y="110" width="120" height="190" class="mW"/><rect x="320" y="70" width="120" height="40" class="mWarm"/><text x="380" y="210" class="ph" text-anchor="middle">ELBO</text><text x="380" y="95" class="tp" text-anchor="middle">间隙 = KL</text><text x="380" y="324" class="ph" text-anchor="middle">只更新 φ（编码器）</text><text x="380" y="344" class="sm" text-anchor="middle">柱子总高不变，分界往上挪</text><line x1="312" y1="70" x2="448" y2="70" class="ink"/><rect x="600" y="60" width="120" height="240" class="mW"/><rect x="600" y="20" width="120" height="40" class="mWarm"/><text x="660" y="185" class="ph" text-anchor="middle">ELBO</text><text x="660" y="45" class="tp" text-anchor="middle">间隙 = KL</text><text x="660" y="324" class="ph" text-anchor="middle">只更新 θ（解码器）</text><text x="660" y="344" class="sm" text-anchor="middle">整根柱子变高，ELBO 跟着变高</text><line x1="592" y1="20" x2="728" y2="20" class="ink"/><text x="30" y="60" class="v">log <tspan class="v">p</tspan><tspan class="vs" baseline-shift="-20%">θ</tspan><tspan class="vr">(</tspan>x<tspan class="vr">)</tspan></text><line x1="0" y1="300" x2="760" y2="300" class="ax"/><path d="M180 185 H300" class="ink" marker-end="url(#elbo-gap-a)"/><path d="M460 185 H580" class="ink" marker-end="url(#elbo-gap-a)"/><text x="0" y="376" class="xs">示意：高度只表示大小关系，不是实测数值。log p(x) 实际是负数，这里只画它比 ELBO 高出多少。</text>
+</svg>
+<figcaption>示意。橙色是间隙 KL(q‖后验)，绿色是 ELBO，两者之和是 log p(x)。只更新编码器时总高不变、间隙变小；只更新解码器时整根柱子变高。</figcaption></figure>
+    
+    
+    
+  </section>
+<section class="aisec" id="cmp-split">
+    <h2><span class="n">3</span><span>拆 ELBO 的两种写法</span></h2>
+    <p>两边最后都要把 ELBO 写成「重建项减先验项」，拆法略有不同。</p>
+    <p>CS231n 是一步到位：贝叶斯公式里的分子本来就是 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>)</span>，乘上 q/q 以后直接按「p(x|z)、q 配 p(z)、q 配后验」分组，三项一次出来。</p>
+    <p>视频是两步：先把 KL(q ‖ 后验) 展开，用条件概率把后验换成联合分布 <span class="m"><i>p</i>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)</span>，得到 <span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i>]</span>；再把联合分布拆成 <span class="m"><i>p</i>(<i>z</i>) <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)</span>，合并出 KL(q ‖ p(z))。</p>
+    <div class="deriv"><div><span class="df"><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>)]</span></span><span class="dc">视频的第一种形式：联合分布减 q 的熵项</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">两边共同的最终形式</span></div></div>
+    <p>第一种形式在论文里也常见，它的好处是不需要先认出 KL：<span class="m">−<i>E</i><sub><i>q</i></sub>[log <i>q</i>]</span> 就是 q 的熵，所以 ELBO 也可以读成「联合分布的期望对数概率，加上 q 的熵」。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="cmp-blur">
+    <h2><span class="n">4</span><span>「为什么糊」的几种回答</span></h2>
+    <p>视频的出发点是一个问题：变分自编码器生成的图糊，Latent Diffusion 也用了编码器和解码器，为什么清楚。几处说法放在一起：</p>
+    <div class="tbl"><table><thead><tr><th>出处</th><th>说法</th><th>评价</th></tr></thead><tbody><tr><td>视频，第一个猜想</td><td>用高斯 q 近似后验本身有偏差，最后拟合出的正态分布不够好；扩散模型能学任意分布到 N(0, 1) 的映射，不用做这个假设</td><td>方向对：Latent Diffusion 确实把隐向量的分布交给扩散模型去学。但这解释的是「生成的 z 好不好」，没解释「解码器为什么清楚」</td></tr><tr><td>视频，第二个原因</td><td>两张图的 q 有重叠，同一个 z 要还原成两张图，解码器只能学成平均，高频细节没了</td><td>对，这是逐像素 L1、L2 损失的通病。L2 的最优输出是均值，L1 是中位数，都给不出清楚的边</td></tr><tr><td>CS231n 第 14 讲</td><td>Latent Diffusion 的编码器解码器是变分自编码器，KL 权重很小，再加一个判别器把重建变清楚</td><td>直接回答了问题。判别器会惩罚看起来模糊的图，解码器不能再靠取平均降低损失</td></tr><tr><td>Latent Diffusion 原论文</td><td>感知损失加图块对抗损失；KL 权重约 10<sup>−6</sup>，或者用向量量化代替 KL</td><td>最细的版本。KL 几乎不起作用，这个自编码器接近普通自编码器</td></tr></tbody></table></div>
+    <p>合起来看，变分自编码器糊有两个来源：逐像素重建损失会在多种可能之间取平均；为了让隐空间贴近 N(0, 1)，KL 项又逼着不同图的 q 互相重叠，制造出更多「同一个 z 对应几张图」的情况。Latent Diffusion 把两件事都拆掉了：重建用感知和对抗损失，隐空间的分布交给扩散模型，KL 几乎不要。</p>
+    
+    
+    
+    <p class="refs"><a href="#v-s14">视频：第一个猜想 →</a><a href="#v-s16">视频：重叠处取平均 →</a><a href="#l14-s1">CS231n 第 14 讲：加一个判别器 →</a></p>
+  </section>
+<section class="aisec" id="cmp-gaps">
+    <h2><span class="n">5</span><span>各自没讲到的</span></h2>
+    <p>CS231n 讲到、视频没讲的：</p>
+    <ul><li>为什么不直接把 z 积掉：高维积分算不动。</li><li>神经网络怎么输出分布：对角高斯，为什么必须对角，为什么解码器方差固定。</li><li>解码器是高斯时，重建项就是 L2 损失。</li><li>重参数化技巧：采样那一步怎么传梯度。</li><li>隐空间各维独立，可以分别改变；在手写数字上沿两维平滑变形。</li><li>Latent Diffusion 的自编码器加了判别器（第 14 讲）。</li></ul>
+    <p>视频讲到、CS231n 没讲的：</p>
+    <ul><li>「变分」这个名字从哪来：变分贝叶斯，在分布族里找最近的那个。</li><li>为什么最大化 ELBO 能让 q 贴近后验：log p(x) 对 q 是常数。</li><li>二维隐空间里只用重建、只用 KL、两者都用的对比图。</li><li>变分自编码器为什么糊，以及和 Latent Diffusion 的比较。</li></ul>
+    <p>两边都没讲的，补在第一个 tab 和「常见问题」里：KL 散度的定义和 ≥ 0 的证明，两个高斯之间 KL 的解析解，KL 方向带来的偏窄，后验坍缩，β 变分自编码器。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="cmp-order">
+    <h2><span class="n">6</span><span>建议的读法</span></h2>
+    <p>没学过 KL 散度的话，先看第一个 tab 的定义、≥ 0 和方向三节，十分钟能看完。</p>
+    <p>然后看 CS231n 的讲法，它把问题的来龙去脉交代得最清楚：为什么要隐变量，为什么积分和贝叶斯公式都走不通，网络怎么输出分布。推导那一节对着课件截图一行行看。</p>
+    <p>再看视频，从另一头把同一个恒等式推一遍，重点看「为什么最大化 ELBO 就是最小化 KL」和后半段的隐空间对比、糊的讨论。</p>
+    <p>最后看这一页和常见问题，把两种讲法合起来。</p>
+    
+    
+    
+    
+  </section>
+  </article>
+</div>
+</div>
+<div class="view" id="view-faq">
+<div class="faqdoc">
+  <p class="lede">前五个问题是读这几页时实际问到的，其余是变分自编码器常见的疑问和毛病。每个答案尽量短，展开的推导链到别的 tab。</p>
+  <div class="eptools"><span>21 个问题 · 点问题展开</span>
+    <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <section class="faqgrp"><h2>符号与概率</h2>
+    <details class="faq" id="faq-xi"><summary><span class="m"><i>x</i><sub><i>i</i></sub></span> 指的是一张图，还是整个数据集？</summary><div class="faqa">
+      <p>一张图。数据集是 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span>，<span class="m"><i>x</i><sub><i>i</i></sub></span> 是其中第 i 张，下标只是编号。CS231n 课件写成上标 <span class="m"><i>x</i><sup>(<i>i</i>)</sup></span>，也是这个意思。</p>
+      <p>所以 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是这一张图的后验：看到这张图以后，它的 z 可能在哪。每张图有自己的一份后验，编码器也是一张一张地算，对第 i 张图输出它自己的 <span class="m"><i>μ</i><sub><i>i</i></sub></span> 和 <span class="m"><i>σ</i><sub><i>i</i></sub></span>。</p>
+      <p>和整个数据集有关的是两样东西。一是训练目标：样本独立时，数据集的对数似然是每张图的对数似然之和，实际训练时一个批次里每张图各算一份 ELBO，再取平均。二是「所有图的 q 合在一起」的那个分布：</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>q</i>(<i>z</i>) = (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc">所有训练图的近似后验取平均</span></div></div>
+      <p>单张图的 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是一个偏离原点的小高斯，KL 项只是把它往 N(0, 1) 拉。所有图的小高斯合起来，整体才接近 N(0, 1)。视频里那三张二维隐空间图，每个点是一张图编码出的 z，画的就是这个合起来的分布。</p>
+      <p class="refs"><a href="#kl-symbols">KL 散度 tab：符号表 →</a><a href="#v-s13">视频：隐空间长什么样 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-zq"><summary><span class="m"><i>z</i> ∼ <i>q</i></span> 是什么意思？</summary><div class="faqa">
+      <p>读作「z 服从分布 q」：z 是一个随机变量，取各个值的概率由 q 决定；也可以理解成 z 是从 q 里抽出来的一个样本。∼ 就是「服从」或「从……采样」。</p>
+      <p>写在期望下标里，<span class="m"><i>E</i><sub><i>z</i>∼<i>q</i></sub>[<i>f</i>(<i>z</i>)]</span> 的意思是 z 按 q 的概率取值，对 f(z) 求平均，常简写成 <span class="m"><i>E</i><sub><i>q</i></sub></span>。在变分自编码器里，q 是 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) = <i>N</i>(<i>μ</i><sub><i>i</i></sub>, <i>σ</i><sub><i>i</i></sub><sup>2</sup>)</span>，z ∼ q 就是从编码器给第 i 张图算出的高斯里抽一个 z，具体做法是先抽 ε ∼ N(0, 1)，再算 z = μ + σε。</p>
+      <p>比如某张图编码得到 μ = 2、σ = 0.5，抽出来的 z 大多在 2 附近，约 95% 落在 1 到 3 之间。</p>
+      <p class="refs"><a href="#kl-expect">KL 散度 tab：期望 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-integral"><summary>KL 散度为什么是积分的形式，为什么又能写成期望？</summary><div class="faqa">
+      <p>积分是因为 z 连续。z 只取有限几个值时，KL 散度是求和 <span class="m">Σ<sub><i>z</i></sub> <i>q</i>(<i>z</i>) log [<i>q</i>(<i>z</i>)/<i>p</i>(<i>z</i>)]</span>；z 是连续向量时，q(z) 变成概率密度，求和就换成积分。两者是同一个东西。</p>
+      <p>能写成期望，是因为期望的定义本身就是这个形状：<span class="m"><i>E</i><sub><i>q</i></sub>[<i>f</i>(<i>z</i>)] = ∫ <i>q</i>(<i>z</i>) <i>f</i>(<i>z</i>) <i>d</i><i>z</i></span>，用 q(z) 当权重给 f(z) 加权平均。f 取 log(q/p)，就是 KL 的积分。</p>
+      <p>写成期望有两个用处。一是期望是线性的，减号能拆开，ELBO 的推导一路靠这个。二是积分算不出来时，可以从 q 里采样取平均来估计，重建项就是这么算的。两个高斯之间的 KL 恰好能积出解析式，所以 KL 项不用采样。</p>
+      <p class="refs"><a href="#kl-expect">KL 散度 tab：期望 →</a><a href="#kl-def">KL 散度 tab：定义 →</a><a href="#kl-mc">KL 散度 tab：采样估计 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-direction"><summary>KL(q ‖ p) 衡量的是两个分布的相似度吗？为什么 q 在前？</summary><div class="faqa">
+      <p>衡量的是差异：两个分布一样时为 0，差得越多越大。它不对称，KL(q ‖ p) 和 KL(p ‖ q) 一般不等，所以不算距离，只叫散度。两枚硬币 q = (0.5, 0.5)、p = (0.9, 0.1)，一个方向 0.511，另一个方向 0.368。</p>
+      <p>q 在前是因为只有这个方向算得动。期望按 q 取，q 是编码器的高斯，能采样也能算密度；真实后验只出现在 log 里，可以拆成 log p(z, x) − log p(x)，后一项和 z 无关，成了常数。反过来要按真实后验取期望，得先能从后验采样，而这做不到。</p>
+      <p>副作用是 q 偏窄：KL(q ‖ p) 重罚「q 放到了 p 很小的地方」，所以 q 宁可缩在后验的一个峰里。</p>
+      <p class="refs"><a href="#kl-dir">KL 散度 tab：方向 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-variational"><summary>「变分」是什么意思？</summary><div class="faqa">
+      <p>来自变分法：优化的对象是一个函数，而不是一个数。变分推断 (Variational Inference) 里，要找的是一个分布 q，让它最接近算不出来的后验。</p>
+      <p>直接在所有分布里找没法做，所以限定在一族简单分布里，比如对角高斯，问题就变成优化这一族的参数 μ、σ。变分自编码器再进一步，不为每张图单独优化一组参数，而是训练一个网络，输入图、输出这张图的 μ 和 σ，这个网络就是编码器。</p>
+      <p class="refs"><a href="#v-s5">视频：变分贝叶斯 →</a><a href="#l13-s4">CS231n：隐变量模型 →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>模型与训练</h2>
+    <details class="faq" id="faq-why-not-ae"><summary>为什么不先训练一个普通自编码器，再给所有 z 拟合一个高斯？</summary><div class="faqa">
+      <p>能做，但效果一般。普通自编码器的隐空间没有约束，编码出来的点聚成形状不规则的几块，块之间有大片空白。用一个高斯去拟合，采样会大量落在空白处，解码出来不像图。视频里「只有重建损失」那张图就是这个样子。</p>
+      <p>变分自编码器的 KL 项在训练时就把隐空间往 N(0, 1) 上压，空白少得多。反过来，如果用一个足够强的模型去学隐空间的分布，这条路是走得通的：Latent Diffusion 就是先训练一个几乎不加约束的自编码器，再用扩散模型去学隐向量的分布。</p>
+      <p class="refs"><a href="#v-s13">视频：隐空间对比 →</a><a href="#l14-s0">CS231n 第 14 讲：在隐空间里做扩散 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-reparam"><summary>为什么要重参数化？</summary><div class="faqa">
+      <p>重建项要按 <span class="m"><i>q</i><sub><i>φ</i></sub></span> 取期望，而 <span class="m"><i>q</i><sub><i>φ</i></sub></span> 依赖编码器的参数 φ。「从一个依赖 φ 的分布里抽一个样本」这个动作没有梯度，反向传播到这里就断了。</p>
+      <p>重参数化把它改写成先抽一个和 φ 无关的 ε ∼ N(0, I)，再算 z = μ + σ ⊙ ε。随机性全在 ε 里，z 是 μ、σ 的普通函数，梯度能照常传回编码器。</p>
+      <p class="refs"><a href="#kl-mc">KL 散度 tab：重参数化 →</a><a href="#l13-s11">CS231n：训练一步 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-one-sample"><summary>每张图每一步只采一个 z，够吗？</summary><div class="faqa">
+      <p>够。单个样本的估计没有偏差，只是噪声大；训练要跑几万步，每步又是一整个批次的图，噪声会被平均掉。原论文 (Kingma 和 Welling) 第 2.3 节说，批量取 100 时每个样本采一次就行。</p>
+      <p>多采几个 z 会让每一步的梯度更稳，但计算量成倍增加，一般不划算。</p>
+      
+    </div></details>
+    <details class="faq" id="faq-logvar"><summary>编码器为什么常输出 log σ<sup>2</sup>，而不是 σ？</summary><div class="faqa">
+      <p>方差必须是正数，网络的输出却可正可负。让网络输出 log σ<sup>2</sup>，任何实数都对应一个合法的方差，用的时候取指数就行。KL 公式 <span class="m">½ Σ (<i>μ</i><sup>2</sup> + <i>σ</i><sup>2</sup> − 1 − log <i>σ</i><sup>2</sup>)</span> 里本来就有 log σ<sup>2</sup>，直接用。</p>
+      
+    </div></details>
+    <details class="faq" id="faq-decoder-out"><summary>解码器输出的是一个分布，还是一张图？</summary><div class="faqa">
+      <p>名义上是分布，实际上用的是图。解码器输出像素高斯的均值，方差固定为常数；训练时算这个高斯的对数似然，生成时直接拿均值当输出，从不在均值上再加噪声。</p>
+      <p>方差固定时，对数似然就是 <span class="m">−‖<i>x</i> − <i>μ</i>‖<sup>2</sup>/(2<i>σ</i><sup>2</sup>)</span> 加常数，最大化它等价于最小化 L2 损失。σ<sup>2</sup> 越小，重建项相对 KL 项越重。</p>
+      <p class="refs"><a href="#l13-s7">CS231n：神经网络怎么输出一个分布 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-bce"><summary>手写数字上为什么常用二元交叉熵当重建损失？</summary><div class="faqa">
+      <p>因为解码器换了一个分布。MNIST 的像素接近非黑即白，可以把每个像素当成伯努利分布，解码器输出它是白色的概率。伯努利分布的对数似然就是二元交叉熵 (Binary Cross-Entropy)。原论文在 MNIST 上用的就是伯努利解码器，在人脸数据上用高斯解码器。</p>
+      <p>规律是一样的：解码器假设什么分布，重建损失就是这个分布的负对数似然。高斯对应 L2，拉普拉斯对应 L1，伯努利对应二元交叉熵。</p>
+      
+    </div></details>
+    <details class="faq" id="faq-mean-or-sample"><summary>生成和重建的时候，用 μ 还是采样？</summary><div class="faqa">
+      <p>生成新图：从先验 N(0, I) 采 z，过解码器。</p>
+      <p>重建或者拿 z 当特征：一般直接用编码器输出的 μ，不采样，结果确定，也最能代表这张图。训练时才必须采样，因为重建项是对 q 取期望。</p>
+      
+    </div></details>
+    <details class="faq" id="faq-latent-dim"><summary>隐变量的维度怎么选？</summary><div class="faqa">
+      <p>太小，信息挤不过瓶颈，重建很差；太大，重建好了，但很多维用不上，KL 项会把这些维压回先验，也就是对这些维 μ = 0、σ = 1，它们不携带任何信息。实际看任务：画二维隐空间的演示用 2 维；MNIST 常用 10 到 50 维；Latent Diffusion 这类用的是空间形状的隐表示，比如 64×64×4。</p>
+      <p>一个实用的检查：训练完看每一维的 KL 贡献，接近 0 的维就是没用上的。</p>
+      
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>常见毛病与变体</h2>
+    <details class="faq" id="faq-blur"><summary>变分自编码器生成的图为什么糊？</summary><div class="faqa">
+      <p>两个原因叠在一起。一是逐像素的重建损失：同一个 z 可能对应好几张不同的图（KL 项逼着不同图的 q 互相重叠），L2 损失下最优输出是这些图的平均，L1 是中位数，边缘和纹理都被平均掉。二是高斯解码器本身：它假设像素之间独立，没法表达「这条边要么在这儿要么在那儿」这种多种可能。</p>
+      <p>改进的方向：把重建损失换成感知损失加对抗损失（Latent Diffusion 的做法），或者换更强的解码器，或者减小 KL 权重，再用别的模型学隐空间的分布。</p>
+      <p class="refs"><a href="#cmp-blur">两种讲法对照：为什么糊 →</a><a href="#v-s16">视频：重叠处取平均 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-collapse"><summary>后验坍缩 (Posterior Collapse) 是什么？</summary><div class="faqa">
+      <p>编码器给所有图都输出和先验一样的 N(0, I)，KL 项降到 0，z 不携带任何信息，解码器完全不看 z 也能把重建做得不错。</p>
+      <p>它常出现在解码器很强的时候，比如用自回归的循环网络当解码器生成句子：解码器靠前面的词就能预测下一个词，用不着 z。这时 KL 项的「免费」最优解就是让 q 等于先验。</p>
+      <p>常见对策：训练初期把 KL 权重从 0 慢慢升到 1 (KL Annealing)；把解码器削弱一点，比如随机丢掉一部分输入词；给每一维的 KL 设一个下限，低于下限不罚 (Free Bits)。</p>
+      <p class="refs"><a href="https://arxiv.org/abs/1511.06349" target="_blank" rel="noreferrer">Generating Sentences from a Continuous Space（KL 退火） ↗</a><a href="https://arxiv.org/abs/1606.04934" target="_blank" rel="noreferrer">Improved Variational Inference with Inverse Autoregressive Flow（Free Bits） ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-beta"><summary>β 变分自编码器是什么？</summary><div class="faqa">
+      <p>给 KL 项乘一个系数 β：损失变成「重建项 − β × KL」。β = 1 就是原版。</p>
+      <p>β &gt; 1 时隐空间被更用力地压向先验，各维更独立，往往一维对应一个可解释的变化（姿态、大小、颜色），代价是重建更糊。β &lt; 1 时重建更好、隐空间更乱。Latent Diffusion 的自编码器取 β ≈ 10<sup>−6</sup>，几乎就是普通自编码器。</p>
+      <p>前面说过，解码器方差 σ<sup>2</sup> 也起同样的作用，调 σ<sup>2</sup> 和调 β 是一回事。</p>
+      <p class="refs"><a href="https://openreview.net/forum?id=Sy2fzU9gl" target="_blank" rel="noreferrer">Higgins 等，ICLR 2017：β 变分自编码器原论文 ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-holes"><summary>从 N(0, I) 采的 z，为什么有时会解码出很怪的图？</summary><div class="faqa">
+      <p>KL 项只是把每张图的 q 往先验拉，并不保证所有图的 q 合在一起正好铺满 N(0, I)。合起来的分布可能在某些区域很稀，先验在那里却有不小的概率。从先验采到这种区域的 z，解码器训练时几乎没见过，输出就不像样。</p>
+      <p>对策是换一个更贴合数据的先验，或者干脆用另一个模型学隐向量的分布：两阶段的做法、Latent Diffusion 都属于这一类。</p>
+      <p class="refs"><a href="https://arxiv.org/abs/1705.07120" target="_blank" rel="noreferrer">Tomczak 和 Welling：可学习的 VampPrior 先验 ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-loglik"><summary>ELBO 能当 log p(x) 用吗？真实的对数似然怎么估？</summary><div class="faqa">
+      <p>ELBO 只是下界，两者差一个 KL(q ‖ 后验)，这个差多大不知道。用 ELBO 比较两个模型可能不公平：一个模型的下界松，不代表它的真实似然低。</p>
+      <p>估真实的 log p(x) 用重要性采样 (Importance Sampling)：从 q 里抽 K 个 z，用 <span class="m">log (1/<i>K</i>) Σ<sub><i>k</i></sub> <i>p</i><sub><i>θ</i></sub>(<i>x</i>, <i>z</i><sub><i>k</i></sub>) / <i>q</i><sub><i>φ</i></sub>(<i>z</i><sub><i>k</i></sub>|<i>x</i>)</span> 估计。</p>
+      <p>K = 1 时它的期望就是 ELBO，K 越大越接近 log p(x)。论文里报告的对数似然通常取 K = 5000 左右。把这个更紧的界直接当训练目标，就是重要性加权自编码器。</p>
+      <p class="refs"><a href="https://arxiv.org/abs/1509.00519" target="_blank" rel="noreferrer">Importance Weighted Autoencoders ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-vq"><summary>向量量化变分自编码器是什么？</summary><div class="faqa">
+      <p>隐变量换成离散的：准备一本码本，几百到几千个向量；编码器的输出替换成码本里最近的那个向量，解码器从这些码本向量重建。全称 Vector Quantized Variational Autoencoder。</p>
+      <p>先验是均匀分布，KL 项变成常数，训练里实际不出现。生成时另外训练一个自回归模型，在码本编号的序列上建模。CS231n 第 14 讲结尾提到，除了扩散模型，另一条现代路线就是「离散变分自编码器 + 自回归模型」。</p>
+      <p class="refs"><a href="https://arxiv.org/abs/1711.00937" target="_blank" rel="noreferrer">Neural Discrete Representation Learning ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-sd"><summary>Stable Diffusion 里的变分自编码器和原版有什么不同？</summary><div class="faqa">
+      <p>结构还是编码器输出 μ、σ，解码器还原图。不同在训练目标：重建损失换成 L1 加感知损失，再加一个图块判别器做对抗训练；KL 项权重只有约 10<sup>−6</sup>。这正是 Latent Diffusion 论文里的 KL 正则版本。</p>
+      <p>形状上，512×512×3 的图压成 64×64×4 的隐表示，空间上 8 倍下采样。因为 KL 几乎不约束，隐表示的方差不是 1，Stable Diffusion 1.x 在送进扩散模型前会乘一个缩放系数 0.18215，把方差拉回 1 附近。</p>
+      <p class="refs"><a href="#l14-s1">CS231n 第 14 讲：加一个判别器 →</a><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noreferrer">High-Resolution Image Synthesis with Latent Diffusion Models ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-family"><summary>变分自编码器和生成对抗网络、扩散模型是什么关系？</summary><div class="faqa">
+      <p>CS231n 的家族树里，变分自编码器是显式但近似的密度模型，能算出 log p(x) 的下界；生成对抗网络只能采样、算不出密度；扩散模型通过逐步去噪采样。</p>
+      <p>它们并不互相取代。扩散模型本身可以看成隐变量模型，训练目标也是变分下界；现代的图像生成流程同时用三样：变分自编码器的编码器解码器负责压缩，判别器负责让解码清楚，扩散模型在隐空间里生成。</p>
+      <p class="refs"><a href="#l14-s2">CS231n 第 14 讲：扩散模型也是隐变量模型 →</a></p>
+    </div></details>
+  </section>
+</div>
+</div>
+</main>
+<div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
+<script>(function(){
+  /* ── tab ── */
+  function showTab(v){
+    document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+    var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
+  }
+  document.querySelectorAll('.tb').forEach(function(b){
+    b.addEventListener('click',function(){
+      showTab(b.dataset.v);
+      history.replaceState(null,'',b===document.querySelector('.tb')?location.pathname+location.search:'#'+b.dataset.v);
+      scrollTo(0,0);
+    });
+  });
+
+  /* ── 全部展开 / 收起（只管当前 tab） ── */
+  document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
+    var open=b.dataset.all==='open';b.closest('.view').querySelectorAll('details.ep,details.faq').forEach(function(d){d.open=open;});});});
+
+  /* ── 播放器：本地有原片就放本地（data-src），没有就用 B 站播放器。时间码都是原片里的秒；点封面从 data-start 开始放
+   * （CS231n 的卡片只截了一讲里的一段，封面从这段的开头放） ── */
+  function player(ep){
+    if(ep._pl)return ep._pl;
+    var box=ep.querySelector('.pl'), which=ep.querySelector('.plwhich'), tl=[].slice.call(ep.querySelectorAll('.tl button'));
+    var st={mode:null,el:null};
+    function bili(t){
+      var f=document.createElement('iframe');
+      f.allow='autoplay;fullscreen;picture-in-picture';f.setAttribute('allowfullscreen','');
+      f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('scrolling','no');
+      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&p='+ep.dataset.p+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
+      box.innerHTML='';box.appendChild(f);st.mode='bili';st.el=f;
+      which.textContent=ep.dataset.src?'B 站播放器（本地没找到视频文件）':'B 站播放器';
+    }
+    function mark(t){var cur=null;tl.forEach(function(b){if(+b.dataset.t<=t+0.5)cur=b;});
+      tl.forEach(function(b){b.classList.toggle('on',b===cur);});}
+    function local(t){
+      var v=document.createElement('video');v.controls=true;v.preload='auto';v.playsInline=true;
+      v.src=ep.dataset.src;
+      v.addEventListener('error',function(){if(st.mode==='local')bili(st.want);},{once:true});
+      v.addEventListener('loadedmetadata',function(){v.currentTime=st.want||0;v.play().catch(function(){});},{once:true});
+      v.addEventListener('timeupdate',function(){mark(v.currentTime);});
+      box.innerHTML='';box.appendChild(v);st.mode='local';st.el=v;
+      which.textContent='本地视频 '+ep.dataset.src.split('/').pop();
+    }
+    function play(t){
+      st.want=t;
+      if(!st.mode){if(ep.dataset.src)local(t);else bili(t);}
+      else if(st.mode==='local'){if(st.el.readyState>=1){st.el.currentTime=t;st.el.play().catch(function(){});}}
+      else bili(t);
+      if(st.mode==='bili')mark(t);
+    }
+    return ep._pl={play:play};
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.ts,.tl button,.plgo');if(!b)return;
+    var ep=b.closest('.ep');if(!ep)return;
+    e.preventDefault();
+    player(ep).play(+(b.dataset.t||ep.dataset.start||0));
+    var pl=ep.querySelector('.pl'),r=pl.getBoundingClientRect();
+    if(r.bottom<60||r.top>innerHeight-80)pl.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+
+  /* ── 截图大图，左右键切同一张卡片里的图 ── */
+  var lb=document.getElementById('lightbox'),list=[],at=-1;
+  function show(i){at=(i+list.length)%list.length;var im=list[at];lb.querySelector('img').src=im.src;
+    var cap=im.closest('.shot').querySelector('figcaption').cloneNode(true),t=cap.querySelector('.ts');if(t)t.remove();
+    lb.querySelector('figcaption').innerHTML=cap.innerHTML+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
+    lb.querySelectorAll('.lb-nav').forEach(function(n){n.hidden=list.length<2;});}
+  document.addEventListener('click',function(e){
+    var im=e.target.closest('.shot img');
+    if(im){list=[].slice.call(im.closest('.ep').querySelectorAll('.shot img'));lb.classList.add('on');show(list.indexOf(im));return;}
+    if(!lb.classList.contains('on'))return;
+    var n=e.target.closest('.lb-nav');if(n){show(at+(n.classList.contains('lb-next')?1:-1));return;}
+    lb.classList.remove('on');
+  });
+  addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;
+    if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
+
+  /* ── 地址栏：#kl 这类是 tab；其余是页内任意 id（#l13-s4、#kl-gauss、#faq-collapse），切到它所在的 tab、展开外面的折叠块再滚过去 ──
+   * 截图是懒加载的，图片撑开以后位置会变，load 之后和图片加载完各再定位一次 */
+  function openHash(){
+    var id=decodeURIComponent(location.hash.slice(1));if(!id)return;
+    if(document.getElementById('view-'+id)){showTab(id);return;}
+    var el=document.getElementById(id);if(!el)return;
+    var v=el.closest('.view');if(v)showTab(v.id.slice(5));
+    for(var d=el.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true;
+    el.scrollIntoView({block:'start'});
+  }
+  openHash();addEventListener('hashchange',openHash);
+  addEventListener('load',function(){setTimeout(openHash,0);setTimeout(openHash,600);});
+})();
+</script>
+</body></html>
