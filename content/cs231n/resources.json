@@ -24,6 +24,33 @@
         "title": "Latent Diffusion 为什么在隐空间计算",
         "paragraphs": [
           "像素空间维度高，反复加噪和去噪的计算开销很大。Latent Diffusion 先将图像编码成较小的表示，在这个空间里训练扩散模型，生成后再解码回图像。"
+        ],
+        "detailed": [
+          {
+            "type": "p",
+            "text": "讲者从一个实际问题切入：扩散模型要反复处理一张图像，图像越大，每次去噪就越贵。256 × 256 的彩色图像有 196,608 个像素通道值。若每一步都在这个空间中计算，训练和生成都要承担相应的开销。"
+          },
+          {
+            "type": "p",
+            "text": "Latent Diffusion 先用 Encoder 把图像压缩到较小的隐表示，再在隐空间中加噪和去噪。Decoder 负责把生成的隐表示还原成图像。这样，最昂贵的反复去噪发生在较小的空间里，最后只需解码一次。"
+          },
+          {
+            "type": "p",
+            "text": "这里压缩的是表示的大小。把边长从 256 压到 32，空间位置数会减少为原来的 1/64；总元素数还要看隐表示有多少通道，不能直接断言总维度也减少 64 倍。视频里的 32 × 32 是说明思路的例子。"
+          },
+          {
+            "type": "p",
+            "text": "压缩必然丢掉一些信息。关键是保留图像的结构和语义，同时让 Decoder 能恢复视觉细节。如果压缩时连物体的位置和形状都丢了，后面的扩散模型也无法凭空找回原图。压缩模型的重建质量因此会限制整个系统的质量。"
+          },
+          {
+            "type": "equation",
+            "label": "两种计算空间",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>x</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>H</mi><mo>×</mo><mi>W</mi><mo>×</mo><mn>3</mn></mrow></msup></mrow><mo>,</mo><mrow><mi>z</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>h</mi><mo>×</mo><mi>w</mi><mo>×</mo><mi>c</mi></mrow></msup></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "视频还提到 Diffusion Transformer。这里需要分开两个选择：在哪个空间里生成，以及用什么网络去预测噪声。在隐空间中做扩散时，去噪网络既可以采用 U-Net，也可以采用 Transformer；更换网络结构不改变先编码、再生成隐表示、最后解码的基本分工。"
+          }
         ]
       },
       {
@@ -38,13 +65,58 @@
           "caption": "Latent Diffusion 的整体路径：图像编码、隐空间扩散和图像解码。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "讲者接着提出自己的疑问：传统 Variational Autoencoder 生成的图像往往较模糊，而 Latent Diffusion 也用了 Encoder 和 Decoder，却能得到更清晰的结果。既然两者都有编码与解码，差别究竟出在哪里。"
+          },
+          {
+            "type": "p",
+            "text": "先把这三件事分开：Encoder 决定图像怎样变成隐表示，Decoder 决定隐表示怎样变回图像，生成模型决定新的隐表示从哪里来。即使前两部分能很好地压缩与重建，也仍然需要解决第三个问题。"
+          },
+          {
+            "type": "p",
+            "text": "在标准 Variational Autoencoder 中，生成时通常直接从标准正态先验取样，再交给 Decoder。Latent Diffusion 则先从噪声出发，经多次去噪得到适合解码的隐表示。两种系统对于隐空间生成分布的处理不同。"
+          },
+          {
+            "type": "p",
+            "text": "这个区别会在后半段展开。前面先把 Variational Autoencoder 的目标函数推清楚：为什么编码器输出一个分布，为什么训练时需要取样，以及为什么损失中会同时出现重建与先验约束。"
+          },
+          {
+            "type": "note",
+            "text": "后面的 Reparameterization、条件均值与中位数等解释，是为理解训练过程补上的推导。它们与视频原话分开呈现；讲者后半段关于生成质量的推测也会单独辨析。"
+          }
+        ]
       },
       {
         "t": 315,
         "title": "Autoencoder：从重建学习特征",
         "paragraphs": [
           "Autoencoder 将输入 x 编码为 z，再由 Decoder 重建输入。训练时比较重建结果与原图，使隐表示携带重建所需的信息。"
+        ],
+        "detailed": [
+          {
+            "type": "p",
+            "text": "先看 Autoencoder。输入图像 x 经过 Encoder 得到隐向量 z，Decoder 再根据 z 输出重建图像 x̂。训练时让 x̂ 接近原图 x，两个网络共同更新。整个过程只需要原图本身作为训练目标。"
+          },
+          {
+            "type": "equation",
+            "label": "重建路径",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mi>z</mi><mo>=</mo><msub><mi>E</mi><mi>φ</mi></msub><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>,</mo><mi>x̂</mi><mo>=</mo><msub><mi>D</mi><mi>θ</mi></msub><mrow><mo>(</mo><mi>z</mi><mo>)</mo></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "如果编码和解码能原样复制所有像素，模型可能只学会一个无用的恒等映射。因此通常要限制隐表示的容量，或者加上噪声、稀疏性等约束，迫使模型保留有助于重建的结构。视频重点使用压缩后的隐表示来解释这一点。"
+          },
+          {
+            "type": "p",
+            "text": "例如，把手写数字图像压成两个数，Decoder 仍能大致画回原来的数字，说明这两个数保留了与数字形状有关的信息。但能重建已有样本，并不意味着知道这两个数在整个平面上应该怎样分布。"
+          },
+          {
+            "type": "p",
+            "text": "这里的 Encoder 输出一个确定的向量。同一张图像输入两次，在网络没有额外随机性的情况下会得到同一个 z。后面 Variational Autoencoder 的 Encoder 会输出分布参数，这是两种方法在训练方式上的一个区别。"
+          }
         ]
       },
       {
@@ -59,7 +131,33 @@
           "caption": "Autoencoder 产生训练样本的隐向量，新样本对应的隐向量仍然需要确定。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "训练集有 n 张图像，经过 Autoencoder 得到 n 个隐向量。拿其中一个隐向量解码，通常可以重建对应的训练图像；要生成新的图像，还需要得到新的、合理的隐向量。"
+          },
+          {
+            "type": "p",
+            "text": "问题在于，重建损失主要约束已经访问过的隐表示附近。假设两团训练数据的隐向量分别落在平面左侧和右侧，中间区域几乎没有训练样本。随手在中间取一个点，Decoder 的输出可能没有意义。"
+          },
+          {
+            "type": "p",
+            "text": "这也说明，在隐向量上做加减或插值有时能得到好结果，却不能代替一个明确的生成分布。插值的成功依赖于学到的空间是否平滑，以及所走的路径有没有离开模型熟悉的区域。"
+          },
+          {
+            "type": "p",
+            "text": "一个自然想法是：先指定一个容易取样的分布，例如标准正态分布，再让图像的隐表示适应它。生成时就能从这个分布取样，避免在未知的隐空间里盲目找点。"
+          },
+          {
+            "type": "p",
+            "text": "但不能从标准正态分布随机取一个 z，随便挑一张训练图像 x，直接要求 Decoder 把前者重建成后者。这个配对没有表达图像与隐变量之间的关系。模型需要一套训练方法，让取到的 z 与当前图像有关，同时又能与选定的生成先验协调。"
+          },
+          {
+            "type": "note",
+            "text": "Autoencoder 可以与额外学习的隐空间生成模型结合。这里讨论的是只训练重建目标的普通 Autoencoder，它本身没有提供可直接使用的隐变量先验。"
+          }
+        ]
       },
       {
         "t": 565,
@@ -73,7 +171,39 @@
           "caption": "给定图像后，从后验取样，再通过 Decoder 重建图像。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "概率生成模型先描述数据如何产生：从先验 p(z) 取出一个隐变量 z，再从条件分布 pθ(x|z) 生成图像 x。θ 是生成网络的参数。生成过程的方向是从隐变量到图像。"
+          },
+          {
+            "type": "equation",
+            "label": "生成模型与边缘概率",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>,</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow><mo>,</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><mo>∫</mo><mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mi>d</mi><mi>z</mi></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "训练时手里只有图像，z 没有被标出来。于是需要反过来问：已经看到这张 x，哪些 z 有可能生成它。这个条件分布就是后验 pθ(z|x)。它可以给多个候选隐向量不同的权重，并不要求每张图像只能对应唯一一个点。"
+          },
+          {
+            "type": "p",
+            "text": "例如，同一个手写数字的粗细、倾斜和笔画位置可能有多种隐表示方式。后验描述的是在当前生成模型下，这些可能解释的相对可信程度。它的形状由生成模型与先验共同决定。"
+          },
+          {
+            "type": "equation",
+            "label": "后验需要归一化",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mfrac><mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mfrac></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "分子可以计算：给定 z，Decoder 给出图像的条件密度，先验也已指定。困难出在分母 pθ(x)，它要对所有可能的 z 积分。隐变量维度高、Decoder 又是复杂神经网络时，通常无法在每次训练更新里精确算出这个积分。"
+          },
+          {
+            "type": "p",
+            "text": "所以问题从寻找一个与图像配对的隐向量，变成了寻找一个能近似真实后验的分布。只要这个分布可计算、可取样，就能为当前图像提供有依据的隐变量样本。"
+          }
+        ]
       },
       {
         "t": 784,
@@ -87,13 +217,63 @@
           "caption": "在选定分布家族内寻找近似后验。示意图中的点代表分布。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "Variational Bayes 的做法是先选定一个能处理的分布家族，再在其中寻找合适的近似。视频画出的外层集合表示所有候选分布，内部的小集合表示允许使用的近似家族；图上的一个点代表一整个分布。"
+          },
+          {
+            "type": "p",
+            "text": "真实后验可能弯曲、多峰，甚至有复杂的维度关联。若只允许使用高斯分布，就只能在高斯家族内寻找尽量合适的一个。最优近似仍然可能与真实后验有差距，这个差距来自近似家族本身的表达能力。"
+          },
+          {
+            "type": "p",
+            "text": "Variational Autoencoder 常把 qφ(z|x) 设为对角高斯。Encoder 输入图像 x，输出均值向量 μφ(x) 和各维的方差。φ 是网络的共享参数，并不只是给某一张图像单独保存的一对均值和方差。"
+          },
+          {
+            "type": "equation",
+            "label": "一种常用的近似家族",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><mi>𝒩</mi><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mi>φ</mi></msub><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>,</mo><mrow><mtext>diag</mtext><mrow><mo>(</mo><mrow><msup><msub><mi>σ</mi><mi>φ</mi></msub><mn>2</mn></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "不同图像会得到不同的分布参数，但使用同一个 Encoder 来计算。这种共享让模型学会一条从图像到近似后验的映射，新图像到来时也能直接计算，无需从头为它优化一个独立分布。"
+          },
+          {
+            "type": "p",
+            "text": "对角高斯假设的是给定 x 后，近似后验的各维独立。它不意味着整个数据集的隐表示一定独立，也不意味着真实后验本来就没有维度关联。区分这几个分布，后面理解隐空间图和 Latent Diffusion 时会用到。"
+          }
+        ]
       },
       {
         "t": 930,
         "title": "用 Kullback-Leibler divergence 衡量近似",
         "paragraphs": [
           "目标写成 qφ(z|x) 到 pθ(z|x) 的 Kullback-Leibler divergence。这个量一般不对称，视频也指出它并非严格意义上的距离。真实后验不可算，直接优化这个表达式仍有困难。"
+        ],
+        "detailed": [
+          {
+            "type": "p",
+            "text": "视频选择 Kullback-Leibler divergence 来衡量近似后验与真实后验的差异。这里顺序有意义：取样和积分按照 qφ(z|x) 进行，然后比较 qφ(z|x) 与 pθ(z|x) 在这些位置上的密度。"
+          },
+          {
+            "type": "equation",
+            "label": "后验近似目标",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><mo>∫</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mrow><mi>log</mi><mfrac><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mfrac></mrow></mrow><mi>d</mi><mi>z</mi></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "这个量非负，两个分布相同时为零，但通常不对称。把两个分布交换位置，得到的优化行为可能不同，因此不能把它简单当成欧氏距离。视频选择的方向是近似分布在前、真实后验在后。"
+          },
+          {
+            "type": "p",
+            "text": "直观地说，如果近似分布把很多概率质量放到真实后验密度极低的位置，对数比值会给出较大代价。若近似家族过于简单，它也可能集中到真实后验的部分区域，而没有覆盖所有可能解释。"
+          },
+          {
+            "type": "p",
+            "text": "看起来目标已经明确了，却还没有变成可训练的损失：真实后验本来就难以计算，公式里又出现了它。接下来的推导要把这个难算的后验项，转换成不必直接计算真实后验的目标。"
+          }
         ]
       },
       {
@@ -101,6 +281,44 @@
         "title": "展开定义，并代入 Bayes 公式",
         "paragraphs": [
           "展开对数比值后，用联合分布与边缘分布表示真实后验。对 z 求期望时，log pθ(x) 可以从期望中提出，因为它与被积分的 z 无关。剩余两项组成 Evidence Lower Bound。"
+        ],
+        "detailed": [
+          {
+            "type": "p",
+            "text": "先把对数比值拆开。为方便看清每一步，下面的 E 都表示在近似后验 qφ(z|x) 下对 z 取期望，图像 x 在这一次计算中固定。"
+          },
+          {
+            "type": "equation",
+            "label": "第一步：展开对数比值",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>−</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "再把 Bayes 公式代入后验：后验等于联合分布除以边缘概率。取对数后，分母对应一个减号；外面原本还有一个减号，因此 log pθ(x) 最终以加号出现。"
+          },
+          {
+            "type": "equation",
+            "label": "第二步：用联合分布替换后验",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>−</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>,</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>+</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "最后一项没有 z，所以在对 z 取期望时可以提出。这里用到的是分布归一化：qφ(z|x) 对整个隐空间积分为 1，因此一个与 z 无关的值，取完期望仍然是它本身。"
+          },
+          {
+            "type": "equation",
+            "label": "第三步：提出与 z 无关的项",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mo>∫</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow></mrow><mi>d</mi><mi>z</mi></mrow><mo>=</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mrow><mo>∫</mo><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mi>d</mi><mi>z</mi></mrow><mo>=</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "把前两个期望合在一起，并改变符号，就得到后面要最大化的 Evidence Lower Bound。到这一步为止，使用的都是精确恒等式，还没有通过丢掉某项来构造近似。"
+          },
+          {
+            "type": "equation",
+            "label": "定义 Evidence Lower Bound",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>ℒ</mi><mrow><mo>(</mo><mrow><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>;</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>,</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>−</mo><mrow><mi>log</mi><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></math>"
+          }
         ]
       },
       {
@@ -117,7 +335,43 @@
           "height": 480
         },
         "note": "固定 θ 时，log pθ(x) 对变分参数 φ 是常数。联合训练 θ 和 φ 时，log pθ(x) 会随 θ 改变；仅凭表达式里没有 z，不能推出它对全部可训练参数都不变。",
-        "formula": "log <i>p</i><sub>θ</sub>(<i>x</i>) = ℒ(θ, φ; <i>x</i>) + D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub>θ</sub>(<i>z</i>|<i>x</i>))"
+        "formula": "log <i>p</i><sub>θ</sub>(<i>x</i>) = ℒ(θ, φ; <i>x</i>) + D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i><sub>θ</sub>(<i>z</i>|<i>x</i>))",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "移项以后，得到本段推导最需要记住的关系：图像的对数似然，等于 Evidence Lower Bound 加上近似后验与真实后验的 Kullback-Leibler divergence。"
+          },
+          {
+            "type": "equation",
+            "label": "精确恒等式",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mi>ℒ</mi><mrow><mo>(</mo><mrow><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>;</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>+</mo><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "右侧最后一项总是非负，因此 Evidence Lower Bound 确实是 log pθ(x) 的下界。近似后验越接近真实后验，这一项越小，下界就越紧；两者相同时，下界等于对数似然。"
+          },
+          {
+            "type": "equation",
+            "label": "为什么称为下界",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>ℒ</mi><mrow><mo>(</mo><mrow><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>;</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>≤</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "固定生成模型参数 θ 时，log pθ(x) 对变分参数 φ 不变。此时提高下界，就是减小后验近似误差。例如，把同一个固定值写成 10 = 7 + 3，再把下界提高到 9，剩下的误差便只能是 1。这个例子表达的是固定左侧时的关系。"
+          },
+          {
+            "type": "p",
+            "text": "实际训练会同时更新 Encoder 和 Decoder。更新 θ 会改变生成模型，也可能改变 log pθ(x)。因此联合训练时不能沿用固定左侧的解释，声称每一次下界上升都会让后验误差下降，或者保证真实对数似然每一步都上升。"
+          },
+          {
+            "type": "p",
+            "text": "联合最大化下界有两个作用：让生成模型更能解释训练数据，同时让近似后验有机会贴近当前模型的真实后验。下界的恒等式说明两者如何联系，但不提供有限训练过程的逐步改进保证。"
+          },
+          {
+            "type": "note",
+            "text": "讲者用表达式里没有 z 来说明常数项。更准确地说，它与积分变量 z 无关，且在固定 θ 时不依赖 φ；它仍然依赖生成模型参数 θ。"
+          }
+        ]
       },
       {
         "t": 1346,
@@ -132,7 +386,44 @@
           "width": 852,
           "height": 480
         },
-        "formula": "ℒ = E<sub><i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub>θ</sub>(<i>x</i>|<i>z</i>)] − D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))"
+        "formula": "ℒ = E<sub><i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i><sub>θ</sub>(<i>x</i>|<i>z</i>)] − D<sub>KL</sub>(<i>q</i><sub>φ</sub>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "目前下界还写着联合分布 pθ(x,z)。把它拆成生成过程中的两部分：先验 p(z)，以及给定隐变量后的图像似然 pθ(x|z)，目标函数就会出现熟悉的重建项。再利用期望的线性，把三项分别写出来。"
+          },
+          {
+            "type": "equation",
+            "label": "第四步：拆开联合分布",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>ℒ</mi><mrow><mo>(</mo><mrow><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>;</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>+</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>−</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "把包含 log qφ(z|x) 与 log p(z) 的部分合起来，它就是近似后验到先验的 Kullback-Leibler divergence，前面带负号。剩下的一项，是在近似后验下求期望的图像对数似然。"
+          },
+          {
+            "type": "equation",
+            "label": "第五步：得到两项训练目标",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><mi>ℒ</mi><mrow><mo>(</mo><mrow><mi>θ</mi><mo>,</mo><mi>φ</mi><mo>;</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>−</mo><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "最大化下界时，第一项希望从当前图像的近似后验里取出的 z，能给原图像较高的生成概率；第二项希望这些条件分布受到简单先验的约束。两项必须一起优化。"
+          },
+          {
+            "type": "p",
+            "text": "实现中常把最大化问题改写成最小化负下界。于是重建项变成负的对数似然，先验约束前的符号变成正号。判断损失符号时，可以回到这个目标检查，避免把应当最小化的差异写成需要最大化。"
+          },
+          {
+            "type": "equation",
+            "label": "最小化形式",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><msub><mi>L</mi><mtext>loss</mtext></msub><mo>=</mo><mo>−</mo><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>+</mo><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><mi>p</mi><mrow><mo>(</mo><mrow><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "这里出现的是与先验比较的差异，前面恒等式中出现的是与真实后验比较的差异。它们是两个不同的量。前者进入可计算的训练目标，后者描述下界与真实对数似然之间的缺口。"
+          }
+        ]
       },
       {
         "t": 1541,
@@ -140,7 +431,59 @@
         "paragraphs": [
           "重建项要求隐表示保留输入信息；先验约束项使近似后验受到所选先验的限制。两项共同决定优化方向。视频接着回顾了从后验近似到这一训练目标的推导。"
         ],
-        "note": "让近似后验接近真实后验，通常不能单独等同于让它接近先验。只有把重建项一起纳入下界，才是这里推导出的完整目标。"
+        "note": "让近似后验接近真实后验，通常不能单独等同于让它接近先验。只有把重建项一起纳入下界，才是这里推导出的完整目标。",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "只看先验约束，最简单的做法是让每张图像的近似后验都等于标准正态分布。这样差异项可以为零，但 Encoder 也可能失去区分图像的能力。输入是 1 还是 8，得到的分布都一样，Decoder 便很难依靠 z 知道要重建哪一张。"
+          },
+          {
+            "type": "p",
+            "text": "只看重建项，Encoder 则可以把不同图像安排到容易区分的位置，甚至让取样方差很小。这有利于重建，却可能使整体隐空间分布与生成时使用的标准正态先验差得很远。"
+          },
+          {
+            "type": "p",
+            "text": "两项一起训练，才要求模型同时保留重建信息，并让这些表示受到先验约束。不能因为损失中出现了“接近先验”，就把整个目标理解成让所有图像的隐分布都完全相同。"
+          },
+          {
+            "type": "table",
+            "head": [
+              "分布",
+              "条件或含义",
+              "在这里的作用"
+            ],
+            "rows": [
+              [
+                "p(z)",
+                "生成之前指定的先验",
+                "提供生成时的取样来源"
+              ],
+              [
+                "pθ(z|x)",
+                "当前生成模型的真实后验",
+                "理想的推断目标，通常难以计算"
+              ],
+              [
+                "qφ(z|x)",
+                "Encoder 给当前图像预测的近似后验",
+                "训练时从中取样并计算可用的目标"
+              ],
+              [
+                "qφ(z)",
+                "所有训练图像的近似后验混合起来的整体分布",
+                "说明整个数据集的隐表示落在哪里"
+              ]
+            ]
+          },
+          {
+            "type": "p",
+            "text": "后验是图像相关的条件分布，先验是在看到图像之前使用的分布。把这两个角色分清，才能理解为什么训练时通过 Encoder 取样，而生成新图像时可以直接从先验取样。"
+          },
+          {
+            "type": "note",
+            "text": "较强的先验约束可能使模型减少通过 z 传递的信息，极端时会出现 Posterior Collapse。这里只用它说明两项目标存在取舍，不能据此断言某次训练一定发生了这种现象。"
+          }
+        ]
       },
       {
         "t": 1684,
@@ -154,7 +497,39 @@
           "caption": "训练示意：Encoder 输出 μ 和 σ，取样后重建，另计算与标准正态先验的差异。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "现在把公式落到训练步骤。给一张图像 x，Encoder 先输出均值与方差参数；按这个条件分布得到 z；Decoder 根据 z 给出重建图像的分布；最后计算负的重建对数似然，加上近似后验到先验的差异。"
+          },
+          {
+            "type": "p",
+            "text": "常用实现会输出各维的 log variance，以便通过指数得到正方差。若用标准差 σ 表示，对角高斯与标准正态先验之间的 Kullback-Leibler divergence 有解析式，不需要为这一项再取样估计。"
+          },
+          {
+            "type": "equation",
+            "label": "对角高斯的先验约束",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>D</mi><mtext>KL</mtext></msub><mrow><mo>(</mo><mrow><mrow><mi>𝒩</mi><mrow><mo>(</mo><mrow><mi>μ</mi><mo>,</mo><mrow><mtext>diag</mtext><mrow><mo>(</mo><msup><mi>σ</mi><mn>2</mn></msup><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mo>‖</mo><mrow><mi>𝒩</mi><mrow><mo>(</mo><mrow><mn>0</mn><mo>,</mo><mi>I</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mo>∑</mo><mi>j</mi></msub><mrow><mo>(</mo><mrow><msup><msub><mi>μ</mi><mi>j</mi></msub><mn>2</mn></msup><mo>+</mo><msup><msub><mi>σ</mi><mi>j</mi></msub><mn>2</mn></msup><mo>−</mo><mn>1</mn><mo>−</mo><mrow><mi>log</mi><msup><msub><mi>σ</mi><mi>j</mi></msub><mn>2</mn></msup></mrow></mrow><mo>)</mo></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "例如，某一维的均值为 2、标准差为 1，这一维的差异就是 2。均值为 0、标准差为 1 时，这一维的差异为 0。偏移均值或大幅改变方差，都会受到这项损失的约束。"
+          },
+          {
+            "type": "p",
+            "text": "补充一个视频没有完整展开的实现细节：取样后仍然需要更新 Encoder。对于高斯分布，可以把随机性放在与参数无关的 ε 上，再用可微的计算得到 z，这就是 Reparameterization。"
+          },
+          {
+            "type": "equation",
+            "label": "可反向传播的取样",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mi>ε</mi><mo>∼</mo><mrow><mi>𝒩</mi><mrow><mo>(</mo><mrow><mn>0</mn><mo>,</mo><mi>I</mi></mrow><mo>)</mo></mrow></mrow><mo>,</mo><mi>z</mi><mo>=</mo><mrow><msub><mi>μ</mi><mi>φ</mi></msub><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>+</mo><mrow><msub><mi>σ</mi><mi>φ</mi></msub><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>⊙</mo><mi>ε</mi></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "固定这次取到的 ε，z 对均值和标准差都是可微的，梯度便能经过 Decoder 传回 Encoder。符号 ⊙ 表示逐元素相乘。它没有把随机取样取消，而是换了一种生成同分布样本的计算方式。"
+          }
+        ]
       },
       {
         "t": 1855,
@@ -162,7 +537,34 @@
         "paragraphs": [
           "重建项对 qφ(z|x) 求期望。每次重新取样，是用 Monte Carlo 方法估计这个期望的做法。讲者还讨论了随机取样对 Decoder 泛化的可能帮助。"
         ],
-        "note": "最大化期望不要求每一个样本的重建概率同时达到最大。取样是在估计平均目标，仍会存在方差。"
+        "note": "最大化期望不要求每一个样本的重建概率同时达到最大。取样是在估计平均目标，仍会存在方差。",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "重建目标前面有一个期望，因此训练关心的是从当前近似后验取样后，平均能把这张图像解释得多好。只固定使用均值，优化的目标通常就与这个期望不同。"
+          },
+          {
+            "type": "equation",
+            "label": "Monte Carlo 估计",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><mrow><msub><mi>E</mi><mi>q</mi></msub><mo>[</mo><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>]</mo></mrow><mo>≈</mo><mfrac><mn>1</mn><mi>K</mi></mfrac><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><mrow><mi>log</mi><mrow><msub><mi>p</mi><mi>θ</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>|</mo><msup><mi>z</mi><mrow><mo>(</mo><mi>k</mi><mo>)</mo></mrow></msup></mrow><mo>)</mo></mrow></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "实际计算时，可以从 qφ(z|x) 取 K 个样本，对每个样本计算原图的对数似然，再求平均。样本越多，通常越能降低这一步估计的方差，但计算也更贵。训练常使用每个输入一个样本，再通过一个批次中的多张图像形成平均梯度。"
+          },
+          {
+            "type": "p",
+            "text": "这里最大化的是平均目标。某次取样的重建较差，并不自动说明这一轮训练错误；不同取样会带来噪声。它也不要求每一个可能的 z，都以最高概率重建同一张图像。"
+          },
+          {
+            "type": "p",
+            "text": "对固定图像反复取样，会让 Decoder 接触这个条件分布附近的多个隐向量。视频将这种作用与数据增强作类比，可以帮助理解随机性的效果；训练中反复取样的直接数学原因，仍然是要估计目标函数里的期望。"
+          },
+          {
+            "type": "p",
+            "text": "训练与生成使用的取样来源也不同：训练重建当前 x 时，从 qφ(z|x) 取样；生成全新图像时，从 p(z) 取样，再送入训练好的 Decoder。生成不需要先提供一张待编码的图像。"
+          }
+        ]
       },
       {
         "t": 1939,
@@ -177,7 +579,38 @@
           "width": 852,
           "height": 480
         },
-        "note": "这类可视化提供训练行为的例子，不保证每个样本的近似后验都变成同一个标准正态分布，也不保证所有数据都能形成清晰类别区域。"
+        "note": "这类可视化提供训练行为的例子，不保证每个样本的近似后验都变成同一个标准正态分布，也不保证所有数据都能形成清晰类别区域。",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "视频接着展示手写数字的隐空间图。颜色代表不同数字，用来比较三种训练结果：只有重建损失，只有先验约束，以及两者共同训练。阅读这类图时，要先明确它画的是多个样本的整体表示。"
+          },
+          {
+            "type": "p",
+            "text": "只有重建损失时，不同数字可能聚集在不同区域，因为这些隐表示需要携带有助于区分和重建图像的信息。但这些区域可能散得很开，也可能存在很少访问的空白区，没有自动形成一个方便取样的标准正态分布。"
+          },
+          {
+            "type": "p",
+            "text": "只有先验约束时，各张图像的近似后验可以都向相同的先验靠拢。整体图看起来规则了，却可能丢掉输入之间的差异。重建项加入以后，模型还必须保留足够的信息去区分不同图像。"
+          },
+          {
+            "type": "p",
+            "text": "讲者用“有区域、有规则”描述两项共同训练的可视化。它可以帮助建立直觉，但不是一个对所有训练结果都成立的数学结论。网络结构、数据和两项损失的相对强度，都会影响最后的形状。"
+          },
+          {
+            "type": "equation",
+            "label": "整体隐分布是条件分布的混合",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mi>z</mi><mo>)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><msub><mi>q</mi><mi>φ</mi></msub><mrow><mo>(</mo><mrow><mi>z</mi><mo>|</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></msup></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "即使每个条件分布 qφ(z|x) 都是对角高斯，把很多张图像的条件分布混合起来，也不一定还是高斯。不同数字可以占据不同区域，正是因为各个输入对应的均值和方差可以不同。"
+          },
+          {
+            "type": "p",
+            "text": "隐空间插值后，数字有时会连续变形，这说明那条路径附近的 Decoder 学到了平滑变化。它并不证明每个维度只控制一个独立语义，也不保证在任意位置取样都能得到清晰图像。"
+          }
+        ]
       },
       {
         "t": 2253,
@@ -192,7 +625,59 @@
           "width": 852,
           "height": 480
         },
-        "note": "Latent Diffusion 的生成过程学习数据隐表示的分布，通常不是直接拟合单张图像的后验 p(z|x)。原论文还使用专门训练的压缩模型和重建目标，不能把效果差异全归结为去掉一个高斯假设。"
+        "note": "Latent Diffusion 的生成过程学习数据隐表示的分布，通常不是直接拟合单张图像的后验 p(z|x)。原论文还使用专门训练的压缩模型和重建目标，不能把效果差异全归结为去掉一个高斯假设。",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "讲者在这里明确说明，接下来的比较包含自己的思考。他把传统 Variational Autoencoder 的限制，与近似后验采用高斯家族联系起来，并认为扩散模型能够表达更复杂的分布。"
+          },
+          {
+            "type": "p",
+            "text": "高斯近似确实可能限制推断能力，但比较 Latent Diffusion 时还要区分两种任务：对一张已知图像推断隐变量，以及在没有这张图像的情况下生成新的隐表示。前者涉及 qφ(z|x)，后者涉及整个数据隐表示的生成分布。"
+          },
+          {
+            "type": "p",
+            "text": "Latent Diffusion 的第二阶段通常学习一批图像经 Encoder 得到的隐表示分布。它不需要在生成时输入原图，再为这一张图估计真实后验。因此，把它说成直接用扩散替换单张图像的后验近似，会混淆这两个任务。"
+          },
+          {
+            "type": "table",
+            "head": [
+              "环节",
+              "标准 Variational Autoencoder",
+              "Latent Diffusion 的常见做法"
+            ],
+            "rows": [
+              [
+                "表示与重建",
+                "与先验约束共同训练 Encoder 和 Decoder",
+                "先训练适合图像压缩与重建的模型"
+              ],
+              [
+                "训练时的隐表示",
+                "由图像的近似后验取样",
+                "由训练好的压缩模型得到"
+              ],
+              [
+                "新的隐表示从何而来",
+                "直接从选定先验取样",
+                "从噪声出发，经过学到的去噪过程"
+              ],
+              [
+                "生成图像",
+                "将隐表示交给 Decoder",
+                "将生成的隐表示交给 Decoder"
+              ]
+            ]
+          },
+          {
+            "type": "p",
+            "text": "这个分工让压缩模型更专注于重建，再由另一个模型学习隐表示的生成。隐空间不必只依靠与简单先验的强约束来保证直接取样质量。两阶段的任务安排，是理解效果差异时需要考虑的一部分。"
+          },
+          {
+            "type": "note",
+            "text": "原论文的压缩模型还使用感知重建与对抗目标，并研究了弱 Kullback-Leibler 约束和 Vector Quantization 两种方案。因此，“Decoder 结构相似”不等于两者的损失、权重或训练得到的参数都相同。不能把生成质量的差异全归因于去掉一个高斯假设。"
+          }
+        ]
       },
       {
         "t": 2383,
@@ -206,7 +691,38 @@
           "caption": "噪声经扩散模型得到隐表示，再经过 Decoder 回到图像。",
           "width": 852,
           "height": 480
-        }
+        },
+        "detailed": [
+          {
+            "type": "p",
+            "text": "在隐空间训练扩散模型时，先从训练图像得到一个隐表示，记为 z₀。前向过程逐步加入噪声，得到不同噪声强度的 zₜ。去噪网络学习如何根据噪声强度和当前表示，预测其中加入的噪声或其他等价目标。"
+          },
+          {
+            "type": "equation",
+            "label": "隐表示的加噪形式",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><msub><mi>z</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mi>ᾱ</mi><mi>t</mi></msub></msqrt><msub><mi>z</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mi>ᾱ</mi><mi>t</mi></msub></mrow></msqrt><mi>ε</mi></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "生成时从接近标准正态分布的噪声开始，按学到的反向过程一步步得到较干净的隐表示。最后的结果再交给 Decoder，得到像素图像。这里迭代去噪的输出是隐表示，不是每一步都已经得到最终分辨率的图像。"
+          },
+          {
+            "type": "p",
+            "text": "因此，扩散使用的初始高斯噪声，与最后送入 Decoder 的隐表示，扮演不同角色。不能因为生成从高斯噪声开始，就认定最终隐表示也必须严格服从标准正态分布。中间的去噪过程正是在学习这种分布变换。"
+          },
+          {
+            "type": "p",
+            "text": "用条件生成时，去噪网络还可以接收文字等条件。条件告诉模型希望生成什么，隐空间决定模型在哪里进行生成计算，Decoder 负责把生成结果还原为可见图像。这些职责可以分别分析。"
+          },
+          {
+            "type": "p",
+            "text": "这也给出了开头疑问的一部分答案：一个能重建清晰图像的 Decoder，只有收到合适的隐表示才可能发挥作用。若生成端频繁取到与训练数据隐表示不匹配的位置，重建能力再好，也不保证输出质量。"
+          },
+          {
+            "type": "note",
+            "text": "上述加噪公式和生成流程是帮助理解的补充。学习一个复杂分布的能力不等于有限模型能精确恢复任意分布；实际效果仍取决于网络、训练和取样过程。"
+          }
+        ]
       },
       {
         "t": 2529,
@@ -221,8 +737,55 @@
           "width": 852,
           "height": 480
         },
-        "note": "在不确定输出的条件风险最小化中，平方误差 L² 对应条件均值，绝对误差 L¹ 对应条件中位数。视频把 L¹ 与取平均直接相连，这里需要区分。图像模糊也受解码分布、模型容量和训练目标等因素影响。"
+        "note": "在不确定输出的条件风险最小化中，平方误差 L² 对应条件均值，绝对误差 L¹ 对应条件中位数。视频把 L¹ 与取平均直接相连，这里需要区分。图像模糊也受解码分布、模型容量和训练目标等因素影响。",
+        "detailed": [
+          {
+            "type": "p",
+            "text": "最后一段讨论模糊。讲者用两个图像对应的隐分布发生重叠来解释：同一个或相近的 z，可能对应不同的目标图像。Decoder 如果只能输出一个确定结果，就需要在这些可能目标之间作折中。"
+          },
+          {
+            "type": "p",
+            "text": "这类折中与采用的重建目标有关。设给定 z 后，某个像素可能有多个取值。如果用平方误差评价一个预测值 a，把误差对所有可能输出求平均，最优预测值就是条件均值。"
+          },
+          {
+            "type": "equation",
+            "label": "平方误差的最优确定预测",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><munder><mo>arg min</mo><mi>a</mi></munder><mrow><mi>E</mi><mo>[</mo><msup><mrow><mo>(</mo><mrow><mi>X</mi><mo>−</mo><mi>a</mi></mrow><mo>)</mo></mrow><mn>2</mn></msup><mo>|</mo><mi>z</mi><mo>]</mo></mrow><mo>=</mo><mrow><mi>E</mi><mo>[</mo><mi>X</mi><mo>|</mo><mi>z</mi><mo>]</mo></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "例如，同一条件下一根细线有一半概率出现在左边，一半概率出现在右边。逐像素平均会让两边都出现较浅的线，实际图像却可能总是只有一根清晰的线。多个合理结果的均值，未必是一个合理的清晰结果。"
+          },
+          {
+            "type": "p",
+            "text": "绝对误差的结论不同。最小化平均绝对误差，对应条件中位数；最小化平均平方误差，对应条件均值。视频将 L¹ 与取平均直接相连，这一点需要纠正。两种损失都不保证输出能覆盖所有可能的图像结构。"
+          },
+          {
+            "type": "equation",
+            "label": "绝对误差的最优确定预测",
+            "html": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mrow><munder><mo>arg min</mo><mi>a</mi></munder><mrow><mi>E</mi><mo>[</mo><mo>|</mo><mi>X</mi><mo>−</mo><mi>a</mi><mo>|</mo><mo>|</mo><mi>z</mi><mo>]</mo></mrow><mo>∈</mo><mrow><mtext>Median</mtext><mrow><mo>(</mo><mrow><mi>X</mi><mo>|</mo><mi>z</mi></mrow><mo>)</mo></mrow></mrow></mrow></math>"
+          },
+          {
+            "type": "p",
+            "text": "从概率角度看，固定方差高斯 Decoder 的负对数似然会给出平方重建误差；固定尺度 Laplace Decoder 对应绝对重建误差。选择输出分布，本身就在选择怎样惩罚不同的重建偏差。"
+          },
+          {
+            "type": "p",
+            "text": "图像模糊仍然不能用一个因素解释完。压缩时是否丢掉细节，隐表示是否保留足够信息，Decoder 的容量与输出分布，以及重建和生成目标怎样搭配，都会影响结果。视频给出了理解折中的直觉；比较完整系统时，需要把这些条件一起看。"
+          }
+        ]
       }
+    ],
+    "defaultMode": "detailed",
+    "detailedIntro": "按视频顺序展开的课程笔记。公式逐步解释，额外推导和对讲者说法的辨析单独标注；原版解析与逐字稿继续保留。",
+    "takeaways": [
+      "普通 Autoencoder 提供重建路径；要生成新的图像，还需要解决新隐表示的取样来源。",
+      "先验 p(z)、真实后验 pθ(z|x) 与近似后验 qφ(z|x) 的角色不同。训练重建从近似后验取样，生成新图像从先验取样。",
+      "Evidence Lower Bound 由期望重建对数似然减去近似后验到先验的差异组成。它与真实对数似然的缺口，是近似后验到真实后验的差异。",
+      "固定生成模型时，提高下界等价于减小后验近似误差；联合更新生成模型时，左侧对数似然也会改变。",
+      "Reparameterization 让高斯取样具有可反向传播的计算路径。Monte Carlo 取样估计的是平均目标。",
+      "Latent Diffusion 在压缩后的表示上学习生成分布，不能简单理解成替换单张图像的真实后验。",
+      "平方误差对应条件均值，绝对误差对应条件中位数。生成质量还受压缩模型、隐表示与 Decoder 训练方式影响。"
     ]
   }
 ]
