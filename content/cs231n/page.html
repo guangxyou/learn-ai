@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CS231n 计算机视觉 · 斯坦福 Spring 2025 全部 18 讲分节笔记，另附 387 篇引用论文和变分自编码器补充视频</title>
-<meta name="description" content="李飞飞、Ehsan Adeli、Justin Johnson 主讲的 CS231n，按 Spring 2025 公开录像写的 18 讲笔记，533 个小节、约 12.5 万字，配 707 张课件截图。从图像分类、线性分类器、反向传播、卷积网络、训练技巧讲到循环网络和 Transformer、检测与分割、视频理解、大规模分布式训练、自监督学习，再到生成模型的自回归、变分自编码器、生成对抗网络和扩散模型；后几讲是客座：吴佳俊讲三维视觉，Ranjay Krishna 讲 CLIP、多模态语言模型和 SAM，李韫竹讲机器人学习，最后李飞飞讲以人为本的 AI。每讲有导语、可点的时间轴、逐节正文和要点，课件链官网 2025、2026 两期。另有「引用论文」tab：两期课件里引用过的 387 篇论文，每篇有中文摘要、arXiv 原文摘要，并按讲次列出它在第几页课件、录像第几分钟、讲的是什么。「补充视频」tab 收了 Nik_Li 讲变分自编码器的 44 分钟白板推导，第 13 讲这部分课上讲得快：从近似后验出发，经变分贝叶斯、KL 散度推到 ELBO 和两项损失，再讨论 Latent Diffusion 为什么比变分自编码器清晰。笔记 17 节约 1.1 万字，配 12 张板书截图，推导逐行誊清，板书笔误、讲者没讲的重参数化技巧和两项损失的公式写在注里，后半段的猜想按 Latent Diffusion 原论文做了对照。">
+<title>CS231n 计算机视觉 · 斯坦福 Spring 2025 全部 18 讲分节笔记，另附 387 篇引用论文</title>
+<meta name="description" content="李飞飞、Ehsan Adeli、Justin Johnson 主讲的 CS231n，按 Spring 2025 公开录像写的 18 讲笔记，533 个小节、约 12.5 万字，配 707 张课件截图。从图像分类、线性分类器、反向传播、卷积网络、训练技巧讲到循环网络和 Transformer、检测与分割、视频理解、大规模分布式训练、自监督学习，再到生成模型的自回归、变分自编码器、生成对抗网络和扩散模型；后几讲是客座：吴佳俊讲三维视觉，Ranjay Krishna 讲 CLIP、多模态语言模型和 SAM，李韫竹讲机器人学习，最后李飞飞讲以人为本的 AI。每讲有导语、可点的时间轴、逐节正文和要点，课件链官网 2025、2026 两期。另有「引用论文」tab：两期课件里引用过的 387 篇论文，每篇有中文摘要、arXiv 原文摘要，并按讲次列出它在第几页课件、录像第几分钟、讲的是什么。第 13 讲的变分自编码器另有专题页，补了 KL 散度基础、扩写的推导和常见问题。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -341,7 +341,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
   <button class="tb on" type="button" role="tab" data-v="course" aria-selected="true">课程笔记</button>
   <button class="tb" type="button" role="tab" data-v="papers" aria-selected="false">引用论文 · 387</button>
-  <button class="tb" type="button" role="tab" data-v="extras" aria-selected="false">补充视频 · 1</button>
 </div></div></nav>
 <main class="wrap"><div class="view on" id="view-course">
   <div class="intro"><h2>这门课</h2>
@@ -1859,7 +1858,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     </section>
 <section class="sec" id="l7-s5">
       <h4><button class="ts" type="button" data-t="615">10:15</button><span>由隐藏状态得到输出</span></h4>
-      <p>输出由另一个函数、另一组参数得到，<span class="m"><i>y</i><sub><i>t</i></sub> = <i>f</i><sub><i>W</i>_<i>h</i><i>y</i></sub>(<i>h</i><sub><i>t</i></sub>)</span>。W<sub>hy</sub> 做两件事：把隐藏状态的维度变成输出的维度（两者可以不同），同时做一个可学习的变换。所以有两组参数：一组算新隐藏状态，一组把隐藏状态变成输出，各自在所有时间步共享。</p>
+      <p>输出由另一个函数、另一组参数得到，<span class="m"><i>y</i><sub><i>t</i></sub> = <i>f</i><sub><i>W</i><sub>hy</sub></sub>(<i>h</i><sub><i>t</i></sub>)</span>。W<sub>hy</sub> 做两件事：把隐藏状态的维度变成输出的维度（两者可以不同），同时做一个可学习的变换。所以有两组参数：一组算新隐藏状态，一组把隐藏状态变成输出，各自在所有时间步共享。</p>
       <p>初始隐藏状态 h<sub>0</sub> 可以设成任何值，通常是一个可学习的向量。有人问之前的输出 y 能不能影响新的隐藏状态：某些形式下可以，语言建模这类自回归任务就是把上一步的输出当作下一步的输入。</p>
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec07-625.jpg" alt="输出：用另一组参数 W_hy 把隐藏状态变成输出" loading="lazy"><figcaption><button class="ts" type="button" data-t="625">10:25</button>输出：用另一组参数 W<sub>hy</sub> 把隐藏状态变成输出</figcaption></figure></div>
@@ -3608,7 +3607,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>接下来是<b>变分自编码器</b>。它仍然是显式密度方法，但密度算不出来，只能算一个近似（真实密度的下界）。放弃精确密度，换来的是：训练过程中自然得到表示数据的隐向量，这些隐向量本身很有用，值得用精确密度去换。</p>
       
       
-      <div class="note"><p><span class="lbl">注</span>这一段课上讲得快，推导省了好几步。「补充视频」tab 收了一个 44 分钟的白板推导，从近似后验出发一步步推到 ELBO 和两项损失，见<a class="ilink" href="#x-vae">补充视频</a>。</p></div>
+      <div class="note"><p><span class="lbl">注</span>这一段课上讲得快，推导省了好几步。变分自编码器另有一篇专题：KL 散度的基础、这一讲的扩充版推导、一个从近似后验出发的白板推导视频，以及常见问题，见<a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题</a>。</p></div>
     </section>
 <section class="sec" id="l13-s19">
       <h4><button class="ts" type="button" data-t="2881">48:01</button><span>自编码器</span></h4>
@@ -9928,193 +9927,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </details></section>
 </div>
 <p class="pempty" hidden>没有符合条件的论文。</p>
-</div>
-<div class="view" id="view-extras">
-  <div class="intro"><p>课上讲得快、没讲透的主题，另找的讲解视频。笔记格式和课程笔记一样：分节转述，节标题和截图带时间码，讲者没讲的推导和说错的地方写在注里。</p></div>
-  <details class="ep" id="x-vae" data-bv="BV1wx421k74m" data-p="1">
-  <summary>
-    <span class="no">补</span>
-    <span class="tt"><b>一个视频看懂VAE的原理以及关于latent diffusion的思考</b><em>Nik_Li · B 站 · 2024-03-17 发布</em><span class="hook">44 分钟白板推导：自编码器为什么不能生成，变分贝叶斯怎么把「找后验」变成「最大化 ELBO」，ELBO 怎么拆成重建项和 KL 项；最后讨论 Latent Diffusion 为什么比变分自编码器清晰。</span></span>
-    <span class="side"><span class="chip">第 13 讲</span><span class="len">43:59</span></span>
-  </summary>
-  <div class="epb">
-    <div class="epmain">
-      <p class="lede">Nik<sub>Li</sub> 在 B 站「图像生成」系列的第 4 期，2024-03-17 发布，前面几期讲过 DDPM、DDIM 和引导。起因是他读 Latent Diffusion 时的疑问：编码器和解码器来自 2013 年的变分自编码器，变分自编码器自己生成的图很糊，中间换成扩散模型以后却很清晰，问题出在哪。</p>
-      <p class="lede">主体是推导，方向和第 13 讲相反。课上 Justin Johnson 从最大似然 log p(x) 出发，写出三项，扔掉算不出的那项 KL 得到下界；这里从「用一个高斯 q 去近似算不出的后验」出发，把 KL 散度展开成 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span>，左边和 q 无关，压低 KL 只能抬高 ELBO。</p>
-      <p class="lede">两条路通向同一个目标函数。这个视频的好处是每一步为什么这样做都交代了，正好补上课上跳过的地方。</p>
-      <p class="lede">推导之后讲两个问题：二维隐空间里只用重建损失、只用 KL、两者都用分别长什么样；Latent Diffusion 和变分自编码器到底差在哪。后半段讲者说明是自己的思考，笔记按 Latent Diffusion 原论文补了对照。</p>
-      <p class="lede">板书有几处笔误（期望的下标漏了 <span class="m"><i>x</i><sub><i>i</i></sub></span>，有一行把 <span class="m">log(<i>q</i>/<i>p</i>)</span> 写成了 <span class="m">log <i>q</i> / log <i>p</i></span>），正文按正确写法誊清，注里写明原板书哪里不同。讲者没讲的重参数化技巧、两项损失的具体公式也补在注里。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1wx421k74m/" target="_blank" rel="noreferrer">B 站原视频 ↗</a><a class="lk" data-l="13" href="#l13">对应第 13 讲</a></p>
-      <p class="mats"><span class="lbl">资料</span><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">Auto-Encoding Variational Bayes</a><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noreferrer">Latent Diffusion 原论文</a><a href="https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf" target="_blank" rel="noreferrer">隐空间三张图的出处</a></p>
-      <section class="sec" id="x-vae-s0">
-      <h4><button class="ts" type="button" data-t="0">0:00</button><span>Latent Diffusion：先压缩，再在隐空间里扩散</span></h4>
-      <p>近两年的扩散模型基本都换成了 Latent Diffusion 的做法。Diffusion Transformer 也是，它只是把去噪网络从 U-Net 换成了 Transformer。普通的扩散模型直接在像素上加噪、去噪，所有计算都在像素空间 (Pixel Space) 里做。</p>
-      <p>像素空间很大：256×256 的三通道图有 196,608 个数，每一步去噪都在这么大的张量上算，而且要走很多步。Latent Diffusion 先用编码器把图压进一个小得多的隐空间 (Latent Space)，扩散只在隐空间里做，最后由解码器还原成图。板书上举的隐空间大小是 32×32。</p>
-      <p>压缩一定丢信息。Latent Diffusion 论文把压缩分成两种：感知压缩 (Perceptual Compression) 去掉高频细节，语义压缩 (Semantic Compression) 去掉的是图里有什么、怎么组成。作者认为细节之间相关性强，比较容易学回来，难学的是整体语义。</p>
-      <p>于是分工是：编码器和解码器负责感知层面的压缩和还原，中间的扩散模型在隐空间里学语义。整个系统分两步训练，先训练编码器和解码器，再在它们给出的隐空间上训练扩散模型。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-155.jpg" alt="上面一行是像素空间里的扩散（256×256×3），下面一行先编码成 z，在 32×32 的隐空间里加噪去噪，再解码" loading="lazy"><figcaption><button class="ts" type="button" data-t="155">2:35</button>上面一行是像素空间里的扩散（256×256×3），下面一行先编码成 z，在 32×32 的隐空间里加噪去噪，再解码</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>原论文 (Rombach 等，arXiv 2021-12-20) 用下采样倍数 f 描述压缩程度，主要用 f = 4 和 f = 8。f = 8 时 256×256 的图压成 32×32，另有若干通道，Stable Diffusion 用 4 个，总数 32×32×4 = 4,096，比像素少 48 倍。</p></div>
-    </section>
-<section class="sec" id="x-vae-s1">
-      <h4><button class="ts" type="button" data-t="158">2:38</button><span>编码器和解码器来自变分自编码器</span></h4>
-      <p>Latent Diffusion 里的编码器和解码器来自<b>变分自编码器 (Variational Autoencoder)</b>。它从普通的自编码器 (Autoencoder) 出发，用一套概率上的办法把自编码器变成了生成模型，2013 年提出（Kingma 和 Welling，arXiv 2013-12-20）。</p>
-      <p>讲者的疑问：变分自编码器作为生成模型效果一般，很多生成结果都比较糊，这是它出了名的缺点。可是把编码器和解码器之间的部分换成扩散模型，图就变得非常清晰。这说明编码器和解码器的能力是够的，问题出在中间。</p>
-      <p>要回答它，先得把变分自编码器的原理弄清楚。他说网上的博客要么讲得笼统、跳过了细节，要么前后对不上，所以做了这期。Latent Diffusion 本身概念不复杂，变分自编码器牵涉贝叶斯推断，值得单独讲。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-315.jpg" alt="整页板书：Latent Diffusion 的编码器和解码器来自变分自编码器 (Variational Autoencoder, 2013)" loading="lazy"><figcaption><button class="ts" type="button" data-t="315">5:15</button>整页板书：Latent Diffusion 的编码器和解码器来自变分自编码器 (Variational Autoencoder, 2013)</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>「沿用 2013 年的编码器和解码器」要打个折扣。Latent Diffusion 的自编码器结构和变分自编码器一样，训练目标却改了不少，这正是它重建清晰的主要原因之一，见<a class="ilink" href="#x-vae-s15">倒数第二节的注</a>。</p></div>
-    </section>
-<section class="sec" id="x-vae-s2">
-      <h4><button class="ts" type="button" data-t="315">5:15</button><span>自编码器：能学特征，不能生成</span></h4>
-      <p>自编码器是一种自监督的图像特征学习方法。输入 <span class="m"><i>x</i><sub><i>i</i></sub></span>，编码器把它压成 <span class="m"><i>z</i><sub><i>i</i></sub></span>，解码器再从 <span class="m"><i>z</i><sub><i>i</i></sub></span> 还原出 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，用 <span class="m"><i>x̂</i><sub><i>i</i></sub></span> 和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 之间的重建损失同时训练编码器和解码器。</p>
-      <p>训练好以后，只给 <span class="m"><i>z</i><sub><i>i</i></sub></span> 就能还原出很像 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的图，说明 <span class="m"><i>z</i><sub><i>i</i></sub></span> 装下了 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的大部分信息，所以 z 可以当特征用。这是自编码器能做特征提取的原因。它为什么不能直接当生成模型，是下一节的内容。</p>
-      
-      
-      
-    </section>
-<section class="sec" id="x-vae-s3">
-      <h4><button class="ts" type="button" data-t="385">6:25</button><span>想生成新图，就要一个新的 z</span></h4>
-      <p>设数据集里有 N 张图 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span>，编码后得到 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span>。生成模型要生成数据集里没有的新图，所以需要一个新的 <span class="m"><i>z</i><sub><i>N</i>+1</sub></span>。它不能从已有的 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span> 里取，那样解码出来的都是见过的图；也不能随便取，随手一个点解码出来多半不像图。</p>
-      <p>所以希望 z 服从某个已知的分布，这样就能从分布里采样新的 z。自编码器做不到：训练时没有对 z 的分布做任何约束，编码出来的点散成什么形状都有可能，找不到一个合理 (reasonable) 的新 z。</p>
-      <p>直接的想法是给 z 规定一个分布，比如标准正态分布 <span class="m"><i>p</i>(<i>z</i>) ∼ <i>N</i>(0, 1)</span>，训练完让所有 <span class="m"><i>z</i><sub><i>i</i></sub></span> 整体服从它。讲者说这很难做，原因有两个：</p>
-      <ul><li>不知道 <span class="m"><i>x</i><sub>1</sub></span> 应该落在这个分布的哪个点上，没有目标值，也就没法监督编码器把点放到该放的位置。</li><li>解码器也难训：从 N(0, 1) 里随便采一个 z 去解码，这个 z 对应哪张 <span class="m"><i>x</i><sub><i>i</i></sub></span> 是不确定的，拿它和某张图算重建损失没有意义。</li></ul>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-560.jpg" alt="左上是自编码器；右边是数据集 x_1 … x_N、编码 z_1 … z_N、想要的新点 z_{N+1} 和先验 p(z) ∼ N(0, 1)，以及「x_1 对应哪个 z_1」的难处" loading="lazy"><figcaption><button class="ts" type="button" data-t="560">9:20</button>左上是自编码器；右边是数据集 <span class="m"><i>x</i><sub>1</sub> … <i>x</i><sub><i>N</i></sub></span>、编码 <span class="m"><i>z</i><sub>1</sub> … <i>z</i><sub><i>N</i></sub></span>、想要的新点 <span class="m"><i>z</i><sub><i>N</i>+1</sub></span> 和先验 p(z) ∼ N(0, 1)，以及「<span class="m"><i>x</i><sub>1</sub></span> 对应哪个 <span class="m"><i>z</i><sub>1</sub></span>」的难处</figcaption></figure></div>
-      
-    </section>
-<section class="sec" id="x-vae-s4">
-      <h4><button class="ts" type="button" data-t="565">9:25</button><span>换个问题：去找后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span></span></h4>
-      <p>变分自编码器换了个角度：给定 <span class="m"><i>x</i><sub><i>i</i></sub></span> 以后，z 的条件分布 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是什么样。这个分布叫<b>后验 (Posterior)</b>。它是不是高斯、参数是多少，都不知道。</p>
-      <p>先假设它已知，往后看一步：从 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 里采一个 z，送进解码器得到 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算重建损失来训练解码器。这个损失是合理的，因为 z 就是从 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的条件分布里来的，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对得上。上一节的第二个难处就这样解决了。</p>
-      <p>于是任务从「给每个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 找一个确定的 <span class="m"><i>z</i><sub><i>i</i></sub></span>」变成了「给每个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 找 z 的一个分布」。讲者认为这是整个推导里最关键的一步转换。</p>
-      <p>他在这里回顾了一遍：自编码器学到了特征，但没有约束特征的分布，所以采不到新的隐向量；隐变量本来就观测不到，先验可以自己假设，但假设了先验，又找不到数据点和分布里的点怎么对应，编码器没法训。现在不找确切的 z，改为找后验。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-790.jpg" alt="这一页写满：下方从后验 p_θ(z|x_i) 采样 z_i，解码得到 x̂_i，再和 x_i 算重建损失" loading="lazy"><figcaption><button class="ts" type="button" data-t="790">13:10</button>这一页写满：下方从后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 采样 <span class="m"><i>z</i><sub><i>i</i></sub></span>，解码得到 <span class="m"><i>x̂</i><sub><i>i</i></sub></span>，再和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算重建损失</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>p(z) 是<b>先验 (Prior)</b>，看到 x 之前对 z 的假设；<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是后验，看到 <span class="m"><i>x</i><sub><i>i</i></sub></span> 之后 z 的分布。θ 是解码器的参数，后验由先验和解码器一起决定：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i>) = <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) <i>p</i>(<i>z</i>) / <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>。分母 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span> 要对所有 z 积分，算不出来，这就是第 13 讲说后验不可算的原因。</p></div>
-    </section>
-<section class="sec" id="x-vae-s5">
-      <h4><button class="ts" type="button" data-t="784">13:04</button><span>变分贝叶斯：在高斯分布族里找离后验最近的那个</span></h4>
-      <p>后验算不出来，就找一个近似。<b>变分贝叶斯 (Variational Bayes)</b> 是贝叶斯推断里的一种近似方法。讲者说不必非要掌握它，讲它是为了说明「变分」这个名字从哪来。</p>
-      <p>板书上的大圆代表所有分布构成的集合，真实后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 是其中一个点。里面的小圈是一族我们会算的分布，比如高斯分布族。做法是在这一族里找一个和后验最接近的分布 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 去近似它：从族里某个分布出发，通过优化一步步挪到离后验最近的位置。</p>
-      <p>这样问题就变成了优化 φ。φ 是这个高斯分布的参数，也就是均值 μ 和标准差 σ。</p>
-      
-      
-      <div class="note"><p><span class="lbl">注</span>讲者说 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 里写不写 <span class="m"><i>x</i><sub><i>i</i></sub></span> 无所谓，为了形式统一才写上。在变分自编码器里这个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 很要紧：每张图有自己的后验，近似也得每张图一个。</p><p>变分自编码器不为每张图单独优化一组 μ、σ，而是训练一个网络，输入 <span class="m"><i>x</i><sub><i>i</i></sub></span>、输出这张图的 μ 和 σ，这个网络就是编码器，这种做法叫摊销推断 (Amortized Inference)。所以「优化 φ」就是训练编码器。</p></div>
-    </section>
-<section class="sec" id="x-vae-s6">
-      <h4><button class="ts" type="button" data-t="930">15:30</button><span>用 KL 散度衡量「最近」</span></h4>
-      <p>「最近」要有一个度量，这里用 <b>KL 散度 (Kullback-Leibler Divergence)</b>，目标是最小化 <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>))</span>。KL 散度不对称，两个分布交换位置结果就不同，严格说它不是距离，但可以当作衡量近似程度的标准。用 KL 散度做这件事，就是变分贝叶斯法。</p>
-      <p>难点在于 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 本身不知道，这个 KL 写不出表达式，没法直接算。下一节的推导绕开它，得到一个能算的替代目标，叫变分下界，也就是 ELBO。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-990.jpg" alt="大圆是所有分布，小圈是高斯分布族 (Gaussian)，在族里找离后验 p_θ(z|x_i) 最近的 q_φ(z|x_i)；左边开始写 KL" loading="lazy"><figcaption><button class="ts" type="button" data-t="990">16:30</button>大圆是所有分布，小圈是高斯分布族 (Gaussian)，在族里找离后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 最近的 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>；左边开始写 KL</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>定义：<span class="m">KL(<i>q</i> ‖ <i>p</i>) = ∫ <i>q</i>(<i>z</i>) log [<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>)] <i>d</i><i>z</i> = <i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) − log <i>p</i>(<i>z</i>)]</span>。后面要用到两条性质。KL ≥ 0，当且仅当两个分布处处相等时为 0。KL(q ‖ p) 和 KL(p ‖ q) 一般不相等，变分推断用 q 在前的这个，期望按 q 取，只需要能从 q 里采样。</p></div>
-    </section>
-<section class="sec" id="x-vae-s7">
-      <h4><button class="ts" type="button" data-t="997">16:37</button><span>展开 KL：<span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span></span></h4>
-      <p>从 KL 散度的定义出发，只用两个工具：对数的性质 <span class="m">log(<i>a</i>/<i>b</i>) = log <i>a</i> − log <i>b</i></span>，以及条件概率的定义 <span class="m"><i>p</i>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) = <i>p</i>(<i>z</i>, <i>x</i><sub><i>i</i></sub>) / <i>p</i>(<i>x</i><sub><i>i</i></sub>)</span>。下面的期望 <span class="m"><i>E</i><sub><i>q</i></sub></span> 都按 <span class="m"><i>z</i> ∼ <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 取。</p>
-      <div class="deriv"><div><span class="df"><span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) = ∫ <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) log [<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) / <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] <i>d</i><i>z</i></span></span><span class="dc">KL 散度的定义</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">对数拆成相减，积分写成期望</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] + <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">代入 p(z|x<sub>i</sub>) = p(z, x<sub>i</sub>) / p(x<sub>i</sub>)，前面的减号让最后一项变成加</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 里没有 z，期望就是它本身</span></div><div><span class="df"><span class="m">= −ELBO + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span></span><span class="dc">前两项记作 −ELBO</span></div></div>
-      <p>其中 <span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span>。移项得到一个恒等式：</p>
-      <div class="deriv"><div><span class="df"><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>) = KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) + ELBO</span></span></div></div>
-      <p><span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 叫<b>边际似然 (Marginal Likelihood)</b>，也叫证据 (Evidence)，做生成模型时说的最大似然就是最大化它。这个式子对任何 q 都成立，中间没有任何近似。</p>
-      
-      
-      <div class="note"><p><span class="lbl">注</span>板书和这里有两处不同。期望的下标写成了 <span class="m"><i>E</i><sub><i>q</i>(<i>z</i>)</sub></span>，省掉了 <span class="m"><i>x</i><sub><i>i</i></sub></span>，和上一节「写不写 <span class="m"><i>x</i><sub><i>i</i></sub></span> 无所谓」一致，但 q 实际依赖 <span class="m"><i>x</i><sub><i>i</i></sub></span>；θ 和 φ 也时写时不写。推导本身没有错。</p></div>
-    </section>
-<section class="sec" id="x-vae-s8">
-      <h4><button class="ts" type="button" data-t="1250">20:50</button><span>为什么最大化 ELBO 就是最小化 KL</span></h4>
-      <p>回到最初的目标：用 q 近似后验，也就是最小化上面那个 KL。恒等式左边的 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span> 里没有 z，和 q 也无关，调 φ 改变 q 的时候它是一个常数。</p>
-      <p>常数等于 KL 加 ELBO，两项此消彼长，ELBO 涨多少 KL 就降多少。所以最小化那个算不出来的 KL，等价于最大化能算出来的 ELBO。讲者强调这一步是整件事的核心，不少博客没讲明白为什么要最大化 ELBO。</p>
-      <p>名字也从这里来。KL ≥ 0，所以 <span class="m">ELBO ≤ log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>)</span>，ELBO 是证据（对数边际似然）的一个下界，Evidence Lower Bound。只有 q 恰好等于真实后验时等号才成立。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-1344.jpg" alt="KL 推导整页：最后一行 log p(x_i) = KL + ELBO，右边注着 max ELBO、min KL，因为 log p(x_i) 是常数" loading="lazy"><figcaption><button class="ts" type="button" data-t="1344">22:24</button>KL 推导整页：最后一行 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>) = KL + ELBO</span>，右边注着 max ELBO、min KL，因为 <span class="m">log <i>p</i>(<i>x</i><sub><i>i</i></sub>)</span> 是常数</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>和<a class="ilink" href="#l13-s25">第 13 讲的推导</a>对照。课上从最大似然出发：想最大化 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>，写出同样的三项，扔掉算不出的 KL 得到下界，再最大化下界。这个视频从近似后验出发，固定 θ 只看 φ。</p><p>实际训练时编码器 φ 和解码器 θ 一起更新：对 φ 来说，抬高 ELBO 就是让 q 贴近后验；对 θ 来说，抬高 ELBO 会把 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span> 一起往上推。两种讲法优化的是同一个式子。</p></div>
-    </section>
-<section class="sec" id="x-vae-s9">
-      <h4><button class="ts" type="button" data-t="1346">22:26</button><span>把 ELBO 拆成两项</span></h4>
-      <p>接着把 ELBO 化成能直接当损失用的形式。这次换一种方式拆联合分布：<span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>) = <i>p</i>(<i>z</i>) <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)</span>，先验乘解码器给出的似然。</p>
-      <div class="deriv"><div><span class="df"><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>z</i>, <i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>z</i>) + log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − <i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)]</span></span><span class="dc">联合分布拆成先验乘似然，乘积的对数变成相加</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − (<i>E</i><sub><i>q</i></sub>[log <i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)] − <i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>z</i>)])</span></span><span class="dc">把含 q 和 p(z) 的两项放到一起</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − <i>E</i><sub><i>q</i></sub>[log (<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) / <i>p</i>(<i>z</i>))]</span></span><span class="dc">对数相减变成对数里相除</span></div><div><span class="df"><span class="m">= <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">按 KL 散度的定义</span></div></div>
-      <p>ELBO 由此分成两项。第一项：从 q 里采 z，解码器还原出 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的对数似然，取期望。第二项：近似后验 q 和先验 p(z) 之间的 KL 散度。最大化 ELBO 就是同时最大化第一项、最小化第二项。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-1540.jpg" alt="ELBO 的化简：最后一行是 −KL(q(z) ‖ p(z)) + E_q[log p_θ(x_i|z)]；倒数第二行把 log(q/p) 误写成了 log q / log p" loading="lazy"><figcaption><button class="ts" type="button" data-t="1540">25:40</button>ELBO 的化简：最后一行是 <span class="m">−KL(<i>q</i>(<i>z</i>) ‖ <i>p</i>(<i>z</i>)) + <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)]</span>；倒数第二行把 log(q/p) 误写成了 log q / log p</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>板书倒数第二行写的是 <span class="m">−<i>E</i><sub><i>q</i></sub>[log <i>q</i>(<i>z</i>) / log <i>p</i>(<i>z</i>)]</span>，应为 <span class="m">log (<i>q</i>(<i>z</i>) / <i>p</i>(<i>z</i>))</span>，两个对数相除和对数里面相除是两回事。下一行写成 KL 的结果是对的。</p></div>
-    </section>
-<section class="sec" id="x-vae-s10">
-      <h4><button class="ts" type="button" data-t="1542">25:42</button><span>两个目标：贴近先验，重建得好</span></h4>
-      <p>损失函数到这里就出来了。先验 p(z) 一开始就假设好了，是标准正态分布 N(0, 1)；q 从高斯分布族里取，<span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) = <i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>)</span>。于是训练要做两件事：</p>
-      <ul><li>最小化 <span class="m">KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span>：编码器给每张图输出的高斯，要靠近标准正态分布。</li><li>最大化 <span class="m"><i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)]</span>：给定 z 时 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的似然要大。生成模型里这个似然由网络来学，这个网络就是解码器。</li></ul>
-      <p>讲者把整条链又走了一遍：想找和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对应的 z 来训练解码器，所以要后验；后验算不出，用变分贝叶斯取一个高斯 q 去近似；近似得好不好用 KL 量；这个 KL 算不出，转成最大化 ELBO；ELBO 再拆成上面两项。按原论文这条推导，q 往 N(0, 1) 靠是推出来的结论，出发点是近似后验。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-1680.jpg" alt="左下是推导的来龙去脉：后验、变分贝叶斯 (VB)、q(z)、KL、ELBO；右边 q(z|x_i) ∼ N(μ, σ²)，p(z) ∼ N(0, 1)" loading="lazy"><figcaption><button class="ts" type="button" data-t="1680">28:00</button>左下是推导的来龙去脉：后验、变分贝叶斯 (VB)、q(z)、KL、ELBO；右边 q(z|x<sub>i</sub>) ∼ N(μ, σ<sup>2</sup>)，p(z) ∼ N(0, 1)</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>讲者有一句说，q 和真实后验越近越好，等价于 q 和先验越近越好。这句说过头了。KL(q ‖ p(z)) 只是 ELBO 里的一项，它和重建项互相牵制：q 如果完全等于 N(0, 1)，z 里就不带任何关于 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的信息，重建项会很差。最大化的是两项之和，最终的 q 落在两者之间。</p></div>
-    </section>
-<section class="sec" id="x-vae-s11">
-      <h4><button class="ts" type="button" data-t="1684">28:04</button><span>训练流程：编码器输出 μ 和 σ，采样，解码</span></h4>
-      <p>第一项前面有一个按 q 取的期望。所以每次编码得到 q 以后，都要从 q 里重新采一个 z（蒙特卡洛方法），希望每次采到的 z 都能把 <span class="m"><i>x</i><sub><i>i</i></sub></span> 还原好。训练一步是这样：</p>
-      <ul><li>输入 x，编码器输出 μ 和 σ，确定一个高斯分布 N(μ, σ<sup>2</sup>)。</li><li>从这个高斯里采一个 z。</li><li>解码器把 z 还原成 x̂，和 x 算 L1 或 L2 重建损失。</li><li>同时算 KL(N(μ, σ<sup>2</sup>) ‖ N(0, 1)) 这一项损失，把每张图的高斯往标准正态分布拉。</li></ul>
-      <p>回头对照推导：编码器输出的 N(μ, σ<sup>2</sup>) 就是 q，在近似真实后验 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>；N(0, 1) 是先验 p(z)。从 q 里采出的 z 可以看作来自 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的后验，和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对得上，所以拿它重建 <span class="m"><i>x</i><sub><i>i</i></sub></span> 是合理的。</p>
-      <p>两项损失具体怎么算，讲者没有展开，这里补上。KL 项在两个高斯之间有解析解，不用采样。z 有 d 维、各维独立时：</p>
-      <div class="deriv"><div><span class="df"><span class="m">KL(<i>N</i>(<i>μ</i>, <i>σ</i><sup>2</sup>) ‖ <i>N</i>(0, 1)) = ½ Σ<sub><i>j</i></sub> (<i>μ</i><sub><i>j</i></sub><sup>2</sup> + <i>σ</i><sub><i>j</i></sub><sup>2</sup> − 1 − log <i>σ</i><sub><i>j</i></sub><sup>2</sup>)</span></span><span class="dc">对 d 个维度求和</span></div></div>
-      <p>比如某一维 μ = 0.5、σ = 0.8，这一维的 KL 是 ½ × (0.25 + 0.64 − 1 + 0.446) ≈ 0.168；μ = 0、σ = 1 时是 0，正好就是先验本身。</p>
-      <p>重建项取决于解码器假设的分布。假设 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>)</span> 是均值为 x̂、方差固定为 s<sup>2</sup> 的高斯，那么 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i>|<i>z</i>) = −‖<i>x</i> − <i>x̂</i>‖<sup>2</sup> / (2<i>s</i><sup>2</sup>) + 常数</span>，最大化它就是最小化 L2 损失；假设成拉普拉斯分布，就对应 L1 损失。讲者说的「L1 或 L2 重建损失」就是这么来的。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-1850.jpg" alt="训练流程：编码器输出 μ、σ，采样 z，解码后和 x_i 算 L1；KL(N(μ, σ²) ‖ N(0, 1)) 把 q 拉向先验" loading="lazy"><figcaption><button class="ts" type="button" data-t="1850">30:50</button>训练流程：编码器输出 μ、σ，采样 z，解码后和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 算 L1；KL(N(μ, σ<sup>2</sup>) ‖ N(0, 1)) 把 q 拉向先验</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>还有一处讲者没提：z 是采样得到的，采样这一步没法直接对 μ、σ 求梯度。变分自编码器用<b>重参数化技巧 (Reparameterization Trick)</b>：先从 N(0, 1) 采 ε，再算 z = μ + σ ε。随机性都放进 ε，z 对 μ 和 σ 可导，梯度就能传回编码器。<a class="ilink" href="#l13-s28">第 13 讲的训练流程</a>讲过这一步。</p></div>
-    </section>
-<section class="sec" id="x-vae-s12">
-      <h4><button class="ts" type="button" data-t="1855">30:55</button><span>为什么每次都重新采样</span></h4>
-      <p>每次都从 q 里重新采样，是因为重建项是一个期望，期望一般用蒙特卡洛估计。讲者的说法是，希望从 q 里采到的每一个 z 都能把 <span class="m"><i>x</i><sub><i>i</i></sub></span> 还原好，所以不断采、不断重建。</p>
-      <p>他还提到另一种看法：从同一个 <span class="m"><i>x</i><sub><i>i</i></sub></span> 的高斯里采出 <span class="m"><i>z</i><sub>1</sub></span>、<span class="m"><i>z</i><sub>2</sub></span> 等好几个点，都要求还原成 <span class="m"><i>x</i><sub><i>i</i></sub></span>，相当于在隐空间里做数据增强，解码器会更鲁棒，泛化更好。</p>
-      <p>最后他把主线收拢了一遍：变分自编码器的出发点是找一个和 <span class="m"><i>x</i><sub><i>i</i></sub></span> 对应的 z 去做重建，为此用变分贝叶斯假设了一个 q，最小化 KL，推成最大化 ELBO，再推出两项损失。网上有的讲法直接规定隐空间要服从正态分布，出发点不同，结论一样。</p>
-      
-      
-      <div class="note"><p><span class="lbl">注</span>实际训练中通常每张图每一步只采一个 z，靠大量迭代把期望平均出来。原论文第 2.3 节说，只要批量够大（他们用 100），每个样本采一次就够了。</p></div>
-    </section>
-<section class="sec" id="x-vae-s13">
-      <h4><button class="ts" type="button" data-t="1939">32:19</button><span>隐空间长什么样：只有重建、只有 KL、两者都有</span></h4>
-      <p>板书上贴了三张图：在 MNIST（0 到 9 的手写数字）上训练，把隐空间画成二维，十种颜色对应十个数字。讲者说实际的隐空间维度可能很高，这是投影到二维的样子。</p>
-      <ul><li>只有重建损失，也就是普通自编码器：同一个数字聚成一块，有区域性；但整体没有规则，各块的形状和位置很随意，块之间有大片空白，很难找到一个合理的新 z。这就是自编码器不能当生成模型的原因。</li><li>只有 KL 散度、不做重建：所有点挤成一个中间密、四周疏的圆，明显是正态分布，有规则；但不同数字混在一起，没有区域性。</li><li>两者都用，即变分自编码器：既有区域，又有规则。</li></ul>
-      <p>讲者的对应关系是：重建损失管区域性，KL 散度管规则。后者好理解，KL 本来就是把隐空间往假设的标准正态分布上拉。前者是因为隐空间也是特征空间，自编码器学的就是特征，相似的图特征相近，投影以后也挨在一起。</p>
-      <p>图上还能看到数字之间的过渡是连续的：从「1」的区域往「2」的区域走，中间的点解码出来会从 1 慢慢变成 2。讲者把解码器的作用概括为在 KL 给出的那团正态分布上做了一次聚类，特征相近的图聚到一起，又没有打破整体分布，所以能从里面采新的 z 来生成新图。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-2250.jpg" alt="隐空间整页：右上三张 MNIST 二维隐空间图（只有重建、只有 KL、两者结合），下面总结 L1 对应区域、KL 对应规则" loading="lazy"><figcaption><button class="ts" type="button" data-t="2250">37:30</button>隐空间整页：右上三张 MNIST 二维隐空间图（只有重建、只有 KL、两者结合），下面总结 L1 对应区域、KL 对应规则</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>三张图标题是 Only reconstruction loss、Only KL divergence、Combination，出自 Irhum Shafkat 的博客文章 Intuitively Understanding Variational Autoencoders。</p><p>讲者口头说的「L1 损失对应区域性」指的是重建损失，用 L1 还是 L2 不影响这个结论。</p></div>
-    </section>
-<section class="sec" id="x-vae-s14">
-      <h4><button class="ts" type="button" data-t="2253">37:33</button><span>Latent Diffusion 为什么更清晰：第一个猜想</span></h4>
-      <p>回到开头的问题。两者结构差不多，都是一个编码器加一个解码器，Latent Diffusion 只是中间多了扩散。讲者说网上没找到相关的讨论，下面是他自己的思考，可能有错。</p>
-      <p>第一个猜想和变分贝叶斯有关。两者都假设先验 p(z) 是 N(0, 1)。变分自编码器靠最小化 KL(q ‖ p(z)) 让数据的隐向量服从先验，而 q 是从高斯族里取来近似后验的，真实后验未必是高斯。这一步近似本身就带来偏差，最后拟合出来的正态分布不如想象中好，生成效果也跟着打折。</p>
-      
-      
-      
-    </section>
-<section class="sec" id="x-vae-s15">
-      <h4><button class="ts" type="button" data-t="2383">39:43</button><span>扩散模型学的是噪声到任意分布的映射</span></h4>
-      <p>先看普通的像素扩散：一张图一步步加噪，最后变成服从标准正态分布的噪声；生成时随便取一个噪声，就能一步步还原成图。它学到的是标准正态分布和真实数据分布 p(x) 之间的映射，而且真实分布不需要是高斯。</p>
-      <p>变分自编码器的问题出在用高斯 q 去假设后验 <span class="m"><i>p</i>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span>。既然扩散模型能学任意未知分布和标准正态分布之间的映射，这个假设就可以不做：隐向量服从什么分布不用知道，交给扩散模型去学它和 N(0, 1) 之间的映射。</p>
-      <p>生成时从 N(0, 1) 取一个 ε，扩散模型把它变成一个服从隐空间分布的 z，解码器再把 z 解成图。少了一步高斯假设，效果可能就更好。这是他的第一个思考。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-2520.jpg" alt="对比变分自编码器和 Latent Diffusion：右下是扩散模型把 ε ∼ N(0, 1) 映射成服从后验分布 p(z|x_i) 的 z，这个分布本身未知 (unknown)" loading="lazy"><figcaption><button class="ts" type="button" data-t="2520">42:00</button>对比变分自编码器和 Latent Diffusion：右下是扩散模型把 ε ∼ N(0, 1) 映射成服从后验分布 p(z|x<sub>i</sub>) 的 z，这个分布本身未知 (unknown)</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>对照 Latent Diffusion 原论文第 3.1 节和附录 G：猜想的方向大体对，但还有一个更直接的原因讲者没提。</p><p>原论文的自编码器用感知损失 (Perceptual Loss) 加基于图块的对抗损失 (Patch-based Adversarial Objective) 训练，论文说这样能保证重建的局部真实感，避免只用 L1、L2 这类像素损失带来的模糊。</p><p>隐空间的正则也很弱：KL 版本的 KL 项权重只有约 10<sup>−6</sup>，另一个版本用向量量化代替 KL，隐空间几乎不被拉向 N(0, 1)，接近一个普通自编码器，所以重建清楚。</p><p>隐向量的分布交给扩散模型去学，这一点和讲者的猜想一致。所以 Latent Diffusion 的清晰来自两处：解码器本身用感知和对抗损失训练；生成时 z 由扩散模型给出，不再直接从 N(0, 1) 里采。</p></div>
-    </section>
-<section class="sec" id="x-vae-s16">
-      <h4><button class="ts" type="button" data-t="2529">42:09</button><span>第二个原因：重叠处取平均，图就糊了</span></h4>
-      <p>第二个思考是变分自编码器的老毛病，讲者说这个说法是别人提过的。两张图各自的高斯 q 可能有重叠，两张图都可能采到重叠区域里的同一个 z，虽然概率很小。解码器面对这个 z，不知道该还原成哪一张，为了让重建损失最小，训练中就会取两者的平均。平均的结果是高频细节变差，图就糊了。</p>
-      <p>举个数字的例子：同一个 z 在一张图里对应某个像素值 0（黑），在另一张里对应 1（白）。用 L2 损失时最优输出是均值 0.5，一片灰；用 L1 时最优输出是中位数，只有两个样本时 0 到 1 之间任何值损失都一样，同样给不出一条清楚的边。边缘、纹理这些高频部分在不同样本之间最容易对不齐，也最容易被平均掉。</p>
-      <p>讲者最后的总结：Latent Diffusion 比变分自编码器好，主要因为它利用了扩散模型的长处，能学到任意未知的复杂分布和标准正态分布之间的关系。隐空间的后验正好是一个未知分布，扩散模型绕开了用变分贝叶斯去近似它这一步，所以效果更好。</p>
-      
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-vae-2637.jpg" alt="整页：左边第二点，两个高斯的重叠处采到同一个 z，解码器只能学成平均 (average)，重建就糊" loading="lazy"><figcaption><button class="ts" type="button" data-t="2637">43:57</button>整页：左边第二点，两个高斯的重叠处采到同一个 z，解码器只能学成平均 (average)，重建就糊</figcaption></figure></div>
-      <div class="note"><p><span class="lbl">注</span>第二个原因也解释了为什么改训练目标有用：只要重建损失是逐像素的 L1、L2，多个可能答案之间就会被平均。Latent Diffusion 的自编码器加了对抗损失，判别器会惩罚看起来模糊的重建，解码器就不能靠取平均来压低损失。</p></div>
-    </section>
-      <section class="sec keys"><h4>这个视频记住这几条</h4><ul><li>自编码器能学特征但不能生成：隐空间没有约束，采不到合理的新 z。</li><li>变分自编码器把「给每张图找一个 z」换成「给每张图找 z 的后验分布」。后验算不出，就用一个高斯 <span class="m"><i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)</span> 去近似，这是变分贝叶斯；编码器输出的 μ、σ 就是这个高斯的参数。</li><li>恒等式 <span class="m">log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>) = KL(<i>q</i> ‖ <i>p</i><sub><i>θ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>)) + ELBO</span> 对任何 q 都成立。左边和 q 无关，所以最小化算不出的 KL 等价于最大化能算的 ELBO；又因为 KL ≥ 0，ELBO 是对数似然的下界。</li><li><span class="m">ELBO = <i>E</i><sub><i>q</i></sub>[log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub><i>i</i></sub>|<i>z</i>)] − KL(<i>q</i><sub><i>φ</i></sub>(<i>z</i>|<i>x</i><sub><i>i</i></sub>) ‖ <i>p</i>(<i>z</i>))</span>：前一项是重建损失（高斯解码器对应 L2），后一项把每张图的高斯拉向 N(0, 1)，有解析解；采样那一步靠重参数化技巧传梯度。</li><li>二维隐空间上，重建损失让同类聚成区域，KL 让整体成为规则的正态分布，两者缺一不可。</li><li>变分自编码器发糊，是因为逐像素重建损失在重叠的后验之间取平均。Latent Diffusion 的自编码器改用感知加对抗损失、KL 权重压到约 10<sup>−6</sup>，隐向量的分布交给扩散模型去学。</li></ul></section>
-    </div>
-    <aside class="epside">
-      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/x-vae.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1wx421k74m/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
-      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>Latent Diffusion：先压缩，再在隐空间里扩散</span></button></li><li><button type="button" data-t="158"><b>2:38</b><span>编码器和解码器来自变分自编码器</span></button></li><li><button type="button" data-t="315"><b>5:15</b><span>自编码器：能学特征，不能生成</span></button></li><li><button type="button" data-t="385"><b>6:25</b><span>想生成新图，就要一个新的 z</span></button></li><li><button type="button" data-t="565"><b>9:25</b><span>换个问题：去找后验</span></button></li><li><button type="button" data-t="784"><b>13:04</b><span>变分贝叶斯：在高斯分布族里找最近的</span></button></li><li><button type="button" data-t="930"><b>15:30</b><span>用 KL 散度衡量「最近」</span></button></li><li><button type="button" data-t="997"><b>16:37</b><span>展开 KL：log p(x) = KL + ELBO</span></button></li><li><button type="button" data-t="1250"><b>20:50</b><span>为什么最大化 ELBO 就是最小化 KL</span></button></li><li><button type="button" data-t="1346"><b>22:26</b><span>把 ELBO 拆成两项</span></button></li><li><button type="button" data-t="1542"><b>25:42</b><span>两个目标：贴近先验，重建得好</span></button></li><li><button type="button" data-t="1684"><b>28:04</b><span>训练流程：输出 μ 和 σ，采样，解码</span></button></li><li><button type="button" data-t="1855"><b>30:55</b><span>为什么每次都重新采样</span></button></li><li><button type="button" data-t="1939"><b>32:19</b><span>隐空间：只有重建、只有 KL、两者都有</span></button></li><li><button type="button" data-t="2253"><b>37:33</b><span>Latent Diffusion 为什么更清晰：第一个猜想</span></button></li><li><button type="button" data-t="2383"><b>39:43</b><span>扩散模型学的是噪声到任意分布的映射</span></button></li><li><button type="button" data-t="2529"><b>42:09</b><span>第二个原因：重叠处取平均，图就糊了</span></button></li></ol>
-    </aside>
-  </div>
-</details>
 </div></main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
@@ -10247,12 +10059,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     if(a&&a.dataset.l){e.preventDefault();gotoLecture(a.dataset.l,a.classList.contains('pnote')?a.getAttribute('href').slice(1):null);}
   });
 
-  /* ── 地址栏：#l7 打开第 7 讲，#l7-s3 跳到第 7 讲第 4 节，#papers 打开论文 tab，#p-resnet2016 打开那篇论文，#extras 打开补充视频，#x-vae-s3 跳到那个视频第 4 节 ── */
+  /* ── 地址栏：#l7 打开第 7 讲，#l7-s3 跳到第 7 讲第 4 节，#papers 打开论文 tab，#p-resnet2016 打开那篇论文── */
   function openHash(){
     var h=location.hash,m;
     if(h==='#papers'){showTab('papers');return;}
-    if(h==='#extras'){showTab('extras');return;}
-    if((m=/^#(x-[\w]+)(-s\d+)?$/.exec(h))){var x=document.getElementById(m[1]);if(x){showTab('extras');x.open=true;(document.getElementById(h.slice(1))||x).scrollIntoView({block:'start'});}return;}
     if((m=/^#p-([\w-]+)$/.exec(h))){var c=document.getElementById('p-'+m[1]);if(c){showTab('papers');c.open=true;c.scrollIntoView({block:'start'});}return;}
     if((m=/^#l(\d+)(-s\d+)?$/.exec(h))){var d=document.getElementById('l'+m[1]);if(d){showTab('course');d.open=true;(document.getElementById(h.slice(1))||d).scrollIntoView({block:'start'});}}
   }
