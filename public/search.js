@@ -322,7 +322,6 @@
         var t = document.querySelector('.tab[data-tab="' + pane.id.slice(5) + '"]');
         if (t && t.getAttribute('aria-selected') !== 'true') t.click();
       }
-      el.dispatchEvent(new CustomEvent('sx:focus', { bubbles: true }));
       // 展开所有包着它的折叠块：讲次、思考题、参考文献、附录
       for (var d = el.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
       if (el.matches('.paper[data-n]')) el.classList.add('open');   // ep117 资料里的论文行
