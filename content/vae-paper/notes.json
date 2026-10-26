@@ -22,6 +22,24 @@
   "a": "\n<p>不是说后验不存在，是说它<b>没有闭式解，数值上也算不动</b>。贝叶斯公式：</p>\n<div class=\"eg\">p(z | x) = p(x | z) p(z) / p(x)\np(x)     = ∫ p(z) p(x | z) dz</div>\n<p>分子好算：先验和解码器都是自己定的。难在分母 <i>p</i>(<b>x</b>)，要对所有可能的 <b>z</b> 积分。解码器 <i>p</i>(<b>x</b>|<b>z</b>) 是神经网络时，这个积分没有解析式；<b>z</b> 有 20 维的话，网格法每维取 100 个点就是 100<sup>20</sup> 次解码，也没法硬算。</p>\n<p>全文要绕开的就是这个分母。</p>"
  },
  {
+  "anchor": "a reparameterization of the variational lower bound",
+  "kind": "原理",
+  "q": "重参数化（Reparameterization）是什么？",
+  "a": "\n<p>下界 ℒ 里有一项期望，取期望用的分布 <i>q</i><sub>φ</sub>(<b>z</b>|<b>x</b>) 本身带着要学的参数 φ。训练时要从这个分布里抽一个 <b>z</b>，而「抽样」这个操作没有导数，梯度从损失往回传，到 <b>z</b> 就断了，到不了编码器输出的 μ 和 σ。</p>\n<p>重参数化把随机性挪到一个和 φ 无关的噪声 ε 上，再用一个确定的函数把 ε 变成 <b>z</b>：</p>\n<div class=\"eg\">ε ~ 𝒩(0, I)\nz = μ + σ ⊙ ε</div>\n<p><b>z</b> 的分布没变，仍然是 𝒩(μ, σ<sup>2</sup>)；变的是 φ 的位置，从「分布的参数」挪到了「普通函数的参数」。代个数：μ = 1，σ = 2，这次抽到 ε = 0.5，于是 <i>z</i> = 2，∂<i>z</i>/∂μ = 1，∂<i>z</i>/∂σ = ε = 0.5，都是普通导数。随机数成了计算图的一个输入，反向传播照常走。</p>\n<p>写成代码就一行：</p>\n<div class=\"eg\">z = mu + torch.exp(0.5 * logvar) * torch.randn_like(mu)</div>\n<p>「对变分下界做重参数化」说的就是对 ℒ 里那项期望用这个改写，得到的估计量就是 SGVB。梯度为什么因此能搬进期望、方差为什么变小，§2.4 那条批注接着讲。</p>"
+ },
+ {
+  "anchor": "i.i.d. datasets",
+  "kind": "基础",
+  "q": "i.i.d. 是什么？这里为什么要强调？",
+  "a": "\n<p>independent and identically distributed，独立同分布：数据集 <b>X</b> = {<b>x</b><sup>(1)</sup>, …, <b>x</b><sup>(<i>N</i>)</sup>} 里每个样本都来自同一个分布 <i>p</i><sub>θ</sub>(<b>x</b>)，样本之间互不影响。</p>\n<p>它在这篇论文里的用处是让整个数据集的对数似然拆成逐点求和：</p>\n<div class=\"eg\">log p<sub>θ</sub>(X) = Σ<sub>i</sub> log p<sub>θ</sub>(x<sup>(i)</sup>)</div>\n<p>能拆开，下界才能按单个数据点写（式 (1)–(3) 都是针对一个 <b>x</b><sup>(<i>i</i>)</sup>），再加起来；随机抽 <i>M</i> 个求和乘 <i>N</i>/<i>M</i> 才是全量的无偏估计（式 (8)），小批量 SGD 才成立。</p>\n<p>MNIST 的一张张图可以看成 i.i.d.；视频的相邻帧、股价序列就不是，前后强相关，似然拆不成逐点求和。</p>"
+ },
+ {
+  "anchor": "continuous latent variables per datapoint",
+  "kind": "原理",
+  "q": "「每个数据点各带连续隐变量」是什么意思？",
+  "a": "\n<p>拆成两半看。</p>\n<p><b>每个数据点各带</b>：每个 <b>x</b><sup>(<i>i</i>)</sup> 有自己的 <b>z</b><sup>(<i>i</i>)</sup>，叫局部隐变量；θ 是全体数据共享的全局参数。生成过程是对每个 <i>i</i> 先抽 <b>z</b><sup>(<i>i</i>)</sup> ~ <i>p</i>(<b>z</b>)，再抽 <b>x</b><sup>(<i>i</i>)</sup> ~ <i>p</i><sub>θ</sub>(<b>x</b>|<b>z</b><sup>(<i>i</i>)</sup>)。图 1 的板式记法画的就是这个：<b>z</b> 在写着 <i>N</i> 的方框里，θ 在框外。</p>\n<p>麻烦在于 <i>N</i> 个数据点就有 <i>N</i> 个后验 <i>p</i>(<b>z</b><sup>(<i>i</i>)</sup>|<b>x</b><sup>(<i>i</i>)</sup>) 要推断。传统变分推断给每个点单独优化一组 (μ<sub><i>i</i></sub>, σ<sub><i>i</i></sub>)，参数量随 <i>N</i> 增长，来一个新样本还得重新优化一遍。本文训练一个编码器 <i>q</i><sub>φ</sub>(<b>z</b>|<b>x</b>)，任何 <b>x</b> 进去，一次前向就给出它的 μ 和 σ。这就是摘要后半句的「识别模型」，也是「特别高效」的来源。</p>\n<p><b>连续</b>：<b>z</b> ∈ ℝ<sup><i>J</i></sup> 是实数向量，不是高斯混合模型里「属于第几簇」那种离散标签。这是硬条件，重参数化要对 <i>z</i> = μ + σε 求导，离散的 <b>z</b> 求不了；离散隐变量后来靠 Gumbel-Softmax 这类方法补上。图 4 里每张 MNIST 图对应二维平面上的一个 <b>z</b>，沿平面移动，笔画粗细和倾斜连续变化。</p>"
+ },
+ {
   "anchor": "The variational Bayesian (VB) approach involves the optimization of an approximation to the intractable posterior",
   "kind": "基础",
   "q": "变分推断（Variational Inference）的思路是什么？",
