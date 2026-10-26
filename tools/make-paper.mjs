@@ -1018,7 +1018,7 @@ function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = ''
 <title>${esc(o.title || '逐句啃 Attention is All You Need')}</title>
 ${o.desc ? `<meta name="description" content="${esc(o.desc)}">` : ''}
 ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
-<style>${CSS}${cssAppx()}${cssMulti(more)}${cssZh()}${cssObj(body)}${DOCSCSS}</style></head><body>
+<style>${CSS}${cssAppx()}${cssMulti(more)}${cssZh()}${cssObj(body)}${DOCSCSS}${o.embed ? ':root{--topbar-h:0px}' : ''}</style></head><body>
 ${o.embed ? '' : `<header class="topbar"><div class="wrap">
   <a class="back" href="${home}">‹ 全部条目</a>
 </div></header>
