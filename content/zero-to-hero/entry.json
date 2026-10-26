@@ -1,6 +1,7 @@
 {
   "id": "zero-to-hero",
   "kind": "paper",
+  "draft": true,
   "title": "Karpathy《Zero to Hero》",
   "subtitle": "从手写反向传播到复现 GPT-2，播放列表全部 10 集的分节笔记，时间码点了跳到录像那一秒",
   "topics": [

@@ -1001,6 +1001,8 @@ function h1HTML(t, tail = 5) {
   return esc(s.slice(0, -tail)) + `<span class="nb">${esc(s.slice(-tail))}</span>`;
 }
 
+/** --embed 1：页面要嵌进别的专题页的 iframe（VAE 原论文对照挂在变分自编码器专题最后一个 tab），
+ *  外层已经有返回链接，这里不再出「‹ 全部条目」 */
 function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = '', hasRes = false, docs = [], more = []) {
   // 首屏落在哪个 tab：--first paper | paper-3 | doc-1 …，默认第一篇论文
   const FIRST = o.first || 'paper';
@@ -1017,10 +1019,10 @@ function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = ''
 ${o.desc ? `<meta name="description" content="${esc(o.desc)}">` : ''}
 ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
 <style>${CSS}${cssAppx()}${cssMulti(more)}${cssZh()}${cssObj(body)}${DOCSCSS}</style></head><body>
-<header class="topbar"><div class="wrap">
+${o.embed ? '' : `<header class="topbar"><div class="wrap">
   <a class="back" href="${home}">‹ 全部条目</a>
 </div></header>
-
+`}
 <div class="wrap"><section class="ep-head">
   ${more.length ? '' : kicker + '\n  '}<h1>${h1HTML(o.h1 || '逐字、逐句理解 Transformer')}</h1>
   ${meta}${more.length ? '\n  ' + kicker : ''}
