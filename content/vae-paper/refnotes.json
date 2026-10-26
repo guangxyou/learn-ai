@@ -1,0 +1,86 @@
+{
+ "1": {
+  "venue": "IEEE TPAMI 2013",
+  "url": "https://arxiv.org/abs/1206.5538",
+  "sum": "Bengio、Courville、Vincent 的表示学习综述。第 4 节两次引它：单靠重构准则学不到有用的表示，以及去噪、收缩、稀疏自编码器这些正则化变体。"
+ },
+ "2": {
+  "venue": "ICML 2012",
+  "url": "https://arxiv.org/abs/1206.6430",
+  "sum": "直接对变分下界做随机优化，用控制变量压低朴素梯度估计量的方差。§2.2 引它说明朴素估计量方差太大，§4 把它列为另一条降方差的路线。"
+ },
+ "3": {
+  "venue": "arXiv 2013",
+  "url": "https://arxiv.org/abs/1306.1091",
+  "sum": "生成随机网络（Generative Stochastic Networks）：带噪声的自编码器学一个马尔可夫链的转移算子，链的平稳分布就是数据分布。§4 列为相关的自编码器式生成模型。"
+ },
+ "4": {
+  "venue": "WSC 1986",
+  "sum": "Devroye 讲非均匀随机数生成的会议论文，作者同年还出了同名主题的专著《Non-Uniform Random Variate Generation》。§2.4 引它说明逆 CDF 没有闭式时也有足够好的近似算法。"
+ },
+ "5": {
+  "venue": "JMLR 2011",
+  "url": "https://jmlr.org/papers/v12/duchi11a.html",
+  "sum": "Adagrad 优化器：按每个参数历史梯度平方和缩放步长。本文所有实验都用它，算法 1 也把它和 SGD 并列。"
+ },
+ "6": {
+  "venue": "Physics Letters B 1987",
+  "url": "https://doi.org/10.1016/0370-2693(87)91197-X",
+  "sum": "Hybrid（Hamiltonian）Monte Carlo 的原始论文，出自格点量子色动力学。§5 和附录 D、E 用它从后验采样，作为 Monte Carlo EM 的采样器和边缘似然估计的第一步。"
+ },
+ "7": {
+  "venue": "ICML 2014",
+  "url": "https://arxiv.org/abs/1310.8499",
+  "sum": "DARN（深度自回归网络），同样用自编码结构学有向概率模型，但隐变量是二值的。§4 拿它和本文对比。"
+ },
+ "8": {
+  "venue": "JMLR 2013",
+  "url": "https://jmlr.org/papers/v14/hoffman13a.html",
+  "sum": "随机变分推断（stochastic variational inference）：用小批量随机梯度优化变分目标，让变分推断能跑大数据集，但仍依赖共轭指数族模型。§4 开头提到它。"
+ },
+ "9": {
+  "venue": "Science 1995",
+  "url": "https://doi.org/10.1126/science.7761831",
+  "sum": "wake-sleep 算法，识别模型这个概念的来源。本文的主要对比对象：§4 讨论它的优缺点，§5 的图 2、图 3 都拿它当基线。"
+ },
+ "10": {
+  "venue": "NYU 技术报告 2008",
+  "url": "https://arxiv.org/abs/1010.3467",
+  "sum": "预测稀疏分解（PSD）：训练一个编码器去逼近稀疏编码的最优解，推断时一次前向代替迭代优化。作者在 §4 说从中得到了启发，和「识别模型代替逐点推断」是同一个思路。"
+ },
+ "11": {
+  "venue": "NIPS 1988",
+  "url": "https://papers.nips.cc/paper_files/paper/1988/hash/ec8956637a99787bd197eacd77acce5e-Abstract.html",
+  "sum": "Linsker 的 infomax 原理：好的表示应最大化输入与输出之间的互信息。§4 借它解释普通自编码器的训练目标。"
+ },
+ "12": {
+  "venue": "AISTATS 2014",
+  "url": "https://arxiv.org/abs/1401.0118",
+  "sum": "黑盒变分推断（Black Box Variational Inference）：用 score function 估计量加控制变量和 Rao-Blackwell 化，对任意模型做变分推断。§4 列为降方差路线的代表。"
+ },
+ "13": {
+  "venue": "ICML 2014",
+  "url": "https://arxiv.org/abs/1401.4082",
+  "sum": "DeepMind 的 Rezende、Mohamed、Wierstra，与本文同时、独立地提出重参数化梯度和识别网络。§4 末尾专门说明两边是各自完成的，今天两篇常一起引。"
+ },
+ "14": {
+  "venue": "NIPS 1997",
+  "url": "https://papers.nips.cc/paper/1398-em-algorithms-for-pca-and-spca",
+  "sum": "用 EM 算 PCA，并提出带完整密度模型的 SPCA。§4 引它说明 PCA 是线性高斯模型在噪声趋于零时的最大似然解。"
+ },
+ "15": {
+  "venue": "Bayesian Analysis 2013",
+  "url": "https://arxiv.org/abs/1206.6679",
+  "sum": "用随机线性回归拟合固定形式的变分后验，里面用到了和本文类似的重参数化。§4 提到它，但它只用于学习指数族近似分布的自然参数。"
+ },
+ "16": {
+  "venue": "AISTATS 2010",
+  "url": "https://proceedings.mlr.press/v9/salakhutdinov10a.html",
+  "sum": "用识别模型加速深度玻尔兹曼机的学习。§4 用它举例：已有的识别模型工作针对的是无向模型。"
+ },
+ "17": {
+  "venue": "JMLR 2010",
+  "url": "https://jmlr.org/papers/v11/vincent10a.html",
+  "sum": "堆叠去噪自编码器。§4 引它说明无正则化自编码器的训练准则等价于最大化互信息的一个下界。"
+ }
+}
