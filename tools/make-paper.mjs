@@ -365,6 +365,8 @@ const VENUE = () => o.venue ?? VENUE_DEFAULT;
 
 /** 作者：ltx_personname 里是「姓名 <br> 机构 <br> 邮箱」，多位作者用 & 连着，名字后面挂脚注角标 */
 function parseAuthors(src) {
+  const own = ownContacts(src);
+  if (own) return own;
   const people = [];
   for (const m of src.matchAll(/<span\b[^>]*\bltx_personname\b[^>]*>/g)) {
     const chunk = sliceTag(src, m.index, 'span');
@@ -390,8 +392,25 @@ function parseAuthors(src) {
   return people;
 }
 
+/** arXiv 新版里每位作者自带单位和邮箱（VAE：两个 ltx_creator 各有一组 ltx_contact）。
+ *  这时单位、邮箱就排在各自名字下面，不进页脚；只有一个 creator 时多半是全体共用，返回 null 走老路 */
+function ownContacts(src) {
+  const creators = [...src.matchAll(/<span\b[^>]*\bltx_creator\b[^>]*>/g)].map((m) => sliceTag(src, m.index, 'span'));
+  if (creators.length < 2 || !creators.every((c) => /\bltx_contact\b/.test(c))) return null;
+  return creators.map((c) => {
+    const name = strip((/<span\b[^>]*\bltx_personname\b[^>]*>([\s\S]*?)<\/span>/.exec(c) || [, ''])[1]);
+    const lines = [name], kinds = ['an'];
+    for (const m of c.matchAll(/<span\b[^>]*\bltx_contact\b[^>]*>/g)) {
+      const t = strip(sliceTag(c, m.index, 'span').replace(/<span\b[^>]*\bltx_contact_name\b[^>]*>[\s\S]*?<\/span>/, ''));
+      if (t) { lines.push(t); kinds.push(/\bltx_role_email\b/.test(m[0]) ? 'ae' : 'aa'); }
+    }
+    return { lines, kinds, mark: '', own: true };
+  });
+}
+
 /** 首页页脚那段 \thanks：LaTeXML 把三条拍平成一段纯文字了，按已知的起头切回三条 */
 function parseAuthorNotes(src) {
+  if (ownContacts(src)) return [];
   const i = src.search(/<span\b[^>]*\bltx_author_notes\b[^>]*>/);
   if (i < 0) return [];
   // sliceTag 而不是非贪婪正则：arXiv 新版这块里套着 ltx_contact / ltx_contact_name，
@@ -924,7 +943,7 @@ function authorHTML(people) {
   return rows.filter((r) => r.length).map((r) =>
     `<div class="arow">${r.map((p) =>
       `<div class="acell">${p.lines.map((t, i) =>
-        `<span class="${['an', 'aa', 'ae'][i] || 'aa'}">${esc(t)}${
+        `<span class="${(p.kinds || ['an', 'aa', 'ae'])[i] || 'aa'}">${esc(t)}${
           i === 0 && p.mark ? `<sup class="amk">${p.mark}</sup>` : ''}</span>`).join('')}</div>`).join('')}</div>`).join('');
 }
 
