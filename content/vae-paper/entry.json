@@ -1,0 +1,52 @@
+{
+  "id": "vae-paper",
+  "kind": "paper",
+  "title": "变分自编码器原论文中英对照",
+  "subtitle": "《Auto-Encoding Variational Bayes》逐段对照翻译，附背景批注",
+  "topics": [
+    "生成模型",
+    "论文"
+  ],
+  "date": "2013-12",
+  "studied": "2026-10",
+  "published": "2026-10-26",
+  "summary": "Kingma 和 Welling 提出变分自编码器的那篇论文，正文、附录 A 到 F、两个算法框、五张图的图注、脚注全部收录，每段英文下面跟一段中文。公式不重排，译文里的公式直接复用原文的 MathML。右栏 58 条批注补读这篇要用的背景：符号速查和全文主线、后验为什么算不出、式 (1)(3) 的推导、朴素梯度估计量为什么方差大、重参数化让梯度穿过采样、式 (10) 和附录 B 闭式 KL 的推导、伯努利和高斯解码器对应 BCE 和平方误差，也标出原文几处笔误（编码器解码器写反、§2.1 应为 §2.2）。17 条参考文献各配一句简述和链接。",
+  "source": {
+    "name": "Auto-Encoding Variational Bayes · ICLR 2014",
+    "url": "https://arxiv.org/abs/1312.6114"
+  },
+  "build": {
+    "note": "论文源用 arxiv.org/html/1312.6114v11 的 SingleFile 存档（LaTeXML 结构），放在 16_VAE/paper/，那个目录不进仓库。译文在 zh.json，一段一条，按 --dumpzh 导出的单元顺序排，en 字段核对没错位。--algos 收算法框。",
+    "tool": "tools/make-paper.mjs",
+    "requires": "16_VAE/paper/arxiv-1312.6114v11.html",
+    "args": [
+      "--src",
+      "16_VAE/paper/arxiv-1312.6114v11.html",
+      "--algos",
+      "1",
+      "--svgfig",
+      "1",
+      "--zh",
+      "content/vae-paper/zh.json",
+      "--notes",
+      "content/vae-paper/notes.json",
+      "--refnotes",
+      "content/vae-paper/refnotes.json",
+      "--venue",
+      "",
+      "--title",
+      "变分自编码器原论文中英对照",
+      "--h1",
+      "《Auto-Encoding Variational Bayes》中英对照",
+      "--kicker",
+      "ICLR 2014",
+      "--srcurl",
+      "https://arxiv.org/abs/1312.6114",
+      "--srclabel",
+      "arXiv:1312.6114",
+      "--paperlabel",
+      "论文 · 中英对照"
+    ]
+  },
+  "page": "page.html"
+}

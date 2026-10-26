@@ -1,0 +1,511 @@
+[
+ {
+  "en": "How can we perform efficient inference",
+  "zh": "在连续隐变量的后验分布不可解、数据集又很大的情况下，怎样在有向概率模型中高效地做推断和学习？我们提出一种随机变分推断与学习算法，它能扩展到大数据集，而且只要满足一些温和的可微条件，在后验不可解的情形下也能工作。我们的贡献有两点。第一，我们证明对变分下界做重参数化，可以得到一个下界估计量，它能直接用标准的随机梯度方法优化。第二，我们证明对于 i.i.d. 数据集、每个数据点各带连续隐变量的情形，用所提出的下界估计量把一个近似推断模型（也叫识别模型）拟合到不可解的后验上，可以让后验推断变得特别高效。实验结果印证了这些理论上的优势。"
+ },
+ {
+  "en": "Introduction",
+  "zh": "引言"
+ },
+ {
+  "en": "How can we perform efficient approximate",
+  "zh": "当有向概率模型的连续隐变量和/或参数的后验分布不可解时，怎样高效地做近似推断和学习？变分贝叶斯（VB）方法的做法是去优化一个对不可解后验的近似。可惜，常用的平均场（mean-field）方法需要解析地求出关于近似后验的期望，而这些期望在一般情况下同样不可解。我们展示了如何通过对变分下界做重参数化，得到下界的一个简单、可微的无偏估计量；这个 SGVB（Stochastic Gradient Variational Bayes，随机梯度变分贝叶斯）估计量几乎可以用于任何带连续隐变量和/或参数的模型，做高效的近似后验推断，并且可以直接用标准的随机梯度上升技术来优化。"
+ },
+ {
+  "en": "For the case of an i.i.d.",
+  "zh": "对于 i.i.d. 数据集、每个数据点各带连续隐变量的情形，我们提出 Auto-Encoding VB（AEVB，自编码变分贝叶斯）算法。AEVB 用 SGVB 估计量去优化一个识别模型，借此让推断和学习都特别高效：有了这个识别模型，只需简单的祖先采样（ancestral sampling）就能做非常高效的近似后验推断，这又反过来让我们能高效地学习模型参数，不必对每个数据点都跑一遍代价高昂的迭代推断（比如 MCMC）。学到的近似后验推断模型还可以用于识别、去噪、表示、可视化等一系列任务。当识别模型用的是神经网络时，我们就得到了<em>变分自编码器</em>（variational auto-encoder）。"
+ },
+ {
+  "en": "Method",
+  "zh": "方法"
+ },
+ {
+  "en": "The strategy in this section can",
+  "zh": "本节的策略可以用来为各种带连续隐变量的有向图模型推导一个下界估计量（一个随机目标函数）。这里我们只讨论一种常见情形：数据集是 i.i.d. 的，每个数据点有自己的隐变量；我们想对（全局）参数做最大似然（ML）或最大后验（MAP）推断，对隐变量做变分推断。把这个设定扩展到对全局参数也做变分推断的情形是很直接的，那个算法放在附录里，但这种情形的实验留待以后的工作。注意，我们的方法也能用于在线、非平稳的场景（比如流式数据），但这里为简单起见，假设数据集是固定的。"
+ },
+ {
+  "en": "Figure 1: The type of directed",
+  "zh": "<b>图 1：</b>本文考虑的有向图模型类型。实线表示生成模型 {m1}，虚线表示对不可解后验 {m3} 的变分近似 {m2}。变分参数 {m4} 与生成模型参数 {m5} 一起联合学习。"
+ },
+ {
+  "en": "Problem scenario",
+  "zh": "问题设定"
+ },
+ {
+  "en": "Let us consider some dataset {m1:\\mathbf{X}=\\{\\mathbf{x}^{(i)}\\}_{i=1}^{N}}",
+  "zh": "考虑某个数据集 {m1}，它由某个连续或离散变量 {m3} 的 {m2} 个 i.i.d. 样本组成。我们假设数据由某个随机过程生成，这个过程涉及一个观测不到的连续随机变量 {m4}。过程分两步：(1) 从某个先验分布 {m6} 生成一个值 {m5}；(2) 从某个条件分布 {m8} 生成一个值 {m7}。我们假设先验 {m9} 和似然 {m10} 分别来自参数化的分布族 {m11} 和 {m12}，并且它们的概率密度函数（PDF）关于 {m13} 和 {m14} 几乎处处可微。遗憾的是，这个过程的很大一部分我们看不到：真实参数 {m15} 和隐变量的取值 {m16} 都是未知的。"
+ },
+ {
+  "en": "Very importantly, we do not make",
+  "zh": "非常重要的一点是，我们<em>不</em>对边缘概率或后验概率做常见的简化假设。相反，我们要的是一个通用算法，在下面这些情形里也能高效工作："
+ },
+ {
+  "en": "Intractability : the case where the",
+  "zh": "<em>不可解（Intractability）</em>：边缘似然的积分 {m1} 不可解（因此既算不出边缘似然，也没法对它求导），真实后验密度 {m2} 不可解（因此用不了 EM 算法），任何合理的平均场 VB 算法所需的积分也都不可解。这类不可解相当常见，似然函数 {m3} 只要稍微复杂一点就会出现，比如带一个非线性隐藏层的神经网络。"
+ },
+ {
+  "en": "A large dataset : we have",
+  "zh": "<em>大数据集</em>：数据多到批量优化的代价太高；我们希望用小批量（minibatch）甚至单个数据点来更新参数。基于采样的方法（比如 Monte Carlo EM）一般会太慢，因为它对每个数据点都要跑一个通常很昂贵的采样循环。"
+ },
+ {
+  "en": "We are interested in, and propose",
+  "zh": "在上述设定下，我们关心三个相关的问题，并为它们给出一个解决方案："
+ },
+ {
+  "en": "Efficient approximate ML or MAP estimation",
+  "zh": "对参数 {m1} 做高效的近似 ML 或 MAP 估计。参数本身可能就是关心的对象，比如在分析某个自然过程时。有了参数，我们还能模拟那个隐藏的随机过程，生成和真实数据相像的人造数据。"
+ },
+ {
+  "en": "Efficient approximate posterior inference of the",
+  "zh": "在选定参数 {m3} 的情况下，给定观测值 {m2}，对隐变量 {m1} 做高效的近似后验推断。这对编码或数据表示类任务有用。"
+ },
+ {
+  "en": "Efficient approximate marginal inference of the",
+  "zh": "对变量 {m1} 做高效的近似边缘推断。这样就能做各种需要 {m2} 的先验的推断任务。计算机视觉里常见的应用有图像去噪、图像修复（inpainting）和超分辨率。"
+ },
+ {
+  "en": "For the purpose of solving the",
+  "zh": "为了解决上述问题，我们引入一个识别模型 {m1}：它是对不可解的真实后验 {m2} 的近似。注意，和平均场变分推断里的近似后验不同，它不一定是可分解（factorial）的，它的参数 {m3} 也不是从某个闭式期望里算出来的。我们会给出一种方法，把识别模型参数 {m4} 和生成模型参数 {m5} 一起联合学习。"
+ },
+ {
+  "en": "From a coding theory perspective, the",
+  "zh": "从编码理论的角度看，未观测变量 {m1} 可以解释为一种隐表示或<em>编码</em>（code）。因此本文也把识别模型 {m2} 叫作概率<em>编码器</em>（encoder）：给定一个数据点 {m3}，它给出编码 {m4} 各个可能取值上的一个分布（比如高斯分布），数据点 {m5} 可能就是从这些编码生成的。同理，我们把 {m6} 叫作概率<em>解码器</em>（decoder）：给定一个编码 {m7}，它给出 {m8} 各个可能对应取值上的一个分布。"
+ },
+ {
+  "en": "The variational bound",
+  "zh": "变分下界"
+ },
+ {
+  "en": "The marginal likelihood is composed of",
+  "zh": "边缘似然是各个数据点的边缘似然之和：{m1}，其中每一项都可以改写为："
+ },
+ {
+  "en": "The first RHS term is the",
+  "zh": "右边第一项是近似后验相对真实后验的 KL 散度。由于 KL 散度非负，右边第二项 {m1} 就叫作数据点 {m2} 的边缘似然的（变分）<em>下界</em>，可以写成："
+ },
+ {
+  "en": "which can also be written as:",
+  "zh": "它也可以写成："
+ },
+ {
+  "en": "We want to differentiate and optimize",
+  "zh": "我们想对下界 {m1} 关于变分参数 {m2} 和生成参数 {m3} 求导并优化。但下界关于 {m4} 的梯度有点麻烦。这类问题常用的（朴素）蒙特卡洛梯度估计量是：{m5}，其中 {m6}。这个梯度估计量的方差非常大（参见 {c1} 等），对我们的目的来说不实用。"
+ },
+ {
+  "en": "The SGVB estimator and AEVB algorithm",
+  "zh": "SGVB 估计量与 AEVB 算法"
+ },
+ {
+  "en": "In this section we introduce a",
+  "zh": "本节给出下界及其关于参数的导数的一个实用估计量。我们假设近似后验的形式是 {m1}，但请注意，这个技术同样适用于 {m2} 的情形，即不以 {m3} 为条件。对参数也推断后验的完全变分贝叶斯方法见附录。"
+ },
+ {
+  "en": "Under certain mild conditions outlined in",
+  "zh": "对选定的近似后验 {m1}，在第 {r1} 节列出的某些温和条件下，我们可以借助（辅助）噪声变量 {m4} 的一个可微变换 {m3}，对随机变量 {m2} 做重参数化："
+ },
+ {
+  "en": "See section {r1:2.4} for general strategies",
+  "zh": "怎样选取合适的分布 {m1} 和函数 {m2}，一般策略见第 {r1} 节。现在可以像下面这样，对某个函数 {m3} 关于 {m4} 的期望做蒙特卡洛估计："
+ },
+ {
+  "en": "We apply this technique to the",
+  "zh": "把这个技术用到变分下界（式 ({r1})）上，就得到我们的通用随机梯度变分贝叶斯（SGVB）估计量 {m1}："
+ },
+ {
+  "en": "Often, the KL-divergence {m1:D_{KL}(q_{\\boldsymbol{\\phi}}(\\mathbf{z}|\\mathbf{x}^{(i)})||p_{\\boldsymbol{\\theta}}(\\mathbf{z}))} of eq.",
+  "zh": "式 ({r1}) 中的 KL 散度 {m1} 往往可以解析地积分出来（见附录 {r2}），这样只剩期望重构误差 {m2} 需要靠采样来估计。这时 KL 散度项可以理解为对 {m3} 的正则化，它促使近似后验靠近先验 {m4}。由此得到 SGVB 估计量的第二个版本 {m5}，它对应式 ({r3})，方差通常比通用估计量小："
+ },
+ {
+  "en": "Given multiple datapoints from a dataset",
+  "zh": "给定来自数据集 {m1}（共 {m2} 个数据点）的多个数据点，可以基于小批量构造整个数据集的边缘似然下界的估计量："
+ },
+ {
+  "en": "where the minibatch {m1:\\mathbf{X}^{M}=\\{\\mathbf{x}^{(i)}\\}_{i=1}^{M}} is a",
+  "zh": "其中小批量 {m1} 是从含 {m4} 个数据点的完整数据集 {m3} 中随机抽取的 {m2} 个数据点。实验中我们发现，只要小批量大小 {m7} 足够大（比如 {m8}），每个数据点的采样数 {m5} 可以取 {m6}。可以求出导数 {m9}，得到的梯度可以配合 SGD 或 Adagrad {c1} 等随机优化方法使用。计算随机梯度的基本做法见算法 {r1}。"
+ },
+ {
+  "en": "A connection with auto-encoders becomes clear",
+  "zh": "看式 ({r1}) 给出的目标函数，和自编码器的联系就清楚了。第一项（近似后验相对先验的 KL 散度）起正则项的作用，第二项是期望负重构误差。函数 {m1} 是这样选的：它把一个数据点 {m2} 和一个随机噪声向量 {m3} 映射成该数据点近似后验的一个样本：{m4}，其中 {m5}。随后样本 {m6} 被输入函数 {m7}，这个函数的值等于给定 {m9} 时数据点 {m8} 在生成模型下的概率密度（或概率质量）。用自编码器的说法，这一项就是负的<em>重构误差</em>（reconstruction error）。"
+ },
+ {
+  "en": "Algorithm 1 Minibatch version of the",
+  "zh": "<b>算法 1</b>　Auto-Encoding VB（AEVB）算法的小批量版本。第 {r1} 节的两个 SGVB 估计量都可以用。实验中取 {m1}、{m2}。",
+  "lines": [
+   "初始化参数",
+   "重复",
+   "随机抽 {m2} 个数据点组成小批量（从完整数据集中抽）",
+   "从噪声分布 {m2} 中随机采样",
+   "（小批量估计量 ({r1}) 的梯度）",
+   "用梯度 {m2} 更新参数（比如 SGD 或 Adagrad {c1}）",
+   "直到参数 {m1} 收敛",
+   "返回"
+  ]
+ },
+ {
+  "en": "The reparameterization trick",
+  "zh": "重参数化技巧"
+ },
+ {
+  "en": "In order to solve our problem",
+  "zh": "为了解决我们的问题，我们换了一种从 {m1} 生成样本的方法。这个参数化技巧的核心很简单。设 {m2} 是一个连续随机变量，{m3} 是某个条件分布。那么通常可以把随机变量 {m4} 表示成一个确定性变量 {m5}，其中 {m6} 是一个辅助变量，有独立的边缘分布 {m7}，{m8} 是某个由 {m9} 参数化的向量值函数。"
+ },
+ {
+  "en": "This reparameterization is useful for our",
+  "zh": "这种重参数化对我们有用，因为它可以用来改写关于 {m1} 的期望，让这个期望的蒙特卡洛估计关于 {m2} 可微。证明如下。给定确定性映射 {m3}，我们知道 {m4}。因此{f1}，{m5}。由此可以构造一个可微的估计量：{m6}，其中 {m7}。第 {r1} 节正是用这个技巧得到了变分下界的可微估计量。"
+ },
+ {
+  "en": "Note that for infinitesimals we use",
+  "zh": "注意，对无穷小量我们采用记号约定 {m1}。"
+ },
+ {
+  "en": "Take, for example, the univariate Gaussian",
+  "zh": "以一元高斯为例：设 {m1}。此时一个合法的重参数化是 {m2}，其中 {m3} 是辅助噪声变量，{m4}。因此 {m5}，其中 {m6}。"
+ },
+ {
+  "en": "For which {m1:q_{\\boldsymbol{\\phi}}(\\mathbf{z}|\\mathbf{x})} can we choose",
+  "zh": "对哪些 {m1}，能选出这样的可微变换 {m2} 和辅助变量 {m3}？有三种基本做法："
+ },
+ {
+  "en": "Tractable inverse CDF. In this case,",
+  "zh": "逆 CDF 可解。此时令 {m1}，令 {m2} 为 {m3} 的逆 CDF。例子：指数分布、柯西分布、Logistic 分布、瑞利分布、帕累托分布、威布尔分布、倒数分布、Gompertz 分布、Gumbel 分布和 Erlang 分布。"
+ },
+ {
+  "en": "Analogous to the Gaussian example, for",
+  "zh": "和高斯的例子类似，对任何「位置-尺度」（location-scale）分布族，都可以选它的标准分布（{m1}，{m2}）作为辅助变量 {m3}，并令 {m4}。例子：拉普拉斯分布、椭圆分布、学生 t 分布、Logistic 分布、均匀分布、三角分布和高斯分布。"
+ },
+ {
+  "en": "Composition: It is often possible to",
+  "zh": "组合：随机变量常常可以表示成辅助变量的各种变换。例子：对数正态分布（对正态变量取指数）、Gamma 分布（若干指数分布变量之和）、Dirichlet 分布（Gamma 变量的加权和）、Beta 分布、卡方分布和 F 分布。"
+ },
+ {
+  "en": "When all three approaches fail, good",
+  "zh": "三种做法都不行的时候，逆 CDF 也有不错的近似，计算的时间复杂度和 PDF 相当（一些方法参见 {c1} 等）。"
+ },
+ {
+  "en": "Example: Variational Auto-Encoder",
+  "zh": "示例：变分自编码器"
+ },
+ {
+  "en": "In this section we’ll give an",
+  "zh": "本节给出一个例子：用神经网络作概率编码器 {m1}（即对生成模型 {m2} 的后验的近似），并用 AEVB 算法联合优化参数 {m3} 和 {m4}。"
+ },
+ {
+  "en": "Let the prior over the latent",
+  "zh": "令隐变量的先验为中心化的各向同性多元高斯 {m1}。注意此时先验没有参数。我们令 {m2} 为多元高斯（实值数据）或伯努利分布（二值数据），其分布参数由 {m3} 经过一个 MLP（只有一个隐藏层的全连接神经网络，见附录 {r1}）算出来。注意此时真实后验 {m4} 不可解。{m5} 的形式虽然有很大自由度，我们假设真实（但不可解的）后验近似呈高斯形式，协方差近似为对角阵。这样就可以令变分近似后验为协方差呈对角结构的多元高斯{f1}："
+ },
+ {
+  "en": "Note that this is just a",
+  "zh": "注意这只是一个（简化的）选择，不是我们方法的局限。"
+ },
+ {
+  "en": "where the mean and s.d. of",
+  "zh": "其中近似后验的均值和标准差 {m1}、{m2} 是编码 MLP 的输出，即数据点 {m3} 和变分参数 {m4} 的非线性函数（见附录 {r1}）。"
+ },
+ {
+  "en": "As explained in section {r1:2.4} ,",
+  "zh": "如第 {r1} 节所述，我们用 {m2} 从后验 {m1} 中采样，其中 {m3}。{m4} 表示逐元素乘积。在这个模型里，{m5}（先验）和 {m6} 都是高斯分布；这时可以用式 ({r2}) 的估计量，其中的 KL 散度不用估计，能直接算出来并求导（见附录 {r3}）。对这个模型和数据点 {m7}，得到的估计量是："
+ },
+ {
+  "en": "As explained above and in appendix",
+  "zh": "如上文和附录 {r1} 所述，解码项 {m1} 是一个伯努利 MLP 或高斯 MLP，看我们建模的数据是哪种类型。"
+ },
+ {
+  "en": "Related work",
+  "zh": "相关工作"
+ },
+ {
+  "en": "The wake-sleep algorithm {c1:[ HDFN95 ]}",
+  "zh": "据我们所知，wake-sleep 算法 {c1} 是文献里唯一另一种能用于同样一般的连续隐变量模型类的在线学习方法。和我们的方法一样，wake-sleep 算法也用一个识别模型来近似真实后验。wake-sleep 算法的一个缺点是要同时优化两个目标函数，而这两个目标合起来并不对应于优化边缘似然（或它的某个下界）。wake-sleep 的一个优点是它也适用于离散隐变量的模型。按每个数据点算，wake-sleep 的计算复杂度和 AEVB 相同。"
+ },
+ {
+  "en": "Stochastic variational inference {c1:[ HBWP13 ]}",
+  "zh": "随机变分推断（stochastic variational inference）{c1} 最近受到越来越多的关注。最近，{c2} 引入了一种控制变量（control variate）方案，用来降低第 {r1} 节讨论的朴素梯度估计量的高方差，并把它用于后验的指数族近似。{c3} 提出了一些通用方法（即一种控制变量方案）来降低原始梯度估计量的方差。{c4} 在一个高效版本的随机变分推断算法里用了与本文类似的重参数化，用来学习指数族近似分布的自然参数。"
+ },
+ {
+  "en": "The AEVB algorithm exposes a connection",
+  "zh": "AEVB 算法揭示了（用变分目标训练的）有向概率模型与自编码器之间的联系。<em>线性</em>自编码器与某一类线性高斯生成模型之间的联系早就为人所知。{c1} 证明了 PCA 对应于线性高斯模型某个特例的最大似然（ML）解，这个特例的先验为 {m1}、条件分布为 {m2}，并且 {m3} 取无穷小。"
+ },
+ {
+  "en": "In relevant recent work on autoencoders",
+  "zh": "在近期关于自编码器的相关工作 {c1} 中，有人证明了无正则化自编码器的训练准则，对应于最大化输入 {m1} 与隐表示 {m2} 之间互信息的一个下界（参见 infomax 原理 {c2}）。（关于参数）最大化互信息等价于最大化条件熵，而条件熵的下界是数据在自编码模型下的期望对数似然 {c3}，也就是负重构误差。然而众所周知，单靠这个重构准则不足以学到有用的表示 {c4}。为了让自编码器学到有用的表示，人们提出了各种正则化技术，比如去噪、收缩（contractive）和稀疏自编码器这些变体 {c5}。SGVB 目标里含有一个由变分下界决定的正则项（例如式 ({r1})），不需要通常那个为了学到有用表示而必须调的正则化超参数。相关的还有预测稀疏分解（PSD）{c6} 这类编码器-解码器结构，我们从中得到了一些启发。同样相关的还有最近提出的生成随机网络（Generative Stochastic Networks）{c7}，其中带噪声的自编码器学习一个马尔可夫链的转移算子，这个链从数据分布中采样。{c8} 用一个识别模型来高效地学习深度玻尔兹曼机（Deep Boltzmann Machine）。这些方法要么针对未归一化的模型（即玻尔兹曼机这类无向模型），要么局限于稀疏编码模型；我们提出的算法则用于学习一般的一类有向概率模型。"
+ },
+ {
+  "en": "The recently proposed DARN method {c1:[",
+  "zh": "最近提出的 DARN 方法 {c1} 也用自编码结构学习有向概率模型，不过只适用于二值隐变量。更近一些，{c2} 也建立了自编码器、有向概率模型和随机变分推断之间的联系，用的正是本文描述的重参数化技巧。他们的工作和我们是各自独立完成的，为 AEVB 提供了另一个视角。"
+ },
+ {
+  "en": "Figure 2: Comparison of our AEVB",
+  "zh": "<b>图 2：</b>在不同隐空间维度（{m1}）下，我们的 AEVB 方法与 wake-sleep 算法优化下界的比较。所有实验里，我们的方法都收敛得快得多，而且达到了更好的解。有意思的是，隐变量更多并没有带来更严重的过拟合，这可以用下界的正则化作用来解释。纵轴：每个数据点的平均变分下界估计值。估计量的方差很小（{m2}），图中略去。横轴：已经评估过的训练样本数。在一颗等效算力 40 GFLOPS 的 Intel Xeon CPU 上，每一百万个训练样本大约要算 20 到 40 分钟。"
+ },
+ {
+  "en": "Experiments",
+  "zh": "实验"
+ },
+ {
+  "en": "We trained generative models of images",
+  "zh": "我们在 MNIST 和 Frey Face 数据集{f1}上训练图像生成模型，并用变分下界和估计的边缘似然来比较几种学习算法。"
+ },
+ {
+  "en": "Available at {r1:http://www.cs.nyu.edu/~roweis/data.html}",
+  "zh": "下载地址：{r1}"
+ },
+ {
+  "en": "The generative model (encoder) and variational",
+  "zh": "我们用的是第 {r1} 节的生成模型（编码器）和变分近似（解码器），文中描述的编码器和解码器隐藏单元数相同。由于 Frey Face 数据是连续的，我们用了输出为高斯的解码器，和编码器一样，只是在解码器输出端用 sigmoid 激活函数把均值限制在区间 {m1} 内。注意，<em>隐藏单元</em>指的是编码器和解码器这两个神经网络的隐藏层。"
+ },
+ {
+  "en": "Parameters are updated using stochastic gradient",
+  "zh": "参数用随机梯度上升更新，梯度通过对下界估计量求导得到：{m1}（见算法 {r1}），再加上一个小的权重衰减项，对应先验 {m2}。优化这个目标等价于近似的 MAP 估计，其中似然的梯度用下界的梯度来近似。"
+ },
+ {
+  "en": "We compared performance of AEVB to",
+  "zh": "我们把 AEVB 和 wake-sleep 算法 {c1} 做了比较。wake-sleep 算法和变分自编码器用的是同一个编码器（也叫识别模型）。所有参数，包括变分参数和生成参数，都从 {m1} 中随机采样初始化，并按 MAP 准则联合做随机优化。步长用 Adagrad {c2} 自适应调整；Adagrad 的全局步长参数根据前几轮迭代在训练集上的表现，从 {0.01, 0.02, 0.1} 中选。小批量大小 {m2}，每个数据点采样 {m3} 次。"
+ },
+ {
+  "en": "Likelihood lower bound",
+  "zh": "似然下界"
+ },
+ {
+  "en": "We trained generative models (decoders) and",
+  "zh": "我们训练了生成模型（解码器）和对应的编码器（又叫识别模型），MNIST 上用 {m1} 个隐藏单元，Frey Face 数据集上用 {m2} 个隐藏单元（为了防止过拟合，因为这个数据集小得多）。隐藏单元数参考了以往自编码器的文献，不同算法的相对表现对这个选择不太敏感。图 {r1} 给出了下界的比较结果。有意思的是，多余的隐变量并没有导致过拟合，这可以用变分下界的正则化性质来解释。"
+ },
+ {
+  "en": "Figure 3: Comparison of AEVB to",
+  "zh": "<b>图 3：</b>在不同训练样本数下，AEVB 与 wake-sleep 算法、Monte Carlo EM 在估计边缘似然上的比较。Monte Carlo EM 不是在线算法，而且（和 AEVB、wake-sleep 不同）没法高效地用在完整的 MNIST 数据集上。"
+ },
+ {
+  "en": "Marginal likelihood",
+  "zh": "边缘似然"
+ },
+ {
+  "en": "For very low-dimensional latent space it",
+  "zh": "隐空间维度很低时，可以用 MCMC 估计量估计学到的生成模型的边缘似然。边缘似然估计量的更多信息见附录。编码器和解码器仍然用神经网络，这次是 100 个隐藏单元、3 个隐变量；隐空间维度再高，估计就不可靠了。数据集仍是 MNIST。AEVB 和 Wake-Sleep 方法与采用 Hybrid Monte Carlo（HMC）{c1} 采样器的 Monte Carlo EM（MCEM）做了比较，细节见附录。我们比较了三种算法在小训练集和大训练集上的收敛速度。结果见图 {r1}。"
+ },
+ {
+  "en": "Visualisation of high-dimensional data",
+  "zh": "高维数据可视化"
+ },
+ {
+  "en": "If we choose a low-dimensional latent",
+  "zh": "如果选一个低维的隐空间（比如 2 维），就可以用学到的编码器（识别模型）把高维数据投影到一个低维流形上。MNIST 和 Frey Face 数据集的二维隐流形可视化见附录 {r1}。"
+ },
+ {
+  "en": "Conclusion",
+  "zh": "结论"
+ },
+ {
+  "en": "We have introduced a novel estimator",
+  "zh": "我们提出了一种新的变分下界估计量 Stochastic Gradient VB（SGVB），用于带连续隐变量的高效近似推断。这个估计量可以直接求导，并用标准的随机梯度方法优化。对于 i.i.d. 数据集、每个数据点各带连续隐变量的情形，我们提出了一个高效推断和学习的算法 Auto-Encoding VB（AEVB），它用 SGVB 估计量学习一个近似推断模型。实验结果印证了这些理论上的优势。"
+ },
+ {
+  "en": "Future work",
+  "zh": "未来工作"
+ },
+ {
+  "en": "Since the SGVB estimator and the",
+  "zh": "由于 SGVB 估计量和 AEVB 算法几乎可以用于任何带连续隐变量的推断和学习问题，未来可做的方向很多：(i) 学习层级化的生成结构，编码器和解码器用深度神经网络（比如卷积网络），并用 AEVB 联合训练；(ii) 时间序列模型（即动态贝叶斯网络）；(iii) 把 SGVB 用到全局参数上；(iv) 带隐变量的监督模型，可用于学习复杂的噪声分布。"
+ },
+ {
+  "en": "(a) Learned Frey Face manifold (b)",
+  "zh": "(a) 学到的 Frey Face 流形　(b) 学到的 MNIST 流形<br><b>图 4：</b>用 AEVB 学到的、隐空间为二维的生成模型的数据流形可视化。隐空间的先验是高斯分布，所以我们把单位正方形上等间距的坐标经过高斯分布的逆 CDF 变换，得到隐变量 {m1} 的取值。对每个 {m2} 取值，画出用学到的参数 {m4} 得到的对应生成分布 {m3}。"
+ },
+ {
+  "en": "(a) 2-D latent space (b) 5-D",
+  "zh": "(a) 2 维隐空间　(b) 5 维隐空间　(c) 10 维隐空间　(d) 20 维隐空间<br><b>图 5：</b>不同隐空间维度下，从学到的 MNIST 生成模型中随机采出的样本。"
+ },
+ {
+  "en": "Visualisations",
+  "zh": "可视化"
+ },
+ {
+  "en": "See figures {r1:4} and {r2:5} for",
+  "zh": "用 SGVB 学到的模型的隐空间和对应观测空间的可视化见图 {r1} 和图 {r2}。"
+ },
+ {
+  "en": "Solution of −DKL(qϕ(𝐳)||p𝜽(𝐳)), Gaussian case",
+  "zh": "高斯情形下的解析解"
+ },
+ {
+  "en": "The variational lower bound (the objective",
+  "zh": "变分下界（要最大化的目标）里有一个 KL 项，它通常可以解析地积分出来。这里给出先验 {m1} 和后验近似 {m2} 都是高斯分布时的解。设 {m3} 为 {m4} 的维数。令 {m5} 和 {m6} 表示在数据点 {m7} 处求得的变分均值和标准差，{m8} 和 {m9} 表示这两个向量的第 {m10} 个元素。那么："
+ },
+ {
+  "en": "And:",
+  "zh": "以及："
+ },
+ {
+  "en": "Therefore:",
+  "zh": "因此："
+ },
+ {
+  "en": "When using a recognition model {m1:q_{\\boldsymbol{\\phi}}(\\mathbf{z}|\\mathbf{x})}",
+  "zh": "使用识别模型 {m1} 时，{m2} 和标准差 {m3} 就是 {m4} 和变分参数 {m5} 的函数，正文里举过例子。"
+ },
+ {
+  "en": "MLP’s as probabilistic encoders and decoders",
+  "zh": "用 MLP 作概率编码器和解码器"
+ },
+ {
+  "en": "In variational auto-encoders, neural networks are",
+  "zh": "在变分自编码器里，神经网络被用作概率编码器和解码器。编码器和解码器有很多种选法，取决于数据和模型的类型。我们的例子里用的是相对简单的神经网络，即多层感知机（MLP）。编码器用输出为高斯的 MLP，解码器则按数据类型，用输出为高斯或伯努利的 MLP。"
+ },
+ {
+  "en": "Bernoulli MLP as decoder",
+  "zh": "伯努利 MLP 作解码器"
+ },
+ {
+  "en": "In this case let {m1:p_{\\boldsymbol{\\theta}}(\\mathbf{x}|\\mathbf{z})} be",
+  "zh": "此时令 {m1} 为多元伯努利分布，其概率由 {m2} 经过一个单隐藏层的全连接神经网络算出："
+ },
+ {
+  "en": "where {m1:f_{\\sigma}(.)} is the elementwise sigmoid",
+  "zh": "其中 {m1} 是逐元素的 sigmoid 激活函数，{m2} 是 MLP 的权重和偏置。"
+ },
+ {
+  "en": "Gaussian MLP as encoder or decoder",
+  "zh": "高斯 MLP 作编码器或解码器"
+ },
+ {
+  "en": "In this case let encoder or",
+  "zh": "此时令编码器或解码器为协方差呈对角结构的多元高斯分布："
+ },
+ {
+  "en": "where {m1:\\{\\mathbf{W}_{3},\\mathbf{W}_{4},\\mathbf{W}_{5},\\mathbf{b}_{3},\\mathbf{b}_{4},\\mathbf{b}_{5}\\}} are the weights and",
+  "zh": "其中 {m1} 是 MLP 的权重和偏置，用作解码器时它们是 {m2} 的一部分。注意，这个网络用作编码器 {m3} 时，{m4} 和 {m5} 的位置互换，权重和偏置就是变分参数 {m6}。"
+ },
+ {
+  "en": "Marginal likelihood estimator",
+  "zh": "边缘似然估计量"
+ },
+ {
+  "en": "We derived the following marginal likelihood",
+  "zh": "我们推导了下面这个边缘似然估计量，只要采样空间的维数低（低于 5 维）、采样又足够多，它就能给出很好的边缘似然估计。设 {m1} 是我们从中采样的生成模型，对给定的数据点 {m2}，我们想估计边缘似然 {m3}。"
+ },
+ {
+  "en": "The estimation process consists of three",
+  "zh": "估计过程分三个阶段："
+ },
+ {
+  "en": "Sample {m1:L} values {m2:\\{\\mathbf{z}^{(l)}\\}} from the",
+  "zh": "用基于梯度的 MCMC（比如 Hybrid Monte Carlo）从后验中采 {m1} 个值 {m2}，梯度用 {m3}。"
+ },
+ {
+  "en": "Fit a density estimator {m1:q(\\mathbf{z})} to",
+  "zh": "用这些样本 {m2} 拟合一个密度估计器 {m1}。"
+ },
+ {
+  "en": "Again, sample {m1:L} new values from",
+  "zh": "再从后验中采 {m1} 个新值。把这些样本和拟合好的 {m2} 一起代入下面的估计量："
+ },
+ {
+  "en": "Derivation of the estimator:",
+  "zh": "估计量的推导："
+ },
+ {
+  "en": "Monte Carlo EM",
+  "zh": "蒙特卡洛 EM"
+ },
+ {
+  "en": "The Monte Carlo EM algorithm does",
+  "zh": "Monte Carlo EM 算法不用编码器，而是用 {m1} 算出的后验梯度，从隐变量的后验中采样。Monte Carlo EM 的流程是：先做 10 步 HMC leapfrog，步长自动调节到接受率为 90%，再用得到的样本做 5 步权重更新。所有算法的参数都用 Adagrad 步长更新（并配有相应的退火计划）。"
+ },
+ {
+  "en": "The marginal likelihood was estimated with",
+  "zh": "边缘似然用训练集和测试集各自的前 1000 个数据点来估计；对每个数据点，用 4 步 leapfrog 的 Hybrid Monte Carlo 从隐变量的后验中采 50 个值。"
+ },
+ {
+  "en": "Full VB",
+  "zh": "完全变分贝叶斯"
+ },
+ {
+  "en": "As written in the paper, it",
+  "zh": "正如正文所说，可以对参数 {m1} 和隐变量 {m2} 都做变分推断，而不是像正文那样只对隐变量做。这里推导这种情形下的估计量。"
+ },
+ {
+  "en": "Let {m1:p_{\\boldsymbol{\\alpha}}(\\boldsymbol{\\theta})} be some hyperprior for",
+  "zh": "设 {m1} 是上面引入的参数的某个超先验（hyperprior），由 {m2} 参数化。边缘似然可以写成："
+ },
+ {
+  "en": "where the first RHS term denotes",
+  "zh": "其中右边第一项表示近似后验相对真实后验的 KL 散度，{m1} 表示边缘似然的变分下界："
+ },
+ {
+  "en": "Note that this is a lower",
+  "zh": "注意这是一个下界，因为 KL 散度非负；当近似后验和真实后验完全一致时，下界等于真实的边缘似然。{m1} 这一项是各个数据点的边缘似然之和：{m2}，其中每一项都可以改写为："
+ },
+ {
+  "en": "where again the first RHS term",
+  "zh": "其中右边第一项同样是近似后验相对真实后验的 KL 散度，{m1} 是数据点 {m2} 的边缘似然的变分下界："
+ },
+ {
+  "en": "The expectations on the RHS of",
+  "zh": "式 ({r1}) 和式 ({r2}) 右边的期望显然可以写成三个独立期望之和，其中第二个和第三个有时可以解析求解，比如 {m1} 和 {m2} 都是高斯分布的时候。为了一般性，这里假设每个期望都不可解。"
+ },
+ {
+  "en": "Under certain mild conditions outlined in",
+  "zh": "对选定的近似后验 {m1} 和 {m2}，在（正文）某节列出的某些温和条件下，我们可以把条件样本 {m3} 重参数化为"
+ },
+ {
+  "en": "where we choose a prior {m1:p(\\boldsymbol{\\epsilon})}",
+  "zh": "其中先验 {m1} 和函数 {m2} 的选取要让下式成立："
+ },
+ {
+  "en": "The same can be done for",
+  "zh": "对近似后验 {m1} 也可以这样做："
+ },
+ {
+  "en": "where we, similarly as above, choose",
+  "zh": "其中与上面类似，先验 {m1} 和函数 {m2} 的选取要让下式成立："
+ },
+ {
+  "en": "For notational conciseness we introduce a",
+  "zh": "为了记号简洁，我们引入简写 {m1}："
+ },
+ {
+  "en": "Using equations ( {r1:20} ) and",
+  "zh": "利用式 ({r1}) 和式 ({r2})，给定数据点 {m1}，变分下界的蒙特卡洛估计为："
+ },
+ {
+  "en": "where {m1:\\boldsymbol{\\epsilon}^{(l)}\\sim p(\\boldsymbol{\\epsilon})} and {m2:\\zeta^{(l)}\\sim p(\\boldsymbol{\\zeta})}",
+  "zh": "其中 {m1}，{m2}。这个估计量只依赖从 {m3} 和 {m4} 中采的样本，它们显然不受 {m5} 影响，所以这个估计量可以对 {m6} 求导。得到的随机梯度可以配合 SGD 或 Adagrad {c1} 等随机优化方法使用。计算随机梯度的基本做法见算法 {r1}。"
+ },
+ {
+  "en": "Algorithm 2 Pseudocode for computing a",
+  "zh": "<b>算法 2</b>　用我们的估计量计算随机梯度的伪代码。函数 {m1}、{m2} 和 {m3} 的含义见正文。",
+  "lines": [
+   "（变分参数的当前值）",
+   "",
+   "对 {m1} 从 {m2} 到 {m3} 循环",
+   "从数据集 {m2} 中随机抽一个",
+   "从先验 {m2} 中随机抽一个",
+   "从先验 {m2} 中随机抽一个",
+   "",
+   "结束循环",
+   "返回"
+  ]
+ },
+ {
+  "en": "Example",
+  "zh": "示例"
+ },
+ {
+  "en": "Let the prior over the parameters",
+  "zh": "令参数和隐变量的先验为中心化的各向同性高斯 {m1} 和 {m2}。注意此时先验没有参数。再假设真实后验近似为高斯分布，协方差近似为对角阵。这样就可以令变分近似后验为协方差呈对角结构的多元高斯："
+ },
+ {
+  "en": "where {m1:\\boldsymbol{\\mu}_{\\mathbf{z}}} and {m2:\\boldsymbol{\\sigma}_{\\mathbf{z}}} are yet",
+  "zh": "其中 {m1} 和 {m2} 是 {m3} 的、尚未指定的函数。由于它们是高斯分布，可以把变分近似后验参数化为："
+ },
+ {
+  "en": "With {m1:\\odot} we signify an element-wise",
+  "zh": "{m1} 表示逐元素乘积。这些可以代入上面定义的下界（式 ({r1}) 和式 ({r2})）。"
+ },
+ {
+  "en": "In this case it is possible",
+  "zh": "在这种情形下，可以构造一个方差更小的替代估计量：因为这个模型里 {m1}、{m2}、{m3} 和 {m4} 都是高斯分布，所以 {m5} 中有四项可以解析求解。得到的估计量为："
+ },
+ {
+  "en": "{m1:\\mu_{j}^{(i)}} and {m2:\\sigma_{j}^{(i)}} simply denote the",
+  "zh": "{m1} 和 {m2} 就是向量 {m4} 和 {m5} 的第 {m3} 个元素。"
+ }
+]

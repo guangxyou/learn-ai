@@ -186,20 +186,25 @@ function parse(src) {
     '<h([2-6])\\b[^>]*\\bltx_title_(?:section|subsection|subsubsection|paragraph|appendix)\\b[^>]*>([\\s\\S]*?)<\\/h\\1>' +
     '|<div\\b[^>]*\\bltx_para\\b[^>]*>' +
     '|<table\\b[^>]*\\b(?:ltx_equation|ltx_equationgroup)\\b[^>]*>' +
-    '|<figure\\b[^>]*\\b(ltx_figure|ltx_table)\\b[^>]*>', 'g');
+    // 算法框（ltx_float_algorithm）只在 --algos 时收：已经上线的页面源里也可能有，默认不动它们的输出
+    `|<figure\\b[^>]*\\b(ltx_figure|ltx_table${o.algos ? '|ltx_float_algorithm' : ''})\\b[^>]*>`, 'g');
   let m;
   while ((m = BLOCK.exec(body))) {
     const tag = m[0];
     if (m[1]) {
       const raw = m[2];
       const num = strip((/<span[^>]*\bltx_tag_(?:section|subsection|subsubsection|appendix)\b[^>]*>([\s\S]*?)<\/span>/.exec(raw) || [, ''])[1]);
-      const text = strip(raw.replace(/<span[^>]*\bltx_tag_[\s\S]*?<\/span>/, ''));
+      const bare = raw.replace(/<span[^>]*\bltx_tag_[\s\S]*?<\/span>/, '');
+      // 标题里带公式（VAE 附录 B「Solution of −D_KL(…)」）：目录用的纯文本把公式压成一串不带空格的字符，
+      // 正文里的标题保留 MathML。不带公式的标题两样都和以前一样
+      const hasMath = /<math\b/.test(bare);
+      const text = strip(hasMath ? bare.replace(/<math\b[\s\S]*?<\/math>/g, (x) => strip(x).replace(/\s+/g, '')) : bare);
       // 正文里的「见 3.2 节」指向 LaTeXML 的 section id，一并留个锚点，不然点了不动
       const sec = body.lastIndexOf('<section', m.index);
       const lxid = sec < 0 ? '' : (/\bid=["']?([\w.]+)/.exec(body.slice(sec, sec + 120)) || [, ''])[1];
       // 标题也保留一份仅供正文渲染的 HTML：批注可以高亮标题，
       // 但目录仍使用纯文本 text，避免把 <mark>/<sup> 带进 TOC。
-      doc.items.push({ kind: 'h', level: +m[1] - 1, num, text, html: esc(text), lxid });
+      doc.items.push({ kind: 'h', level: +m[1] - 1, num, text, html: hasMath ? bare.trim() : esc(text), lxid });
       continue;
     }
     const id = (/\bid=["']?([\w.]+)/.exec(tag) || [, ''])[1];
@@ -217,7 +222,7 @@ function parse(src) {
     for (const part of splitPara(el)) doc.items.push(part);
   }
 
-  for (const b of src.slice(bi < 0 ? 0 : bi).matchAll(/<li\b[^>]*\bid=["']?(bib\.bib(\d+))["']?[^>]*>([\s\S]*?)<\/li>/g))
+  for (const b of src.slice(bi < 0 ? 0 : bi).matchAll(/<li\b[^>]*\bid=["']?(bib\.bibx?(\d+))["']?[^>]*>([\s\S]*?)<\/li>/g))
     doc.refs.push({ id: b[1], num: +b[2], html: b[3], cites: [] });
 
   collectCites(doc);
@@ -265,7 +270,8 @@ function collectCites(doc) {
   // 作者-年份式的引用（GPT-2：「(Krizhevsky et al., 2012)」）正文里没有 [N]，只能认 href 里的 bib 号。
   // 先把这种 <a> 换成「\u0001号\u0002原文\u0003」再 strip，切完句子再换回原文。
   // 链接文字是纯数字的（[16] 那种）原样留着，照旧走下面 [N] 那条路，不会同一处记两遍。
-  const AY = /<a\b[^>]*\bhref=["']?#bib\.bib(\d+)["']?[^>]*>([\s\S]*?)<\/a>/g;
+  // arXiv 新版作者-年份式的文献 id 是 bib.bibx5（VAE 那篇的 [DHS10]），多一个 x
+  const AY = /<a\b[^>]*\bhref=["']?#bib\.bibx?(\d+)["']?[^>]*>([\s\S]*?)<\/a>/g;
   const tagAY = (h) => h.replace(AY, (m, n, t) => (/^[\d\s,]*$/.test(strip(t)) ? m : `\u0001${n}\u0002${strip(t).replace(/\./g, '\u0004')}\u0003`));
   // 链接文字里的句点先换掉：「Gillick et al. (2015)」的「al. (」会被下面的切句规则当成句末
   const AYM = /\u0001(\d+)\u0002([^\u0003]*)\u0003/g;
@@ -533,6 +539,109 @@ function wrapText(html, text, open, close, pre) {
   return html.slice(0, a) + open + html.slice(a, b) + close + html.slice(b);
 }
 
+/* ══════════════════ 中文译文（--zh） ══════════════════ */
+
+/** 沉浸式翻译那种排法：每段英文底下跟一段中文。可译单元按论文顺序排：
+ *  摘要、标题、段落（段落带的脚注紧跟在它后面）、图表注。zh.json 是同样顺序的数组，
+ *  每条 { en: 英文开头几个词, zh: 译文 }，en 只用来核对没错位 —— 对不上就停，宁可构建失败。
+ *
+ *  译文里的公式和引用不重写，用占位符指回英文原文里的第 k 个：
+ *    {m3} 第 3 个行内公式（原样复用那段 MathML）  {c1} 第 1 处文献引用  {r2} 第 2 个交叉引用（2.4 节、式 (3)）
+ *    {f1} 第 1 个脚注角标
+ *  算法框另有 lines: [...]，一行伪代码一条，也可以用占位符，指的是那一行里的第 k 个。 */
+function zhSplit(html) {
+  const parts = { m: [], c: [], r: [], f: [] };
+  const h = html
+    .replace(/<cite\b[\s\S]*?<\/cite>/g, (x) => `\u0001c${parts.c.push(x)}\u0002`)
+    .replace(/<math\b[\s\S]*?<\/math>/g, (x) => `\u0001m${parts.m.push(x)}\u0002`)
+    .replace(/<a\b[^>]*\bltx_ref\b[^>]*>[\s\S]*?<\/a>/g, (x) => `\u0001r${parts.r.push(x)}\u0002`)
+    .replace(/<sup class="fnm">[\s\S]*?<\/sup>/g, (x) => `\u0001f${parts.f.push(x)}\u0002`);
+  return { h, parts };
+}
+
+/** 给 --dumpzh 看的骨架：占位符摊开成 {m3:\mathbf{x}}，写译文时照着填 */
+function zhSkel(html) {
+  const { h, parts } = zhSplit(html);
+  return strip(h.replace(/\u0001([mcrf])(\d+)\u0002/g, (_, k, n) => {
+    const x = parts[k][n - 1];
+    const t = k === 'm' ? (/\balttext=(?:"([^"]*)"|'([^']*)'|([^\s>]+))/.exec(x) || []).slice(1).find((v) => v != null) || ''
+      : strip(x);
+    return ` {${k}${n}:${t.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')}} `;
+  }));
+}
+
+/** 译文里的占位符换回原文的那段标记。复用的公式去掉 id，不然一页里两个元素同 id */
+function zhFill(zh, html, where) {
+  const { parts } = zhSplit(html);
+  return zh.replace(/\{([mcrf])(\d+)\}/g, (all, k, n) => {
+    const x = parts[k][n - 1];
+    if (!x) throw new Error(`译文占位符 ${all} 在原文里没有（${where}）`);
+    return x.replace(/\sid=(?:"[^"]*"|'[^']*'|[^\s>]+)/g, '');
+  });
+}
+
+/** 一个图表里要译的：所有图注（含子图的 (a)(b)）加算法框的伪代码行 */
+const capsOf = (html) => [...html.matchAll(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/g)].map((m) => m[1]);
+const linesOf = (html) => [...html.matchAll(/<div\b[^>]*\bltx_listingline\b[^>]*>/g)].map((m) => sliceTag(html, m.index, 'div'));
+
+function zhUnits(doc) {
+  const u = [];
+  if (doc.absBlk) u.push({ b: doc.absBlk, text: () => zhSkel(doc.absBlk.html) });
+  for (const it of doc.items) {
+    if (it.kind === 'h') u.push({ b: it, text: () => it.text });
+    else if (it.kind === 'p') {
+      u.push({ b: it, text: () => zhSkel(it.html) });
+      for (const f of it.fn || []) u.push({ b: f, text: () => zhSkel(f.html) });
+    } else if (it.kind === 'float') u.push({ b: it, text: () => capsOf(it.html).map(zhSkel).join(' ') });
+  }
+  return u;
+}
+
+function applyZh(doc, file) {
+  const list = JSON.parse(readFileSync(file, 'utf8'));
+  const units = zhUnits(doc);
+  if (list.length !== units.length)
+    throw new Error(`译文 ${list.length} 条，可译单元 ${units.length} 个，数目对不上（--dumpzh 导出来对一下）`);
+  units.forEach((u, i) => {
+    const t = list[i], en = norm(u.text());
+    if (!en.startsWith(norm(t.en)))
+      throw new Error(`第 ${i} 条译文错位：期望开头「${en.slice(0, 60)}」，zh.json 写的是「${t.en}」`);
+    const b = u.b, where = `第 ${i} 条「${t.en}」`;
+    if (b.kind === 'h') b.zh = t.zh;
+    else if (b.kind === 'float') {
+      const caps = capsOf(b.html);
+      b.zh = zhFill(t.zh, caps.join(' '), where);
+      if (t.lines) {
+        const lines = linesOf(b.html);
+        if (lines.length !== t.lines.length) throw new Error(`${where}：伪代码 ${lines.length} 行，译文 ${t.lines.length} 行`);
+        let h = b.html;
+        lines.forEach((ln, k) => {
+          const zh = t.lines[k] ? `<span class="lzh">${zhFill(t.lines[k], ln, where + ` 第 ${k + 1} 行`)}</span>` : '';
+          h = h.replace(ln, ln.replace(/<\/div>$/, zh + '</div>'));
+        });
+        b.html = h;
+      }
+      // 中文图注接在最后一个 </figcaption> 后面：子图的小注在前，总图注在最后；算法框只有顶上那一个
+      const at = b.html.lastIndexOf('</figcaption>');
+      if (at >= 0) b.html = b.html.slice(0, at + 13) + `<div class="fzh">${b.zh}</div>` + b.html.slice(at + 13);
+    } else b.zh = zhFill(t.zh, b.html, where);
+  });
+  console.log(`· 译文 ${units.length} 条全部对上`);
+}
+
+function dumpZh(doc, file) {
+  const out = zhUnits(doc).map((u) => {
+    const x = { kind: u.b.kind || 'fn', en: u.text() };
+    if (u.b.kind === 'float') {
+      const lines = linesOf(u.b.html).map(zhSkel);
+      if (lines.length) x.lines = lines;
+    }
+    return x;
+  });
+  writeFileSync(file, JSON.stringify(out, null, 1));
+  console.log(`  · 可译单元 ${out.length} 条 → ${file}`);
+}
+
 /* ══════════════════ 三、出页面 ══════════════════ */
 
 /** 一篇论文的正文和目录。一页放两篇时（GPT-1 + GPT-2）各调一次，第二篇再整块加 id 前缀。
@@ -564,8 +673,9 @@ function paperHTML(doc, loose, refnotes, venue, showVenue, foldAppx) {
   </section>`);
 
   if (doc.absBlk) {
-    secs.push({ id: 'sabstract', num: '', text: 'Abstract', level: 1 });
-    parts.push(`<h2 class="ph" id="sabstract">Abstract</h2>`);
+    const zh = o.zh ? '摘要' : '';
+    secs.push({ id: 'sabstract', num: '', text: 'Abstract', zh, level: 1 });
+    parts.push(`<h2 class="ph" id="sabstract">Abstract${zh ? `<span class="hzh">${zh}</span>` : ''}</h2>`);
     parts.push(blk(doc.absBlk));
   }
 
@@ -574,7 +684,7 @@ function paperHTML(doc, loose, refnotes, venue, showVenue, foldAppx) {
   const flush = () => {
     if (!pending.length) return;
     parts.push(`<div class="fnsec"><span class="fnsec-h">脚注</span>${pending.map((n) =>
-      `<p><sup>${esc(n.mark)}</sup>${n.html}</p>`).join('')}</div>`);
+      `<p><sup>${esc(n.mark)}</sup>${n.html}</p>${n.zh ? `<p class="fzh">${n.zh}</p>` : ''}`).join('')}</div>`);
     pending = [];
   };
 
@@ -598,11 +708,12 @@ function paperHTML(doc, loose, refnotes, venue, showVenue, foldAppx) {
       // 段落级小标题会重名（GPT-1 的 Unsupervised pre-training 在第 2 节和 4.1 节各一次），第二次起加序号
       if (usedIds[id]) id += '-' + (++usedIds[id]); else usedIds[id] = 1;
       // 段落级标题（Encoder: / Decoder: / Acknowledgements）只进正文，不进目录，否则目录被撑散
-      if (it.level < 4) secs.push({ id, num: it.num, text: it.text, level: it.level });
+      if (it.level < 4) secs.push({ id, num: it.num, text: it.text, zh: it.zh, level: it.level });
       const tag = it.level === 1 ? 'h2' : it.level < 4 ? 'h3' : 'h4';
       const lxa = it.lxid ? `<span class="lxa" id="${it.lxid}"></span>` : '';
       const heading = `<${tag} class="ph" id="${id}">${
-        it.num ? `<span class="hn">${esc(it.num)}</span>` : ''}${it.html || esc(it.text)}</${tag}>`;
+        it.num ? `<span class="hn">${esc(it.num)}</span>` : ''}${it.html || esc(it.text)}${
+        it.zh ? `<span class="hzh">${it.zh}</span>` : ''}</${tag}>`;
       parts.push(it.notes
         ? `${lxa}<div class="blk hblk hot">${heading}<div class="side">${it.notes.map(noteCard).join('')}</div></div>`
         : `${lxa}${heading}`);
@@ -667,10 +778,11 @@ function paperHTML(doc, loose, refnotes, venue, showVenue, foldAppx) {
 
   parts.push(`<details class="refs" id="sreferences"><summary>References<span>${doc.refs.length} 条</span></summary>
     <ol>${doc.refs.map((r) => refHTML(r, refnotes)).join('')}</ol></details>`);
-  secs.push({ id: 'sreferences', num: '', text: 'References', level: 1 });
+  secs.push({ id: 'sreferences', num: '', text: 'References', zh: o.zh ? '参考文献' : '', level: 1 });
 
   const toc = secs.map((s) =>
-    `<a href="#${s.id}" data-ol="${s.id}" class="${s.level > 1 ? 'sub' : ''}">${s.num ? esc(s.num) + ' ' : ''}${esc(s.text)}</a>`).join('');
+    `<a href="#${s.id}" data-ol="${s.id}" class="${s.level > 1 ? 'sub' : ''}">${s.num ? esc(s.num) + ' ' : ''}${esc(s.text)}${
+      s.zh ? `<span class="tzh">${s.zh}</span>` : ''}</a>`).join('');
   return { body: parts.join('\n'), toc };
 }
 
@@ -837,7 +949,8 @@ function blk(b) {
     </div>`).join('');
   return `<div class="blk${b.notes ? ' hot' : ''}${b.li ? ' li' : ''}">
     ${b.notes ? `<span class="dot">${b.notes.length}</span>` : ''}
-    <p class="pp">${b.html}</p>
+    <p class="pp">${b.html}</p>${b.zh ? `
+    <p class="pp zh" lang="zh-Hans">${b.zh}</p>` : ''}
     ${notes ? `<div class="side">${notes}</div>` : ''}
   </div>`;
 }
@@ -866,7 +979,7 @@ function shell(body, toc, meta, paperTitle, home = '#', posters = [], views = ''
 <title>${esc(o.title || '逐句啃 Attention is All You Need')}</title>
 ${o.desc ? `<meta name="description" content="${esc(o.desc)}">` : ''}
 ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
-<style>${CSS}${cssAppx()}${cssMulti(more)}${DOCSCSS}</style></head><body>
+<style>${CSS}${cssAppx()}${cssMulti(more)}${cssZh()}${cssObj(body)}${DOCSCSS}</style></head><body>
 <header class="topbar"><div class="wrap">
   <a class="back" href="${home}">‹ 全部条目</a>
 </div></header>
@@ -895,7 +1008,9 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
   </div>
   <div class="swbox">
     <button class="sw" id="sw-all" type="button" aria-pressed="false"><i></i>展开全部批注</button>
-    <button class="sw" id="sw-off" type="button" aria-pressed="false"><i></i>隐藏所有批注</button>
+    <button class="sw" id="sw-off" type="button" aria-pressed="false"><i></i>隐藏所有批注</button>${
+    o.zh ? `
+    <button class="sw" id="sw-zh" type="button" aria-pressed="false"><i></i>隐藏译文</button>` : ''}
   </div>
 </div></div>
 
@@ -1156,7 +1271,7 @@ ${o.canonical ? `<link rel="canonical" href="${esc(o.canonical)}">` : ''}
       if(sheetOn())closeSheet();
       all.setAttribute('aria-pressed','false');}
   });
-${jsAppx()}${jsMulti(more)}})();
+${o.zh ? "  sw(document.getElementById('sw-zh'),'no-zh');\n" : ''}${jsAppx()}${jsMulti(more)}})();
 </script>
 </body></html>`;
 }
@@ -1633,6 +1748,36 @@ body[data-view="paper-${p.idx}"] .main>.toc,body[data-view="paper-${p.idx}"] .ma
 .ptitle{text-wrap:balance}
 ` : '');
 
+/** arXiv 新版 HTML 把矢量图存成 <object type=image/svg+xml>，宽高照 LaTeX 里的尺寸写死（VAE 图 2 只有 521px），
+ *  坐标轴上的字小到读不了。--svgfig 时放大到正文宽度，靠它自带的 aspect-ratio 保持比例。
+ *  ResNet 页也有这种图，默认不出这段，它的输出不变。 */
+const cssObj = (body) => (o.svgfig && /<object\b[^>]*image\/svg/.test(body) ? `
+.floatbox object.ltx_graphics{width:min(100%,860px);height:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:12px}
+` : '');
+
+/** 译文的样式（--zh）。中文段紧贴英文段，左边一道细线标出它是译文；没传的页面一个字节都不多。 */
+const cssZh = () => (o.zh ? `
+/* 宽屏下 .blk 是「正文 | 旁注」两栏网格，中文段不钉住会被自动排进旁注那一栏 */
+.blk>.pp{grid-column:1}
+.pp.zh{font:15.5px/1.85 var(--sans);color:#2C3440;padding-top:2px;margin-bottom:10px;
+  border-left:2px solid var(--line);margin-left:22px;padding-left:14px;background:none}
+.blk.hot .pp.zh{border-left-color:var(--line);background:none}
+.blk.li .pp.zh{margin-left:52px;padding-left:14px}
+.blk.li .pp.zh::before{content:none}
+.pp.zh math{font-size:.97em}
+.hzh{margin-left:12px;font-weight:600;color:var(--accent-ink);font-size:.92em}
+h4.ph .hzh{font-family:var(--sans)}
+.tzh{margin-left:6px;color:var(--text-3);font-size:.95em}
+.toc a.on .tzh{color:inherit}
+.fzh{margin:6px auto 0;max-width:min(760px,100%);font:13.5px/1.75 var(--sans);color:#2C3440;text-align:center}
+.fzh math{font-size:.97em}
+.lzh{display:block;margin:1px 0 3px 1.5em;font:13px/1.6 var(--sans);color:var(--text-2)}
+.fnsec .fzh{text-align:left;max-width:none;margin:0 0 8px;font-size:12.5px}
+.ltx_listing{text-align:left;display:inline-block;margin-top:10px;font:14px/1.7 var(--serif)}
+.ltx_listingline{padding:1px 0}
+body.no-zh .pp.zh,body.no-zh .hzh,body.no-zh .tzh,body.no-zh .fzh,body.no-zh .lzh{display:none}
+` : '');
+
 /** 附录折叠块的样式（--foldappx）。外框和 References 一套，但里头是整段正文，
  *  所以不缩进也不换字体。没传这个参数的页面一个字节都不多。 */
 const cssAppx = () => (o.foldappx ? `
@@ -1712,6 +1857,9 @@ const doc = parse(src);
 console.log(`· 标题「${doc.title}」，作者 ${doc.authors.length}，段落 ${doc.items.filter((i) => i.kind === 'p').length}，` +
   `公式 ${doc.items.filter((i) => i.kind === 'eq').length}，图表 ${doc.items.filter((i) => i.kind === 'float').length}，` +
   `标题 ${doc.items.filter((i) => i.kind === 'h').length}，参考文献 ${doc.refs.length}`);
+
+if (o.dumpzh) dumpZh(doc, o.dumpzh);
+if (o.zh) applyZh(doc, o.zh);
 
 console.log('· 挂批注…');
 const blocks = doc.absBlk ? [doc.absBlk, ...doc.items] : doc.items;

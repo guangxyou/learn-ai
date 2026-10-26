@@ -1,0 +1,349 @@
+[
+ {
+  "kind": "基础",
+  "q": "符号速查：这篇论文里每个字母指什么",
+  "a": "\n<p>粗体小写（<b>x</b>、<b>z</b>）是向量，粗体大写（<b>X</b>）是整个数据集。上标带括号的是编号，不是幂。</p>\n<table><tbody>\n<tr><td><i>x</i><sup>(<i>i</i>)</sup></td><td>第 <i>i</i> 个数据点，在实验里就是一张图（MNIST 是 784 个像素拉成的向量）</td></tr>\n<tr><td><b>X</b>、<i>N</i></td><td>整个数据集，和它的大小</td></tr>\n<tr><td><b>z</b>、<i>J</i></td><td>隐变量（编码），和它的维数</td></tr>\n<tr><td>θ</td><td>生成模型的参数，也就是解码器的权重</td></tr>\n<tr><td>φ</td><td>识别模型的参数，也就是编码器的权重</td></tr>\n<tr><td><i>p</i><sub>θ</sub>(<b>z</b>)</td><td>先验，本文第 3 节取 𝒩(0, I)</td></tr>\n<tr><td><i>p</i><sub>θ</sub>(<b>x</b>|<b>z</b>)</td><td>似然，也就是概率解码器</td></tr>\n<tr><td><i>p</i><sub>θ</sub>(<b>z</b>|<b>x</b>)</td><td>真实后验，算不出来</td></tr>\n<tr><td><i>q</i><sub>φ</sub>(<b>z</b>|<b>x</b>)</td><td>近似后验，也就是概率编码器</td></tr>\n<tr><td><i>p</i><sub>θ</sub>(<b>x</b>)</td><td>边缘似然（又叫证据 evidence），想最大化但算不出</td></tr>\n<tr><td>ℒ</td><td>变分下界，后来的文献叫 ELBO（Evidence Lower BOund）</td></tr>\n<tr><td>ε、<i>g</i><sub>φ</sub></td><td>辅助噪声，和把噪声变成 <b>z</b> 的那个可微变换</td></tr>\n<tr><td><i>L</i>、<i>M</i></td><td>每个数据点采几个 ε；一个小批量有几个数据点</td></tr>\n<tr><td><b>z</b><sup>(<i>i</i>,<i>l</i>)</sup></td><td>给第 <i>i</i> 个数据点采的第 <i>l</i> 个 <b>z</b></td></tr>\n</tbody></table>\n<p>几个缩写：w.r.t. 是「关于」（对谁求导、对哪个分布取期望），RHS 是「等式右边」，s.d. 是标准差，i.i.d. 是独立同分布，e.g. 是「比如」，i.e. 是「也就是」。</p>"
+ },
+ {
+  "kind": "原理",
+  "q": "先看全文主线：每一节在解决哪一步",
+  "a": "\n<p>整篇论文是一条链，每一环都是被上一环逼出来的：</p>\n<div class=\"eg\">想要      最大化 log p(x)，学出生成模型\n卡住      p(x) = ∫ p(z) p(x|z) dz 算不出，后验 p(z|x) 也算不出\n§2.1     引入编码器 q(z|x) 去近似后验\n§2.2     log p(x) = KL(q ‖ 后验) + ℒ，改为最大化下界 ℒ\n又卡住    ℒ 是对 q 取的期望，对 φ 求梯度时朴素估计方差太大\n§2.4     重参数化 z = μ + σ⊙ε，随机性挪到 ε 上，梯度能穿过去\n§2.3     得到 SGVB 估计量，配小批量 SGD 就是 AEVB 算法\n§3       编码器、解码器都用神经网络，就叫变分自编码器</div>\n<p>读的时候抓住两个对象：一个是下界 ℒ（式 (2)(3)），一个是重参数化（式 (4)）。其余部分要么是在推这两个东西，要么是在验证它们。站内的<a href=\"../vae/\">变分自编码器专题</a>从 KL 散度开始把这条链又推了一遍，卡住时可以对照着看。</p>"
+ },
+ {
+  "anchor": "directed probabilistic models",
+  "kind": "基础",
+  "q": "有向概率模型是什么？",
+  "a": "\n<p>就是有向图模型（贝叶斯网络）。图里的箭头表示「谁生成谁」：<b>z</b> → <b>x</b> 的意思是先抽一个 <b>z</b>，再按 <b>z</b> 抽出 <b>x</b>。联合概率按箭头拆开：</p>\n<div class=\"eg\">p(x, z) = p(z) · p(x | z)</div>\n<p>和它对照的是无向模型（玻尔兹曼机、马尔可夫随机场），那种模型没有「生成顺序」，要算一个归一化常数（配分函数）才能得到概率。第 4 节末尾说别的方法针对的是 unnormalized models，指的就是无向模型。</p>"
+ },
+ {
+  "anchor": "intractable posterior distributions",
+  "kind": "基础",
+  "q": "后验「不可解」（intractable）具体指什么？",
+  "a": "\n<p>不是说后验不存在，是说它<b>没有闭式解，数值上也算不动</b>。贝叶斯公式：</p>\n<div class=\"eg\">p(z | x) = p(x | z) p(z) / p(x)\np(x)     = ∫ p(z) p(x | z) dz</div>\n<p>分子好算：先验和解码器都是自己定的。难在分母 <i>p</i>(<b>x</b>)，要对所有可能的 <b>z</b> 积分。解码器 <i>p</i>(<b>x</b>|<b>z</b>) 是神经网络时，这个积分没有解析式；<b>z</b> 有 20 维的话，网格法每维取 100 个点就是 100<sup>20</sup> 次解码，也没法硬算。</p>\n<p>全文要绕开的就是这个分母。</p>"
+ },
+ {
+  "anchor": "The variational Bayesian (VB) approach involves the optimization of an approximation to the intractable posterior",
+  "kind": "基础",
+  "q": "变分推断（Variational Inference）的思路是什么？",
+  "a": "\n<p>把「求后验」这个积分问题换成一个优化问题：先选一族好算的分布（比如对角高斯），再在这族里找一个离真实后验最近的 <i>q</i>，「近」用 KL 散度衡量。</p>\n<p>名字里的「变分」来自变分法：优化的对象是一个函数（分布），不是一个数。实际操作时 <i>q</i> 由几个参数决定，所以落地还是普通的参数优化。</p>\n<p>代价是结果只是近似：<i>q</i> 那一族本身表达不了的形状（多峰、各维相关），永远拟合不出来。</p>"
+ },
+ {
+  "anchor": "the common mean-field approach requires analytical solutions of expectations w.r.t. the approximate posterior",
+  "kind": "基础",
+  "q": "平均场（mean-field）方法为什么在这里用不上？",
+  "a": "\n<p>平均场假设 <i>q</i>(<b>z</b>) = ∏<sub><i>j</i></sub> <i>q</i>(<i>z</i><sub><i>j</i></sub>)，各维互相独立。传统做法是坐标上升：轮流固定其它维、解析地算出某一维的最优 <i>q</i>(<i>z</i><sub><i>j</i></sub>)。</p>\n<p>每一步都要算形如 𝔼<sub><i>q</i></sub>[log <i>p</i>(<b>x</b>, <b>z</b>)] 的期望，只有共轭模型（先验和似然配成一对，乘出来还是同一族分布）才有解析解。解码器换成神经网络，这个期望就写不出来了。</p>\n<p>另一个问题是每个数据点都要单独跑一遍优化，数据集一大就慢。本文用一个编码器网络同时解决这两件事。</p>"
+ },
+ {
+  "anchor": "simple differentiable unbiased estimator of the lower bound",
+  "kind": "基础",
+  "q": "「估计量」和「无偏」是什么意思？",
+  "a": "\n<p><b>估计量</b>（estimator）：用随机样本算出来的一个数，拿去近似一个算不出来的量。下界 ℒ 是一个期望，算不出精确值，就采几个样本求平均来估它。</p>\n<p><b>无偏</b>（unbiased）：这个估计量的期望正好等于真值。单次估计会偏高或偏低，但平均起来不偏。随机梯度下降只要求梯度无偏，噪声靠多步迭代抹平。</p>\n<p><b>可微</b>：估计量对参数可以求导，这样才能用反向传播训练。做到可微是第 2.4 节重参数化的功劳。</p>"
+ },
+ {
+  "anchor": "simple ancestral sampling",
+  "kind": "词句",
+  "q": "ancestral sampling（祖先采样）是什么？",
+  "a": "\n<p>按有向图里箭头的方向，从没有父节点的「祖先」开始，一层一层往下采样。每一步只需要从一个已知的条件分布里抽一个数，没有迭代。</p>\n<p>在这里的意思是：拿到 <b>x</b>，过一遍编码器得到 μ 和 σ，抽一个 ε，算出 <b>z</b> = μ + σ ⊙ ε。一次前向传播就拿到后验样本，对比下一句提到的 MCMC 要跑成百上千步。</p>"
+ },
+ {
+  "anchor": "expensive iterative inference schemes (such as MCMC)",
+  "kind": "基础",
+  "q": "MCMC 是什么，为什么说它贵？",
+  "a": "\n<p>马尔可夫链蒙特卡洛（Markov Chain Monte Carlo）：构造一条马尔可夫链，让它的平稳分布恰好等于想要的后验，然后让链跑很多步，把后面的状态当成样本。</p>\n<p>它的好处是不用知道分母 <i>p</i>(<b>x</b>) 也能采样。贵在两点：链要先跑一段才能「忘掉」起点（burn-in），相邻样本还高度相关；而且<b>每个数据点都要单独跑一条链</b>。MNIST 有 6 万张图，每张跑几百步，每一步还要算一次梯度，训练一轮就是上千万次网络计算。附录 E 的 Monte Carlo EM 就是这种做法，图 3 里它跑不动完整的 MNIST。</p>"
+ },
+ {
+  "anchor": "maximum likelihood (ML) or maximum a posteriori (MAP) inference on the (global) parameters",
+  "kind": "基础",
+  "q": "ML、MAP 是什么？全局参数和隐变量为什么区别对待？",
+  "a": "\n<p><b>最大似然（Maximum Likelihood）</b>：找让 <i>p</i>(<b>X</b>|θ) 最大的 θ。<b>最大后验（Maximum A Posteriori）</b>：再乘一个参数先验 <i>p</i>(θ)，找让 <i>p</i>(θ|<b>X</b>) 最大的 θ。高斯先验取对数就是 L2 权重衰减，第 5 节实验正是这么做的。两者都是<b>点估计</b>，θ 只要一个值。</p>\n<p><b>全局参数</b> θ 被所有数据点共享，数据量一大，它的后验会很尖，取一个点损失不大。<b>隐变量</b> <b>z</b><sup>(<i>i</i>)</sup> 每个数据点各有一个，只由那一个数据点决定，不确定性很大，所以要估整个分布，这就是对它做变分推断的原因。</p>"
+ },
+ {
+  "anchor": "dashed lines denote the variational approximation",
+  "kind": "原理",
+  "q": "图 1 怎么读？",
+  "a": "\n<p>这是图模型的标准画法：</p>\n<table><tbody>\n<tr><td>灰色圆 <b>x</b></td><td>观测到的变量</td></tr>\n<tr><td>白色圆 <b>z</b></td><td>观测不到的隐变量</td></tr>\n<tr><td>圆角方框和 <i>N</i></td><td>「plate」，框里的东西重复 <i>N</i> 次，每个数据点各有一对 <b>z</b>、<b>x</b></td></tr>\n<tr><td>实线 <b>z</b> → <b>x</b></td><td>生成方向，由 θ 控制，就是解码器</td></tr>\n<tr><td>虚线 <b>x</b> → <b>z</b></td><td>推断方向，由 φ 控制，就是编码器</td></tr>\n</tbody></table>\n<p>θ 和 φ 画在框外，表示它们是全局参数，所有数据点共用一份。</p>"
+ },
+ {
+  "anchor": "differentiable almost everywhere",
+  "kind": "词句",
+  "q": "「几乎处处可微」为什么要专门提？",
+  "a": "\n<p>几乎处处可微：除了测度为零的个别点（比如 ReLU 在 0 那一点）之外都可微。实际训练中恰好落在那些点上的概率是零，不影响求梯度。</p>\n<p>要求它对 θ 和 <b>z</b> 都可微，是因为后面的重参数化要让梯度<b>穿过 <b>z</b></b> 传回编码器。<b>z</b> 是离散的（比如取 0 或 1）就不满足这一条，所以本文只处理连续隐变量。离散隐变量后来另有办法，见第 2.4 节「组合」那一条的批注。</p>"
+ },
+ {
+  "anchor": "(so the EM algorithm cannot be used)",
+  "kind": "基础",
+  "q": "EM 算法为什么要求后验可解？",
+  "a": "\n<p>EM（Expectation-Maximization）交替两步：</p>\n<div class=\"eg\">E 步   用当前 θ 算后验 p(z | x, θ)，求 log p(x, z) 在它下面的期望\nM 步   最大化这个期望，更新 θ</div>\n<p>E 步要的是<b>精确</b>后验，后验算不出，这一步就卡住了。</p>\n<p>可以把 AEVB 看成 EM 的推广：E 步换成「编码器给出的近似后验」，M 步换成一步梯度更新，而且两步合成一个目标 ℒ，一次反向传播同时更新 φ 和 θ。</p>"
+ },
+ {
+  "anchor": "Monte Carlo EM, would in general be too slow",
+  "kind": "基础",
+  "q": "Monte Carlo EM 慢在哪？",
+  "a": "\n<p>它用采样代替 E 步里算不出的期望：对每个数据点，先跑 MCMC 从后验里采一批 <b>z</b>，再用这些样本更新 θ。附录 E 的设置是每次 10 步 HMC，再做 5 步权重更新。</p>\n<p>慢就慢在<b>每个数据点、每次更新都要重新采样</b>，采样结果也不能在数据点之间共享。编码器的做法是把「从 <b>x</b> 推 <b>z</b>」这件事学成一个网络，代价摊到训练里，用的时候一次前向就出结果。</p>"
+ },
+ {
+  "anchor": "let us introduce a recognition model",
+  "kind": "词句",
+  "q": "为什么叫「识别模型」？它和平均场的近似后验有什么不同？",
+  "a": "\n<p>名字来自 1995 年的 Helmholtz machine 和 wake-sleep 算法（Dayan、Hinton 等，第 4 节引的 [HDFN95]）：生成模型从原因 <b>z</b> 生成数据，识别模型反过来从数据「认出」原因。后来的文献多叫 encoder 或 inference network。</p>\n<p>和平均场的区别在于参数怎么来：</p>\n<div class=\"eg\">平均场     每个数据点单独一组 q 的参数，各自优化\n识别模型   一个共享的网络，输入 x，直接输出 q 的参数</div>\n<p>后一种叫<b>摊销推断</b>（Amortized Inference）：推断的成本一次性摊进网络训练里，新数据来了不用再优化，前向一遍就行。代价是网络不一定能对每个数据点都给出最优的 <i>q</i>，后来的文献把这部分差距叫 amortization gap。</p>"
+ },
+ {
+  "anchor": "it is not necessarily factorial",
+  "kind": "词句",
+  "q": "factorial 在这里是什么意思？",
+  "a": "\n<p>不是「阶乘」，是「可分解」：<i>q</i>(<b>z</b>) 能写成各维边缘分布的乘积，即各维独立。平均场就是这个假设。</p>\n<p>作者说方法本身不要求这一点。不过第 3 节的实际例子用的还是对角高斯，那恰好是可分解的。后来的 normalizing flow 类工作才真正把非对角的后验用起来。</p>"
+ },
+ {
+  "anchor": "as a probabilistic encoder",
+  "kind": "原理",
+  "q": "「概率」编码器和普通自编码器的编码器差在哪？",
+  "a": "\n<p>普通自编码器的编码器输出<b>一个点</b> <b>z</b>；概率编码器输出<b>一个分布</b>，具体就是每一维的均值 μ<sub><i>j</i></sub> 和标准差 σ<sub><i>j</i></sub>。</p>\n<p>解码器也一样：它输出的不是一张图，而是「这张图的分布」的参数。二值图像输出每个像素为 1 的概率，连续数据输出每个像素的均值（和方差）。训练时的重构损失就是真实图像在这个分布下的负对数似然，所以伯努利解码器对应二元交叉熵，高斯解码器对应（加权的）平方误差。</p>"
+ },
+ {
+  "anchor": "The first RHS term is the KL divergence of the approximate from the true posterior",
+  "kind": "原理",
+  "q": "式 (1) 怎么来的？KL 的方向是哪个？",
+  "a": "\n<p>只用到「log <i>p</i>(<b>x</b>) 和 <b>z</b> 无关」这一点，对任意 <i>q</i> 都成立：</p>\n<div class=\"eg\">log p(x) = 𝔼_q[ log p(x) ]\n         = 𝔼_q[ log p(x, z) − log p(z|x) ]\n         = 𝔼_q[ log p(x, z) − log q(z|x) ]  +  𝔼_q[ log q(z|x) − log p(z|x) ]\n         =            ℒ                     +       KL( q(z|x) ‖ p(z|x) )</div>\n<p>第三行是同时加减 log <i>q</i>。「KL divergence of the approximate from the true posterior」写成符号是 <i>D</i><sub>KL</sub>(<i>q</i> ‖ <i>p</i>)，<b>近似后验在前</b>。</p>\n<p>由此得到两个结论：KL ≥ 0，所以 ℒ ≤ log <i>p</i>(<b>x</b>)，叫下界；对 φ 来说左边是常数，两项此消彼长，<b>最大化 ℒ 就等于把 <i>q</i> 往真实后验推</b>，而且不用知道真实后验长什么样。</p>"
+ },
+ {
+  "anchor": "which can also be written as:",
+  "kind": "原理",
+  "q": "式 (2) 怎么变成式 (3)？两项各管什么？",
+  "a": "\n<p>把 log <i>p</i>(<b>x</b>, <b>z</b>) 拆成 log <i>p</i>(<b>z</b>) + log <i>p</i>(<b>x</b>|<b>z</b>)，和 −log <i>q</i> 重新组合：</p>\n<div class=\"eg\">ℒ = 𝔼_q[ log p(z) − log q(z|x) ] + 𝔼_q[ log p(x|z) ]\n  =      −KL( q(z|x) ‖ p(z) )      + 𝔼_q[ log p(x|z) ]</div>\n<p>两项互相拉扯：</p>\n<table><tbody>\n<tr><td>−KL(<i>q</i> ‖ 先验)</td><td>让每张图的编码分布都靠近 𝒩(0, I)，不许各占一块互不相干的小角落</td></tr>\n<tr><td>𝔼<sub><i>q</i></sub>[log <i>p</i>(<b>x</b>|<b>z</b>)]</td><td>从编码采出来的 <b>z</b> 要能解码回原图，即重构</td></tr>\n</tbody></table>\n<p>VAE 代码里的 loss = 重构损失 + KL，就是 −ℒ 按这个式子写的。</p>"
+ },
+ {
+  "anchor": "The usual (naïve) Monte Carlo gradient estimator for this type of problem is",
+  "kind": "原理",
+  "q": "这个朴素梯度估计量是什么？为什么方差大？",
+  "a": "\n<p>它后来常被叫作 score function 估计量，强化学习里叫 REINFORCE。来源是一个恒等式 ∇<i>q</i> = <i>q</i> ∇log <i>q</i>：</p>\n<div class=\"eg\">∇_φ 𝔼_q[f(z)] = ∫ f(z) ∇_φ q(z) dz = 𝔼_q[ f(z) ∇_φ log q(z) ]</div>\n<p>原文下标写成 ∇<sub><i>q</i><sub>φ</sub>(<b>z</b>)</sub>，按推导应当是对 φ 求梯度，是排版笔误。</p>\n<p><b>方差大的原因</b>：它只用了 <i>f</i> 的<b>值</b>，没用 <i>f</i> 的<b>梯度</b>。<i>f</i> 是对数似然，量级常在 −100 上下，这个大数整个乘在 ∇log <i>q</i> 上，单个样本的估计正负摆动很大，要很多样本才能平均出可用的方向。第 4 节提到的控制变量就是专门压这个方差的办法；本文换了一条路，见式 (4)。</p>"
+ },
+ {
+  "anchor": "we can reparameterize the random variable",
+  "kind": "原理",
+  "q": "重参数化到底解决了什么？",
+  "a": "\n<p>问题出在「从 <i>q</i><sub>φ</sub> 里采一个 <b>z</b>」这个操作：采样本身没有导数，梯度传不回 φ。</p>\n<p>重参数化把随机性挪到一个和 φ 无关的噪声 ε 上：</p>\n<div class=\"eg\">改之前   z ~ q_φ(z|x)                 φ 藏在分布里\n改之后   ε ~ 𝒩(0, I)，z = μ_φ(x) + σ_φ(x) ⊙ ε    φ 在一个普通函数里</div>\n<p>ε 的分布不依赖 φ，梯度可以移进期望里：</p>\n<div class=\"eg\">∇_φ 𝔼_ε[ f(g_φ(ε, x)) ] = 𝔼_ε[ ∇_φ f(g_φ(ε, x)) ]</div>\n<p>右边的 ∇<sub>φ</sub> <i>f</i>(<i>g</i><sub>φ</sub>(ε, <b>x</b>)) 就是普通的链式法则，反向传播自动算。它用上了 <i>f</i> 对 <b>z</b> 的梯度，比朴素估计量多了方向信息，方差通常小得多。</p>"
+ },
+ {
+  "anchor": "We can now form Monte Carlo estimates of expectations",
+  "kind": "基础",
+  "q": "蒙特卡洛估计是什么？",
+  "a": "\n<p>期望算不出来，就采样求平均：</p>\n<div class=\"eg\">𝔼_p[ f(z) ] ≈ (1/L) Σₗ f(z⁽ˡ⁾)，z⁽ˡ⁾ ~ p</div>\n<p>这个估计是无偏的，方差随样本数 <i>L</i> 按 1/<i>L</i> 下降。式 (5) 只是把 <b>z</b> 换成了 <i>g</i><sub>φ</sub>(ε<sup>(<i>l</i>)</sup>, <b>x</b>)，采样对象从 <b>z</b> 变成了 ε。</p>"
+ },
+ {
+  "anchor": "which typically has less variance than the generic estimator",
+  "kind": "原理",
+  "q": "SGVB 的 A、B 两个版本差在哪？",
+  "a": "\n<table><tbody>\n<tr><td>A 版（式 6）</td><td>整个 log <i>p</i>(<b>x</b>, <b>z</b>) − log <i>q</i>(<b>z</b>|<b>x</b>) 都用采样来估</td></tr>\n<tr><td>B 版（式 7）</td><td>KL 项用闭式公式直接算（附录 B），只有重构项采样</td></tr>\n</tbody></table>\n<p>闭式算出来的部分没有随机性，方差为零，所以 B 版整体方差更小。前提是 KL 有闭式解，对角高斯后验配标准高斯先验正好满足。今天的 VAE 实现几乎都用 B 版。</p>"
+ },
+ {
+  "anchor": "we can construct an estimator of the marginal likelihood lower bound of the full dataset, based on minibatches",
+  "kind": "原理",
+  "q": "式 (8) 为什么要乘 N/M？",
+  "a": "\n<p>整个数据集的下界是 <i>N</i> 个数据点各自下界之和。小批量只有 <i>M</i> 个，求和后乘 <i>N</i>/<i>M</i>，期望就等于全体之和，是无偏估计。</p>\n<p>实际代码里常把损失除以 <i>N</i>，写成「每个数据点的平均 −ℒ」，和这里只差一个常数倍，相当于换了学习率。要注意的是 KL 项和重构项要按同样的方式求和或平均，单独把其中一项按像素平均、另一项按维度求和，两者的相对权重就变了，结果会很不一样。</p>"
+ },
+ {
+  "anchor": "per datapoint can be set to",
+  "kind": "原理",
+  "q": "每个数据点只采 1 个 ε（L = 1）够吗？",
+  "a": "\n<p>够。单个数据点只采一个 ε，梯度噪声确实大；但一个小批量里有 100 个数据点，噪声在平均时被摊薄了，SGD 本来也是靠多步迭代消化梯度噪声的。</p>\n<p>多采几个 ε 能降方差，但计算量按 <i>L</i> 倍增长；同样的算力换成更大的小批量通常更划算。今天的 VAE 代码默认 <i>L</i> = 1。</p>"
+ },
+ {
+  "anchor": "SGD or Adagrad",
+  "kind": "工程对照",
+  "q": "Adagrad 现在还用吗？",
+  "a": "\n<p>Adagrad（2011 年 JMLR）给每个参数单独设步长：按这个参数历史梯度平方和的平方根缩放，常更新的参数步长变小。缺点是平方和只增不减，训练后期步长会缩到几乎为零。</p>\n<p>这篇论文发表一年后，Kingma 自己和 Ba 提出了 Adam（arXiv 2014 年 12 月），用指数滑动平均代替累加，解决了步长一路衰减的问题。今天训练 VAE 基本都用 Adam 或 AdamW。</p>",
+  "skip": 0
+ },
+ {
+  "anchor": "acts as a regularizer, while the second term is a an expected negative reconstruction error",
+  "kind": "原理",
+  "q": "式 (7) 和 VAE 代码里的损失怎么对上？",
+  "a": "\n<p>取负号就是损失函数，以 MNIST（伯努利解码器）为例：</p>\n<div class=\"eg\">loss = BCE(x, 解码器输出)                          ← −𝔼_q[log p(x|z)]，L = 1\n     + 0.5 · Σⱼ ( μⱼ² + σⱼ² − log σⱼ² − 1 )            ← KL(q ‖ 𝒩(0, I))</div>\n<p>第一项让 <b>z</b> 携带足够重构原图的信息，第二项把编码分布拉向标准高斯。只有第一项就退化成普通自编码器（σ 会被压到 0）；只有第二项，编码器干脆输出 𝒩(0, I)，什么都不记。</p>\n<p>原文这句「The first term is (the KL ...) acts」「a an」是两处语法笔误，意思不受影响。</p>"
+ },
+ {
+  "anchor": "Minibatch version of the Auto-Encoding VB (AEVB) algorithm",
+  "kind": "原理",
+  "q": "算法 1 对应的训练代码长什么样？",
+  "a": "\n<p>一轮迭代就是一次普通的前向加反向：</p>\n<div class=\"eg\">x        = 取一个小批量                       # M = 100\nμ, logσ² = encoder(x)\nε        = randn_like(μ)\nz        = μ + exp(0.5·logσ²) · ε            # 重参数化\nx_hat    = decoder(z)\nloss     = 重构损失(x, x_hat) + KL(μ, logσ²)\nloss.backward()                               # 一次反传同时得到对 θ、φ 的梯度 g\noptimizer.step()</div>\n<p>算法里的 <b>g</b> ← ∇<sub>θ,φ</sub> 是一个梯度，不是两套：编码器和解码器连成一张计算图，反向传播一次走完。</p>"
+ },
+ {
+  "anchor": "Given the deterministic mapping",
+  "kind": "原理",
+  "q": "「证明如下」那几步在说什么？",
+  "a": "\n<p>核心是概率的变量替换：<b>z</b> = <i>g</i>(ε) 是一个确定的映射时，一小块区域里的概率质量换了坐标也不变，</p>\n<div class=\"eg\">q(z) ∏ dzᵢ = p(ε) ∏ dεᵢ</div>\n<p>脚注 1 说的就是 ∏ d<i>z</i><sub><i>i</i></sub> 这个体积元的记号。于是对 <b>z</b> 的积分可以整体换成对 ε 的积分：</p>\n<div class=\"eg\">∫ q(z) f(z) dz = ∫ p(ε) f(g(ε)) dε，即 𝔼_q[f(z)] = 𝔼_ε[f(g(ε))]</div>\n<p>同一个期望换一个变量来写。好处在右边：分布 <i>p</i>(ε) 里没有 φ，φ 只出现在函数 <i>g</i> 里。</p>"
+ },
+ {
+  "anchor": "Take, for example, the univariate Gaussian case",
+  "kind": "原理",
+  "q": "一元高斯的例子，代几个数看看",
+  "a": "\n<p>设编码器对某张图输出 μ = 2，σ = 0.5，这次采到 ε = 0.8：</p>\n<div class=\"eg\">z      = μ + σ·ε = 2 + 0.5 × 0.8 = 2.4\n∂z/∂μ  = 1\n∂z/∂σ  = ε = 0.8</div>\n<p>损失对 <i>z</i> 的梯度 ∂ℓ/∂<i>z</i> 由解码器反传过来，再乘上面两个偏导就分别传到 μ 和 σ，接着进编码器。采样带来的随机性只体现在 ε 的取值上，不挡梯度。</p>\n<p>原文这里写的是 <i>p</i>(<i>z</i>|<i>x</i>)，按上下文应理解为近似后验 <i>q</i>。</p>"
+ },
+ {
+  "anchor": "Tractable inverse CDF",
+  "kind": "基础",
+  "q": "逆 CDF 为什么能当变换 g？",
+  "a": "\n<p>这是逆变换采样：ε 服从 [0, 1] 上的均匀分布，<i>F</i> 是目标分布的累积分布函数（CDF），那么 <i>z</i> = <i>F</i><sup>−1</sup>(ε) 就服从目标分布。</p>\n<p>以指数分布为例，<i>F</i>(<i>z</i>) = 1 − e<sup>−λ<i>z</i></sup>，反解得 <i>z</i> = −ln(1 − ε)/λ。λ 是要学的参数，它出现在一个可微函数里，梯度就能传回去。</p>\n<p>图 4 画流形时也用了同一招：把单位正方形上的均匀坐标过一遍高斯的逆 CDF。</p>"
+ },
+ {
+  "anchor": "location-scale",
+  "kind": "基础",
+  "q": "「位置-尺度」分布族是什么？",
+  "a": "\n<p>一族分布里，任何一个都能由标准分布平移、缩放得到：<i>z</i> = 位置 + 尺度 · ε。高斯就是 μ + σε，拉普拉斯、学生 t、均匀分布也一样。</p>\n<p>这一类做重参数化最省事：编码器输出位置和尺度两组数，ε 从固定的标准分布采。</p>"
+ },
+ {
+  "anchor": "It is often possible to express random variables as different transformations of auxiliary variables",
+  "kind": "工程对照",
+  "q": "离散变量、Gamma 这类不好变换的分布，后来怎么处理？",
+  "a": "\n<p>这一条（组合变换）在 2013 年覆盖不全，后来有两条重要补丁：</p>\n<table><tbody>\n<tr><td>离散隐变量</td><td>Gumbel-Softmax / Concrete（Jang 等、Maddison 等，2016 年 11 月）：用 Gumbel 噪声加 softmax 得到离散样本的连续松弛，温度趋于 0 时接近 one-hot。用到的 Gumbel 分布就在上一条的列表里</td></tr>\n<tr><td>Gamma、Beta、Dirichlet</td><td>隐式重参数化梯度（Figurnov 等，NeurIPS 2018）：不需要显式写出 <i>g</i>，借 CDF 的隐函数求导得到梯度</td></tr>\n</tbody></table>\n<p>另一个分支是 VQ-VAE（2017 年 11 月），它用离散码本，梯度用直通估计（straight-through）硬传过去，不走重参数化。</p>"
+ },
+ {
+  "anchor": "centered isotropic multivariate Gaussian",
+  "kind": "词句",
+  "q": "centered isotropic multivariate Gaussian 拆开是什么？",
+  "a": "\n<p>centered：均值为 0。isotropic：各向同性，每个方向方差都一样，且各维不相关，协方差是单位阵 I。multivariate：多元，<b>z</b> 是向量。</p>\n<p>合起来就是 𝒩(0, I)。这个先验没有任何可学的参数，所以下一句说「the prior lacks parameters」。</p>"
+ },
+ {
+  "anchor": "with a diagonal covariance structure",
+  "kind": "基础",
+  "q": "对角协方差意味着什么？",
+  "a": "\n<p>协方差矩阵只有对角线非零，即各维互相独立，每维只有自己的方差 σ<sub><i>j</i></sub><sup>2</sup>。</p>\n<p>实际好处有两个：编码器只需输出 2<i>J</i> 个数（<i>J</i> 个 μ、<i>J</i> 个 σ），不用输出 <i>J</i> × <i>J</i> 的矩阵；和标准高斯先验之间的 KL 有简单闭式（附录 B）。代价是近似后验表达不了各维之间的相关性。脚注 2 说这只是为了简单，不是方法的限制。</p>"
+ },
+ {
+  "anchor": "are outputs of the encoding MLP",
+  "kind": "工程对照",
+  "q": "实际代码里编码器输出的是 σ 吗？",
+  "a": "\n<p>一般不直接输出 σ，而是输出 log σ<sup>2</sup>（代码里常叫 logvar），再用 σ = exp(0.5 · logvar) 换回来。附录 C 的式 (12) 也是让网络输出 log σ<sup>2</sup>。</p>\n<p>原因是 σ 必须为正，而网络的线性输出层什么值都可能给；取对数后输出可以是任意实数。数值上也更稳：σ 很小时直接回归 σ 梯度很陡。</p>"
+ },
+ {
+  "anchor": "The resulting estimator for this model and datapoint",
+  "kind": "原理",
+  "q": "式 (10) 逐项看",
+  "a": "\n<div class=\"eg\">ℒ ≈ ½ Σⱼ ( 1 + log σⱼ² − μⱼ² − σⱼ² )   +   (1/L) Σₗ log p(x | z⁽ˡ⁾)\n      └──────── −KL，闭式 ────────┘         └──── 重构，采样 ────┘</div>\n<p>看 KL 那一项每一维的值：μ<sub><i>j</i></sub> = 0、σ<sub><i>j</i></sub> = 1 时等于 0，是最大值；μ 偏离 0 或 σ 偏离 1 都会让它变负。所以这一项把每一维往标准高斯拉。推导见附录 B 的批注。</p>\n<p>ℒ 越大越好，训练时取负号当损失。</p>"
+ },
+ {
+  "anchor": "The wake-sleep algorithm",
+  "kind": "基础",
+  "q": "wake-sleep 算法是怎么训练的？缺点为什么是「两个目标」？",
+  "a": "\n<p>Hinton、Dayan 等 1995 年提出，同样有一个生成网络和一个识别网络，交替训练：</p>\n<div class=\"eg\">wake   拿真实 x，用识别网络推出 z，更新生成网络让它更会从 z 生成 x\nsleep  让生成网络「做梦」：从先验采 z 再生成 x，更新识别网络让它从 x 还原 z</div>\n<p>sleep 阶段等于在最小化 KL(<i>p</i> ‖ <i>q</i>)，方向和下界里的 KL(<i>q</i> ‖ <i>p</i>) 相反，而且用的是生成网络造的假数据。两个阶段各自优化一个目标，合起来不是任何一个下界的梯度，所以没有收敛保证。AEVB 两个网络优化的是同一个 ℒ。</p>"
+ },
+ {
+  "anchor": "introduced a control variate schemes",
+  "kind": "基础",
+  "q": "控制变量（control variate）怎么降方差？",
+  "a": "\n<p>想估 𝔼[<i>f</i>]，找一个和 <i>f</i> 相关、期望已知的量 <i>h</i>，改为估 𝔼[<i>f</i> − <i>c</i>(<i>h</i> − 𝔼[<i>h</i>])]。期望没变，<i>h</i> 的波动和 <i>f</i> 的波动相互抵消，方差变小。强化学习里减去一个 baseline 是同一回事。</p>\n<p>这是给朴素梯度估计量「打补丁」的路线。本文走的是另一条：重参数化直接换一个低方差的估计量，不需要设计 <i>h</i>。</p>"
+ },
+ {
+  "anchor": "the naïve gradient estimator discussed in section",
+  "kind": "词句",
+  "q": "这里的「section 2.1」对吗？",
+  "a": "\n<p>不对。朴素蒙特卡洛梯度估计量是在 2.2 节（变分下界）的最后一段讨论的，2.1 节是问题设定。这是原文的引用笔误，arXiv 的最后一版（v11）也没改。</p>"
+ },
+ {
+  "anchor": "it was shown that PCA corresponds to the maximum-likelihood (ML) solution",
+  "kind": "原理",
+  "q": "PCA 和线性高斯模型是什么关系？",
+  "a": "\n<p>线性高斯模型：<b>z</b> ∼ 𝒩(0, I)，<b>x</b> = <b>W</b><b>z</b> + 噪声。噪声方差趋于 0 时，最大似然解出来的 <b>W</b> 张成的正好是主成分子空间，也就是 PCA 的结果。Roweis 1998 和同期 Tipping、Bishop 的概率 PCA 都证明了这一点。</p>\n<p>VAE 可以看成它的非线性版本：<b>W</b><b>z</b> 换成神经网络 <i>f</i><sub>θ</sub>(<b>z</b>)，ML 解没有闭式了，于是用编码器加下界来近似求解。</p>"
+ },
+ {
+  "anchor": "the infomax principle",
+  "kind": "基础",
+  "q": "互信息和 infomax 原理是什么？",
+  "a": "\n<p>互信息 <i>I</i>(<i>X</i>; <i>Z</i>) 衡量知道 <i>Z</i> 之后对 <i>X</i> 的不确定性减少了多少。infomax 原理（Linsker 1988）主张好的表示应当尽量保留输入的信息，即最大化 <i>I</i>(<i>X</i>; <i>Z</i>)。</p>\n<p><i>I</i>(<i>X</i>; <i>Z</i>) = <i>H</i>(<i>X</i>) − <i>H</i>(<i>X</i>|<i>Z</i>)，<i>H</i>(<i>X</i>) 由数据决定，所以最大化互信息就是让 <i>H</i>(<i>X</i>|<i>Z</i>) 变小。原文写「maximizing the conditional entropy」，严格说应是最大化<b>负</b>条件熵。负条件熵的下界是期望对数似然，也就是负重构误差，这就是普通自编码器训练目标的来历。</p>\n<p>后半段的意思：光保留信息不够，恒等映射也保留了全部信息，所以需要正则化。</p>"
+ },
+ {
+  "anchor": "lacking the usual nuisance regularization hyperparameter",
+  "kind": "工程对照",
+  "q": "KL 项「不需要调正则化超参数」，后来呢？",
+  "a": "\n<p>按下界推导，KL 项的权重就是 1，不用调，这是作者想强调的优点。</p>\n<p>后来的实践又把这个权重放了出来：</p>\n<table><tbody>\n<tr><td>β-VAE（Higgins 等，ICLR 2017）</td><td>权重 β &gt; 1，换取更「解耦」的隐变量，代价是重构变糊</td></tr>\n<tr><td>KL annealing（Bowman 等，2015 年 11 月）</td><td>训练初期权重从 0 慢慢升到 1，缓解文本 VAE 的后验坍缩</td></tr>\n<tr><td>Stable Diffusion 的 VAE</td><td>KL 权重只有 10<sup>−6</sup> 量级，几乎只当一个轻微约束，主要靠重构和对抗损失</td></tr>\n</tbody></table>\n<p>权重不为 1 时优化的就不再是 log <i>p</i>(<b>x</b>) 的下界了。</p>"
+ },
+ {
+  "anchor": "Their work was developed independently of ours",
+  "kind": "工程对照",
+  "q": "[RMW14] 和这篇是什么关系？",
+  "a": "\n<p>Rezende、Mohamed、Wierstra（DeepMind）的《Stochastic Backpropagation and Approximate Inference in Deep Generative Models》，arXiv 2014 年 1 月，发表在 ICML 2014。本文 arXiv 首版是 2013 年 12 月，发表在 ICLR 2014。</p>\n<p>两篇独立提出了几乎相同的东西：重参数化求梯度，加一个识别网络。所以现在讲变分自编码器和重参数化技巧，通常两篇一起引。</p>"
+ },
+ {
+  "anchor": "the estimated average variational lower bound per datapoint",
+  "kind": "原理",
+  "q": "图 2 纵轴的数为什么 MNIST 是负的、Frey Face 是正的？",
+  "a": "\n<p>纵轴是每个数据点的平均 ℒ，越高越好。</p>\n<table><tbody>\n<tr><td>MNIST</td><td>二值像素，伯努利解码器，每个像素的对数概率 ≤ 0，784 个像素加起来约 −100</td></tr>\n<tr><td>Frey Face</td><td>连续像素，高斯解码器。连续分布的概率<b>密度</b>可以大于 1，对数密度可以为正，560 个像素加起来到了 +1000 以上</td></tr>\n</tbody></table>\n<p>所以两组数不能互相比，只能在同一个数据集内比较。Frey Face 上 wake-sleep 的线很早就平了，AEVB 还在涨。</p>"
+ },
+ {
+  "anchor": "The generative model (encoder) and variational approximation (decoder)",
+  "kind": "词句",
+  "q": "这里编码器和解码器是不是写反了？",
+  "a": "\n<p>写反了。生成模型 <i>p</i><sub>θ</sub>(<b>x</b>|<b>z</b>) 是解码器，变分近似 <i>q</i><sub>φ</sub>(<b>z</b>|<b>x</b>) 是编码器，第 2.1 节自己就是这么定义的。下面「似然下界」一段写「generative models (decoders) and corresponding encoders」才是对的。</p>"
+ },
+ {
+  "anchor": "plus a small weight decay term corresponding to a prior",
+  "kind": "原理",
+  "q": "权重衰减为什么「对应一个先验」？",
+  "a": "\n<p>先验 <i>p</i>(θ) = 𝒩(0, I) 取对数：</p>\n<div class=\"eg\">log p(θ) = −½ ‖θ‖² + 常数</div>\n<p>把它加进要最大化的目标，等于从损失里减去 ½‖θ‖²，就是 L2 权重衰减。所以「下界 + 权重衰减」对应的是 MAP 估计（式里多了参数先验），不再是纯粹的最大似然。</p>"
+ },
+ {
+  "anchor": "superfluous latent variables did not result in overfitting",
+  "kind": "原理",
+  "q": "多余的隐变量为什么不会过拟合？",
+  "a": "\n<p>KL 项对每一维单独计价：某一维如果对重构没帮助，最省的做法是让它的 μ = 0、σ = 1，和先验一模一样，KL 为零。解码器从这一维拿不到任何信息，也就学会忽略它。等于模型自己把用不上的维度关掉了。</p>\n<p>后来的研究（Burda 等，IWAE，2015 年 9 月）专门数过这种现象，把真正被用到的维度叫 active units。它的极端情况是<b>后验坍缩</b>（posterior collapse）：解码器足够强时（比如自回归的文本解码器），所有维度都被关掉，<b>z</b> 完全被忽略。</p>"
+ },
+ {
+  "anchor": "using an MCMC estimator",
+  "kind": "基础",
+  "q": "已经有下界了，为什么还要估边缘似然？",
+  "a": "\n<p>下界 ℒ 和真值 log <i>p</i>(<b>x</b>) 之间差一个 KL。两个模型下界一样高，不代表它们的 log <i>p</i>(<b>x</b>) 一样高，可能只是其中一个的近似后验更差。比较生成模型本身该比 log <i>p</i>(<b>x</b>)。</p>\n<p>它只能估不能算，附录 D 给了一个基于 MCMC 的估计量，只在 3 维隐空间可靠，这也是这组实验只用 3 个隐变量的原因。</p>"
+ },
+ {
+  "anchor": "Hybrid Monte Carlo (HMC)",
+  "kind": "基础",
+  "q": "Hybrid Monte Carlo 是什么？leapfrog 又是什么？",
+  "a": "\n<p>今天更常叫 Hamiltonian Monte Carlo。把 −log 后验当成势能，给样本一个随机初速度，按哈密顿力学让它「滑」一段，终点作为候选样本，再按 Metropolis 规则决定是否接受。</p>\n<p>leapfrog（蛙跳法）是模拟这段运动的数值积分方法，每一步要算一次 ∇<sub><b>z</b></sub> log <i>p</i>(<b>z</b>|<b>x</b>)，附录 E 里那个梯度公式就是干这个用的。借助梯度，它能一次走得很远、接受率又高，比随机游走式的 MCMC 高效得多，但每一步仍然要算网络梯度。</p>"
+ },
+ {
+  "anchor": "project high-dimensional data to a low-dimensional manifold",
+  "kind": "基础",
+  "q": "流形（manifold）在这里指什么？",
+  "a": "\n<p>高维空间里的一块低维「曲面」。MNIST 的一张图是 784 维像素空间里的一个点，但随便填 784 个像素值几乎都是噪声，真正像手写数字的图只聚在一片很窄的区域里，可以用少数几个自由度（笔画粗细、倾斜、数字类别）来描述。</p>\n<p>2 维隐空间就是用 2 个坐标给这片区域编号，编码器负责把图映射到坐标，解码器负责把坐标映射回图。附录 A 的图 4 把这个编号画了出来。</p>"
+ },
+ {
+  "anchor": "learning hierarchical generative architectures with deep neural networks",
+  "kind": "工程对照",
+  "q": "这四个未来方向后来都做成了什么？",
+  "a": "\n<table><tbody>\n<tr><td>(i) 层级结构、卷积</td><td>Ladder VAE（2016 年 2 月）、NVAE（2020 年 7 月）。卷积编码器/解码器很快成为默认配置</td></tr>\n<tr><td>(ii) 时间序列</td><td>VRNN（Chung 等，2015 年 6 月），把变分自编码器嵌进循环网络的每一步</td></tr>\n<tr><td>(iii) 全局参数也做变分</td><td>附录 F 的思路，和贝叶斯神经网络那条线（如 Blundell 等的 Bayes by Backprop，2015 年 5 月）合流</td></tr>\n<tr><td>(iv) 带隐变量的监督模型</td><td>Kingma、Rezende 等的半监督变分自编码器（2014 年 6 月），条件变分自编码器 CVAE（Sohn 等，NeurIPS 2015）</td></tr>\n</tbody></table>\n<p>影响最大的落地不在这四条里：Latent Diffusion（2021 年 12 月）/ Stable Diffusion 用一个卷积变分自编码器把 512 × 512 的图压到 64 × 64 × 4 的隐空间，扩散模型在隐空间里做生成。</p>"
+ },
+ {
+  "anchor": "linearly spaced coordinates on the unit square were transformed through the inverse CDF of the Gaussian",
+  "kind": "原理",
+  "q": "图 4 的坐标为什么要过一遍高斯的逆 CDF？",
+  "a": "\n<p>先验是 𝒩(0, 1)，大部分概率质量集中在 0 附近。在单位正方形上等间距取点，再过逆 CDF Φ<sup>−1</sup>，得到的网格中间密、边上疏，<b>每一格覆盖的先验概率相同</b>。直接在 [−3, 3] 上等间距取，边缘会浪费很多格子在几乎采不到的区域。</p>\n<p>每个格点的 <b>z</b> 送进解码器，画出的是 <i>p</i><sub>θ</sub>(<b>x</b>|<b>z</b>) 的均值。图里相邻格子平滑过渡（Frey Face 的表情和朝向，MNIST 的数字形状和倾斜），说明隐空间是连续的，这也是 KL 项把编码挤在一起的结果。</p>"
+ },
+ {
+  "anchor": "Here we give the solution when both the prior",
+  "kind": "原理",
+  "q": "附录 B 的闭式 KL 怎么推？",
+  "a": "\n<p>只需要一个事实：<i>z</i> ∼ 𝒩(μ, σ<sup>2</sup>) 时 𝔼[<i>z</i><sup>2</sup>] = μ<sup>2</sup> + σ<sup>2</sup>。逐维算两个积分：</p>\n<div class=\"eg\">∫ q log p(z) dz = −(J/2) log 2π − ½ Σⱼ ( μⱼ² + σⱼ² )\n∫ q log q(z) dz = −(J/2) log 2π − ½ Σⱼ ( 1 + log σⱼ² )</div>\n<p>第一行：log 𝒩(<i>z</i>; 0, 1) = −½ log 2π − <i>z</i><sup>2</sup>/2，取期望得 μ<sup>2</sup> + σ<sup>2</sup>。第二行：(<i>z</i> − μ)<sup>2</sup>/σ<sup>2</sup> 的期望是 1。两行相减，log 2π 抵消：</p>\n<div class=\"eg\">−KL = ½ Σⱼ ( 1 + log σⱼ² − μⱼ² − σⱼ² )</div>\n<p>就是式 (10) 前半部分。</p>"
+ },
+ {
+  "anchor": "is the elementwise sigmoid activation function",
+  "kind": "原理",
+  "q": "伯努利解码器的对数似然就是二元交叉熵",
+  "a": "\n<p>解码器输出 <b>y</b>，每个像素一个 0 到 1 之间的概率。像素 <i>x</i><sub><i>i</i></sub> ∈ {0, 1} 在伯努利分布下的对数似然：</p>\n<div class=\"eg\">log p(x|z) = Σᵢ [ xᵢ log yᵢ + (1 − xᵢ) log(1 − yᵢ) ]</div>\n<p>取负号就是二元交叉熵（BCE），这就是 MNIST 版 VAE 用 BCE 当重构损失的原因。sigmoid 保证输出落在 (0, 1) 里。</p>"
+ },
+ {
+  "anchor": "In this case let encoder or decoder be a multivariate Gaussian with a diagonal covariance structure",
+  "kind": "原理",
+  "q": "高斯解码器的对数似然和平方误差什么关系？",
+  "a": "\n<div class=\"eg\">log p(x|z) = −½ Σᵢ [ log 2πσᵢ² + (xᵢ − μᵢ)² / σᵢ² ]</div>\n<p>σ 固定成常数时，前一项是常数，剩下的就是平方误差乘 1/(2σ<sup>2</sup>)。所以「重构损失用 MSE」等于假设了一个固定方差的高斯解码器，σ 的取值决定重构项和 KL 项的相对权重：σ 取得越小，重构越受重视。</p>\n<p>同一个网络当编码器用时，输出的 μ 和 log σ<sup>2</sup> 就是近似后验的参数。</p>"
+ },
+ {
+  "anchor": "Fit a density estimator",
+  "kind": "原理",
+  "q": "附录 D 的边缘似然估计量为什么成立？",
+  "a": "\n<p>对任意一个归一化的密度 <i>q</i>(<b>z</b>)，在真实后验下取期望：</p>\n<div class=\"eg\">𝔼_{p(z|x)}[ q(z) / p(x, z) ] = ∫ p(z|x) · q(z) / ( p(x) p(z|x) ) dz = 1 / p(x)</div>\n<p>所以用 MCMC 从后验采样，求 <i>q</i>/<i>p</i>(<b>x</b>, <b>z</b>) 的平均再取倒数，就得到 <i>p</i>(<b>x</b>) 的估计。这是调和平均估计量的一个改进版。</p>\n<p><i>q</i> 越接近后验，比值越稳定，方差越小，所以第 2 步先用一批样本拟合 <i>q</i>，第 3 步再换一批新样本代入，避免同一批样本既拟合又估计带来的偏差。维数一高，<i>q</i> 很难拟合准，这就是只在 3 维以下使用的原因。</p>"
+ },
+ {
+  "anchor": "be some hyperprior for the parameters introduced above",
+  "kind": "基础",
+  "q": "附录 F 的「完全变分贝叶斯」比正文多做了什么？",
+  "a": "\n<p>正文对 θ 只取一个点（ML/MAP），附录 F 把 θ 也当成随机变量，给它一个先验 <i>p</i><sub>α</sub>(θ)（参数的先验叫<b>超先验</b>，α 是它的参数），再用一个近似后验 <i>q</i><sub>φ</sub>(θ) 去逼近。</p>\n<p>重参数化照样用：θ = <i>h</i><sub>φ</sub>(ζ)，ζ 是另一份噪声。这样每次前向用的都是一组采出来的权重，就是后来贝叶斯神经网络常见的做法。论文没有为这一节做实验。</p>"
+ }
+]
