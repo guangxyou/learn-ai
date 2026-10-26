@@ -155,10 +155,28 @@ function unscaleTables(html) {
       });
 }
 
+/** --figimg "S2.F1=a.svg,S3.F2=b.png"：LaTeXML 把 TikZ 图转成的 SVG 靠 foreignObject 摆字，
+ *  字母和箭头会错位（VAE 图 1）。这时换成从 PDF 裁出来的原图，图注照旧用源里的 */
+function swapFigs(src) {
+  if (!o.figimg) return src;
+  for (const pair of o.figimg.split(',')) {
+    const [id, file] = pair.split('=');
+    const at = src.search(new RegExp(`<figure\\b[^>]*\\bid="?${id.replace(/\./g, '\\.')}"?[\\s>]`));
+    if (at < 0) throw new Error(`--figimg：源里没有 ${id}`);
+    const fig = sliceTag(src, at, 'figure');
+    const head = /^<figure\b[^>]*>/.exec(fig)[0];
+    const type = file.endsWith('.svg') ? 'image/svg+xml' : `image/${file.split('.').pop()}`;
+    const img = `<img class="ltx_graphics ltx_centering" alt="" src="data:${type};base64,${readFileSync(file).toString('base64')}">`;
+    src = src.slice(0, at) + head + img + fig.slice(fig.search(/<figcaption\b/)) + src.slice(at + fig.length);
+  }
+  return src;
+}
+
 function parse(src) {
   // MathML 里 <annotation> 存的是 TeX 备份，不渲染但会被 strip 成重复文本 ——
   // 「values h times」会变成「values h h times」，锚点一跨公式就对不上。先整体摘掉。
   src = src.replace(/<annotation\b[^>]*>[\s\S]*?<\/annotation>/g, '');
+  src = swapFigs(src);
 
   const doc = { title: '', notice: '', authors: [], abstract: '', items: [], refs: [] };
 
