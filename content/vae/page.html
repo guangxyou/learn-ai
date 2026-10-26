@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>变分自编码器 (Variational Autoencoder) · 先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照和 21 个常见问题</title>
-<meta name="description" content="变分自编码器的专题页，五个 tab。「KL 散度」补推导要用的概率：符号表、贝叶斯公式里的先验似然后验证据、期望、KL 散度的定义和 ≥ 0 的证明、两个方向为什么拟合出不同的形状、两个高斯之间 KL 的解析解、蒙特卡洛估计和重参数化，配三张按数值积分画的示意图。「CS231n 的讲法」把第 13 讲 Justin Johnson 讲变分自编码器的 27 分钟按他的思路扩写：从最大似然出发，边缘化和贝叶斯公式都走不通，加编码器近似后验，对角高斯和 L2 的关系，log p(x) 拆三项、扔掉算不出的 KL 得到证据下界，训练流程和两项损失的拉扯，每一步式子写全，配课件截图；另收第 14 讲回头提到变分自编码器的两段（Latent Diffusion 加判别器、扩散模型也是变分下界）。「白板推导视频」是 Nik_Li 的 44 分钟推导，从近似后验出发推到同一个目标，并讨论 Latent Diffusion 为什么比变分自编码器清晰。「两种讲法对照」用同一个恒等式把两条路合起来，讲编码器和解码器一起更新时下界怎么变、为什么糊的几种回答。「常见问题」21 问，从 xᵢ 指什么、z ∼ q 是什么意思，到后验坍缩、β 变分自编码器、Stable Diffusion 里的变分自编码器。约 3 万字，32 张截图。">
+<title>变分自编码器 (Variational Autoencoder) · 先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照、21 个常见问题和原论文中英对照</title>
+<meta name="description" content="六个 tab：KL 散度基础、CS231n 第 13 讲的扩写、Nik_Li 44 分钟白板推导、两种讲法对照、21 个常见问题，最后是原论文逐段中英对照，带 61 条批注。论文看不懂不要硬看，硬看发现还是看不懂。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -267,6 +267,10 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .faq[open]>summary{border-bottom:1px solid var(--line)}
 .faqa{padding:6px 16px 10px;font-size:15px;line-height:1.85}
 .faqa p{margin:10px 0}
+/* 原论文对照：iframe 贴满 tab 栏以下的整屏，论文页自己滚；两侧吃掉 .wrap 的内边距 */
+#view-paper{padding-top:0;margin:0 -24px}
+.paperframe{display:block;width:100%;height:calc(100vh - var(--bar-h) - 1px);height:calc(100dvh - var(--bar-h) - 1px);border:0;background:var(--bg)}
+@media(max-width:640px){#view-paper{margin:0 -16px}}
 </style></head><body>
 <div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
 <div class="wrap"><header class="ep-head">
@@ -279,6 +283,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   <button class="tb" type="button" role="tab" data-v="video" aria-selected="false">白板推导视频</button>
   <button class="tb" type="button" role="tab" data-v="compare" aria-selected="false">两种讲法对照</button>
   <button class="tb" type="button" role="tab" data-v="faq" aria-selected="false">常见问题</button>
+  <button class="tb" type="button" role="tab" data-v="paper" aria-selected="false">原论文对照</button>
 </div></div></nav>
 <main class="wrap">
 <div class="view on" id="view-kl">
@@ -1059,6 +1064,9 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
   </section>
 </div>
 </div>
+<div class="view" id="view-paper">
+<iframe class="paperframe" data-src="__ASSETS__/paper.html" title="《Auto-Encoding Variational Bayes》中英对照"></iframe>
+</div>
 </main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
@@ -1067,12 +1075,20 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
     document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
     var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
+    // 原论文对照是 iframe，第一次切过来才加载（10 MB 的页不该拖慢首屏）
+    var f=document.querySelector('#view-'+v+' iframe[data-src]');if(f&&!f.src)f.src=f.dataset.src;
+  }
+  // iframe 那个 tab 要让它贴着 tab 栏铺满一屏，不然底下一截在屏幕外，得先滚外层
+  function settle(v){
+    var view=document.getElementById('view-'+v);
+    if(view&&view.querySelector('iframe')){var bar=document.querySelector('.bar');scrollTo(0,view.getBoundingClientRect().top+scrollY-bar.offsetHeight);}
+    else scrollTo(0,0);
   }
   document.querySelectorAll('.tb').forEach(function(b){
     b.addEventListener('click',function(){
       showTab(b.dataset.v);
       history.replaceState(null,'',b===document.querySelector('.tb')?location.pathname+location.search:'#'+b.dataset.v);
-      scrollTo(0,0);
+      settle(b.dataset.v);
     });
   });
 
