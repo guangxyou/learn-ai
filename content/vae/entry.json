@@ -2,7 +2,7 @@
   "id": "vae",
   "kind": "paper",
   "title": "变分自编码器 (Variational Autoencoder)",
-  "subtitle": "先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照和 21 个常见问题",
+  "subtitle": "先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照、21 个常见问题和原论文中英对照",
   "topics": [
     "生成模型",
     "视频笔记"
@@ -10,21 +10,21 @@
   "date": "2013-12",
   "studied": "2026-10",
   "published": "2026-10-23",
-  "summary": "变分自编码器的专题页，五个 tab。「KL 散度」补推导要用的概率：符号表、贝叶斯公式里的先验似然后验证据、期望、KL 散度的定义和 ≥ 0 的证明、两个方向为什么拟合出不同的形状、两个高斯之间 KL 的解析解、蒙特卡洛估计和重参数化，配三张按数值积分画的示意图。「CS231n 的讲法」把第 13 讲 Justin Johnson 讲变分自编码器的 27 分钟按他的思路扩写：从最大似然出发，边缘化和贝叶斯公式都走不通，加编码器近似后验，对角高斯和 L2 的关系，log p(x) 拆三项、扔掉算不出的 KL 得到证据下界，训练流程和两项损失的拉扯，每一步式子写全，配课件截图；另收第 14 讲回头提到变分自编码器的两段（Latent Diffusion 加判别器、扩散模型也是变分下界）。「白板推导视频」是 Nik_Li 的 44 分钟推导，从近似后验出发推到同一个目标，并讨论 Latent Diffusion 为什么比变分自编码器清晰。「两种讲法对照」用同一个恒等式把两条路合起来，讲编码器和解码器一起更新时下界怎么变、为什么糊的几种回答。「常见问题」21 问，从 xᵢ 指什么、z ∼ q 是什么意思，到后验坍缩、β 变分自编码器、Stable Diffusion 里的变分自编码器。约 3 万字，32 张截图。",
+  "summary": "六个 tab：KL 散度基础、CS231n 第 13 讲的扩写、Nik_Li 44 分钟白板推导、两种讲法对照、21 个常见问题，最后是原论文逐段中英对照，带 61 条批注。论文看不懂不要硬看，硬看发现还是看不懂。",
   "source": {
     "name": "Auto-Encoding Variational Bayes · Kingma, Welling",
     "url": "https://arxiv.org/abs/1312.6114"
   },
   "page": "page.html",
   "outputs": [
-    "<b>5</b> 个 tab",
+    "<b>6</b> 个 tab",
     "<b>3</b> 万字",
     "<b>32</b> 张截图",
-    "<b>3</b> 张示意图",
-    "<b>21</b> 个常见问题"
+    "<b>21</b> 个常见问题",
+    "<b>61</b> 条论文批注"
   ],
   "build": {
-    "note": "输入在 16_VAE/ 下（content/*.mjs 正文、figures/ 示意图、Nik_Li 视频原片），那个目录不进仓库；CS231n 的截图借 14_CS231n 的录像和挑帧工具。page.html 和 assets/ 是提交进仓库的成品，16_VAE/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。",
+    "note": "输入在 16_VAE/ 下（content/*.mjs 正文、figures/ 示意图、Nik_Li 视频原片），那个目录不进仓库；CS231n 的截图借 14_CS231n 的录像和挑帧工具。page.html 和 assets/ 是提交进仓库的成品，16_VAE/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。 最后一个 tab 是原论文中英对照：16_VAE/build.mjs 调 tools/make-paper.mjs --embed 1 生成 assets/paper.html（图拆到 assets/paper/），用 iframe 嵌进来；译文、批注、文献简述和图 1 在 content/vae/paper/，论文源 16_VAE/paper/arxiv-1312.6114v11.html 不进仓库。",
     "tool": "16_VAE/build.mjs",
     "requires": "16_VAE/build.mjs",
     "args": []
