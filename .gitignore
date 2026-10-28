@@ -32,7 +32,11 @@ _backup/
 # 画图时开的量尺台，本地临时文件
 .preview/
 
-# 本地工具和草稿，不发布。explainer-video 里有 1.3 GB 的 Python 虚拟环境（Whisper、TTS），
-# 2026-10-28 没忽略时 deploy-remote.sh 卡在「工作区不干净」，rsync 兜底还会把它推上服务器。
-tools/explainer-video/
-tutorials/
+# explainer-video 的代码进仓库，1.3 GB 的 Python 虚拟环境（Whisper、TTS）和音视频不进。
+# 2026-10-28 整个目录没跟踪时 deploy-remote.sh 卡在「工作区不干净」，rsync 兜底还会把 .venv 推上服务器。
+# 成片和配音默认写在各条目的视频目录（编号目录）里，已被上面的规则忽略；这里再兜一层。
+tools/explainer-video/.venv/
+*.mp4
+*.m4a
+*.wav
+*.mp3
