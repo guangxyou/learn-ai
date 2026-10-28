@@ -1,0 +1,32 @@
+{
+  "id": "ddpm",
+  "kind": "paper",
+  "title": "去噪扩散概率模型 (Denoising Diffusion Probabilistic Model)",
+  "subtitle": "先补马尔可夫链和高斯运算，再从全貌一路推到每个公式，最后是两个视频的笔记和 14 个常见问题",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2020-06",
+  "studied": "2026-10",
+  "published": "2026-10-28",
+  "summary": "五个 tab：马尔可夫链、高斯运算、KL 和变分下界这些前置知识；DDPM 综述 15 节，从一句话讲到前向、逆向、后验、预测噪声、简化损失、算法和网络，附一段能跑的 PyTorch 最小实现；Nik_Li 54 分钟白板推导和 Deepia 32 分钟动画讲解的逐节笔记，讲得不准的地方在注里改了；最后是 14 个常见问题。",
+  "source": {
+    "name": "Denoising Diffusion Probabilistic Models · Ho, Jain, Abbeel",
+    "url": "https://arxiv.org/abs/2006.11239"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>5</b> 个 tab",
+    "<b>2</b> 万字",
+    "<b>38</b> 张截图",
+    "<b>2</b> 张示意图",
+    "<b>14</b> 个常见问题"
+  ],
+  "build": {
+    "note": "输入在 17_DDPM/ 下（content/*.mjs 正文、figures/ 示意图、两个视频原片和转写），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，17_DDPM/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。",
+    "tool": "17_DDPM/build.mjs",
+    "requires": "17_DDPM/build.mjs",
+    "args": []
+  }
+}
