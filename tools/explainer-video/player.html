@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>explainer player</title>
+<style>html,body{margin:0;background:#222}canvas{display:block;width:100vw;height:auto}</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import { boot } from './engine.js';
+const q = new URLSearchParams(location.search);
+boot(document.getElementById('c'), q.get('v'), q).catch((e) => { document.body.textContent = e.stack; window.bootError = String(e.stack); });
+</script>
