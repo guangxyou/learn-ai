@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CS231n 计算机视觉 · 斯坦福 Spring 2025 全部 18 讲分节笔记，另附 387 篇引用论文</title>
-<meta name="description" content="李飞飞、Ehsan Adeli、Justin Johnson 主讲的 CS231n，按 Spring 2025 公开录像写的 18 讲笔记，533 个小节、约 12.5 万字，配 707 张课件截图。从图像分类、线性分类器、反向传播、卷积网络、训练技巧讲到循环网络和 Transformer、检测与分割、视频理解、大规模分布式训练、自监督学习，再到生成模型的自回归、变分自编码器、生成对抗网络和扩散模型；后几讲是客座：吴佳俊讲三维视觉，Ranjay Krishna 讲 CLIP、多模态语言模型和 SAM，李韫竹讲机器人学习，最后李飞飞讲以人为本的 AI。每讲有导语、可点的时间轴、逐节正文和要点，课件链官网 2025、2026 两期。另有「引用论文」tab：两期课件里引用过的 387 篇论文，每篇有中文摘要、arXiv 原文摘要，并按讲次列出它在第几页课件、录像第几分钟、讲的是什么。第 13 讲的变分自编码器另有专题页，补了 KL 散度基础、扩写的推导和常见问题。">
+<title>CS231n 计算机视觉 · 斯坦福 Spring 2025 全部 18 讲分节笔记，另附 387 篇引用论文和补充视频</title>
+<meta name="description" content="李飞飞、Ehsan Adeli、Justin Johnson 主讲的 CS231n，按 Spring 2025 公开录像写的 18 讲笔记，533 个小节、约 12.5 万字，配 707 张课件截图。从图像分类、线性分类器、反向传播、卷积网络、训练技巧讲到循环网络和 Transformer、检测与分割、视频理解、大规模分布式训练、自监督学习，再到生成模型的自回归、变分自编码器、生成对抗网络和扩散模型；后几讲是客座：吴佳俊讲三维视觉，Ranjay Krishna 讲 CLIP、多模态语言模型和 SAM，李韫竹讲机器人学习，最后李飞飞讲以人为本的 AI。每讲有导语、可点的时间轴、逐节正文和要点，课件链官网 2025、2026 两期。另有「引用论文」tab：两期课件里引用过的 387 篇论文，每篇有中文摘要、arXiv 原文摘要，并按讲次列出它在第几页课件、录像第几分钟、讲的是什么。「资料」tab 收课上一笔带过、另找来看的讲解视频，目前一条：主成分分析、t-SNE、UMAP 三种降维可视化方法，对应第 12、13 讲。第 13 讲的变分自编码器另有专题页，补了 KL 散度基础、扩写的推导和常见问题。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -327,6 +327,8 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .sec{scroll-margin-top:calc(var(--bar-h) + 12px)}
 .intro ul{margin:4px 0 12px;padding-left:1.2em}.intro li{margin:4px 0}
 .intro .tbl td{color:var(--text-2)}
+.links .repost{font-size:12px;color:var(--text-3)}
+#view-extras .intro{margin-bottom:16px}
 /* 逐行推导：式子一列，说明一列；手机上说明换到式子下面，长式子横向滚动 */
 .deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
 .deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
@@ -341,6 +343,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
   <button class="tb on" type="button" role="tab" data-v="course" aria-selected="true">课程笔记</button>
   <button class="tb" type="button" role="tab" data-v="papers" aria-selected="false">引用论文 · 387</button>
+  <button class="tb" type="button" role="tab" data-v="extras" aria-selected="false">资料 · 1</button>
 </div></div></nav>
 <main class="wrap"><div class="view on" id="view-course">
   <div class="intro"><h2>这门课</h2>
@@ -3220,7 +3223,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>评估自监督学习可以看几个方面：前置任务本身解得怎么样（标签是自动生成的，可以直接评估）；表示的质量，比如不微调直接看表示，做聚类，或用 t-SNE 这类降维方法画到二维、三维看有没有规律；鲁棒性、泛化性和计算效率。最重要的是<b>下游任务上的表现</b>，整件事就是为了提高我们关心的任务的效果。</p>
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec12-675.jpg" alt="评估：前置任务的表现、表示质量（聚类、t-SNE）、鲁棒性和效率，最重要的是下游任务" loading="lazy"><figcaption><button class="ts" type="button" data-t="675">11:15</button>评估：前置任务的表现、表示质量（聚类、t-SNE）、鲁棒性和效率，最重要的是下游任务</figcaption></figure></div>
-      
+      <div class="note"><p><span class="lbl">注</span>Adeli 说 t-SNE 课上没怎么讲。主成分分析、t-SNE、UMAP 三种降维方法怎么算、各自的毛病，见「资料」tab 里的<a class="ilink" href="#x-dimred">潜在空间可视化</a>。</p></div>
     </section>
 <section class="sec" id="l12-s7">
       <h4><button class="ts" type="button" data-t="693">11:33</button><span>例子：预测旋转再迁移</span></h4>
@@ -3501,7 +3504,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p>例子有 k-means 聚类（找簇）、主成分分析这类降维（找低维子空间或流形）、<b>密度估计</b>（拟合产生数据的概率分布）。聚类和主成分分析不一定要有概率解释，所以「有监督与无监督」是一条轴，「判别与生成」是另一条轴。</p>
       
       <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec13-756.jpg" alt="有监督学习：学从 x 到 y 的映射，比如分类、描述、检测、分割" loading="lazy"><figcaption><button class="ts" type="button" data-t="756">12:36</button>有监督学习：学从 x 到 y 的映射，比如分类、描述、检测、分割</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/lec13-863.jpg" alt="无监督学习：只有 x，找结构，比如聚类、降维、密度估计" loading="lazy"><figcaption><button class="ts" type="button" data-t="863">14:23</button>无监督学习：只有 x，找结构，比如聚类、降维、密度估计</figcaption></figure></div>
-      
+      <div class="note"><p><span class="lbl">注</span>降维除了主成分分析，常用来画特征的还有 t-SNE 和 UMAP，三种方法的算法和取舍见「资料」tab 里的<a class="ilink" href="#x-dimred">潜在空间可视化</a>。</p></div>
     </section>
 <section class="sec" id="l13-s6">
       <h4><button class="ts" type="button" data-t="925">15:25</button><span>判别模型与生成模型</span></h4>
@@ -9927,10 +9930,177 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 </details></section>
 </div>
 <p class="pempty" hidden>没有符合条件的论文。</p>
+</div>
+<div class="view" id="view-extras">
+  <div class="intro"><p>课上一笔带过、自己另找来看的讲解视频，笔记格式和讲次一样，开头写明对应哪一讲。变分自编码器另有一篇专题，见<a href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题</a>。</p></div>
+  <details class="ep" id="x-dimred" data-bv="BV12HE8zsEnb" data-p="1">
+  <summary>
+    <span class="no">1</span>
+    <span class="tt"><b>潜在空间可视化：主成分分析、t-SNE、UMAP</b><em>Latent Space Visualisation: PCA, t-SNE, UMAP</em><span class="hook">把 50 维的潜在向量画到二维：三种降维方法各自怎么算、适合什么数据、慢在哪里。</span></span>
+    <span class="side"><span class="chip">Deepia</span><span class="len">18:45</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">论文和课上常见的那种彩色散点图（每个点是一张图在网络里的特征，颜色是类别），都要先把高维向量压到二维或三维。</p>
+      <p class="lede">这个 Manim 动画视频讲三种最常用的方法：线性投影的<b>主成分分析 (Principal Component Analysis, PCA)</b>，保持邻居关系的 <b>t-SNE</b>，以及用近邻图做的 <b>UMAP</b>。</p>
+      <p class="lede">课程里对应两处：第 12 讲评估自监督表示时提到「用 t-SNE 这类降维方法画到二维看有没有规律」，讲者自己说课上没怎么讲 t-SNE，见<a class="ilink" href="#l12-s6">第 12 讲 · 怎么评估</a>；第 13 讲把主成分分析列为无监督学习的例子，见<a class="ilink" href="#l13-s5">第 13 讲 · 有监督与无监督</a>。笔记在视频之外补了几处原论文的细节，放在「注」里。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV12HE8zsEnb/" target="_blank" rel="noreferrer">B 站 ↗</a><a href="https://www.youtube.com/watch?v=o_cAOa5fMhE" target="_blank" rel="noreferrer">YouTube · Deepia 2024-08-05 ↗</a><span class="repost">B 站 NeuroHacks 2025-05-16 搬运，中英字幕</span></p>
+      <p class="mats"><span class="lbl">资料</span><a href="https://www.youtube.com/watch?v=o_cAOa5fMhE" target="_blank" rel="noreferrer">YouTube 原视频</a><a href="https://github.com/ytdeepia/Latent-Space-Visualisation-PCA-t-SNE-UMAP" target="_blank" rel="noreferrer">动画代码</a><a href="https://papers.nips.cc/paper_files/paper/2002/hash/6150ccc6069bea6b5716254057a194ef-Abstract.html" target="_blank" rel="noreferrer">SNE（2002）</a><a href="https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf" target="_blank" rel="noreferrer">t-SNE（2008）</a><a href="https://arxiv.org/abs/1802.03426" target="_blank" rel="noreferrer">UMAP（2018）</a><a href="https://arxiv.org/abs/1910.00204" target="_blank" rel="noreferrer">TriMap</a><a href="https://arxiv.org/abs/2012.04456" target="_blank" rel="noreferrer">PaCMAP</a><a href="https://distill.pub/2016/misread-tsne/" target="_blank" rel="noreferrer">Distill：How to Use t-SNE Effectively</a><a href="https://pair-code.github.io/understanding-umap/" target="_blank" rel="noreferrer">Google PAIR：Understanding UMAP</a><a href="https://cs231n.github.io/understanding-cnn/" target="_blank" rel="noreferrer">CS231n 讲义：用 t-SNE 画卷积网络特征</a></p>
+      <section class="sec" id="x-dimred-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>开场：潜在空间的图怎么画出来</span></h4>
+      <p>深度网络的潜在空间常被画成一团团彩色的簇，可潜在向量往往有 50 维甚至更多，压到二维、三维还要保留结构，并不容易。视频依次讲主成分分析、t-SNE、UMAP 怎么算，以及各自能处理什么样的数据。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-10.jpg" alt="潜在空间的二维可视化：每个点是一个样本，颜色是类别" loading="lazy"><figcaption><button class="ts" type="button" data-t="10">0:10</button>潜在空间的二维可视化：每个点是一个样本，颜色是类别</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s1">
+      <h4><button class="ts" type="button" data-t="30">0:30</button><span>主成分分析：投影到主方向</span></h4>
+      <p>第一个例子是一千个人的体重和身高，画在二维图上（先把两个量缩放到 0 到 1）。数据主要沿两个方向变化，红箭头方向上的变化明显比绿箭头大，这两个方向就是<b>主成分 (Principal Component)</b>。要把数据画到一条轴上，就投影到最大的那个主成分上。</p>
+      <p>这个例子里直接投影到横轴结果也差不多，所以换一个数据：病人的血压和胆固醇，分成三个簇。投到横轴只看得到两个簇，两群人被并到了一起；投到纵轴也一样。投到主成分上，三个簇都保留下来了，低维表示留住了原数据最主要的特征。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-135.jpg" alt="投影到主成分上：三个簇在一维里仍然分得开" loading="lazy"><figcaption><button class="ts" type="button" data-t="135">2:15</button>投影到主成分上：三个簇在一维里仍然分得开</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s2">
+      <h4><button class="ts" type="button" data-t="146">2:26</button><span>计算：中心化、协方差、特征向量</span></h4>
+      <p>第一步算数据的<b>协方差矩阵</b>。先中心化：每个变量减去自己的均值。然后用中心化后数据矩阵的转置乘它自己，再除以样本数。二维数据得到一个 2×2 矩阵，对角线是两个变量各自的方差，非对角线是协方差。</p>
+      <p>第二步求协方差矩阵的<b>特征向量</b>，也就是被矩阵作用后方向不变的向量。按特征值从大到小排序，特征值最大的那几个特征向量就是主成分。最后把选中的特征向量拼成投影矩阵，数据乘上它就完成了降维。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>X</i>̃ = <i>X</i> − <i>x</i>̄</span></span><span class="dc">每一列减去均值</span></div><div><span class="df"><span class="m"><i>C</i> = <i>X</i>̃<sup><i>T</i></sup> <i>X</i>̃ / (<i>n</i> − 1)</span></span><span class="dc">协方差矩阵，d × d</span></div><div><span class="df"><span class="m"><i>C</i> <i>v</i> = <i>λ</i> <i>v</i></span></span><span class="dc">特征向量 v 是主方向，特征值 λ 是这个方向上的方差</span></div><div><span class="df"><span class="m"><i>Z</i> = <i>X</i>̃ [<i>v</i><sub>1</sub> … <i>v</i><sub><i>k</i></sub>]</span></span><span class="dc">投影到前 k 个主成分</span></div></div>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-182.jpg" alt="协方差矩阵：中心化后的数据矩阵转置乘自身，除以 n − 1" loading="lazy"><figcaption><button class="ts" type="button" data-t="182">3:02</button>协方差矩阵：中心化后的数据矩阵转置乘自身，除以 n − 1</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-225.jpg" alt="投影矩阵由选中的特征向量拼成" loading="lazy"><figcaption><button class="ts" type="button" data-t="225">3:45</button>投影矩阵由选中的特征向量拼成</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>视频画面上协方差先写的是 1/(n − 1)，后面复杂度那一页写成 1/n。两种都常见，除以 n − 1 是无偏估计，对主方向没有影响。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s3">
+      <h4><button class="ts" type="button" data-t="232">3:52</button><span>主成分分析的优点与局限</span></h4>
+      <p>主成分分析只用到基本的线性代数，所以很快：复杂度是 O(nd<sup>2</sup> + d<sup>3</sup>)，n 是样本数，d 是特征维数，对样本数是线性的。前一项是算协方差矩阵，后一项是特征分解。</p>
+      <p>用它看自编码器的潜在空间，还能顺带拿到特征值，知道潜在空间里哪些维度最重要、重要多少。视频的例子里三个特征值是 5、1、0.2，第一个方向占了大部分方差。</p>
+      <p>短处是它只做线性投影。螺旋形的两类数据，换哪个方向投影都分不开，毛病出在投影本身是线性运算，而数据之间的关系是非线性的。即便如此，它仍是最快、最好解释的降维方法，研究和工程里用得最多；潜在变量之间的关系往往不是线性的，所以还需要别的方法。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-252.jpg" alt="复杂度 O(nd² + d³)：n 是样本数，d 是特征维数" loading="lazy"><figcaption><button class="ts" type="button" data-t="252">4:12</button>复杂度 O(nd<sup>2</sup> + d<sup>3</sup>)：n 是样本数，d 是特征维数</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-272.jpg" alt="特征值告诉我们每个方向有多重要" loading="lazy"><figcaption><button class="ts" type="button" data-t="272">4:32</button>特征值告诉我们每个方向有多重要</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-310.jpg" alt="螺旋数据：任何线性投影都分不开两类" loading="lazy"><figcaption><button class="ts" type="button" data-t="310">5:10</button>螺旋数据：任何线性投影都分不开两类</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s4">
+      <h4><button class="ts" type="button" data-t="315">5:15</button><span>t-SNE 的来历</span></h4>
+      <p><b>t-SNE (t-Distributed Stochastic Neighbor Embedding)</b> 由 Laurens van der Maaten 和 Geoffrey Hinton 在 2008 年提出，是 2002 年 SNE (Stochastic Neighbor Embedding) 的改进版。</p>
+      <p>视频先讲 SNE 的基本做法，再简单说 t-SNE 改了什么。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-330.jpg" alt="t-SNE 的两位作者：Laurens van der Maaten、Geoffrey Hinton" loading="lazy"><figcaption><button class="ts" type="button" data-t="330">5:30</button>t-SNE 的两位作者：Laurens van der Maaten、Geoffrey Hinton</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>SNE 那篇是 Hinton 和 Sam Roweis 合写的（NIPS 2002）。视频顺带把反向传播、对比学习也列成 Hinton 的想法：反向传播是 1986 年 Rumelhart、Hinton、Williams 的论文推广开的，更早还有 Werbos 等人；对比学习里 Hinton 是 SimCLR 的作者之一，这条思路本身更早就有。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s5">
+      <h4><button class="ts" type="button" data-t="368">6:08</button><span>SNE 的思路：近的还要近</span></h4>
+      <p>高维空间里离得近的点，降到低维以后也应该离得近。做法是量出每个点到邻居的距离，然后让低维空间里的距离尽量和它相似：设计一个损失函数衡量高维和低维两套距离差多少，再对低维坐标最小化它。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-376.jpg" alt="高维空间里相邻的点，到低维也要相邻" loading="lazy"><figcaption><button class="ts" type="button" data-t="376">6:16</button>高维空间里相邻的点，到低维也要相邻</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s6">
+      <h4><button class="ts" type="button" data-t="409">6:49</button><span>高维相似度：高斯</span></h4>
+      <p>第一步把距离变成概率：以某个点为中心放一个高斯，其他点落在高斯上的高度，可以理解为「它是中心点邻居」的概率。高斯越宽，被当成邻居的点越多；越窄，只有最近的几个算邻居。宽度 σ<sub><i>i</i></sub> 由一个叫<b>困惑度 (Perplexity)</b> 的超参数控制，后面再讲。</p>
+      <p>每个点都这样算一遍。为了让概率加起来等于 1，要除以中心点到所有其他点的高斯值之和，这一步计算量很大。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>p</i><sub><i>j</i>|<i>i</i></sub> = exp(−‖<i>x</i><sub><i>i</i></sub> − <i>x</i><sub><i>j</i></sub>‖<sup>2</sup> / 2<i>σ</i><sub><i>i</i></sub><sup>2</sup>) / Σ<sub><i>k</i>≠<i>i</i></sub> exp(−‖<i>x</i><sub><i>i</i></sub> − <i>x</i><sub><i>k</i></sub>‖<sup>2</sup> / 2<i>σ</i><sub><i>i</i></sub><sup>2</sup>)</span></span><span class="dc">点 j 是点 i 邻居的概率</span></div></div>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-467.jpg" alt="以 x₀ 为中心的高斯：越近的点概率越高，σ 决定高斯的宽度" loading="lazy"><figcaption><button class="ts" type="button" data-t="467">7:47</button>以 x<sub>0</sub> 为中心的高斯：越近的点概率越高，σ 决定高斯的宽度</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s7">
+      <h4><button class="ts" type="button" data-t="479">7:59</button><span>低维相似度与 KL 散度</span></h4>
+      <p>低维空间里先随机放点，用同样的方法算概率，只是换成低维坐标 y，而且不再有 σ。现在有了高维、低维两个概率分布，要让它们尽量接近。</p>
+      <p>衡量两个分布差多少，最常用的是 <b>KL 散度 (Kullback-Leibler Divergence)</b>：两个分布差得越远它越大，完全重合时为零。对低维坐标 y<sub><i>i</i></sub> 求 KL 散度的梯度，得到一个简洁的式子，沿梯度挪动低维点就能让低维分布逼近高维分布。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>C</i> = Σ<sub><i>i</i></sub> KL(<i>P</i><sub><i>i</i></sub> ‖ <i>Q</i><sub><i>i</i></sub>) = Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> <i>p</i><sub><i>j</i>|<i>i</i></sub> log (<i>p</i><sub><i>j</i>|<i>i</i></sub> / <i>q</i><sub><i>j</i>|<i>i</i></sub>)</span></span><span class="dc">SNE 的损失</span></div><div><span class="df"><span class="m">∂<i>C</i>/∂<i>y</i><sub><i>i</i></sub> = 2 Σ<sub><i>j</i></sub> (<i>p</i><sub><i>j</i>|<i>i</i></sub> − <i>q</i><sub><i>j</i>|<i>i</i></sub> + <i>p</i><sub><i>i</i>|<i>j</i></sub> − <i>q</i><sub><i>i</i>|<i>j</i></sub>)(<i>y</i><sub><i>i</i></sub> − <i>y</i><sub><i>j</i></sub>)</span></span><span class="dc">对低维坐标的梯度</span></div></div>
+      <p>例子：二维里的四个簇降到一维，迭代 80 次后一维上也分出了四个簇，这是主成分分析做不到的。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-540.jpg" alt="KL 散度：两个高斯离得越远，KL 越大" loading="lazy"><figcaption><button class="ts" type="button" data-t="540">9:00</button>KL 散度：两个高斯离得越远，KL 越大</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-566.jpg" alt="高维分布 p、低维分布 q，以及 KL 散度对低维坐标的梯度" loading="lazy"><figcaption><button class="ts" type="button" data-t="566">9:26</button>高维分布 p、低维分布 q，以及 KL 散度对低维坐标的梯度</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-597.jpg" alt="四个簇降到一维：迭代 79 次后已经分成四团" loading="lazy"><figcaption><button class="ts" type="button" data-t="597">9:57</button>四个簇降到一维：迭代 79 次后已经分成四团</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>KL 散度为什么这样定义、为什么不对称，见<a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题</a>的第一个 tab。视频说 KL 散度是「蓝色曲线下的面积」，那是动画里的直观画法，定义是上面那个求和（连续情形是积分）。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s8">
+      <h4><button class="ts" type="button" data-t="607">10:07</button><span>困惑度</span></h4>
+      <p>困惑度用来选每个点的 σ<sub><i>i</i></sub>。它由分布 P<sub><i>i</i></sub> 的熵算出，算法对每个点反复试不同的 σ<sub><i>i</i></sub>（实际是二分搜索），直到 P<sub><i>i</i></sub> 的困惑度约等于用户给的值。</p>
+      <div class="deriv"><div><span class="df"><span class="m">困惑度 = 2<sup><i>H</i>(<i>P</i><sub><i>i</i></sub>)</sup></span></span><span class="dc">P<sub><i>i</i></sub> 的熵取 2 的幂</span></div><div><span class="df"><span class="m"><i>H</i>(<i>P</i><sub><i>i</i></sub>) = −Σ<sub><i>j</i></sub> <i>p</i><sub><i>j</i>|<i>i</i></sub> log<sub>2</sub> <i>p</i><sub><i>j</i>|<i>i</i></sub></span></span><span class="dc">香农熵</span></div></div>
+      <p>理论上困惑度大致等于每个点认作邻居的点数，实际没这么直观。MNIST 上用默认的 30 已经能看出几个簇；把困惑度调到 40、60、70、100，簇的大小和分布怎么变并不清楚，按理说簇应该更散。困惑度是最重要的参数，但只能试几个值，直到可视化结果满意为止。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-626.jpg" alt="困惑度由每个点的条件分布的熵定义" loading="lazy"><figcaption><button class="ts" type="button" data-t="626">10:26</button>困惑度由每个点的条件分布的熵定义</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-652.jpg" alt="MNIST，困惑度 30：默认参数已经能分出几个簇" loading="lazy"><figcaption><button class="ts" type="button" data-t="652">10:52</button>MNIST，困惑度 30：默认参数已经能分出几个簇</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s9">
+      <h4><button class="ts" type="button" data-t="691">11:31</button><span>能处理非线性，但很慢</span></h4>
+      <p>SNE 一类方法最大的好处是能处理非线性数据。三维的弹簧状数据，两类缠在一起：主成分分析降到二维只得到一个混在一起的圆环，SNE 把两类分开了。缺点是跑得很慢。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-711.jpg" alt="弹簧状三维数据：主成分分析得到一个混在一起的圆环，SNE 把两类分开" loading="lazy"><figcaption><button class="ts" type="button" data-t="711">11:51</button>弹簧状三维数据：主成分分析得到一个混在一起的圆环，SNE 把两类分开</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s10">
+      <h4><button class="ts" type="button" data-t="726">12:06</button><span>t-SNE 的改动与缺点</span></h4>
+      <p>t-SNE 对 SNE 改了好几处来提速、改善效果，视频只讲最重要的两处，都在概率分布上：高维空间用对称的分布，低维空间用<b>学生 t 分布 (Student's t-Distribution)</b> 代替高斯。视频的解释是这些分布不用指数函数，更好算。</p>
+      <p>改完以后仍然比主成分分析慢得多：1 万张 MNIST 要将近 90 秒。另一个毛病是困惑度很敏感，从 30 改成 31，好几个簇的位置和形状就全变了。所以每改一次困惑度都得重新看图，困惑度越大跑得越慢，调参更费时间。</p>
+      <p>尽管这样，因为处理非线性关系比主成分分析好得多，t-SNE 很长时间里都是用得最多的可视化方法。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-747.jpg" alt="低维空间改用 t 分布：尾巴比高斯厚" loading="lazy"><figcaption><button class="ts" type="button" data-t="747">12:27</button>低维空间改用 t 分布：尾巴比高斯厚</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-757.jpg" alt="运行时间随样本数增长：t-SNE 在 1 万个样本时接近 90 秒，主成分分析几乎为零" loading="lazy"><figcaption><button class="ts" type="button" data-t="757">12:37</button>运行时间随样本数增长：t-SNE 在 1 万个样本时接近 90 秒，主成分分析几乎为零</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>原论文换 t 分布的主要理由是<b>拥挤问题 (Crowding Problem)</b>：高维里中等距离的点太多，二维放不下。t 分布尾巴厚，中等距离的点在低维可以被推得更远，簇与簇之间就拉开了。</p><p>对称化 p<sub><i>i</i><i>j</i></sub> = (p<sub>j|i</sub> + p<sub>i|j</sub>) / 2n 主要是让梯度更简单，t-SNE 的梯度是 ∂C/∂y<sub><i>i</i></sub> = 4 Σ<sub><i>j</i></sub> (p<sub><i>i</i><i>j</i></sub> − q<sub><i>i</i><i>j</i></sub>)(y<sub><i>i</i></sub> − y<sub><i>j</i></sub>)(1 + ‖y<sub><i>i</i></sub> − y<sub><i>j</i></sub>‖<sup>2</sup>)<sup>−1</sup>。</p><p>高维那边仍然是高斯。真正把 t-SNE 提速到能跑几十万个点的，是后来的 Barnes-Hut 近似（2014）和 FIt-SNE。</p><p>Distill 的《How to Use t-SNE Effectively》用交互图演示了另外两点：t-SNE 图上簇的大小和簇之间的距离基本没有意义，随机数据也可能被画出「簇」。读这种图时只看谁和谁挨在一起。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s11">
+      <h4><button class="ts" type="button" data-t="809">13:29</button><span>UMAP：用图代替概率分布</span></h4>
+      <p><b>UMAP (Uniform Manifold Approximation and Projection)</b> 是 2018 年提出的，背后有拓扑和范畴论的理论基础，视频不展开。核心想法和 t-SNE 类似：看每个高维样本到各个邻居的距离，找一个大致保持这些距离的低维表示。区别是高维和低维数据都用<b>图</b>来表示，不用高斯和概率分布。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-857.jpg" alt="UMAP 用图表示高维和低维数据" loading="lazy"><figcaption><button class="ts" type="button" data-t="857">14:17</button>UMAP 用图表示高维和低维数据</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s12">
+      <h4><button class="ts" type="button" data-t="859">14:19</button><span>k 近邻图与边权</span></h4>
+      <p>先给每个样本找最近的 k 个邻居（有好几种算法，都基于比较点之间的距离），每找到一个邻居就连一条边，得到一张二值图。例子里 k = 3，k 也是 UMAP 最主要的超参数。</p>
+      <p>再把二值图变成带权图：对点到邻居的距离做指数衰减，并减去它到最近邻的距离 ρ<sub><i>i</i></sub>，这样最近的邻居权重固定是 1。形式和 t-SNE 类似，但不做归一化，所以快得多。每个样本都得到一张自己的带权图。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>v</i><sub><i>j</i>|<i>i</i></sub> = exp(−max(0, <i>d</i>(<i>x</i><sub><i>i</i></sub>, <i>x</i><sub><i>j</i></sub>) − ρ<sub><i>i</i></sub>) / <i>σ</i><sub><i>i</i></sub>)</span></span><span class="dc">ρ<sub><i>i</i></sub> 是点 i 到最近邻的距离</span></div></div>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-887.jpg" alt="3 近邻：每个点连向最近的 3 个点" loading="lazy"><figcaption><button class="ts" type="button" data-t="887">14:47</button>3 近邻：每个点连向最近的 3 个点</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-922.jpg" alt="边权：减去到最近邻的距离 ρᵢ 后做指数衰减，最近的邻居权重是 1" loading="lazy"><figcaption><button class="ts" type="button" data-t="922">15:22</button>边权：减去到最近邻的距离 ρ<sub><i>i</i></sub> 后做指数衰减，最近的邻居权重是 1</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>σ<sub><i>i</i></sub> 怎么定视频没讲。原论文让每个点的权重之和等于 log<sub>2</sub> k，和 t-SNE 用困惑度定 σ<sub><i>i</i></sub> 是同一类做法，只是不用归一化成概率。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s13">
+      <h4><button class="ts" type="button" data-t="934">15:34</button><span>合并成一张对称图</span></h4>
+      <p>每个样本一张图，要合成一张。从 i 到 j 和从 j 到 i 各有一个权重，要合成一条边，权重仍在 0 到 1 之间。例子里白点和红点之间两个方向的权重是 1 和 0.8，合起来是 1 + 0.8 − 1 × 0.8 = 1。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>w</i><sub><i>i</i><i>j</i></sub> = <i>v</i><sub><i>j</i>|<i>i</i></sub> + <i>v</i><sub><i>i</i>|<i>j</i></sub> − <i>v</i><sub><i>j</i>|<i>i</i></sub> <i>v</i><sub><i>i</i>|<i>j</i></sub></span></span><span class="dc">两个方向的权重合成一条边</span></div></div>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-952.jpg" alt="合并两个方向的边：w = a + b − ab，结果仍在 0 到 1 之间" loading="lazy"><figcaption><button class="ts" type="button" data-t="952">15:52</button>合并两个方向的边：w = a + b − ab，结果仍在 0 到 1 之间</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="x-dimred-s14">
+      <h4><button class="ts" type="button" data-t="972">16:12</button><span>低维图与交叉熵</span></h4>
+      <p>对初始的低维表示做同样的事，得到另一张带权图。两张图用邻接矩阵表示（每个元素是一条边的权重），在两个矩阵上算交叉熵，用随机梯度下降最小化，调整低维表示。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>L</i> = Σ<sub><i>i</i><i>j</i></sub> <i>w</i><sub><i>h</i></sub> log (<i>w</i><sub><i>h</i></sub> / <i>w</i><sub><i>l</i></sub>) + (1 − <i>w</i><sub><i>h</i></sub>) log ((1 − <i>w</i><sub><i>h</i></sub>) / (1 − <i>w</i><sub><i>l</i></sub>))</span></span><span class="dc">w<sub>h</sub>、w<sub>l</sub> 是高维、低维图里同一条边的权重</span></div></div>
+      <p>第一项让高维里相连的点在低维也相连，相当于吸引；第二项让高维里不相连的点在低维也别连上，相当于排斥。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-993.jpg" alt="高维图和低维图的邻接矩阵，以及两者之间的交叉熵" loading="lazy"><figcaption><button class="ts" type="button" data-t="993">16:33</button>高维图和低维图的邻接矩阵，以及两者之间的交叉熵</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>低维图的边权原论文用的是 1 / (1 + a‖y<sub><i>i</i></sub> − y<sub><i>j</i></sub>‖<sup>2b</sup>)，a、b 由超参数 min<sub>dist</sub> 拟合出来，形状和 t 分布相近；初始低维坐标默认用谱嵌入，不随机放。排斥项靠负采样近似，这是它快的另一个原因。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s15">
+      <h4><button class="ts" type="button" data-t="1000">16:40</button><span>MNIST、运行时间、猛犸象</span></h4>
+      <p>用 UMAP 画 MNIST，各个数字分成很清楚的簇，只用了 5 秒，视频说同样的数据 t-SNE 要 40 秒（和前面 1 万张接近 90 秒的数字对不上，大概是设置不同）。按样本数画运行时间，UMAP 增长得比 t-SNE 慢得多。</p>
+      <p>UMAP 的主要超参数是建图时的近邻数。一只三维猛犸象的点云，近邻数从 10 加到 20、100，开始只是一团模糊，近邻数越大，细节越多。调这个参数时结果的变化可以预料，t-SNE 调困惑度时很难判断结果有没有变好。</p>
+      <p>最后，UMAP 比较能保持全局结构：三维里挨在一起的身体部位，到二维仍挨在一起。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-1017.jpg" alt="用 UMAP 画 MNIST：各数字分成清楚的簇" loading="lazy"><figcaption><button class="ts" type="button" data-t="1017">16:57</button>用 UMAP 画 MNIST：各数字分成清楚的簇</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-1032.jpg" alt="运行时间：UMAP 随样本数增长得比 t-SNE 慢得多" loading="lazy"><figcaption><button class="ts" type="button" data-t="1032">17:12</button>运行时间：UMAP 随样本数增长得比 t-SNE 慢得多</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/x-dimred-1066.jpg" alt="猛犸象点云，UMAP 用 100 个近邻：三维里相邻的部位在二维里仍相邻" loading="lazy"><figcaption><button class="ts" type="button" data-t="1066">17:46</button>猛犸象点云，UMAP 用 100 个近邻：三维里相邻的部位在二维里仍相邻</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「UMAP 更能保持全局结构」后来有争议：Kobak 和 Linderman 2021 年在 Nature Biotechnology 上指出，差别主要来自初始化，t-SNE 用同样的初始化也能保持差不多的全局结构。猛犸象这个例子可以在 Google PAIR 的《Understanding UMAP》里自己拖参数试。</p></div>
+    </section>
+<section class="sec" id="x-dimred-s16">
+      <h4><button class="ts" type="button" data-t="1080">18:00</button><span>总结：怎么选</span></h4>
+      <p>虽然 UMAP 常常比主成分分析和 t-SNE 好，后两者在工程和研究里仍然用得很多。经验法则：要快速看一眼，先用主成分分析；数据更复杂时 t-SNE 也能给出不错的结果；作者认为总体上 UMAP 是最好的选择。更新的方法还有 TriMap 和 PaCMAP，论文链接在视频简介里。</p>
+      <p>视频结尾预告下一期讲变分自编码器，本站有<a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题</a>。</p>
+      
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/x-dimred-1086.jpg" alt="作者的排名：UMAP 第一，t-SNE 第二，主成分分析第三" loading="lazy"><figcaption><button class="ts" type="button" data-t="1086">18:06</button>作者的排名：UMAP 第一，t-SNE 第二，主成分分析第三</figcaption></figure></div>
+      
+    </section>
+      <section class="sec keys"><h4>记住这几条</h4><ul><li>主成分分析是线性投影：中心化、算协方差矩阵、取特征值最大的特征向量当投影方向。很快，特征值还能说明每个方向多重要，但分不开螺旋这种非线性结构。</li><li>SNE 和 t-SNE 把高维距离变成以每个点为中心的高斯概率，低维也算一套，用 KL 散度的梯度挪低维点；困惑度决定每个点的高斯宽度，结果对它很敏感。</li><li>t-SNE 在低维换成厚尾的 t 分布，缓解拥挤问题；图上簇的大小和簇间距离不可当真。</li><li>UMAP 用 k 近邻带权图表示高维和低维数据，权重不归一化，两个方向的边按 a + b − ab 合并，用交叉熵加随机梯度下降优化；近邻数 k 是主要超参数，调起来比困惑度可预期，速度快得多。</li><li>快速看一眼用主成分分析，要看非线性的簇结构用 UMAP 或 t-SNE。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/x-dimred.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV12HE8zsEnb/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：潜在空间的图怎么画出来</span></button></li><li><button type="button" data-t="30"><b>0:30</b><span>主成分分析：投影到主方向</span></button></li><li><button type="button" data-t="146"><b>2:26</b><span>计算：中心化、协方差、特征向量</span></button></li><li><button type="button" data-t="232"><b>3:52</b><span>主成分分析的优点与局限</span></button></li><li><button type="button" data-t="315"><b>5:15</b><span>t-SNE 的来历</span></button></li><li><button type="button" data-t="368"><b>6:08</b><span>SNE 的思路：近的还要近</span></button></li><li><button type="button" data-t="409"><b>6:49</b><span>高维相似度：高斯</span></button></li><li><button type="button" data-t="479"><b>7:59</b><span>低维相似度与 KL 散度</span></button></li><li><button type="button" data-t="607"><b>10:07</b><span>困惑度</span></button></li><li><button type="button" data-t="691"><b>11:31</b><span>能处理非线性，但很慢</span></button></li><li><button type="button" data-t="726"><b>12:06</b><span>t-SNE 的改动与缺点</span></button></li><li><button type="button" data-t="809"><b>13:29</b><span>UMAP：用图代替概率分布</span></button></li><li><button type="button" data-t="859"><b>14:19</b><span>k 近邻图与边权</span></button></li><li><button type="button" data-t="934"><b>15:34</b><span>合并成一张对称图</span></button></li><li><button type="button" data-t="972"><b>16:12</b><span>低维图与交叉熵</span></button></li><li><button type="button" data-t="1000"><b>16:40</b><span>MNIST、运行时间、猛犸象</span></button></li><li><button type="button" data-t="1080"><b>18:00</b><span>总结：怎么选</span></button></li></ol>
+    </aside>
+  </div>
+</details>
 </div></main>
 <div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
 <script>(function(){
-  /* ── tab：课程笔记 / 引用论文 ── */
+  /* ── tab：课程笔记 / 引用论文 / 资料 ── */
   function showTab(v){
     document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
     document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
@@ -10059,10 +10229,11 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
     if(a&&a.dataset.l){e.preventDefault();gotoLecture(a.dataset.l,a.classList.contains('pnote')?a.getAttribute('href').slice(1):null);}
   });
 
-  /* ── 地址栏：#l7 打开第 7 讲，#l7-s3 跳到第 7 讲第 4 节，#papers 打开论文 tab，#p-resnet2016 打开那篇论文── */
+  /* ── 地址栏：#l7 打开第 7 讲，#l7-s3 跳到第 7 讲第 4 节，#papers 打开论文 tab，#p-resnet2016 打开那篇论文，#extras 打开资料 tab，#x-dimred 打开那条（#x-dimred-s3 到第 4 节）── */
   function openHash(){
     var h=location.hash,m;
-    if(h==='#papers'){showTab('papers');return;}
+    if(h==='#papers'||h==='#extras'){showTab(h.slice(1));return;}
+    if((m=/^#x-([\w-]+?)(-s\d+)?$/.exec(h))){var x=document.getElementById('x-'+m[1]);if(x){showTab('extras');x.open=true;(document.getElementById(h.slice(1))||x).scrollIntoView({block:'start'});}return;}
     if((m=/^#p-([\w-]+)$/.exec(h))){var c=document.getElementById('p-'+m[1]);if(c){showTab('papers');c.open=true;c.scrollIntoView({block:'start'});}return;}
     if((m=/^#l(\d+)(-s\d+)?$/.exec(h))){var d=document.getElementById('l'+m[1]);if(d){showTab('course');d.open=true;(document.getElementById(h.slice(1))||d).scrollIntoView({block:'start'});}}
   }
