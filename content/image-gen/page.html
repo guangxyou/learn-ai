@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>图像生成的来路：从生成对抗网络到 DALL·E 2 · 一期 DALL·E 2 精读视频里的 35 分钟串讲，展开成一条从生成对抗网络、变分自编码器、VQ-VAE 到扩散模型和引导的演进线</title>
-<meta name="description" content="三个 tab：把十个生成模型串成一条线，每个讲清学的是什么、怎么采样、留下什么问题；跟李沐学AI 那期 87 分钟 DALL·E 2 精读的逐节笔记，讲者说得不准的十来处在注里改了；最后是 15 个常见问题，第一个就是先验、后验、似然到底谁是谁。">
+<title>图像生成的来路：从生成对抗网络到 DALL·E 2 · 从 2006 年的自编码器排到 2026 年的对话式生图，再把一期 DALL·E 2 精读视频里的串讲展开成一条演进线</title>
+<meta name="description" content="四个 tab：时间线把二十年分成九个阶段，各一张表，2025、2026 年的条目都对过官方发布页；一条线串起来讲清十个经典模型各学什么、怎么采样、留下什么问题；跟李沐学AI 那期 87 分钟 DALL·E 2 精读的逐节笔记，讲者说得不准的十来处在注里改了；最后是 15 个常见问题。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -257,6 +257,7 @@ span.atl::after{transform:translateX(-50%)}span.aov::after{left:6%;right:6%}
 pre.code{margin:14px 0 16px;padding:14px 16px;background:#1C1F26;color:#E8E6E1;border-radius:var(--r-sm);overflow-x:auto;font:12.5px/1.6 var(--mono)}
 pre.code code{background:none;padding:0;color:inherit;font:inherit}
 @media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:680px}}
+#view-timeline td:first-child{white-space:nowrap}
 .faqdoc{max-width:820px;margin:0 auto}
 .faqgrp h2{font-size:16px;margin:30px 0 10px;color:var(--text)}
 .faq{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);margin:8px 0}
@@ -273,17 +274,146 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
   <h1>图像生成的来路：从生成对抗网络到 DALL·E 2</h1>
 </header></div>
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
-  <button class="tb on" type="button" role="tab" data-v="overview" aria-selected="true">一条线串起来</button>
+  <button class="tb on" type="button" role="tab" data-v="timeline" aria-selected="true">时间线</button>
+  <button class="tb" type="button" role="tab" data-v="overview" aria-selected="false">一条线串起来</button>
   <button class="tb" type="button" role="tab" data-v="video" aria-selected="false">DALL·E 2 精读笔记</button>
   <button class="tb" type="button" role="tab" data-v="faq" aria-selected="false">常见问题</button>
 </div></div></nav>
 <main class="wrap">
-<div class="view on" id="view-overview">
+<div class="view on" id="view-timeline">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#t-stages">全貌</a></li><li><a href="#t-pre">前史</a></li><li><a href="#t-gan">对抗网络</a></li><li><a href="#t-likelihood">似然派</a></li><li><a href="#t-diffusion">扩散</a></li><li><a href="#t-text">文本生成图像</a></li><li><a href="#t-control">可控与提速</a></li><li><a href="#t-dit">Transformer 与流</a></li><li><a href="#t-ar">自回归回潮</a></li><li><a href="#t-native">2025</a></li><li><a href="#t-now">2026</a></li><li><a href="#t-threads">贯穿的线</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">图像生成时间线：2006 年到现在</h2>
+    <p class="lede">这一页把图像生成从 2006 年排到现在（2026 年 10 月），不限于 DALL·E 2 那期视频。视频讲的是 2022 年年中以前的那一段，正好是第 4、5 个阶段；之后四年，生成器从扩散换到流匹配，骨干从 U-Net 换到 Transformer，最后整个生成能力并进了对话模型。</p><p class="lede">每个阶段一张表，日期是论文第一版上 arXiv 的日子，产品以官方发布页为准。只列改变了做法的工作，同类的跟进没有收全。最后一节把二十年串成几条贯穿的线。</p>
+    <section class="aisec" id="t-stages">
+    <h2><span class="n">1</span><span>先看全貌：九个阶段</span></h2>
+    <div class="tbl"><table><thead><tr><th>阶段</th><th>时间</th><th>主角</th><th>这一段解决了什么</th></tr></thead><tbody><tr><td>1 前史</td><td>2006–2013</td><td>自编码器、变分自编码器</td><td>能压缩、能重建，变分自编码器第一次能稳定采样</td></tr><tr><td>2 对抗</td><td>2014–2019</td><td>生成对抗网络</td><td>把单类图像（人脸、卧室）做到以假乱真</td></tr><tr><td>3 似然派</td><td>2014–2020</td><td>自回归、流模型、码本</td><td>能算似然、覆盖全分布，但慢或糊</td></tr><tr><td>4 扩散</td><td>2015–2021</td><td>DDPM、分数模型、引导</td><td>多样性和保真度都要，分数超过对抗网络</td></tr><tr><td>5 文本生成图像</td><td>2021–2022</td><td>DALL·E、CLIP、隐空间扩散</td><td>用一句话出图，开源和产品同时出现</td></tr><tr><td>6 可控与提速</td><td>2022–2023</td><td>ControlNet、LoRA、蒸馏</td><td>按姿态、线稿、人物来画，几步出图</td></tr><tr><td>7 Transformer 与流</td><td>2022–2024</td><td>DiT、整流、MMDiT</td><td>骨干和训练目标都换了，规模继续往上推</td></tr><tr><td>8 自回归回潮</td><td>2024</td><td>下一尺度预测、连续 token、统一模型</td><td>证明不用扩散也能做到同等质量</td></tr><tr><td>9 进入对话模型</td><td>2025–2026</td><td>原生多模态模型</td><td>生成和编辑变成对话里的一个能力</td></tr></tbody></table></div>
+    <p>阶段之间有重叠：似然派和对抗网络是同一时期的两个方向，扩散模型 2015 年就有了，2020 年才做出效果。划分按「这几年大家主要在改哪一块」。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-pre">
+    <h2><span class="n">2</span><span>前史：能压缩，还不能生成（2006–2013）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2006-07-28</td><td>深度自编码器（Science）</td><td>Hinton、Salakhutdinov</td><td>多层网络把图压成低维编码再还原，重建明显好过 PCA</td></tr><tr><td>2008-07-05</td><td>去噪自编码器（ICML 2008）</td><td>Vincent 等</td><td>输入先污染，目标仍是原图</td></tr><tr><td>2013-12-20</td><td>变分自编码器</td><td>Kingma、Welling</td><td>隐变量成为能采样的分布，第一次能稳定地「随机抽一张新图」</td></tr></tbody></table></div>
+    <p>这一时期的深度生成模型还有受限玻尔兹曼机和深度信念网络，靠马尔可夫链蒙特卡洛采样，慢，很难扩展到彩色大图。变分自编码器的意义在于把生成写成一个能用反向传播训练的目标（证据下界），后面几乎所有模型都受它影响。它生成的图偏糊，原因见「一条线串起来」的 <a class="ilink" href="#o-vae">变分自编码器</a> 一节。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-gan">
+    <h2><span class="n">3</span><span>对抗网络的五年：从 64×64 到以假乱真的人脸（2014–2019）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2014-06-10</td><td>生成对抗网络</td><td>Goodfellow 等</td><td>生成器和判别器对抗训练</td></tr><tr><td>2014-11-06</td><td>条件生成对抗网络</td><td>Mirza、Osindero</td><td>生成器和判别器都接上类别标签，能按条件生成</td></tr><tr><td>2015-08-26</td><td>神经风格迁移</td><td>Gatys 等</td><td>不训练生成器，直接优化一张图去匹配内容和风格特征</td></tr><tr><td>2015-11-19</td><td>DCGAN</td><td>Radford 等</td><td>给出一套能稳定训练的卷积结构，隐空间可以做向量算术</td></tr><tr><td>2016-11-21</td><td>pix2pix</td><td>Isola 等</td><td>成对数据的图到图翻译：线稿上色、地图转卫星图</td></tr><tr><td>2017-01-26</td><td>Wasserstein GAN</td><td>Arjovsky 等</td><td>换成推土机距离，缓解训练不稳和模式坍塌</td></tr><tr><td>2017-03-30</td><td>CycleGAN</td><td>Zhu 等</td><td>不需要成对数据：马变斑马、照片变莫奈</td></tr><tr><td>2017-10-27</td><td>ProGAN</td><td>Karras 等（NVIDIA）</td><td>从 4×4 逐级长到 1024×1024，第一次出高清人脸</td></tr><tr><td>2018-09-28</td><td>BigGAN</td><td>Brock 等（DeepMind）</td><td>大批量、大模型做 ImageNet 类别条件生成，截断技巧调保真度和多样性</td></tr><tr><td>2018-12-12</td><td>StyleGAN</td><td>Karras 等（NVIDIA）</td><td>风格调制的生成器，FFHQ 人脸几乎分不出真假</td></tr><tr><td>2019-12-03</td><td>StyleGAN2</td><td>Karras 等（NVIDIA）</td><td>去掉伪影，人脸质量到顶</td></tr></tbody></table></div>
+    <p>五年里分辨率从 64×64 涨到 1024×1024，单一类别（人脸、卧室、汽车）的照片已经以假乱真，2019 年 2 月上线的 thispersondoesnotexist 这类网站让大众第一次见识到。</p>
+    <p>卡住的地方也很清楚：类别一多、场景一复杂就不行，ImageNet 上靠 BigGAN 的截断技巧才勉强兼顾；训练靠一堆技巧维持平衡；没有似然，不知道漏掉了数据的哪一部分。文本生成图像在这一时期也有人做（StackGAN、AttnGAN），只能画鸟、花这类窄领域。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-likelihood">
+    <h2><span class="n">4</span><span>似然这一派：自回归、流、码本（2014–2020）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2014-10-30</td><td>NICE</td><td>Dinh 等</td><td>可逆网络，似然能精确算（流模型）</td></tr><tr><td>2016-01-25</td><td>PixelRNN</td><td>van den Oord 等（DeepMind）</td><td>一个像素一个像素地自回归生成，似然最好，极慢</td></tr><tr><td>2016-05-27</td><td>RealNVP</td><td>Dinh 等</td><td>仿射耦合层，流模型能处理自然图像</td></tr><tr><td>2016-06-16</td><td>条件 PixelCNN</td><td>van den Oord 等</td><td>卷积版自回归，训练能并行</td></tr><tr><td>2017-11-02</td><td>VQ-VAE</td><td>van den Oord 等</td><td>图像压成离散码本编号，再用 PixelCNN 在编号上生成</td></tr><tr><td>2018-07-09</td><td>Glow</td><td>Kingma、Dhariwal（OpenAI）</td><td>1×1 可逆卷积，流模型做出 256×256 人脸</td></tr><tr><td>2019-06-02</td><td>VQ-VAE-2</td><td>Razavi 等</td><td>两层码本 + 带注意力的 prior，质量接近 BigGAN</td></tr><tr><td>2020-12-17</td><td>VQGAN（Taming Transformers）</td><td>Esser 等</td><td>码本用对抗损失和感知损失训练，压得更狠还清楚，Transformer 在码本上生成</td></tr></tbody></table></div>
+    <p>这一派的共同点是能写出（或下界出）似然，所以不会漏掉数据的某些模式，多样性好。问题各不相同：像素级自回归生成一张图要串行几万步；流模型要求网络可逆，表达能力受限，图偏糊；码本加自回归是折中，把串行步数降到一千左右。</p>
+    <p>这一派留给后面的东西比它自己的样本重要：VQ-VAE 和 VQGAN 的「先压缩、再在压缩空间里生成」成了 DALL·E、Latent Diffusion、Stable Diffusion 共同的骨架；Glow 的二作 Dhariwal 后来是 ADM 和 DALL·E 2 的作者。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-diffusion">
+    <h2><span class="n">5</span><span>扩散模型站起来（2015–2021）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2015-03-12</td><td>非平衡热力学扩散模型</td><td>Sohl-Dickstein 等</td><td>加噪链的逆过程，框架有了，效果一般</td></tr><tr><td>2019-07-12</td><td>NCSN（分数模型）</td><td>Song、Ermon</td><td>学数据分布的梯度，用朗之万动力学采样</td></tr><tr><td>2020-06-19</td><td>DDPM</td><td>Ho、Jain、Abbeel</td><td>预测噪声、方差固定，第一次出好图</td></tr><tr><td>2020-10-06</td><td>DDIM</td><td>Song 等</td><td>同一个模型换个采样器，1000 步压到几十步</td></tr><tr><td>2020-11-26</td><td>分数随机微分方程</td><td>Song 等</td><td>把扩散和分数模型统一成随机微分方程，还给出对应的常微分方程</td></tr><tr><td>2021-02-18</td><td>Improved DDPM</td><td>Nichol、Dhariwal（OpenAI）</td><td>学方差、余弦加噪表，随规模稳定变好</td></tr><tr><td>2021-05-11</td><td>ADM（Diffusion Models Beat GANs）</td><td>Dhariwal、Nichol（OpenAI）</td><td>加大模型 + 分类器引导，ImageNet FID 超过 BigGAN</td></tr><tr><td>2021-12</td><td>无分类器引导（NeurIPS 研讨会）</td><td>Ho、Salimans</td><td>一个模型随机丢条件，采样时放大有条件和无条件的差</td></tr></tbody></table></div>
+    <p>这一段的细节在「一条线串起来」的 <a class="ilink" href="#o-ddpm">扩散模型</a>、<a class="ilink" href="#o-cg">分类器引导</a>、<a class="ilink" href="#o-cfg">无分类器引导</a> 几节。要点是：扩散模型同时拿到了似然派的多样性和对抗网络级别的保真度，训练又稳定，只剩一个短板：采样慢。之后几年的很多工作都在补这个短板。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-text">
+    <h2><span class="n">6</span><span>文本生成图像爆发（2021–2022）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2021-01-05</td><td>DALL·E（博客）</td><td>OpenAI</td><td>120 亿参数，码本 + 自回归，零样本按句子出图</td></tr><tr><td>2021-01-05</td><td>CLIP（博客）</td><td>OpenAI</td><td>4 亿图文对对比学习，后来成了各家的文本编码器和打分器</td></tr><tr><td>2021-05-26</td><td>CogView</td><td>清华等</td><td>中文文本生成图像</td></tr><tr><td>2021-12-20</td><td>GLIDE</td><td>OpenAI</td><td>文本条件扩散 + 无分类器引导</td></tr><tr><td>2021-12-20</td><td>Latent Diffusion</td><td>慕尼黑大学（Rombach 等）</td><td>在自编码器的隐空间里扩散，算力降一个量级</td></tr><tr><td>2022-04-06</td><td>DALL·E 2（博客；论文 04-13）</td><td>OpenAI</td><td>CLIP 图像特征当中间表示，扩散 prior + 扩散解码器</td></tr><tr><td>2022-05-23</td><td>Imagen</td><td>Google</td><td>冻住的 T5-XXL 当文本编码器，级联扩散</td></tr><tr><td>2022-06-22</td><td>Parti</td><td>Google</td><td>200 亿参数自回归，码本路线也能做到同等质量</td></tr><tr><td>2022-07-12</td><td>Midjourney 开放测试</td><td>Midjourney</td><td>通过 Discord 对公众开放</td></tr><tr><td>2022-08-22</td><td>Stable Diffusion 开源</td><td>Stability AI、Runway、慕尼黑大学</td><td>Latent Diffusion 的大规模版本，权重公开，消费级显卡能跑</td></tr><tr><td>2022-09-28</td><td>DALL·E 2 取消等候名单</td><td>OpenAI</td><td>所有人都能注册使用</td></tr></tbody></table></div>
+    <p>一年半里发生了两件事。技术上，扩散模型取代码本加自回归成为主流（DALL·E 到 DALL·E 2 的转向就是缩影），CLIP 和大语言模型的文本编码器让「听懂一句话」变得可行。</p>
+    <p>传播上，Midjourney 和 Stable Diffusion 在同一个夏天出现，一个靠产品和审美，一个靠开放权重，文本生成图像从论文里的样例变成了几百万人每天在用的工具。</p>
+    <p>视频讲的就是这一段的前半部分，DALL·E 2 的结构见「一条线串起来」的 <a class="ilink" href="#o-unclip">DALL·E 2</a> 一节。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-control">
+    <h2><span class="n">7</span><span>可控、定制、提速（2022–2023）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2022-08-02</td><td>Textual Inversion</td><td>Gal 等</td><td>学一个新词向量代表某个物体或风格</td></tr><tr><td>2022-08-25</td><td>DreamBooth</td><td>Ruiz 等（Google）</td><td>几张照片微调整个模型，生成「这只狗」在任意场景里</td></tr><tr><td>2023-02-10</td><td>ControlNet</td><td>Zhang、Rao、Agrawala（斯坦福）</td><td>复制一份编码器接姿态、线稿、深度图等条件，原模型冻住</td></tr><tr><td>2023-03-02</td><td>Consistency Models</td><td>Song 等（OpenAI）</td><td>学一个直接映射到终点的函数，一两步出图</td></tr><tr><td>2023-07-04</td><td>SDXL</td><td>Stability AI</td><td>更大的 U-Net、两个文本编码器、精修模型</td></tr><tr><td>2023-09-20</td><td>DALL·E 3（10-19 进 ChatGPT Plus）</td><td>OpenAI</td><td>训练数据用模型重写成详细描述，提示词由 ChatGPT 改写</td></tr><tr><td>2023-10-06</td><td>Latent Consistency Models</td><td>Luo 等（清华）</td><td>一致性蒸馏用到隐空间扩散，4 步左右出图</td></tr><tr><td>2023-11-28</td><td>Adversarial Diffusion Distillation（SDXL Turbo）</td><td>Stability AI</td><td>蒸馏加对抗损失，1 步出图</td></tr><tr><td>2023-12-20</td><td>Midjourney V6</td><td>Midjourney</td><td>长提示词更准，画面更连贯</td></tr></tbody></table></div>
+    <p>基础模型有了以后，社区的工作集中在两件事。一是控制：用户想要的往往是「这个人、这个姿势、这张线稿」，文字说不清楚。</p>
+    <p>DreamBooth 和 LoRA（2021-06-17 原本是给语言模型的低秩微调，2023 年初被大量用到 Stable Diffusion 上）解决「这个人」，ControlNet 解决「这个姿势和构图」。二是速度：几十步采样太慢，一致性模型和对抗蒸馏把步数压到 1 到 4 步，接近对抗网络的一次前向。</p>
+    <p>DALL·E 3 指出了另一个方向：模型画不对，很多时候是训练数据的描述太简略。用一个描述模型把训练图重新写成长描述，提示词遵循能力就大幅提升。此后各家都这么做。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-dit">
+    <h2><span class="n">8</span><span>骨干换成 Transformer，目标换成流（2022–2024）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2022-09-07</td><td>整流（Rectified Flow）</td><td>Liu 等</td><td>学一条从噪声到数据的直线速度场，路径越直采样步数越少</td></tr><tr><td>2022-10-06</td><td>流匹配（Flow Matching）</td><td>Lipman 等（Meta）</td><td>直接回归速度场，扩散是它的一个特例</td></tr><tr><td>2022-12-19</td><td>DiT</td><td>Peebles、Xie</td><td>用 Transformer 替代 U-Net 做扩散骨干，计算量越大 FID 越好</td></tr><tr><td>2023-09-30</td><td>PixArt-α</td><td>华为诺亚等</td><td>DiT 做文本生成图像，训练耗时约为 Stable Diffusion 1.5 的十分之一</td></tr><tr><td>2024-02-15</td><td>Sora（技术报告）</td><td>OpenAI</td><td>DiT 用到视频的时空图块上，规模带来一致性</td></tr><tr><td>2024-03-05</td><td>Stable Diffusion 3（论文；06-12 开放 Medium 权重）</td><td>Stability AI</td><td>MMDiT（文本和图像两路 token 联合注意力）+ 整流</td></tr><tr><td>2024-07-30</td><td>Midjourney V6.1</td><td>Midjourney</td><td>更连贯、更快</td></tr><tr><td>2024-08-01</td><td>FLUX.1</td><td>Black Forest Labs</td><td>Stable Diffusion 原班人马，120 亿参数整流 Transformer，部分开放权重</td></tr><tr><td>2024-10-14</td><td>SANA</td><td>NVIDIA 等</td><td>32 倍压缩的自编码器 + 线性注意力，能出 4K，小版本在 16GB 笔记本显卡上就能跑</td></tr></tbody></table></div>
+    <p>这一段换了两样东西。骨干：U-Net 是卷积网络，规模涨到几十亿参数后收益变小；DiT 证明 Transformer 做扩散同样随算力稳定变好，文本 token 和图像 token 又能放进同一个注意力里（MMDiT），于是 SD3、FLUX、Sora 都改用 Transformer。</p>
+    <p>目标：流匹配和整流把「加噪再去噪」改写成「学一条从噪声到数据的速度场」，数学更简单，路径更直，少步采样更容易。扩散模型这个名字还在用，训练目标多半已经是流匹配。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-ar">
+    <h2><span class="n">9</span><span>自回归回潮，生成和理解开始合并（2024）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2024-04-03</td><td>VAR</td><td>田柯宇等（北大、字节）</td><td>不逐个 token 预测，而是逐个尺度预测：先 1×1，再 2×2……质量和速度超过同期 DiT</td></tr><tr><td>2024-05-16</td><td>Chameleon</td><td>Meta</td><td>图像和文本都是离散 token，一个模型从头混合训练</td></tr><tr><td>2024-06-17</td><td>MAR</td><td>Li、何恺明等</td><td>每个 token 用一个小扩散头生成，不再需要离散码本</td></tr><tr><td>2024-08-20</td><td>Transfusion</td><td>Meta</td><td>一个 Transformer，文本用下一词预测，图像用扩散，同时训练</td></tr><tr><td>2024-09-27</td><td>Emu3</td><td>智源</td><td>只用下一 token 预测，生成和理解都做</td></tr><tr><td>2024-10-17</td><td>Janus</td><td>DeepSeek</td><td>理解和生成用两套视觉编码，共享一个语言模型</td></tr><tr><td>2024-12-05</td><td>Infinity</td><td>字节</td><td>按比特预测的尺度自回归，1024×1024 约 0.8 秒</td></tr></tbody></table></div>
+    <p>视频里讲者说「CLIP 和 DALL·E 2 都嫌自回归太贵」，两个月后 Parti 就反驳了一次；这一年自回归又回来了，而且换了花样：VAR 按尺度生成，MAR 把离散码本换成连续 token。</p>
+    <p>更大的变化是方向：既然大语言模型本身就是自回归的，那把图像也当成 token，让同一个模型既能看图又能画图。Chameleon、Transfusion、Emu3、Janus 是几种不同的拼法，到 2025 年这条路进了产品。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-native">
+    <h2><span class="n">10</span><span>生成进了对话模型（2025）</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2025-03-25</td><td>GPT-4o 图像生成</td><td>OpenAI</td><td>生成由 GPT-4o 原生完成，取代 ChatGPT 里的 DALL·E 3；能在对话里多轮改图，文字渲染和多物体明显变好</td></tr><tr><td>2025-04-03</td><td>Midjourney V7</td><td>Midjourney</td><td>细节和提示词遵循变好，加了草稿模式</td></tr><tr><td>2025-04-15</td><td>Seedream 3.0（技术报告）</td><td>字节</td><td>中英文字渲染、原生 2K</td></tr><tr><td>2025-05-20</td><td>BAGEL</td><td>字节</td><td>开源的统一理解和生成模型</td></tr><tr><td>2025-06-17</td><td>FLUX.1 Kontext（技术报告）</td><td>Black Forest Labs</td><td>同一个流匹配模型做生成和按指令编辑，人物前后一致</td></tr><tr><td>2025-08-04</td><td>Qwen-Image</td><td>阿里通义</td><td>200 亿参数 MMDiT，用 Qwen2.5-VL 理解提示词，中文文字渲染突出，开放权重</td></tr><tr><td>2025-08-26</td><td>Gemini 2.5 Flash Image（Nano Banana）</td><td>Google</td><td>原生图像生成和对话式编辑，人物一致性好</td></tr><tr><td>2025-09-24</td><td>Seedream 4.0（技术报告）</td><td>字节</td><td>生成和编辑合一，多图参考，最高 4K</td></tr><tr><td>2025-09-28</td><td>HunyuanImage 3.0</td><td>腾讯</td><td>800 亿参数（激活 130 亿）的混合专家多模态模型，开放权重</td></tr><tr><td>2025-11-20</td><td>Nano Banana Pro（Gemini 3 Pro Image）</td><td>Google</td><td>建在 Gemini 3 Pro 上，长文字、信息图、4K</td></tr><tr><td>2025-11-25</td><td>FLUX.2</td><td>Black Forest Labs</td><td>多参考图编辑，开放的 Dev 版 320 亿参数</td></tr><tr><td>2025-11-27</td><td>Z-Image</td><td>阿里通义</td><td>60 亿参数单流 DiT，蒸馏版 8 步出图</td></tr></tbody></table></div>
+    <p>这一年最大的变化发生在 3 月 25 日：ChatGPT 的图像生成从调用 DALL·E 3 改成由 GPT-4o 自己生成。用户第一次可以像改文章一样改图：「把背景换成雪地」「人物不要动」「把这行字改成中文」。</p>
+    <p>OpenAI 没公开结构；从效果看，语言模型对提示词的理解、对上下文的记忆直接用在了生成上。随后 Google 的 Nano Banana 系列走同一条路。</p>
+    <p>开源一侧，中文团队成了主力：Qwen-Image、Seedream、HunyuanImage、Z-Image 在中文文字渲染、编辑一致性上和闭源模型差距不大。技术上没有统一答案：有的是大语言模型加扩散头，有的是 MMDiT 接一个视觉语言模型当文本编码器，有的是混合专家的统一自回归模型。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-now">
+    <h2><span class="n">11</span><span>2026 年到现在</span></h2>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2026-02-26</td><td>Nano Banana 2（Gemini 3.1 Flash Image）</td><td>Google</td><td>接近 Pro 的质量，Flash 的速度和价格，成为 Gemini 应用默认图像模型</td></tr><tr><td>2026-04-14</td><td>Midjourney V8.1</td><td>Midjourney</td><td>比之前快 4 到 5 倍，原生 2K；6 月 10 日成为默认</td></tr><tr><td>2026-04-21</td><td>GPT Image 2（ChatGPT Images 2.0）</td><td>OpenAI</td><td>API 快照 gpt-image-2-2026-04-21</td></tr><tr><td>2026-06-15</td><td>Imagen 4 宣布下线（8 月 17 日关闭）</td><td>Google</td><td>独立的文本生成图像模型退场，Gemini API 里只留 Gemini 原生图像模型</td></tr><tr><td>2026-07-24</td><td>Midjourney V8.2 成为默认</td><td>Midjourney</td><td>新的编辑模型取代全能参考、角色参考和重绘工具</td></tr><tr><td>2026-10-06</td><td>Nano Banana 2.1 正式可用</td><td>Google</td><td>视觉质量、多轮人物一致性、文字渲染再提升，支持 8:1 宽幅</td></tr></tbody></table><p class="tnote">截至 2026-10-29。只收了官方页面能对上日期的条目。</p></div>
+    <p>Google 在 2026 年 6 月宣布下线 Imagen 4，是一个标志：独立的文本生成图像模型在大厂里让位给对话模型自带的生成能力。Midjourney 是另一种活法，继续做独立模型，把重点放在审美、个性化和编辑。开源一侧仍以 DiT 加流匹配为主，加上越来越大的视觉语言模型做条件编码器。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="t-threads">
+    <h2><span class="n">12</span><span>二十年里贯穿的几条线</span></h2>
+    <div class="tbl"><table><thead><tr><th></th><th>2014 前后</th><th>2020–2022</th><th>2023–2024</th><th>2025–2026</th></tr></thead><tbody><tr><td>生成器</td><td>对抗网络、自回归、流</td><td>扩散</td><td>流匹配（扩散的推广）</td><td>流匹配，加上语言模型里的自回归</td></tr><tr><td>骨干网络</td><td>卷积</td><td>U-Net + 注意力</td><td>Transformer（DiT、MMDiT）</td><td>大语言模型本身或其扩展</td></tr><tr><td>条件</td><td>类别标签</td><td>CLIP、T5 文本特征</td><td>更大的文本编码器、控制图</td><td>整段对话、多张参考图</td></tr><tr><td>在哪个空间生成</td><td>像素</td><td>像素或隐空间</td><td>高压缩隐空间</td><td>隐空间或视觉 token</td></tr><tr><td>生成一张图要几步</td><td>1（对抗网络）或几万（像素自回归）</td><td>1000，DDIM 后几十</td><td>蒸馏后 1–8</td><td>按产品调，常见几步到几十步</td></tr><tr><td>怎么评价</td><td>Inception Score、FID</td><td>MS-COCO 零样本 FID、人评</td><td>人评、偏好模型</td><td>公开对战排行榜</td></tr></tbody></table></div>
+    <p>几条观察：</p>
+    <ul><li>每次换生成器，都是因为旧的在「保真度、多样性、训练稳定、采样速度」里卡死了一项。对抗网络卡在多样性和稳定，自回归卡在速度，扩散卡在速度，靠少步采样和蒸馏补上了。</li><li>「先压缩，再生成」这个两阶段结构从 VQ-VAE 一直用到今天，变的是压缩比和压缩后的形式（离散编号还是连续向量）。</li><li>提示词能力的进步，一半来自模型，一半来自数据：DALL·E 3 之后，训练图的描述普遍由模型重写。</li><li>视频里讲者的那句「规模最要紧，别的都好商量」，四年后看大体成立：U-Net 换成 Transformer、扩散换成流匹配、要不要 prior，都被证明是可以换的；不变的是更大的模型、更多更好的数据。</li></ul>
+    
+    
+    
+    
+  </section>
+  </article>
+</div>
+</div>
+<div class="view" id="view-overview">
 <div class="aiwrap">
   <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-map">总图</a></li><li><a href="#o-goal">要做的事</a></li><li><a href="#o-timeline">时间线</a></li><li><a href="#o-gan">生成对抗网络</a></li><li><a href="#o-ae">自编码器</a></li><li><a href="#o-vae">变分自编码器</a></li><li><a href="#o-vqvae">VQ-VAE</a></li><li><a href="#o-dalle">DALL·E</a></li><li><a href="#o-ddpm">扩散模型</a></li><li><a href="#o-compare">对照</a></li><li><a href="#o-adm">做大</a></li><li><a href="#o-cg">分类器引导</a></li><li><a href="#o-cfg">无分类器引导</a></li><li><a href="#o-glide">GLIDE</a></li><li><a href="#o-unclip">DALL·E 2</a></li><li><a href="#o-after">之后</a></li></ol></nav>
   <article class="aidoc">
     <h2 class="aih">一条线串起来：从生成对抗网络到 DALL·E 2</h2>
-    <p class="lede">这一页把视频里那段 35 分钟的串讲展开成文字。视频每个模型一张框图、几句话，适合建立印象；这里补上框图背后的那一两个公式，以及讲者说得不准的地方。每一节回答三件事：这个模型学的是什么，生成一张图时怎么采样，它留下了什么问题，下一个模型怎么接。</p><p class="lede">变分自编码器和 DDPM 本站各有一个专题页，推导都在那里，这里只讲到能看懂 DALL·E 2 为止。读完第 1 节的总图，后面可以按需跳着看。</p>
+    <p class="lede">这一页把视频里那段 35 分钟的串讲展开成文字。视频每个模型一张框图、几句话，适合建立印象；这里补上框图背后的那一两个公式，以及讲者说得不准的地方。每一节回答三件事：这个模型学的是什么，生成一张图时怎么采样，它留下了什么问题，下一个模型怎么接。</p><p class="lede">变分自编码器和 DDPM 本站各有一个专题页，推导都在那里，这里只讲到能看懂 DALL·E 2 为止。读完第 1 节的总图，后面可以按需跳着看。2022 年以后的事在「时间线」tab。</p>
     <section class="aisec" id="o-map">
     <h2><span class="n">1</span><span>总图：两条线加一个 CLIP，汇到 DALL·E 2</span></h2>
     <p>2013 到 2022 年的图像生成可以拆成两条线，再加上一个从旁边接进来的 CLIP，三路在 DALL·E 2 汇合。</p>
