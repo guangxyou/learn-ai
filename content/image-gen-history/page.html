@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图像生成二十年：从自编码器到对话里改图 · 2006 年到 2026 年 10 月，九个阶段加数据和评价两条线，讲每一代生成器解决了什么、卡在哪里</title>
+<meta name="description" content="一篇文章：前史、对抗网络、似然派、扩散、文本生成图像、可控与提速、Transformer 与流匹配、自回归回潮、进入对话模型九个阶段，每段讲核心做法和卡点，配关键公式和一张日期表；再单独讲训练数据和评价方法怎么变；最后是贯穿二十年的几条线和还没解决的问题。论文日期取 arXiv 第一版，2025、2026 年的产品都对过官方发布页。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+:root{--bar-h:0px}
+.ep-head h1+p{margin:8px 0 0;color:var(--text-3);font-size:14.5px}
+main.wrap{padding-top:18px;padding-bottom:60px}
+.aidoc .lede+.lede{margin-top:10px}
+.atl,.aov{position:relative;display:inline-block;line-height:1.15}
+.atl::after{content:'~';position:absolute;left:50%;top:-.36em;transform:translateX(-30%);font:normal .8em/1 system-ui,sans-serif}
+.aov::after{content:'';position:absolute;left:24%;right:2%;top:.2em;border-top:1px solid currentColor}
+span.atl::after{transform:translateX(-50%)}span.aov::after{left:6%;right:6%}
+.aisec{scroll-margin-top:12px}
+.deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df{white-space:pre}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.aidoc .tbl{margin:14px 0}
+.aidoc td:first-child{white-space:nowrap}
+.fig svg{max-width:100%;height:auto}
+@media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:760px}}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">综述</span><span>2006-07 到 2026-10 · 15 节</span></div>
+  <h1>图像生成二十年：从自编码器到对话里改图</h1>
+</header></div>
+<main class="wrap">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#stages">全貌</a></li><li><a href="#pre">前史</a></li><li><a href="#gan">对抗网络</a></li><li><a href="#likelihood">似然派</a></li><li><a href="#diffusion">扩散</a></li><li><a href="#text">文本生成图像</a></li><li><a href="#control">可控与提速</a></li><li><a href="#dit">Transformer 与流</a></li><li><a href="#ar">自回归回潮</a></li><li><a href="#native">2025</a></li><li><a href="#now">2026</a></li><li><a href="#data">数据</a></li><li><a href="#eval">评价</a></li><li><a href="#threads">贯穿的线</a></li><li><a href="#open">没解决的</a></li></ol></nav>
+  <article class="aidoc">
+    <p class="lede">这篇文章把深度学习时代的图像生成从 2006 年排到现在（2026 年 10 月）。二十年里生成器换了四代：对抗网络、自回归和流、扩散、流匹配；骨干从卷积换到 Transformer；条件从一个类别标签变成一整段对话。到 2025 年，生成图像不再是一个单独的模型，而是对话模型的一项能力。</p><p class="lede">按阶段讲，每个阶段先说那几年在解决什么、做法的核心是什么、卡在哪里，再附一张表列出改变了做法的工作。同类的跟进没有收全。阶段讲完以后，单独讲数据和评价两条线，最后把二十年串成几条贯穿的线，列出还没解决的问题。</p><p class="lede">日期一律是论文第一版上 arXiv 的日子；产品以官方发布页为准，查不到官方日期的没有收。</p>
+    <section class="aisec" id="stages">
+    <h2><span class="n">1</span><span>先看全貌：九个阶段</span></h2>
+    <div class="tbl"><table><thead><tr><th>阶段</th><th>时间</th><th>主角</th><th>这一段解决了什么</th></tr></thead><tbody><tr><td>1 前史</td><td>2006–2013</td><td>自编码器、变分自编码器</td><td>能压缩、能重建，变分自编码器第一次能稳定采样</td></tr><tr><td>2 对抗网络</td><td>2014–2019</td><td>生成对抗网络</td><td>把单类图像（人脸、卧室）做到以假乱真</td></tr><tr><td>3 似然派</td><td>2014–2020</td><td>自回归、流模型、码本</td><td>能算似然、覆盖全分布，但慢或糊</td></tr><tr><td>4 扩散</td><td>2015–2021</td><td>DDPM、分数模型、引导</td><td>多样性和保真度都要，分数超过对抗网络</td></tr><tr><td>5 文本生成图像</td><td>2021–2022</td><td>DALL·E、CLIP、隐空间扩散</td><td>用一句话出图，开源和产品同时出现</td></tr><tr><td>6 可控与提速</td><td>2022–2023</td><td>ControlNet、LoRA、蒸馏</td><td>按姿态、线稿、人物来画，几步出图</td></tr><tr><td>7 Transformer 与流</td><td>2022–2024</td><td>DiT、整流、MMDiT</td><td>骨干和训练目标都换了，规模继续往上推</td></tr><tr><td>8 自回归回潮</td><td>2024</td><td>下一尺度预测、连续 token、统一模型</td><td>证明不用扩散也能做到同等质量</td></tr><tr><td>9 进入对话模型</td><td>2025–2026</td><td>原生多模态模型</td><td>生成和编辑变成对话里的一个能力</td></tr></tbody></table></div>
+    <p>阶段之间有重叠：似然派和对抗网络是同一时期的两个方向；扩散模型 2015 年就有了，2020 年才做出效果。划分按「这几年大家主要在改哪一块」。</p>
+    <p>读下去会发现，每次换代都可以用五个指标解释：<b>保真度</b>（单张图像不像真的）、<b>多样性</b>（能不能覆盖数据里的各种情况）、<b>训练稳定性</b>、<b>采样速度</b>、<b>可控性</b>（能不能按人的意思画）。一个方法总是在其中一两项上卡住，下一个方法先补上这一项。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 992 480" width="992" height="480" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .bar{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .gbar{fill:#F3F1ED;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:4 3}
+  .grid{stroke:#ECE9E3;stroke-width:1}
+  .axis{stroke:#868D98;stroke-width:1.2}
+  .now{stroke:#C2410C;stroke-width:1.4;stroke-dasharray:5 4}
+  .hd{font-size:14px;font-weight:650;fill:#4E5560}
+  .nm{font-size:15px;font-weight:650;fill:#14161A}
+  .yr{font-size:13px;fill:#4E5560}
+  .wk{font-size:14px;fill:#4E5560}
+  .nw{font-size:13px;fill:#C2410C;font-weight:600}
+</style>
+<rect x="-16" y="-16" width="992" height="480" fill="#fff"/>
+<text x="16.0" y="22" class="hd" text-anchor="start">阶段</text>
+<text x="178.0" y="22" class="hd" text-anchor="start">年份（每格两年）</text>
+<path d="M178.0 32 V424" class="grid"/><text x="178.0" y="442" class="yr" text-anchor="middle">2006</text>
+<path d="M251.9 32 V424" class="grid"/><text x="251.9" y="442" class="yr" text-anchor="middle">2008</text>
+<path d="M325.8 32 V424" class="grid"/><text x="325.8" y="442" class="yr" text-anchor="middle">2010</text>
+<path d="M399.7 32 V424" class="grid"/><text x="399.7" y="442" class="yr" text-anchor="middle">2012</text>
+<path d="M473.6 32 V424" class="grid"/><text x="473.6" y="442" class="yr" text-anchor="middle">2014</text>
+<path d="M547.5 32 V424" class="grid"/><text x="547.5" y="442" class="yr" text-anchor="middle">2016</text>
+<path d="M621.4 32 V424" class="grid"/><text x="621.4" y="442" class="yr" text-anchor="middle">2018</text>
+<path d="M695.3 32 V424" class="grid"/><text x="695.3" y="442" class="yr" text-anchor="middle">2020</text>
+<path d="M769.2 32 V424" class="grid"/><text x="769.2" y="442" class="yr" text-anchor="middle">2022</text>
+<path d="M843.1 32 V424" class="grid"/><text x="843.1" y="442" class="yr" text-anchor="middle">2024</text>
+<path d="M917.0 32 V424" class="grid"/><text x="917.0" y="442" class="yr" text-anchor="middle">2026</text>
+<path d="M178 424 H954" class="axis"/>
+<path d="M947.8 32 V424" class="now"/>
+<text x="941.8" y="44" class="nw" text-anchor="end">2026-10</text>
+<text x="16.0" y="72" class="nm" text-anchor="start">1 前史</text>
+<rect x="178.0" y="57" width="295.6" height="20" rx="4" class="bar"/>
+<text x="481.6" y="72" class="wk" text-anchor="start">深度自编码器、去噪自编码器、变分自编码器</text>
+<text x="16.0" y="114" class="nm" text-anchor="start">2 对抗网络</text>
+<rect x="473.6" y="99" width="221.7" height="20" rx="4" class="bar"/>
+<text x="465.6" y="114" class="wk" text-anchor="end">DCGAN、ProGAN、BigGAN、StyleGAN</text>
+<text x="16.0" y="156" class="nm" text-anchor="start">3 似然派</text>
+<rect x="473.6" y="141" width="258.7" height="20" rx="4" class="bar"/>
+<text x="465.6" y="156" class="wk" text-anchor="end">PixelCNN、Glow、VQ-VAE、VQGAN</text>
+<text x="16.0" y="198" class="nm" text-anchor="start">4 扩散</text>
+<rect x="510.6" y="183" width="184.8" height="20" rx="4" class="gbar"/>
+<rect x="695.3" y="183" width="73.9" height="20" rx="4" class="bar"/>
+<text x="502.6" y="198" class="wk" text-anchor="end">DDPM、DDIM、ADM、无分类器引导</text>
+<text x="16.0" y="240" class="nm" text-anchor="start">5 文本生成图像</text>
+<rect x="732.3" y="225" width="73.9" height="20" rx="4" class="bar"/>
+<text x="724.3" y="240" class="wk" text-anchor="end">DALL·E、CLIP、DALL·E 2、Stable Diffusion</text>
+<text x="16.0" y="282" class="nm" text-anchor="start">6 可控与提速</text>
+<rect x="769.2" y="267" width="73.9" height="20" rx="4" class="bar"/>
+<text x="761.2" y="282" class="wk" text-anchor="end">ControlNet、LoRA、少步蒸馏</text>
+<text x="16.0" y="324" class="nm" text-anchor="start">7 Transformer 与流</text>
+<rect x="769.2" y="309" width="110.9" height="20" rx="4" class="bar"/>
+<text x="761.2" y="324" class="wk" text-anchor="end">DiT、流匹配、SD3、FLUX.1</text>
+<text x="16.0" y="366" class="nm" text-anchor="start">8 自回归回潮</text>
+<rect x="843.1" y="351" width="37.0" height="20" rx="4" class="bar"/>
+<text x="835.1" y="366" class="wk" text-anchor="end">VAR、MAR、统一模型</text>
+<text x="16.0" y="408" class="nm" text-anchor="start">9 进入对话模型</text>
+<rect x="880.1" y="393" width="67.7" height="20" rx="4" class="bar"/>
+<text x="872.1" y="408" class="wk" text-anchor="end">GPT-4o 生图、Nano Banana、GPT Image 2</text>
+</svg>
+<figcaption>九个阶段在时间轴上的位置。扩散一行的浅色虚线段是 2015–2019 年：框架已经有了，效果还不行。橙色竖线是现在（2026-10）。</figcaption></figure>
+  </section>
+<section class="aisec" id="pre">
+    <h2><span class="n">2</span><span>前史：能压缩，还不能生成（2006–2013）</span></h2>
+    <p>2006 年 Hinton 和 Salakhutdinov 在 Science 上发表深度自编码器：编码器把图像压成几十维的编码，解码器再还原回来，重建误差明显低于 PCA。这证明了深层网络能学到图像的紧凑表示，但它本身不能生成。训练只要求训练图的编码能还原，没有约束编码在空间里怎么分布，随手取一个编码，解码出来多半是乱的。</p>
+    <p>同一时期真正的生成模型是受限玻尔兹曼机和深度信念网络。它们定义了一个能量函数，采样要靠马尔可夫链蒙特卡洛反复迭代，混合得很慢，在 MNIST 手写数字上能用，扩展不到彩色大图。去噪自编码器（2008）换了个训练方式：输入先加噪声或挖掉一部分，目标仍是干净的原图。这个「从破坏中还原」的想法在十几年后以扩散模型的形式回来了。</p>
+    <p>转折是 2013 年底的变分自编码器。它让编码器输出一个分布 <span class="m"><i>q</i>(<i>z</i>|<i>x</i>)</span> 而不是一个点，同时把先验 <span class="m"><i>p</i>(<i>z</i>)</span> 规定成标准正态，训练目标是证据下界：</p>
+    <div class="deriv"><div><span class="df"><span class="m">log <i>p</i>(<i>x</i>) ≥ <i>E</i><sub><i>q</i>(<i>z</i>|<i>x</i>)</sub>[log <i>p</i>(<i>x</i>|<i>z</i>)] − KL(<i>q</i>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span></span><span class="dc">第一项是重建，第二项把每张图的编码分布拉向标准正态</span></div></div>
+    <p>KL 项让所有编码挤在标准正态附近，生成时直接从 <span class="m"><i>N</i>(0, <i>I</i>)</span> 抽一个 z 交给解码器，就能稳定地得到一张新图。重参数化 <span class="m"><i>z</i> = <i>μ</i> + <i>σ</i> ⊙ <i>ε</i></span> 让采样这一步也能反向传播。之后几乎所有深度生成模型都沿用了它的两个东西：用神经网络参数化分布，以及优化似然的下界。</p>
+    <p>变分自编码器的图偏糊。解码器输出通常取高斯，<span class="m">log <i>p</i>(<i>x</i>|<i>z</i>)</span> 等价于均方误差；一个编码对应多种可能的细节时，均方误差最小的答案是它们的平均，边缘和纹理就被抹平了。这个问题直到「先压缩、再在压缩空间里生成」的两阶段结构出现才绕开。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2006-07-28</td><td>深度自编码器（Science）</td><td>Hinton、Salakhutdinov</td><td>多层网络把图压成低维编码再还原，重建明显好过 PCA</td></tr><tr><td>2008-07-05</td><td>去噪自编码器（ICML 2008）</td><td>Vincent 等</td><td>输入先污染，目标仍是原图</td></tr><tr><td>2013-12-20</td><td>变分自编码器</td><td>Kingma、Welling</td><td>隐变量成为能采样的分布，第一次能稳定地「随机抽一张新图」</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="gan">
+    <h2><span class="n">3</span><span>对抗网络的五年：从 64×64 到以假乱真的人脸（2014–2019）</span></h2>
+    <p>2014 年 6 月的生成对抗网络完全绕开了似然。生成器 G 把噪声 z 变成图像，判别器 D 判断一张图是真的还是 G 生成的，两者交替训练：</p>
+    <div class="deriv"><div><span class="df"><span class="m">min<sub><i>G</i></sub> max<sub><i>D</i></sub> <i>E</i><sub><i>x</i></sub>[log <i>D</i>(<i>x</i>)] + <i>E</i><sub><i>z</i></sub>[log(1 − <i>D</i>(<i>G</i>(<i>z</i>)))]</span></span><span class="dc">D 想把真假分开，G 想让 D 分不开</span></div></div>
+    <p>判别器相当于一个可学习的损失函数，它惩罚的是「看起来不像真的」，而不是「和某张图逐像素不一样」，所以生成的图锐利，没有变分自编码器那种糊。代价是这个分布的密度写不出来，没法算一张图的似然，也就无从知道模型漏掉了数据的哪一部分。</p>
+    <p>之后五年的工作大多在解决两个问题。一是训练不稳：两个网络的博弈很容易失衡，判别器太强时生成器拿不到梯度。DCGAN 给出了一套能稳定训练的卷积结构，Wasserstein GAN 把目标换成推土机距离，ProGAN 从 4×4 开始逐级加层长到 1024×1024。二是<b>模式坍塌</b>：生成器发现某几种图能骗过判别器，就只生成这几种，多样性很差。</p>
+    <p>到 StyleGAN 系列，单一类别的照片已经以假乱真。StyleGAN 用一个映射网络把 z 变成风格向量，再在生成器的每一层调制特征，粗层管姿态和脸型，细层管发丝和皮肤纹理，还能在两张脸之间平滑插值。2019 年 2 月上线的 thispersondoesnotexist 每刷新一次给出一张不存在的人脸，很多人第一次意识到生成的照片可以和真的分不开。</p>
+    <p>同一时期还有一批「图到图」的工作：pix2pix 用成对数据把线稿变照片、地图变卫星图；CycleGAN 不要成对数据，用循环一致性把马变斑马；神经风格迁移（2015）甚至不训练生成器，直接优化一张图去匹配一幅画的风格特征。这些后来都成了可控生成的源头。</p>
+    <p>卡住的地方也很清楚。类别一多、场景一复杂就不行：BigGAN 在 ImageNet 一千类上靠大批量和截断技巧（只从 z 的中心区域采样）才勉强做出来，截断越狠图越好、种类越少。文本生成图像在这一时期也有人做（StackGAN、AttnGAN），只能画鸟、花这类窄领域。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2014-06-10</td><td>生成对抗网络</td><td>Goodfellow 等</td><td>生成器和判别器对抗训练</td></tr><tr><td>2014-11-06</td><td>条件生成对抗网络</td><td>Mirza、Osindero</td><td>生成器和判别器都接上类别标签，能按条件生成</td></tr><tr><td>2015-08-26</td><td>神经风格迁移</td><td>Gatys 等</td><td>不训练生成器，直接优化一张图去匹配内容和风格特征</td></tr><tr><td>2015-11-19</td><td>DCGAN</td><td>Radford 等</td><td>给出一套能稳定训练的卷积结构，隐空间可以做向量算术</td></tr><tr><td>2016-11-21</td><td>pix2pix</td><td>Isola 等</td><td>成对数据的图到图翻译：线稿上色、地图转卫星图</td></tr><tr><td>2017-01-26</td><td>Wasserstein GAN</td><td>Arjovsky 等</td><td>换成推土机距离，缓解训练不稳和模式坍塌</td></tr><tr><td>2017-03-30</td><td>CycleGAN</td><td>Zhu 等</td><td>不需要成对数据：马变斑马、照片变莫奈</td></tr><tr><td>2017-10-27</td><td>ProGAN</td><td>Karras 等（NVIDIA）</td><td>从 4×4 逐级长到 1024×1024，第一次出高清人脸</td></tr><tr><td>2018-09-28</td><td>BigGAN</td><td>Brock 等（DeepMind）</td><td>大批量、大模型做 ImageNet 类别条件生成，截断技巧调保真度和多样性</td></tr><tr><td>2018-12-12</td><td>StyleGAN</td><td>Karras 等（NVIDIA）</td><td>风格调制的生成器，FFHQ 人脸几乎分不出真假</td></tr><tr><td>2019-12-03</td><td>StyleGAN2</td><td>Karras 等（NVIDIA）</td><td>去掉伪影，人脸质量到顶</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="likelihood">
+    <h2><span class="n">4</span><span>似然这一派：自回归、流、码本（2014–2020）</span></h2>
+    <p>和对抗网络同时，另一批人坚持要能算似然。好处是训练目标就是最大似然，模型必须给每张训练图都分到概率，不会只挑几种好生成的，多样性有保证；坏处是要为「能算」付出结构上的代价。</p>
+    <p><b>自回归</b>把图像拆成一串像素，用链式法则逐个预测：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>p</i>(<i>x</i>) = ∏<sub><i>i</i></sub> <i>p</i>(<i>x</i><sub><i>i</i></sub> | <i>x</i><sub>1</sub>, …, <i>x</i><sub><i>i</i>−1</sub>)</span></span><span class="dc">每个像素以前面所有像素为条件</span></div></div>
+    <p>PixelRNN 和 PixelCNN（2016）在 CIFAR-10 上的似然是当时最好的，但生成一张 256×256 的彩色图要串行预测近二十万个值，一张图要跑很久。</p>
+    <p><b>流模型</b>用一串可逆变换把图像映到标准正态，按变量替换公式精确算似然。NICE、RealNVP、Glow 一路改进耦合层的设计，Glow 做出了 256×256 的人脸，能在隐空间里调笑容、年龄。可逆的要求限制了网络的表达能力，每一层都要和输入同样大小，图偏糊，参数量也大。</p>
+    <p><b>码本加自回归</b>是两者之间的折中，后来影响最大。VQ-VAE（2017）先训练一个自编码器，把图像压成一张小的离散编号图（比如 32×32 个编号，每个编号查码本得到一个向量），再用 PixelCNN 在编号上做自回归。</p>
+    <p>串行步数从几十万降到一千左右，编号又像文字一样可以做分类预测。VQ-VAE-2 加了层级码本；VQGAN（2020）给自编码器加上感知损失和对抗损失，压缩得更狠还清楚，再用 Transformer 在编号上生成。</p>
+    <p>这一派留给后面的东西比它自己的样本重要。「先压缩、再在压缩空间里生成」成了 DALL·E、Latent Diffusion、Stable Diffusion 共同的骨架，今天的扩散和流匹配模型仍在自编码器的隐空间里工作；「把图像变成 token」则在 2024 年以后让图像进入了语言模型。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2014-10-30</td><td>NICE</td><td>Dinh 等</td><td>可逆网络，似然能精确算（流模型）</td></tr><tr><td>2016-01-25</td><td>PixelRNN</td><td>van den Oord 等（DeepMind）</td><td>一个像素一个像素地自回归生成，似然最好，极慢</td></tr><tr><td>2016-05-27</td><td>RealNVP</td><td>Dinh 等</td><td>仿射耦合层，流模型能处理自然图像</td></tr><tr><td>2016-06-16</td><td>条件 PixelCNN</td><td>van den Oord 等</td><td>卷积版自回归，训练能并行</td></tr><tr><td>2017-11-02</td><td>VQ-VAE</td><td>van den Oord 等</td><td>图像压成离散码本编号，再用 PixelCNN 在编号上生成</td></tr><tr><td>2018-07-09</td><td>Glow</td><td>Kingma、Dhariwal（OpenAI）</td><td>1×1 可逆卷积，流模型做出 256×256 人脸</td></tr><tr><td>2019-06-02</td><td>VQ-VAE-2</td><td>Razavi 等</td><td>两层码本 + 带注意力的 prior，质量接近 BigGAN</td></tr><tr><td>2020-12-17</td><td>VQGAN（Taming Transformers）</td><td>Esser 等</td><td>码本用对抗损失和感知损失训练，压得更狠还清楚，Transformer 在码本上生成</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="diffusion">
+    <h2><span class="n">5</span><span>扩散模型站起来（2015–2021）</span></h2>
+    <p>扩散模型的框架 2015 年就有了：Sohl-Dickstein 等人借非平衡热力学的思路，定义一条逐步加噪、把图像变成纯噪声的链，再训练一个网络学它的逆过程。只要每一步加的噪声足够小，逆向一步就能用一个高斯描述好。框架很漂亮，但样本质量远不如同期的对抗网络，之后几年没什么人跟。</p>
+    <p>另一条线从分数出发。Song 和 Ermon 的 NCSN（2019）不学概率本身，而学对数密度的梯度 <span class="m">∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i>)</span>（分数），再用朗之万动力学沿着梯度一步步把噪声推向数据；为了让低密度区域的分数也学得准，训练时用多个尺度的噪声污染数据。这和扩散在数学上是一回事，只是起点不同。</p>
+    <p>2020 年 6 月的 DDPM 把扩散做出了效果。它有两个关键简化。一是前向加噪有闭式解，任意一步都能从原图一步算出：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>x</i><sub><i>t</i></sub> = √<i class="aov">α</i><sub><i>t</i></sub> <i>x</i><sub>0</sub> + √(1 − <i class="aov">α</i><sub><i>t</i></sub>) <i>ε</i>,  <i>ε</i> ∼ <i>N</i>(0, <i>I</i>)</span></span><span class="dc">训练时随机取一个 t，直接构造带噪图</span></div><div><span class="df"><span class="m"><i>L</i> = <i>E</i><sub><i>x</i><sub>0</sub>, <i>t</i>, <i>ε</i></sub> ‖<i>ε</i> − <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>)‖<sup>2</sup></span></span><span class="dc">网络只预测加进去的那份噪声</span></div></div>
+    <p>二是把复杂的变分下界简化成上面这个均方误差。训练变成了一个普通的回归问题，不用对抗、不用可逆结构，网络随便选（DDPM 用的是带注意力的 U-Net）。生成时从纯噪声开始，每步用网络估计的噪声去掉一小部分、再加一点新噪声，走一千步。</p>
+    <p>接下来一年多的工作补齐了剩下的短板。DDIM 证明同一个训练好的模型可以换一个不加随机噪声的采样器，一千步压到几十步。Song 等人把扩散和分数模型统一成随机微分方程，并给出一个确定性的常微分方程版本，这为后来的快速求解器和流匹配铺了路。Improved DDPM 学方差、改用余弦加噪表，质量随规模稳定变好。</p>
+    <p>2021 年 5 月的 ADM（论文题目就叫「扩散模型打败了对抗网络」）在 ImageNet 上 FID 超过 BigGAN，同时多样性更好。</p>
+    <p>它多用了一招<b>分类器引导</b>：另训一个能看带噪图的分类器，采样时沿分类器梯度把图往目标类别推，用多样性换保真度。年底的<b>无分类器引导</b>去掉了这个额外的分类器：同一个模型训练时随机把条件丢掉，采样时把有条件和无条件两次预测的差放大：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i class="atl">ε</i> = <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅) + <i>w</i> · (<i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>c</i>) − <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅))</span></span><span class="dc">w 大于 1 时更贴合条件 c，多样性下降</span></div></div>
+    <p>这个公式此后几乎出现在所有文本生成图像模型里，w 就是各种界面上的「引导强度」。到 2021 年底，扩散模型同时有了似然派的多样性和对抗网络级别的保真度，训练又稳定，只剩一个短板：采样要走很多步。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2015-03-12</td><td>非平衡热力学扩散模型</td><td>Sohl-Dickstein 等</td><td>加噪链的逆过程，框架有了，效果一般</td></tr><tr><td>2019-07-12</td><td>NCSN（分数模型）</td><td>Song、Ermon</td><td>学数据分布的梯度，用朗之万动力学采样</td></tr><tr><td>2020-06-19</td><td>DDPM</td><td>Ho、Jain、Abbeel</td><td>预测噪声、方差固定，第一次出好图</td></tr><tr><td>2020-10-06</td><td>DDIM</td><td>Song 等</td><td>同一个模型换个采样器，1000 步压到几十步</td></tr><tr><td>2020-11-26</td><td>分数随机微分方程</td><td>Song 等</td><td>把扩散和分数模型统一成随机微分方程，还给出对应的常微分方程</td></tr><tr><td>2021-02-18</td><td>Improved DDPM</td><td>Nichol、Dhariwal（OpenAI）</td><td>学方差、余弦加噪表，随规模稳定变好</td></tr><tr><td>2021-05-11</td><td>ADM（Diffusion Models Beat GANs）</td><td>Dhariwal、Nichol（OpenAI）</td><td>加大模型 + 分类器引导，ImageNet FID 超过 BigGAN</td></tr><tr><td>2021-12</td><td>无分类器引导（NeurIPS 研讨会）</td><td>Ho、Salimans</td><td>一个模型随机丢条件，采样时放大有条件和无条件的差</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="text">
+    <h2><span class="n">6</span><span>文本生成图像爆发（2021–2022）</span></h2>
+    <p>2021 年 1 月 5 日 OpenAI 同一天公布了 DALL·E 和 CLIP。DALL·E 是码本加自回归的放大版：一个离散自编码器把 256×256 的图压成 32×32 个编号，文本 BPE 编码成最多 256 个 token，两者拼成一串，用 120 亿参数的 Transformer 逐个预测。</p>
+    <p>它能按没见过的组合出图（「牛油果形状的扶手椅」），第一次让人看到「用一句话描述，模型就画出来」是可行的。</p>
+    <p>CLIP 本身不生成图像。它用 4 亿对网上收集的图文对做对比学习，让匹配的图和文在同一个向量空间里靠近。它后来身兼三职：生成模型的文本编码器、给生成结果打分排序的裁判、筛选训练数据的过滤器。</p>
+    <p>之后一年半，主流从码本加自回归转向扩散。GLIDE（2021-12）把扩散模型接上文本条件，用无分类器引导，效果超过 DALL·E。</p>
+    <p>同一天的 Latent Diffusion 把 VQ-VAE 的两阶段思路用到扩散上：先训一个自编码器，把 512×512×3 的图压成 64×64×4 的隐变量（数据量约为原来的 1/48），扩散只在隐空间里做，算力降了一个量级。</p>
+    <p>2022 年春夏三家大厂的方案各不相同：</p>
+    <ul><li>DALL·E 2 先用一个 prior 把文本变成 CLIP 图像特征，再用扩散解码器把特征画成图。</li><li>Google 的 Imagen 不要 prior，用冻住的 T5-XXL 语言模型编码文本，接级联扩散从 64×64 放大到 1024×1024，论文的一个结论是加大文本编码器比加大图像生成网络更管用。</li><li>Parti 回到码本加自回归，做到 200 亿参数，质量同样顶尖。</li></ul>
+    <p>结构可以很不一样，共同点是更大的模型、更好的文本理解。</p>
+    <p>真正让它走出论文的是 2022 年夏天。Midjourney 7 月在 Discord 上开放测试，靠审美和社区；8 月 22 日 Stable Diffusion 公开权重，它是 Latent Diffusion 在 LAION 图文数据上的大规模版本，一张消费级显卡就能跑。开放权重带来了此后两年的社区生态：各种微调模型、插件、图形界面都建在它上面。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2021-01-05</td><td>DALL·E（博客）</td><td>OpenAI</td><td>120 亿参数，码本 + 自回归，零样本按句子出图</td></tr><tr><td>2021-01-05</td><td>CLIP（博客）</td><td>OpenAI</td><td>4 亿图文对对比学习，后来成了各家的文本编码器和打分器</td></tr><tr><td>2021-05-26</td><td>CogView</td><td>清华等</td><td>中文文本生成图像</td></tr><tr><td>2021-12-20</td><td>GLIDE</td><td>OpenAI</td><td>文本条件扩散 + 无分类器引导</td></tr><tr><td>2021-12-20</td><td>Latent Diffusion</td><td>慕尼黑大学（Rombach 等）</td><td>在自编码器的隐空间里扩散，算力降一个量级</td></tr><tr><td>2022-04-06</td><td>DALL·E 2（博客；论文 04-13）</td><td>OpenAI</td><td>CLIP 图像特征当中间表示，扩散 prior + 扩散解码器</td></tr><tr><td>2022-05-23</td><td>Imagen</td><td>Google</td><td>冻住的 T5-XXL 当文本编码器，级联扩散</td></tr><tr><td>2022-06-22</td><td>Parti</td><td>Google</td><td>200 亿参数自回归，码本路线也能做到同等质量</td></tr><tr><td>2022-07-12</td><td>Midjourney 开放测试</td><td>Midjourney</td><td>通过 Discord 对公众开放</td></tr><tr><td>2022-08-22</td><td>Stable Diffusion 开源</td><td>Stability AI、Runway、慕尼黑大学</td><td>Latent Diffusion 的大规模版本，权重公开，消费级显卡能跑</td></tr><tr><td>2022-09-28</td><td>DALL·E 2 取消等候名单</td><td>OpenAI</td><td>所有人都能注册使用</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="control">
+    <h2><span class="n">7</span><span>可控、定制、提速（2022–2023）</span></h2>
+    <p>有了开放的基础模型，研究和社区的注意力转到两件事上。第一件是控制。用户想要的往往是「这个人、这个姿势、这张线稿」，用文字说不清楚。</p>
+    <p>「这个人」靠定制：Textual Inversion 学一个新的词向量代表某个物体；DreamBooth 用三五张照片微调整个模型，让它记住这只狗或这个人，再放进任意场景。</p>
+    <p>LoRA 原本是 2021 年给语言模型设计的低秩微调，只训练每层权重旁边两个很小的矩阵，2023 年初被大量用到 Stable Diffusion 上，一个风格或人物的 LoRA 只有几十 MB，可以随意组合。</p>
+    <p>「这个姿势和构图」靠 ControlNet：把扩散网络的编码器复制一份，接上姿态骨架、线稿、深度图之类的条件，原模型冻住不动，两者通过初始化为零的卷积相连，训练开始时不破坏原模型。它让文本生成图像第一次能用在需要精确构图的工作里。</p>
+    <p>第二件是速度。几十步采样在一张消费级显卡上仍要好几秒。</p>
+    <p>一致性模型（2023-03）学一个函数，把轨迹上任意一点直接映到终点，一两步出图；Latent Consistency Models 把它蒸馏到 Stable Diffusion 上，4 步左右；SDXL Turbo 的对抗扩散蒸馏在蒸馏之外再加一个判别器，1 步出图，接近对抗网络的一次前向。对抗网络的判别器以损失函数的身份回到了扩散里。</p>
+    <p>DALL·E 3（2023-09）指出了另一个方向：模型画不对，很多时候是训练数据的描述太简略。网上图片的替代文字往往只有几个词，和图里的内容对不上。OpenAI 训练了一个描述模型，把训练图重写成详细的长描述，提示词遵循能力大幅提升；用户的提示词再由 ChatGPT 改写成同样风格的长描述。此后各家都这么做。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2022-08-02</td><td>Textual Inversion</td><td>Gal 等</td><td>学一个新词向量代表某个物体或风格</td></tr><tr><td>2022-08-25</td><td>DreamBooth</td><td>Ruiz 等（Google）</td><td>几张照片微调整个模型，生成「这只狗」在任意场景里</td></tr><tr><td>2023-02-10</td><td>ControlNet</td><td>Zhang、Rao、Agrawala（斯坦福）</td><td>复制一份编码器接姿态、线稿、深度图等条件，原模型冻住</td></tr><tr><td>2023-03-02</td><td>Consistency Models</td><td>Song 等（OpenAI）</td><td>学一个直接映射到终点的函数，一两步出图</td></tr><tr><td>2023-07-04</td><td>SDXL</td><td>Stability AI</td><td>更大的 U-Net、两个文本编码器、精修模型</td></tr><tr><td>2023-09-20</td><td>DALL·E 3（10-19 进 ChatGPT Plus）</td><td>OpenAI</td><td>训练数据用模型重写成详细描述，提示词由 ChatGPT 改写</td></tr><tr><td>2023-10-06</td><td>Latent Consistency Models</td><td>Luo 等（清华）</td><td>一致性蒸馏用到隐空间扩散，4 步左右出图</td></tr><tr><td>2023-11-28</td><td>Adversarial Diffusion Distillation（SDXL Turbo）</td><td>Stability AI</td><td>蒸馏加对抗损失，1 步出图</td></tr><tr><td>2023-12-20</td><td>Midjourney V6</td><td>Midjourney</td><td>长提示词更准，画面更连贯</td></tr></tbody></table><p class="tnote">LoRA 论文 2021-06-17 上 arXiv，原本是给语言模型的。</p></div>
+    
+  </section>
+<section class="aisec" id="dit">
+    <h2><span class="n">8</span><span>骨干换成 Transformer，目标换成流（2022–2024）</span></h2>
+    <p>这一段换了两样东西，都在 2022 年下半年出现，到 2024 年成为主流。</p>
+    <p>一是骨干网络。从 DDPM 到 SDXL，去噪网络都是 U-Net：卷积的编码器和解码器，中间夹一些注意力层。DiT（2022-12）把隐变量切成小块当 token，换成标准的 Transformer，实验显示计算量越大 FID 越好，没有看到饱和。</p>
+    <p>Transformer 还有一个好处：文本 token 和图像 token 能放进同一个注意力里。Stable Diffusion 3 的 MMDiT 就是这样，文本和图像各有一套权重，在注意力里联合计算，图文交互比 U-Net 里的交叉注意力充分。Sora 把同样的做法用到视频的时空图块上。</p>
+    <p>二是训练目标。整流和流匹配把「加噪再去噪」改写成「学一个从噪声到数据的速度场」。最常用的版本让带噪样本是数据和噪声的直线插值，网络预测沿这条直线的速度：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>x</i><sub><i>t</i></sub> = (1 − <i>t</i>) <i>x</i><sub>0</sub> + <i>t</i> <i>ε</i></span></span><span class="dc">t 从 0 到 1，从数据走到噪声</span></div><div><span class="df"><span class="m"><i>L</i> = <i>E</i> ‖<i>v</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>) − (<i>ε</i> − <i>x</i><sub>0</sub>)‖<sup>2</sup></span></span><span class="dc">目标速度就是这条直线的方向</span></div></div>
+    <p>生成时从纯噪声出发，沿学到的速度场解一个常微分方程走回数据。路径越直，用越少的步数就越准。数学上扩散是流匹配的一个特例（换一种插值方式），所以「扩散模型」这个名字还在用，训练目标多半已经是流匹配。SD3、FLUX.1 以及之后大部分开源模型都是 Transformer 加流匹配。</p>
+    <p>同时，压缩这一步也在变狠。Stable Diffusion 的自编码器下采样 8 倍；SANA（2024-10）用 32 倍压缩的自编码器加线性注意力，能直接出 4K 图，小版本在 16GB 的笔记本显卡上就能跑。</p>
+    <p>PixArt-α 说明了用好的数据和分阶段训练，DiT 做文本生成图像的训练成本可以降到 Stable Diffusion 1.5 的十分之一左右。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2022-09-07</td><td>整流（Rectified Flow）</td><td>Liu 等</td><td>学一条从噪声到数据的直线速度场，路径越直采样步数越少</td></tr><tr><td>2022-10-06</td><td>流匹配（Flow Matching）</td><td>Lipman 等（Meta）</td><td>直接回归速度场，扩散是它的一个特例</td></tr><tr><td>2022-12-19</td><td>DiT</td><td>Peebles、Xie</td><td>用 Transformer 替代 U-Net 做扩散骨干，计算量越大 FID 越好</td></tr><tr><td>2023-09-30</td><td>PixArt-α</td><td>华为诺亚等</td><td>DiT 做文本生成图像，训练耗时约为 Stable Diffusion 1.5 的十分之一</td></tr><tr><td>2024-02-15</td><td>Sora（技术报告）</td><td>OpenAI</td><td>DiT 用到视频的时空图块上，规模带来一致性</td></tr><tr><td>2024-03-05</td><td>Stable Diffusion 3（论文；06-12 开放 Medium 权重）</td><td>Stability AI</td><td>MMDiT（文本和图像两路 token 联合注意力）+ 整流</td></tr><tr><td>2024-07-30</td><td>Midjourney V6.1</td><td>Midjourney</td><td>更连贯、更快</td></tr><tr><td>2024-08-01</td><td>FLUX.1</td><td>Black Forest Labs</td><td>Stable Diffusion 原班人马，120 亿参数整流 Transformer，部分开放权重</td></tr><tr><td>2024-10-14</td><td>SANA</td><td>NVIDIA 等</td><td>32 倍压缩的自编码器 + 线性注意力，能出 4K，小版本在 16GB 笔记本显卡上就能跑</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="ar">
+    <h2><span class="n">9</span><span>自回归回潮，生成和理解开始合并（2024）</span></h2>
+    <p>扩散成为主流以后，自回归一度被认为太慢、太贵。2024 年它换了花样回来。</p>
+    <p>VAR（2024-04）不再按光栅顺序逐个 token 预测，而是逐个尺度预测：先生成 1×1 的编号图，再 2×2、4×4，一直到最终分辨率，每个尺度内的所有 token 并行生成。串行步数只有十来步，质量和速度都超过同期的 DiT，拿了 NeurIPS 2024 的最佳论文。</p>
+    <p>MAR（2024-06）去掉了离散码本：每个 token 是连续向量，由一个很小的扩散网络当「输出头」来生成，避开了量化带来的信息损失。Infinity 把尺度自回归推到 1024×1024，单张约 0.8 秒。</p>
+    <p>更大的变化是方向。大语言模型本身就是自回归的，如果图像也能变成 token，同一个模型就能既看图又画图，生成时还能用上语言模型的知识和上下文。</p>
+    <p>Chameleon 把图像和文本都编成离散 token，从头混合训练；Transfusion 在一个 Transformer 里让文本走下一词预测、图像走扩散；Emu3 只用下一 token 预测，生成和理解都做；Janus 发现理解和生成要的视觉特征不一样，就用两套视觉编码器，共享一个语言模型。</p>
+    <p>这几种拼法在 2024 年都还没有在质量上超过专门的扩散模型，但它们回答了一个问题：生成图像不一定要一个单独的模型。到 2025 年这条路进了产品。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>作者 / 机构</th><th>变化</th></tr></thead><tbody><tr><td>2024-04-03</td><td>VAR</td><td>田柯宇等（北大、字节）</td><td>不逐个 token 预测，而是逐个尺度预测：先 1×1，再 2×2……质量和速度超过同期 DiT</td></tr><tr><td>2024-05-16</td><td>Chameleon</td><td>Meta</td><td>图像和文本都是离散 token，一个模型从头混合训练</td></tr><tr><td>2024-06-17</td><td>MAR</td><td>Li、何恺明等</td><td>每个 token 用一个小扩散头生成，不再需要离散码本</td></tr><tr><td>2024-08-20</td><td>Transfusion</td><td>Meta</td><td>一个 Transformer，文本用下一词预测，图像用扩散，同时训练</td></tr><tr><td>2024-09-27</td><td>Emu3</td><td>智源</td><td>只用下一 token 预测，生成和理解都做</td></tr><tr><td>2024-10-17</td><td>Janus</td><td>DeepSeek</td><td>理解和生成用两套视觉编码，共享一个语言模型</td></tr><tr><td>2024-12-05</td><td>Infinity</td><td>字节</td><td>按比特预测的尺度自回归，1024×1024 约 0.8 秒</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="native">
+    <h2><span class="n">10</span><span>生成进了对话模型（2025）</span></h2>
+    <p>2025 年 3 月 25 日，ChatGPT 的图像生成从调用 DALL·E 3 改成由 GPT-4o 自己生成。用户第一次可以像改文章一样改图：「把背景换成雪地」「人物不要动」「把这行字改成中文」。图里的文字终于能写对，十几个物体的复杂提示也能大体照办。上线后的几天里，用它把照片转成某种动画风格的图在社交网络上大量传播，OpenAI 一度限流。</p>
+    <p>OpenAI 没公开结构。从效果看，语言模型对提示词的理解、对上下文的记忆直接用在了生成上，图像生成从「写好一段提示词」变成了「对话」。</p>
+    <p>8 月 Google 的 Gemini 2.5 Flash Image（Nano Banana）走同一条路，在多轮编辑时保持人物一致这一点上尤其突出；11 月建在 Gemini 3 Pro 上的 Nano Banana Pro 能画长段文字和信息图。</p>
+    <p>独立的生成模型也在往同一个方向靠：FLUX.1 Kontext 用同一个流匹配模型做生成和按指令编辑，Seedream 4.0 把生成和编辑合一并支持多张参考图。编辑能力和生成能力的界限基本消失了。</p>
+    <p>开源一侧，中文团队成了主力：</p>
+    <ul><li>Qwen-Image 是 200 亿参数的 MMDiT，用 Qwen2.5-VL 视觉语言模型理解提示词，中文文字渲染突出。</li><li>HunyuanImage 3.0 是 800 亿参数（每个 token 激活 130 亿）的混合专家模型，在一个自回归框架里统一理解和生成。</li><li>Z-Image 只有 60 亿参数，蒸馏版 8 步出图。</li><li>BAGEL 是开源的统一理解和生成模型。</li></ul>
+    <p>技术上没有统一答案：有的是大语言模型加扩散头，有的是 MMDiT 接一个视觉语言模型当文本编码器，有的是统一的自回归模型，共同点是文本理解这一侧越来越大。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2025-03-25</td><td>GPT-4o 图像生成</td><td>OpenAI</td><td>生成由 GPT-4o 原生完成，取代 ChatGPT 里的 DALL·E 3；能在对话里多轮改图，文字渲染和多物体明显变好</td></tr><tr><td>2025-04-03</td><td>Midjourney V7</td><td>Midjourney</td><td>细节和提示词遵循变好，加了草稿模式</td></tr><tr><td>2025-04-15</td><td>Seedream 3.0（技术报告）</td><td>字节</td><td>中英文字渲染、原生 2K</td></tr><tr><td>2025-05-20</td><td>BAGEL</td><td>字节</td><td>开源的统一理解和生成模型</td></tr><tr><td>2025-06-17</td><td>FLUX.1 Kontext（技术报告）</td><td>Black Forest Labs</td><td>同一个流匹配模型做生成和按指令编辑，人物前后一致</td></tr><tr><td>2025-08-04</td><td>Qwen-Image</td><td>阿里通义</td><td>200 亿参数 MMDiT，用 Qwen2.5-VL 理解提示词，中文文字渲染突出，开放权重</td></tr><tr><td>2025-08-26</td><td>Gemini 2.5 Flash Image（Nano Banana）</td><td>Google</td><td>原生图像生成和对话式编辑，人物一致性好</td></tr><tr><td>2025-09-24</td><td>Seedream 4.0（技术报告）</td><td>字节</td><td>生成和编辑合一，多图参考，最高 4K</td></tr><tr><td>2025-09-28</td><td>HunyuanImage 3.0</td><td>腾讯</td><td>800 亿参数（激活 130 亿）的混合专家多模态模型，开放权重</td></tr><tr><td>2025-11-20</td><td>Nano Banana Pro（Gemini 3 Pro Image）</td><td>Google</td><td>建在 Gemini 3 Pro 上，长文字、信息图、4K</td></tr><tr><td>2025-11-25</td><td>FLUX.2</td><td>Black Forest Labs</td><td>多参考图编辑，开放的 Dev 版 320 亿参数</td></tr><tr><td>2025-11-27</td><td>Z-Image</td><td>阿里通义</td><td>60 亿参数单流 DiT，蒸馏版 8 步出图</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="now">
+    <h2><span class="n">11</span><span>2026 年到现在</span></h2>
+    <p>2026 年的变化更多发生在产品层面。Google 2 月把 Nano Banana 2 设为 Gemini 应用的默认图像模型，质量接近 Pro、速度和价格接近 Flash；6 月宣布 8 月关闭 Imagen 4，Gemini API 里只留 Gemini 原生的图像模型。</p>
+    <p>这是一个标志：在大厂里，独立的文本生成图像模型让位给了对话模型自带的生成能力。OpenAI 4 月发布 GPT Image 2，ChatGPT 里的图像生成随之升级。</p>
+    <p>Midjourney 是另一种活法：继续做独立模型，把重点放在审美、个性化和编辑上，V8 系列更快、原生 2K，V8.2 用一个新的编辑模型取代了之前分散的几个参考和重绘工具。开源一侧仍以 DiT 加流匹配为主，配上越来越大的视觉语言模型做条件编码器。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>工作</th><th>机构</th><th>变化</th></tr></thead><tbody><tr><td>2026-02-26</td><td>Nano Banana 2（Gemini 3.1 Flash Image）</td><td>Google</td><td>接近 Pro 的质量，Flash 的速度和价格，成为 Gemini 应用默认图像模型</td></tr><tr><td>2026-04-14</td><td>Midjourney V8.1</td><td>Midjourney</td><td>比之前快 4 到 5 倍，原生 2K；6 月 10 日成为默认</td></tr><tr><td>2026-04-21</td><td>GPT Image 2（ChatGPT Images 2.0）</td><td>OpenAI</td><td>API 快照 gpt-image-2-2026-04-21</td></tr><tr><td>2026-06-15</td><td>Imagen 4 宣布下线（8 月 17 日关闭）</td><td>Google</td><td>独立的文本生成图像模型退场，Gemini API 里只留 Gemini 原生图像模型</td></tr><tr><td>2026-07-24</td><td>Midjourney V8.2 成为默认</td><td>Midjourney</td><td>新的编辑模型取代全能参考、角色参考和重绘工具</td></tr><tr><td>2026-10-06</td><td>Nano Banana 2.1 正式可用</td><td>Google</td><td>视觉质量、多轮人物一致性、文字渲染再提升，支持 8:1 宽幅</td></tr></tbody></table><p class="tnote">截至 2026-10-29。只收了官方页面能对上日期的条目。</p></div>
+    
+  </section>
+<section class="aisec" id="data">
+    <h2><span class="n">12</span><span>数据：从 ImageNet 到重写描述</span></h2>
+    <p>模型结构换了好几轮，数据的变化同样大，只是论文里通常写得很少。</p>
+    <p>对抗网络和似然派时代用的是有标注的小数据集：CIFAR-10 的 6 万张 32×32 小图、ImageNet 的一千类 128 万张、CelebA 和 FFHQ 的人脸、LSUN 的卧室和教堂。条件最多是一个类别标签。</p>
+    <p>文本生成图像需要的是图文对，而且要几亿对。CLIP 和 DALL·E 用的是 OpenAI 自己从网上收集、没有公开的数据。LAION 把这件事开放了：从 Common Crawl 网页里抽出图片和替代文字，用 CLIP 算图文相似度，低于阈值的丢掉，2021 年发布 4 亿对，2022 年发布 58.5 亿对。</p>
+    <p>Stable Diffusion 就是在 LAION 的子集上训练的。网上的替代文字又短又不准，和图里的内容常常对不上，这限制了模型听懂复杂提示的能力。</p>
+    <p>DALL·E 3 之后的做法是重写描述：用一个看图说话的模型给每张训练图重新写一段详细描述，描述里有哪些物体、什么位置、什么颜色、图里写了什么字。到 2025 年，这一步通常由各家自己的视觉语言模型来做，描述越写越长，图里文字的渲染也跟着变准。数据规模之外，筛选也越来越重要：去掉低质量、有水印、重复的图，按美学分数挑出精选集做最后阶段的微调。</p>
+    <p>数据也带来了争议：网上抓的图里有大量受版权保护的作品和真实人物照片。生成内容的溯源因此成了一个工程问题，Google DeepMind 2023-08-29 发布的 SynthID 把不可见的水印直接嵌进像素，经过裁剪、压缩之后仍能检测。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>数据或做法</th><th>来源</th><th>规模或变化</th></tr></thead><tbody><tr><td>2009-06</td><td>ImageNet（CVPR 2009）</td><td>普林斯顿、斯坦福</td><td>一千类约 128 万张，对抗网络时代类别条件生成的主战场</td></tr><tr><td>2021-01-05</td><td>CLIP 训练数据</td><td>OpenAI</td><td>4 亿图文对，未公开</td></tr><tr><td>2021-11-03</td><td>LAION-400M</td><td>LAION</td><td>用 CLIP 相似度过滤网页图文，4 亿对，公开</td></tr><tr><td>2022-10-16</td><td>LAION-5B（论文）</td><td>LAION</td><td>58.5 亿对，Stable Diffusion 用的是它的子集</td></tr><tr><td>2023-08-29</td><td>SynthID</td><td>Google DeepMind</td><td>生成图像嵌入不可见水印，用于溯源</td></tr><tr><td>2023-09-20</td><td>DALL·E 3 重写描述</td><td>OpenAI</td><td>训练图的描述由模型重写成详细长句，此后成为通行做法</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="eval">
+    <h2><span class="n">13</span><span>评价：从 FID 到对战排行榜</span></h2>
+    <p>生成模型怎么评一直是个难题：没有标准答案，好坏取决于人。评价方法的变化也反映了大家关心的东西在变。</p>
+    <p>早期用 Inception Score 和 FID。两者都借一个训练好的 ImageNet 分类网络：Inception Score 看生成的图是否既能被分得很确定、类别又分布均匀；FID 把真实图和生成图都过一遍网络，比较两组特征的均值和协方差，越小越好。</p>
+    <p>FID 同时受保真度和多样性影响，在类别条件生成上很好用，此后十年都是论文里的标配。2022 年文本生成图像的论文还在比 MS-COCO 上的零样本 FID。</p>
+    <p>问题是 FID 不看提示词，也和人的偏好对不太上。于是出现了两类新指标。一类测图文是否匹配：CLIPScore 直接用 CLIP 算相似度；GenEval（2023）用目标检测器逐项检查数量、颜色、位置这类组合要求有没有画对。</p>
+    <p>另一类直接学人的偏好：ImageReward、Pick-a-Pic、HPSv2 收集大量「两张图里人更喜欢哪张」的标注，训练一个打分模型。</p>
+    <p>偏好数据还能反过来训练生成模型。Diffusion-DPO（2023-11）把语言模型里的直接偏好优化搬到扩散模型上，用 Pick-a-Pic 的偏好对微调 SDXL，人评明显变好。到 2025 年，类似语言模型的「预训练、精选数据微调、偏好对齐」三段式成了大模型生图的常规流程。</p>
+    <p>面向公众的比较则交给了对战排行榜：给出同一个提示词，匿名展示两个模型的图，让访客投票，按 Elo 类评分排名。它衡量的是大众偏好，不细分能力，但覆盖面最广，各家发布新模型时都会引用。</p>
+    <div class="tbl"><table><thead><tr><th>日期</th><th>指标或方法</th><th>作者</th><th>测什么</th></tr></thead><tbody><tr><td>2016-06-10</td><td>Inception Score</td><td>Salimans 等</td><td>分类网络对生成图的判别是否确定、类别是否均匀</td></tr><tr><td>2017-06-26</td><td>FID</td><td>Heusel 等</td><td>真实图和生成图在 Inception 特征上的分布距离</td></tr><tr><td>2021-04-18</td><td>CLIPScore</td><td>Hessel 等</td><td>用 CLIP 相似度衡量图文是否匹配，原本为图像描述设计</td></tr><tr><td>2023-04-12</td><td>ImageReward</td><td>Xu 等（清华）</td><td>人类偏好打分模型</td></tr><tr><td>2023-05-02</td><td>Pick-a-Pic / PickScore</td><td>Kirstain 等</td><td>真实用户的成对偏好数据和打分模型</td></tr><tr><td>2023-06-15</td><td>HPSv2</td><td>Wu 等</td><td>人类偏好打分模型和基准</td></tr><tr><td>2023-10-17</td><td>GenEval</td><td>Ghosh 等</td><td>用检测器逐项检查数量、颜色、位置是否照提示画对</td></tr><tr><td>2023-11-21</td><td>Diffusion-DPO</td><td>Wallace 等</td><td>用偏好数据直接微调扩散模型</td></tr></tbody></table></div>
+    
+  </section>
+<section class="aisec" id="threads">
+    <h2><span class="n">14</span><span>二十年里贯穿的几条线</span></h2>
+    <div class="tbl"><table><thead><tr><th></th><th>2014 前后</th><th>2020–2022</th><th>2023–2024</th><th>2025–2026</th></tr></thead><tbody><tr><td>生成器</td><td>对抗网络、自回归、流</td><td>扩散</td><td>流匹配（扩散的推广）</td><td>流匹配，加上语言模型里的自回归</td></tr><tr><td>骨干网络</td><td>卷积</td><td>U-Net + 注意力</td><td>Transformer（DiT、MMDiT）</td><td>大语言模型本身或其扩展</td></tr><tr><td>条件</td><td>类别标签</td><td>CLIP、T5 文本特征</td><td>更大的文本编码器、控制图</td><td>整段对话、多张参考图</td></tr><tr><td>在哪个空间生成</td><td>像素</td><td>像素或隐空间</td><td>高压缩隐空间</td><td>隐空间或视觉 token</td></tr><tr><td>生成一张图要几步</td><td>1（对抗网络）或几万（像素自回归）</td><td>1000，DDIM 后几十</td><td>蒸馏后 1–8</td><td>按产品调，常见几步到几十步</td></tr><tr><td>训练数据</td><td>ImageNet、人脸数据集</td><td>LAION 这类网页图文对</td><td>模型重写的长描述</td><td>自有数据 + 视觉语言模型写的描述</td></tr><tr><td>怎么评价</td><td>Inception Score、FID</td><td>MS-COCO 零样本 FID、人评</td><td>偏好模型、GenEval</td><td>公开对战排行榜</td></tr></tbody></table></div>
+    <p>几条观察：</p>
+    <ul><li>每次换生成器，都是因为旧的在保真度、多样性、训练稳定、采样速度里卡死了一项。对抗网络卡在多样性和稳定，像素自回归卡在速度，扩散也卡在速度，靠少步采样和蒸馏补上了。</li><li>「先压缩，再生成」这个两阶段结构从 VQ-VAE 一直用到今天，变的是压缩比和压缩后的形式（离散编号还是连续向量）。</li><li>提示词能力的进步，一半来自模型，一半来自数据：DALL·E 3 之后，训练图的描述普遍由模型重写；文本这一侧的模型从 CLIP 涨到 T5-XXL，再到整个视觉语言模型。</li><li>结构上的很多选择最后都被证明是可以换的：U-Net 换成 Transformer、扩散换成流匹配、要不要 prior、离散还是连续 token。不变的是更大的模型、更多更好的数据。</li><li>老方法常以零件的身份回来：判别器回到了对抗蒸馏里，去噪自编码器的想法变成了扩散，码本和自回归变成了统一模型里的视觉 token。</li></ul>
+    
+  </section>
+<section class="aisec" id="open">
+    <h2><span class="n">15</span><span>还没解决的问题</span></h2>
+    <p>截至 2026 年 10 月，单张图的保真度、图里的文字、按指令编辑这几项已经基本过关，剩下的难点集中在下面几处：</p>
+    <ul><li><b>精确的组合</b>：数量多、空间关系复杂的提示（「左边三个红杯子，右边两个蓝的，中间那个倒着」）仍然常出错，GenEval 一类基准上，位置和颜色归属通常是各家分数最低的两项。</li><li><b>长程一致性</b>：同一个人物、同一个产品在几十张图、多轮编辑里保持不变，进步很大，仍不可靠；到视频里问题更明显。</li><li><b>评价</b>：偏好模型和对战排行榜衡量的是「大多数人喜欢」，测不出专业场景要的准确性，也会被风格讨巧的模型刷高。</li><li><b>结构不公开</b>：GPT 图像模型和 Nano Banana 系列都没有公开结构和训练细节，开源模型能看到的最新做法和闭源产品之间有一段信息差。</li><li><b>版权与溯源</b>：训练数据的授权、生成内容的标记还没有统一做法，水印只能证明「是这家生成的」，证明不了「不是生成的」。</li></ul>
+    
+  </section>
+  </article>
+</div>
+</main>
+</body></html>

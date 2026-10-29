@@ -1,0 +1,28 @@
+{
+  "id": "image-gen-history",
+  "kind": "paper",
+  "title": "图像生成二十年：从自编码器到对话里改图",
+  "subtitle": "2006 年到 2026 年 10 月，九个阶段加数据和评价两条线，讲每一代生成器解决了什么、卡在哪里",
+  "topics": [
+    "生成模型",
+    "综述"
+  ],
+  "date": "2006-07",
+  "studied": "2026-10",
+  "published": "2026-10-29",
+  "summary": "一篇文章：前史、对抗网络、似然派、扩散、文本生成图像、可控与提速、Transformer 与流匹配、自回归回潮、进入对话模型九个阶段，每段讲核心做法和卡点，配关键公式和一张日期表；再单独讲训练数据和评价方法怎么变；最后是贯穿二十年的几条线和还没解决的问题。论文日期取 arXiv 第一版，2025、2026 年的产品都对过官方发布页。",
+  "page": "page.html",
+  "outputs": [
+    "<b>15</b> 节",
+    "<b>0.9</b> 万字",
+    "<b>14</b> 张表",
+    "<b>8</b> 个公式",
+    "<b>1</b> 张阶段图"
+  ],
+  "build": {
+    "note": "输入在 19_ImageGenHistory/ 下（content/article.mjs 正文、figures/gen.mjs 阶段图、research/arxiv.txt 日期记录），那个目录不进仓库。page.html 是提交进仓库的成品，19_ImageGenHistory/ 在时构建会先重新生成。",
+    "tool": "19_ImageGenHistory/build.mjs",
+    "requires": "19_ImageGenHistory/build.mjs",
+    "args": []
+  }
+}
