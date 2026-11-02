@@ -1,8 +1,8 @@
 {
   "id": "vae",
   "kind": "paper",
-  "title": "变分自编码器 (Variational Autoencoder)",
-  "subtitle": "先补 KL 散度，再从 CS231n 和一个白板推导视频两头推一遍 ELBO，最后是两种讲法的对照、21 个常见问题和原论文中英对照",
+  "title": "VAE",
+  "subtitle": "变分自编码器 (Variational Autoencoder) 的来历、每个计算环节和后续发展，附原论文逐段中英对照",
   "topics": [
     "生成模型",
     "视频笔记"
@@ -10,21 +10,22 @@
   "date": "2013-12",
   "studied": "2026-10",
   "published": "2026-10-23",
-  "summary": "六个 tab：KL 散度基础、CS231n 第 13 讲的扩写、Nik_Li 44 分钟白板推导、两种讲法对照、21 个常见问题，最后是原论文逐段中英对照，带 61 条批注。论文看不懂不要硬看，硬看发现还是看不懂。",
+  "summary": "四个 tab：综述、原论文中英对照、21 个常见问题，KL 散度、CS231n、Nik_Li 白板推导等资料默认折叠。论文看不懂不要硬看，硬看发现还是看不懂。",
   "source": {
     "name": "Auto-Encoding Variational Bayes · Kingma, Welling",
     "url": "https://arxiv.org/abs/1312.6114"
   },
   "page": "page.html",
   "outputs": [
-    "<b>6</b> 个 tab",
-    "<b>3</b> 万字",
+    "<b>4</b> 个 tab",
+    "<b>3.5</b> 万字",
+    "<b>7</b> 张示意图",
     "<b>32</b> 张截图",
     "<b>21</b> 个常见问题",
     "<b>61</b> 条论文批注"
   ],
   "build": {
-    "note": "输入在 16_VAE/ 下（content/*.mjs 正文、figures/ 示意图、Nik_Li 视频原片），那个目录不进仓库；CS231n 的截图借 14_CS231n 的录像和挑帧工具。page.html 和 assets/ 是提交进仓库的成品，16_VAE/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。 最后一个 tab 是原论文中英对照：16_VAE/build.mjs 调 tools/make-paper.mjs --embed 1 生成 assets/paper.html（图拆到 assets/paper/），用 iframe 嵌进来；译文、批注、文献简述和图 1 在 content/vae/paper/，论文源 16_VAE/paper/arxiv-1312.6114v11.html 不进仓库。",
+    "note": "输入在 16_VAE/ 下（content/*.mjs 正文、figures/ 示意图、Nik_Li 视频原片），那个目录不进仓库；CS231n 的截图借 14_CS231n 的录像和挑帧工具。page.html 和 assets/ 是提交进仓库的成品，16_VAE/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。 第二个 tab 是原论文中英对照：16_VAE/build.mjs 调 tools/make-paper.mjs --embed 1 生成 assets/paper.html（图拆到 assets/paper/），用 iframe 嵌进来；译文、批注、文献简述和图 1 在 content/vae/paper/，论文源 16_VAE/paper/arxiv-1312.6114v11.html 不进仓库。",
     "tool": "16_VAE/build.mjs",
     "requires": "16_VAE/build.mjs",
     "args": []
