@@ -1,0 +1,31 @@
+{
+  "id": "latent-diffusion",
+  "kind": "paper",
+  "title": "Latent Diffusion",
+  "subtitle": "隐空间扩散模型 (Latent Diffusion Model) 的来历、方法和后续发展，Stable Diffusion 的基础，附原论文逐段中英对照",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2021-12",
+  "studied": "2026-11",
+  "published": "2026-11-04",
+  "summary": "四个 tab：综述、原论文中英对照、15 个常见问题，NeurIPS 2023 教程的两份笔记默认折叠在资料里。",
+  "source": {
+    "name": "High-Resolution Image Synthesis with Latent Diffusion Models · Rombach, Blattmann, Lorenz, Esser, Ommer",
+    "url": "https://arxiv.org/abs/2112.10752"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>4</b> 个 tab",
+    "<b>5</b> 张示意图",
+    "<b>52</b> 张截图",
+    "<b>15</b> 个常见问题"
+  ],
+  "build": {
+    "note": "输入在 20_LatentDiffusion/ 下（content/*.mjs 正文、figures/ 示意图、教程录像和字幕），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，20_LatentDiffusion/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放转录。第二个 tab 是原论文中英对照（无批注）：build.mjs 调 tools/make-paper.mjs --embed 1 --plain 1 生成 assets/paper.html，图拆到 assets/paper/，用 iframe 嵌进来；译文、文献链接和表格样式在 content/latent-diffusion/paper/，论文源 20_LatentDiffusion/paper/ 不进仓库。",
+    "tool": "20_LatentDiffusion/build.mjs",
+    "requires": "20_LatentDiffusion/build.mjs",
+    "args": []
+  }
+}

@@ -1,0 +1,12 @@
+/* 宽表格按 686px 的正文宽度缩小，Table 18 太宽，缩到还能读的程度后横向滚动 */
+[id="S4.T1"] table{zoom:.78}
+[id="S4.T2"] table{zoom:.8}
+[id="S4.T3"] table{zoom:.94}
+[id="S4.T5"] table{zoom:.96}
+[id="A4.T10"] table{zoom:.72}
+[id="A5.T12"] table{zoom:.82}
+[id="A5.T13"] table{zoom:.9}
+[id="A5.T14"] table{zoom:.92}
+[id="A5.T15"] table{zoom:.68}
+[id="A6.T18"] table{zoom:.72}
+figure.ltx_table{overflow-x:auto}
