@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Latent Diffusion · 隐空间扩散模型 (Latent Diffusion Model) 的来历、方法和后续发展，Stable Diffusion 的基础，附原论文逐段中英对照</title>
+<meta name="description" content="四个 tab：综述、原论文中英对照、15 个常见问题，NeurIPS 2023 教程的两份笔记默认折叠在资料里。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+.epmain .lede+.lede{margin-top:10px}
+.atl,.aov{position:relative;display:inline-block}
+.atl::after{content:'~';position:absolute;left:50%;top:-.36em;transform:translateX(-30%);font:normal .8em/1 system-ui,sans-serif}
+.aov::after{content:'';position:absolute;left:24%;right:2%;top:.2em;border-top:1px solid currentColor}
+span.atl::after{transform:translateX(-50%)}span.aov::after{left:6%;right:6%}
+.tl button b{width:7ch}
+.sec,.aisec,.faq{scroll-margin-top:calc(var(--bar-h) + 12px)}
+.intro p{margin:0 0 10px}
+.deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df{white-space:pre}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.aidoc .tbl,.epmain .tbl{margin:14px 0}
+pre.code{margin:14px 0 16px;padding:14px 16px;background:#1C1F26;color:#E8E6E1;border-radius:var(--r-sm);overflow-x:auto;font:12.5px/1.6 var(--mono)}
+pre.code code{background:none;padding:0;color:inherit;font:inherit}
+@media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:680px}}
+.faqdoc{max-width:820px;margin:0 auto}
+.faqgrp h2{font-size:16px;margin:30px 0 10px;color:var(--text)}
+.faq{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);margin:8px 0}
+.faq>summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:600;font-size:15px;line-height:1.6}
+.faq>summary::-webkit-details-marker{display:none}
+.faq>summary::before{content:'问';display:inline-block;font-size:11.5px;color:var(--accent);font-weight:700;margin-right:10px}
+.faq[open]>summary{border-bottom:1px solid var(--line)}
+.faqa{padding:6px 16px 10px;font-size:15px;line-height:1.85}
+.faqa p{margin:10px 0}
+/* 综述：原论文的图 */
+.pfig .pimgs{display:flex;gap:16px;justify-content:center;align-items:flex-start;padding:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm)}
+.pfig .pimgs img{display:block;min-width:0;flex:1 1 0;max-width:360px;height:auto}
+.pfig figcaption{margin-top:6px}
+/* 资料：默认折叠的块 */
+.resdoc>.lede{max-width:860px;color:var(--text);font-size:15px;line-height:1.8;margin:0 0 6px}
+.res{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg);margin:12px 0;scroll-margin-top:calc(var(--bar-h) + 12px)}
+.res>summary{cursor:pointer;list-style:none;padding:14px 18px;display:flex;gap:12px;align-items:center}
+.res>summary::-webkit-details-marker{display:none}
+.res>summary::after{content:'展开';margin-left:auto;flex:none;font-size:12px;color:var(--accent-ink)}
+.res[open]>summary::after{content:'收起'}
+.res[open]>summary{border-bottom:1px solid var(--line)}
+.res .rt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.res .rt b{font-size:16px;color:var(--text)}
+.res .rt em{font-style:normal;font-size:13px;color:var(--text-3);line-height:1.6}
+.resb{padding:18px 18px 8px}
+@media(max-width:640px){.resb{padding:14px 10px 6px}}
+.ep-sub{margin:6px 0 0;font-size:15px;color:var(--text-3)}
+/* 论文：iframe 贴满 tab 栏以下的整屏，论文页自己滚；两侧吃掉 .wrap 的内边距 */
+#view-paper{padding-top:0;margin:0 -24px}
+.paperframe{display:block;width:100%;height:calc(100vh - var(--bar-h) - 1px);height:calc(100dvh - var(--bar-h) - 1px);border:0;background:var(--bg)}
+@media(max-width:640px){#view-paper{margin:0 -16px}}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">专题</span><span>Rombach、Blattmann、Lorenz、Esser、Ommer，arXiv 2021-12-20，CVPR 2022</span></div>
+  <h1>Latent Diffusion</h1>
+  <p class="ep-sub">隐空间扩散模型 (Latent Diffusion Model)，Stable Diffusion 的基础</p>
+</header></div>
+<nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
+  <button class="tb on" type="button" role="tab" data-v="overview" aria-selected="true">综述</button>
+  <button class="tb" type="button" role="tab" data-v="paper" aria-selected="false">论文</button>
+  <button class="tb" type="button" role="tab" data-v="faq" aria-selected="false">常见问题</button>
+  <button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资料</button>
+</div></div></nav>
+<main class="wrap">
+<div class="view on" id="view-overview">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-oneline">概述</a></li><li><a href="#o-history">来历</a></li><li><a href="#o-problem">要解决的问题</a></li><li><a href="#o-frame">整体结构</a></li><li><a href="#o-ae">第一阶段：自编码器</a></li><li><a href="#o-scale">隐空间的尺度</a></li><li><a href="#o-f">压缩倍数</a></li><li><a href="#o-ldm">第二阶段：扩散模型</a></li><li><a href="#o-unet">去噪网络</a></li><li><a href="#o-cross">交叉注意力</a></li><li><a href="#o-concat">拼接</a></li><li><a href="#o-cfg">引导</a></li><li><a href="#o-sample">采样</a></li><li><a href="#o-conv">卷积采样</a></li><li><a href="#o-results">实验结果</a></li><li><a href="#o-limits">局限</a></li><li><a href="#o-sd">Stable Diffusion</a></li><li><a href="#o-after">后续发展</a></li><li><a href="#o-relation">相关模型</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">Latent Diffusion 综述：来历、方法与后续发展</h2>
+    <p class="lede">这一页按计算顺序讲 Latent Diffusion。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间九节依次讲第一阶段的自编码器、隐空间的尺度、压缩倍数的选择、第二阶段的扩散模型、去噪网络、两种条件机制、引导和采样；后面六节讲卷积采样、实验结果、局限、Stable Diffusion、后续发展和相关模型。</p><p class="lede">论文逐段中英对照在「论文」tab，常见问题在「常见问题」tab，NeurIPS 2023 教程的笔记收在「资料」tab，默认折叠。前向过程、逆向过程和预测噪声的推导不在这里重复，见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题</a>；KL 散度和证据下界见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">VAE 专题</a>。</p>
+    <section class="aisec" id="o-oneline">
+    <h2><span class="n">1</span><span>概述：先压缩，再在压缩后的空间里扩散</span></h2>
+    <p><b>隐空间扩散模型 (Latent Diffusion Model, LDM)</b> 是一种图像生成方法，由慕尼黑大学和海德堡大学的 Robin Rombach、Andreas Blattmann、Dominik Lorenz、Björn Ommer 以及 Runway ML 的 Patrick Esser 提出。论文 2021-12-20 发布在 arXiv，发表于 CVPR 2022。Stable Diffusion 是这种方法的大规模版本。</p>
+    <p>方法分两个阶段。第一阶段训练一个自编码器，把图像压缩成一个仍保留空间结构的小张量，比如把 512×512×3 的图像压缩成 64×64×4，数据量降到约 1/48。第二阶段冻结自编码器，在这个隐空间 (Latent Space) 里训练扩散模型。生成时，扩散模型在隐空间迭代去噪，解码器只在最后运行一次，把结果还原成图像。</p>
+    <p>论文的另一个贡献是条件机制。它在 U-Net 中加入交叉注意力 (Cross-Attention) 层，文本、类别、布局都可以先编码成一串 token，再由交叉注意力接入去噪网络。这个结构后来成为文本生成图像的标准做法。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 916 412" width="916" height="412" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="arch1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="arch1-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="arch1-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-8" y="-8" width="916" height="412" fill="#fff"/>
+<text x="0" y="13" class="ph">第一阶段：训练自编码器，训练完冻结</text><rect x="0" y="38" width="76" height="40" rx="7" class="mG"/><text x="38" y="63" text-anchor="middle"><tspan class="v" style="font-size:15px">x</tspan></text><text x="38" y="93" class="xs" text-anchor="middle">512 × 512 × 3</text><path d="M76 58 H116" class="ink" marker-end="url(#arch1-a)"/><rect x="120" y="30" width="104" height="56" rx="7" class="mW"/><text x="172" y="55" class="pb" text-anchor="middle">编码器</text><text x="172" y="72" class="xs" text-anchor="middle">卷积，下采样 8 倍</text><path d="M224 58 H264" class="ink" marker-end="url(#arch1-a)"/><rect x="268" y="38" width="76" height="40" rx="7" class="mWarm"/><text x="306" y="63" text-anchor="middle"><tspan class="v" style="font-size:15px">z</tspan></text><text x="306" y="93" class="xs" text-anchor="middle">64 × 64 × 4</text><path d="M344 58 H384" class="ink" marker-end="url(#arch1-a)"/><rect x="388" y="30" width="104" height="56" rx="7" class="mW"/><text x="440" y="55" class="pb" text-anchor="middle">解码器</text><text x="440" y="72" class="xs" text-anchor="middle">卷积，上采样 8 倍</text><path d="M492 58 H532" class="ink" marker-end="url(#arch1-a)"/><rect x="536" y="38" width="76" height="40" rx="7" class="mG"/><text x="574" y="63" text-anchor="middle"><tspan class="v" style="font-size:15px">x</tspan><tspan class="vr" style="font-size:15px">̃</tspan></text><text x="574" y="93" class="xs" text-anchor="middle">512 × 512 × 3</text><text x="640" y="45" class="sm">损失：L1 + LPIPS 感知损失</text><text x="640" y="63" class="sm">+ 图块判别器的对抗损失</text><text x="640" y="81" class="sm">+ 权重约 10<tspan baseline-shift="45%" style="font-size:8.5px">−6</tspan> 的 KL 惩罚</text><text x="0" y="122" class="ph">第二阶段：在隐空间训练扩散模型</text><rect x="0" y="158" width="76" height="40" rx="7" class="mG"/><text x="38" y="183" text-anchor="middle"><tspan class="v" style="font-size:15px">x</tspan></text><text x="38" y="213" class="xs" text-anchor="middle">512 × 512 × 3</text><path d="M76 178 H116" class="ink" marker-end="url(#arch1-a)"/><rect x="120" y="150" width="104" height="56" rx="7" class="mG"/><text x="172" y="175" class="pb" text-anchor="middle">编码器</text><text x="172" y="192" class="xs" text-anchor="middle">已冻结</text><path d="M224 178 H264" class="ink" marker-end="url(#arch1-a)"/><rect x="268" y="158" width="76" height="40" rx="7" class="mWarm"/><text x="306" y="183" text-anchor="middle"><tspan class="v" style="font-size:15px">z</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:10.5px">0</tspan></text><text x="306" y="213" class="xs" text-anchor="middle">64 × 64 × 4</text><path d="M344 178 H384" class="ink" marker-end="url(#arch1-a)"/><rect x="388" y="150" width="104" height="56" rx="7" class="mWarm"/><text x="440" y="172" class="pb" text-anchor="middle">加噪</text><text x="440" y="193" text-anchor="middle"><tspan class="v" style="font-size:14px">z</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.8px">t</tspan><tspan class="vr" style="font-size:14px">, </tspan><tspan class="v" style="font-size:14px">t</tspan></text><path d="M492 178 H532" class="ink" marker-end="url(#arch1-a)"/><rect x="536" y="146" width="104" height="64" rx="7" class="mW"/><text x="588" y="175" class="pb" text-anchor="middle">U-Net</text><text x="588" y="192" class="xs" text-anchor="middle">交叉注意力接收条件</text><path d="M640 178 H680" class="ink" marker-end="url(#arch1-a)"/><rect x="684" y="150" width="216" height="56" rx="7" class="mWarm"/><text x="792" y="184" text-anchor="middle"><tspan class="vr" style="font-size:14px">‖</tspan><tspan class="v" style="font-size:14px">ε</tspan><tspan class="vr" style="font-size:14px"> − </tspan><tspan class="v" style="font-size:14px">ε</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.8px">θ</tspan><tspan class="vr" style="font-size:14px">(</tspan><tspan class="v" style="font-size:14px">z</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.8px">t</tspan><tspan class="vr" style="font-size:14px">, </tspan><tspan class="v" style="font-size:14px">t</tspan><tspan class="vr" style="font-size:14px">, </tspan><tspan class="v" style="font-size:14px">τ</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.8px">θ</tspan><tspan class="vr" style="font-size:14px">(</tspan><tspan class="v" style="font-size:14px">y</tspan><tspan class="vr" style="font-size:14px">))‖</tspan><tspan class="vr" baseline-shift="45%" style="font-size:9.8px">2</tspan></text><rect x="268" y="226" width="76" height="34" rx="7" class="mG"/><text x="306" y="248" class="pb" text-anchor="middle">文本 y</text><path d="M344 243 H384" class="ink" marker-end="url(#arch1-a)"/><rect x="388" y="222" width="104" height="42" rx="7" class="mW"/><text x="440" y="248" class="pb" text-anchor="middle">条件编码器 τ</text><path d="M492 243 H588 V214" class="ink" marker-end="url(#arch1-a)"/><text x="500" y="258" class="xs">77 个 token 的序列</text><text x="0" y="298" class="ph">生成：只在隐空间迭代，最后解码一次</text><rect x="0" y="314" width="110" height="56" rx="7" class="mWarm"/><text x="55" y="338" text-anchor="middle"><tspan class="v" style="font-size:13px">z</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.1px">T</tspan><tspan class="vr" style="font-size:13px"> ∼ </tspan><tspan class="v" style="font-size:13px">N</tspan><tspan class="vr" style="font-size:13px">(0, </tspan><tspan class="v" style="font-size:13px">I</tspan><tspan class="vr" style="font-size:13px">)</tspan></text><text x="55" y="358" class="xs" text-anchor="middle">64 × 64 × 4</text><path d="M110 342 H160" class="ink" marker-end="url(#arch1-a)"/><rect x="164" y="310" width="196" height="64" rx="7" class="mW"/><text x="262" y="336" class="pb" text-anchor="middle">U-Net 迭代去噪</text><text x="262" y="356" class="xs" text-anchor="middle">DDIM 约 50 步，每步两次（引导）</text><path d="M360 342 H410" class="ink" marker-end="url(#arch1-a)"/><rect x="414" y="322" width="76" height="40" rx="7" class="mWarm"/><text x="452" y="347" text-anchor="middle"><tspan class="v" style="font-size:15px">z</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:10.5px">0</tspan></text><text x="452" y="377" class="xs" text-anchor="middle">64 × 64 × 4</text><path d="M490 342 H540" class="ink" marker-end="url(#arch1-a)"/><rect x="544" y="314" width="104" height="56" rx="7" class="mW"/><text x="596" y="339" class="pb" text-anchor="middle">解码器</text><text x="596" y="356" class="xs" text-anchor="middle">只运行 1 次</text><path d="M648 342 H698" class="ink" marker-end="url(#arch1-a)"/><rect x="702" y="322" width="76" height="40" rx="7" class="mG"/><text x="740" y="347" text-anchor="middle"><tspan class="v" style="font-size:15px">x</tspan><tspan class="vr" style="font-size:15px">̃</tspan></text><text x="740" y="377" class="xs" text-anchor="middle">512 × 512 × 3</text>
+</svg>
+<figcaption>两个训练阶段和生成过程。尺寸按 Stable Diffusion v1（512×512，下采样 8 倍，4 个通道）标注。原论文的文本模型在 256×256 上训练，隐变量是 32×32×4。</figcaption></figure>
+    
+    
+    
+  </section>
+<section class="aisec" id="o-history">
+    <h2><span class="n">2</span><span>来历：两阶段生成和扩散模型在 2021 年汇合</span></h2>
+    <p>2021 年的高分辨率图像生成主要有三条路线，各有明显的短板。生成对抗网络 (GAN) 采样快、图像清晰，但难以覆盖复杂数据的全部模式。自回归 Transformer 建模能力强，但参数量达到数十亿，采样要逐个 token 进行。扩散模型的样本质量已经超过 GAN，但直接在像素上运算，训练和采样都非常昂贵。</p>
+    <p>两阶段生成此前已经发展了几年。VQ-VAE（2017-11-02）和 VQ-VAE-2（2019-06-02）先把图像压缩成离散 token，再用自回归模型学习 token 的分布。VQGAN（2020-12-17）在自编码器的损失里加入感知损失和图块判别器，下采样 16 倍仍能得到较好的重建。DALL·E（2021-02-24）把这条路线用到文本生成图像。VQGAN 的三位作者 Patrick Esser、Robin Rombach、Björn Ommer 都是 LDM 的作者。</p>
+    <p>这条路线的限制来自第二阶段。自回归模型的计算量随 token 数量快速增长，所以第一阶段必须压缩得很狠。VQGAN 的 16 倍下采样会丢失细节，LDM 论文图 1 显示它的 PSNR 只有 19.9。</p>
+    <p>另一方面，扩散模型在 2020 年以后进展很快。DDPM（2020-06-19）给出了简单的训练目标，DDIM（2020-10-06）把采样缩短到几十步，ADM（2021-05-11）在 ImageNet 上超过了 BigGAN。把扩散模型放进隐空间的想法也已经出现：LSGM（2021-06-10）联合训练变分自编码器和隐空间扩散先验，D2C（2021-06-12）把隐空间扩散用于少样本条件生成。</p>
+    <p>LDM 的做法是把这两条路线直接组合起来：沿用 VQGAN 的第一阶段，把第二阶段换成扩散模型。扩散模型的 U-Net 是卷积结构，计算量随隐变量尺寸增长较慢，而且能利用隐变量的二维结构，所以第一阶段只需要下采样 4 到 8 倍，重建质量明显提高。两阶段分开训练，也避开了 LSGM 需要在重建和生成之间精细加权的困难。</p>
+    <p>同一天 arXiv 上还出现了 GLIDE（2021-12-20），它在像素空间用文本条件扩散模型，加上一个上采样模型。论文 v2（2022-04-13）把文本模型扩大到 14.5 亿参数，并加入了无分类器引导，这才有了正文中与 GLIDE 的对比结果。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1711.00937" target="_blank" rel="noreferrer">VQ-VAE ↗</a><a href="https://arxiv.org/abs/2012.09841" target="_blank" rel="noreferrer">VQGAN ↗</a><a href="https://arxiv.org/abs/2102.12092" target="_blank" rel="noreferrer">DALL·E ↗</a><a href="https://arxiv.org/abs/2105.05233" target="_blank" rel="noreferrer">ADM ↗</a><a href="https://arxiv.org/abs/2106.05931" target="_blank" rel="noreferrer">LSGM ↗</a><a href="https://arxiv.org/abs/2106.06819" target="_blank" rel="noreferrer">D2C ↗</a><a href="https://arxiv.org/abs/2112.10741" target="_blank" rel="noreferrer">GLIDE ↗</a></p>
+  </section>
+<section class="aisec" id="o-problem">
+    <h2><span class="n">3</span><span>要解决的问题：大部分计算花在察觉不到的细节上</span></h2>
+    <p>论文引用的成本数字来自 ADM：最强的扩散模型要训练 150 至 1000 个 V100 日，在一块 A100 上生成 5 万个样本大约要 5 天。成本来自两处。训练时，梯度要在全部像素上计算。采样时，同一个网络要在完整分辨率上运行 25 至 1000 次。</p>
+    <p>论文进一步分析了这些计算花在哪里。图 2 取一个训练好的 DDPM，横轴是率 (Rate)，即已传输的信息量，纵轴是失真 (Distortion)，即重建误差。曲线在很低的率上就达到了较低的失真，此后要把失真进一步降到接近零，率会急剧上升。</p>
+    <p>也就是说，图像的大部分比特对应感知上几乎无法分辨的高频细节。论文把学习分成两段：前一段是<b>感知压缩 (Perceptual Compression)</b>，处理这些细节，几乎不涉及语义；后一段是<b>语义压缩 (Semantic Compression)</b>，学习数据的语义和构图，这才是生成模型的主要任务。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig2.jpg" alt="原论文图 2。数字图像的大部分比特对应察觉不到的细节。扩散模型可以通过损失权重降低它们的影响，但梯度和网络仍然要在所有像素上计算。" loading="lazy" style="max-width:520px"></div><figcaption>原论文图 2。数字图像的大部分比特对应察觉不到的细节。扩散模型可以通过损失权重降低它们的影响，但梯度和网络仍然要在所有像素上计算。</figcaption></figure>
+    <p>DDPM 的简化损失已经通过权重降低了这部分细节的影响，但这只改变损失的分配，每一步的计算量没有减少。LDM 的思路是用一个单独的模型处理感知压缩，扩散模型只在压缩后的空间里处理语义压缩，这样计算量才真正下降。</p>
+    
+    
+    <div class="note"><p><span class="lbl">补充</span>教程第一部分在 30 分钟前后详细讲解了这条率失真曲线，见资料 tab。</p></div>
+    
+  </section>
+<section class="aisec" id="o-frame">
+    <h2><span class="n">4</span><span>整体结构：三个网络和两个训练阶段</span></h2>
+    <p>完整模型由三个网络组成，训练时分两个阶段。</p>
+    <div class="tbl"><table><thead><tr><th>网络</th><th>输入和输出</th><th>何时训练</th><th>生成时的调用次数</th></tr></thead><tbody><tr><td>编码器 <span class="m">ℰ</span></td><td>图像 <span class="m"><i>x</i></span> 到隐变量 <span class="m"><i>z</i></span></td><td>第一阶段，之后冻结</td><td>文本生成图像时不调用</td></tr><tr><td>解码器 <span class="m">𝒟</span></td><td>隐变量 <span class="m"><i>z</i></span> 到图像 <span class="m"><i class="atl">x</i></span></td><td>第一阶段，之后冻结</td><td>1 次</td></tr><tr><td>去噪 U-Net <span class="m"><i>ε</i><sub><i>θ</i></sub></span></td><td>带噪隐变量 <span class="m"><i>z</i><sub><i>t</i></sub></span>、时间 <span class="m"><i>t</i></span>、条件，输出噪声预测</td><td>第二阶段</td><td>每个采样步 1 至 2 次</td></tr><tr><td>条件编码器 <span class="m">τ<sub><i>θ</i></sub></span></td><td>条件 <span class="m"><i>y</i></span> 到 token 序列</td><td>第二阶段，与 U-Net 联合训练</td><td>1 次，结果可复用</td></tr></tbody></table></div>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig3.jpg" alt="原论文图 3。左边是像素空间的编码器和解码器，中间是隐空间的扩散过程和去噪 U-Net，右边是条件编码器。开关表示两种接入方式：拼接到输入，或通过交叉注意力接入中间层。" loading="lazy" style="max-width:620px"></div><figcaption>原论文图 3。左边是像素空间的编码器和解码器，中间是隐空间的扩散过程和去噪 U-Net，右边是条件编码器。开关表示两种接入方式：拼接到输入，或通过交叉注意力接入中间层。</figcaption></figure>
+    <p>两阶段分开训练有三个实际好处。第一，自编码器只需训练一次，可以用于很多个扩散模型。第二，自编码器和扩散模型的目标不同，分开训练不需要调两者之间的权重。第三，生成图像的成本大幅下降，因为迭代都在小张量上进行，解码只运行一次。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-ae">
+    <h2><span class="n">5</span><span>第一阶段：感知压缩自编码器</span></h2>
+    <p>自编码器沿用 VQGAN 的设计，编码器和解码器都是卷积网络。给定图像 <span class="m"><i>x</i> ∈ ℝ<sup><i>H</i>×<i>W</i>×3</sup></span>，编码器输出 <span class="m"><i>z</i> = ℰ(<i>x</i>) ∈ ℝ<sup><i>h</i>×<i>w</i>×<i>c</i></sup></span>，解码器输出重建 <span class="m"><i class="atl">x</i> = 𝒟(<i>z</i>)</span>，下采样倍数 <span class="m"><i>f</i> = <i>H</i>/<i>h</i> = <i>W</i>/<i>w</i></span>，取 2 的整数次幂。</p>
+    <p>只用 L1 或 L2 重建损失，结果会偏模糊：在细节不确定时，像素损失的最优解是所有可能结果的平均。所以论文用三项损失：</p>
+    <ul><li><b>重建损失：</b> L1 加上 LPIPS 感知损失。LPIPS 比较的是预训练 VGG 网络的特征，它对高频纹理的位置不敏感，更接近人的判断。</li><li><b>对抗损失：</b> 一个基于图块的判别器 <span class="m"><i>D</i><sub><i>ψ</i></sub></span>，逐块判断真假。它不判断整张图，所以只约束局部的真实感。官方 KL 配置 <code>autoencoder_kl_32x32x4.yaml</code> 中，判别器从第 50001 步起才参与训练。</li><li><b>正则化损失 <span class="m"><i>L</i><sub><i>r</i><i>e</i><i>g</i></sub></span>：</b> 限制隐变量的尺度，有两种形式，下面详述。</li></ul>
+    <div class="deriv"><div><span class="df"><span class="m"><i>L</i><sub><i>A</i><i>u</i><i>t</i><i>o</i><i>e</i><i>n</i><i>c</i><i>o</i><i>d</i><i>e</i><i>r</i></sub> = min<sub>ℰ,𝒟</sub> max<sub><i>ψ</i></sub> ( <i>L</i><sub><i>r</i><i>e</i><i>c</i></sub>(<i>x</i>, 𝒟(ℰ(<i>x</i>))) − <i>L</i><sub><i>a</i><i>d</i><i>v</i></sub>(𝒟(ℰ(<i>x</i>))) + log <i>D</i><sub><i>ψ</i></sub>(<i>x</i>) + <i>L</i><sub><i>r</i><i>e</i><i>g</i></sub>(<i>x</i>; ℰ, 𝒟) )</span></span><span class="dc">论文式 (25)</span></div></div>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 876 332" width="876" height="332" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="firststage2-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="firststage2-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="firststage2-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-8" y="-8" width="876" height="332" fill="#fff"/>
+<rect x="0" y="74" width="92" height="44" rx="7" class="mG"/><text x="46" y="101" text-anchor="middle"><tspan class="v" style="font-size:16px">x</tspan></text><path d="M92 96 H128" class="ink" marker-end="url(#firststage2-a)"/><rect x="132" y="68" width="110" height="56" rx="7" class="mW"/><text x="187" y="93" class="pb" text-anchor="middle">编码器</text><text x="187" y="110" class="xs" text-anchor="middle">输出均值和方差</text><path d="M242 96 H278" class="ink" marker-end="url(#firststage2-a)"/><rect x="282" y="68" width="124" height="56" rx="7" class="mWarm"/><text x="344" y="92" text-anchor="middle"><tspan class="v" style="font-size:14px">z</tspan><tspan class="vr" style="font-size:14px"> = </tspan><tspan class="v" style="font-size:14px">μ</tspan><tspan class="vr" style="font-size:14px"> + </tspan><tspan class="v" style="font-size:14px">σ</tspan><tspan class="vr" style="font-size:14px"> </tspan><tspan class="v" style="font-size:14px">ε</tspan></text><text x="344" y="112" class="xs" text-anchor="middle">重参数化采样</text><path d="M406 96 H442" class="ink" marker-end="url(#firststage2-a)"/><rect x="446" y="68" width="110" height="56" rx="7" class="mW"/><text x="501" y="101" class="pb" text-anchor="middle">解码器</text><path d="M556 96 H592" class="ink" marker-end="url(#firststage2-a)"/><rect x="596" y="74" width="92" height="44" rx="7" class="mG"/><text x="642" y="101" text-anchor="middle"><tspan class="v" style="font-size:16px">x</tspan><tspan class="vr" style="font-size:16px">̃</tspan></text><path d="M344 68 V34" class="ink" marker-end="url(#firststage2-a)"/><rect x="226" y="0" width="236" height="34" rx="7" class="mWarm"/><text x="344" y="22" class="sm" text-anchor="middle">KL 到标准正态，权重 10⁻⁶</text><path d="M46 118 V168 H226" class="thin"/><path d="M642 118 V168 H462" class="thin"/><rect x="230" y="150" width="228" height="36" rx="7" class="mWarm"/><text x="344" y="173" class="sm" text-anchor="middle">重建：L1 + LPIPS（VGG 特征距离）</text><path d="M642 118 V210 H560" class="ink" marker-end="url(#firststage2-a)"/><path d="M46 168 V230 H420" class="ink" marker-end="url(#firststage2-a)"/><rect x="424" y="202" width="132" height="44" rx="7" class="mW"/><text x="490" y="221" class="pb" text-anchor="middle">图块判别器</text><text x="490" y="238" class="xs" text-anchor="middle">逐块判断真假</text><text x="60" y="224" class="xs">真实图像</text><text x="574" y="204" class="xs">重建图像</text><path d="M490 246 V274" class="ink" marker-end="url(#firststage2-a)"/><rect x="350" y="278" width="280" height="36" rx="7" class="mWarm"/><text x="490" y="301" class="sm" text-anchor="middle">对抗损失：约 5 万步之后才加入</text><text x="712" y="92" class="sm">三项损失的分工</text><text x="712" y="114" class="xs">L1 和 LPIPS：约束内容</text><text x="712" y="134" class="xs">判别器：补出局部纹理</text><text x="712" y="154" class="xs">KL：防止隐变量尺度失控</text>
+</svg>
+<figcaption>第一阶段的三项损失，以 KL 正则化为例。</figcaption></figure>
+    <p>判别器的作用值得单独说明。图像压缩后信息已经丢失，解码器无法还原原有的每一根毛发。判别器迫使解码器生成看起来真实的纹理，这些纹理并非从隐变量中解码而来，而是解码器自己合成的。所以这个自编码器的 PSNR 不算很高，但视觉效果很好。教程第一部分用一张松鼠尾巴的对比说明了这一点：没有判别器时毛发糊成一片，加上判别器后毛发清晰，但并不是原来的那些毛发。</p>
+    <p>这也说明了为什么生成图像的质量上限由自编码器决定：无论扩散模型生成什么隐变量，最后都要经过同一个解码器。</p>
+    
+    <div class="ex"><p class="ex-h"><span class="lbl">例子</span>两种正则化</p>
+      <p><b>KL 正则化：</b> 编码器输出高斯分布的均值和方差，<span class="m"><i>z</i> = ℰ<sub><i>μ</i></sub>(<i>x</i>) + ℰ<sub><i>σ</i></sub>(<i>x</i>) · <i>ε</i></span>，对标准正态分布加 KL 惩罚，权重约 10<sup>−6</sup>。这个权重小到不会让隐变量接近标准正态，KL 项只起到防止方差过大的作用。</p>
+      <p><b>VQ 正则化：</b> 使用一个包含 <span class="m">|𝒵|</span> 个向量的码本，把隐变量量化到最近的码本向量，但量化层被并入解码器：扩散模型工作在量化之前的连续 <span class="m"><i>z</i></span> 上，解码时才量化。码本选得很大（如 8192、16384），因此正则化同样很弱。</p>
+      <p>两种都能用。论文发现 VQ 正则化的重建略差，但有时样本质量更好。文本生成图像模型和后来的 Stable Diffusion 用的是 KL 正则化。</p></div>
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1801.03924" target="_blank" rel="noreferrer">LPIPS ↗</a><a href="https://arxiv.org/abs/1611.07004" target="_blank" rel="noreferrer">图块判别器 (pix2pix) ↗</a><a href="https://github.com/CompVis/latent-diffusion/blob/main/configs/autoencoder/autoencoder_kl_32x32x4.yaml" target="_blank" rel="noreferrer">官方自编码器配置 ↗</a></p>
+  </section>
+<section class="aisec" id="o-scale">
+    <h2><span class="n">6</span><span>隐空间的尺度：为什么要乘 0.18215</span></h2>
+    <p>扩散模型的噪声表默认数据的方差约为 1。KL 权重只有 10<sup>−6</sup> 时，编码器输出的方差并不受约束，隐变量的标准差可能明显大于 1。此时信噪比 <span class="m">Var(<i>z</i>) / <i>σ</i><sub><i>t</i></sub><sup>2</sup></span> 偏高，同样的噪声水平对这些数据的破坏不够，模型会在逆向过程的早期就决定大量语义细节。</p>
+    <p>论文附录 G 的处理方式很简单：用第一个批量估计隐变量的标准差 <span class="m"><i>σ̂</i></span>，把隐变量除以它：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>σ̂</i><sup>2</sup> = (1 / <i>b</i><i>c</i><i>h</i><i>w</i>) Σ<sub><i>b</i>,<i>c</i>,<i>h</i>,<i>w</i></sub> (<i>z</i><sup><i>b</i>,<i>c</i>,<i>h</i>,<i>w</i></sup> − <i>μ̂</i>)<sup>2</sup></span></span><span class="dc">在第一个批量上估计，所有通道共用一个值</span></div><div><span class="df"><span class="m"><i>z</i> ← <i>z</i> / <i>σ̂</i> = ℰ(<i>x</i>) / <i>σ̂</i></span></span><span class="dc">缩放后标准差为 1</span></div></div>
+    <p>Stable Diffusion v1 配置里的 <code>scale_factor: 0.18215</code> 就是这个 <span class="m">1/<i>σ̂</i></span>，对应的 <span class="m"><i>σ̂</i></span> 约为 5.49。编码后乘以它，解码前除以它。使用预训练自编码器时，这是最容易遗漏的一步。VQ 正则化的隐空间方差本来就接近 1，不需要缩放。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig15.jpg" alt="原论文图 15。三列分别是不缩放的 KL 隐空间、缩放后的 KL 隐空间和 VQ 隐空间上的卷积采样结果，任务是风景语义合成。" loading="lazy"></div><figcaption>原论文图 15。三列分别是不缩放的 KL 隐空间、缩放后的 KL 隐空间和 VQ 隐空间上的卷积采样结果，任务是风景语义合成。</figcaption></figure>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-f">
+    <h2><span class="n">7</span><span>压缩倍数：怎么选下采样倍数 f 和通道数 c</span></h2>
+    <p>压缩比由 <span class="m"><i>f</i></span> 和 <span class="m"><i>c</i></span> 共同决定，等于 <span class="m">3<i>f</i><sup>2</sup>/<i>c</i></span>。<span class="m"><i>f</i></span> 决定空间分辨率，也决定了 U-Net 的计算量；<span class="m"><i>c</i></span> 决定每个位置保留多少信息。下图用论文表 8 的全部数据作图。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 896 352" width="896" height="352" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="tradeoff3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="tradeoff3-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="tradeoff3-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-8" y="-8" width="896" height="352" fill="#fff"/>
+<text x="0" y="14" class="ph">重建 PSNR（越高越好）</text><path d="M44 250.88888888888889 H374" class="thin" stroke-opacity=".5"/><text x="36" y="254.88888888888889" class="xs" text-anchor="end">18</text><path d="M44 196.66666666666666 H374" class="thin" stroke-opacity=".5"/><text x="36" y="200.66666666666666" class="xs" text-anchor="end">22</text><path d="M44 142.44444444444446 H374" class="thin" stroke-opacity=".5"/><text x="36" y="146.44444444444446" class="xs" text-anchor="end">26</text><path d="M44 88.22222222222223 H374" class="thin" stroke-opacity=".5"/><text x="36" y="92.22222222222223" class="xs" text-anchor="end">30</text><path d="M44 34 H374" class="thin" stroke-opacity=".5"/><text x="36" y="38" class="xs" text-anchor="end">34</text><path d="M76.1729375396636 278 v5" class="ax"/><text x="76.1729375396636" y="297" class="xs" text-anchor="middle">6</text><path d="M154 278 v5" class="ax"/><text x="154" y="297" class="xs" text-anchor="middle">16</text><path d="M241.1729375396636 278 v5" class="ax"/><text x="241.1729375396636" y="297" class="xs" text-anchor="middle">48</text><path d="M296.17293753966356 278 v5" class="ax"/><text x="296.17293753966356" y="297" class="xs" text-anchor="middle">96</text><path d="M351.1729375396636 278 v5" class="ax"/><text x="351.1729375396636" y="297" class="xs" text-anchor="middle">192</text><path d="M44 34 V278 H374" class="ax"/><text x="209" y="316" class="sm" text-anchor="middle">压缩比 3f² / c（对数坐标）</text><path d="M76.2 54.7 L154.0 121.7 L241.2 167.0 L296.2 197.5 L351.2 218.6" class="ink"/><path d="M76.2 76.7 L154.0 123.1 L241.2 182.2 L296.2 212.5 L351.2 258.3" class="grad"/><circle cx="76.2" cy="76.7" r="3.4" fill="#B45309"/><circle cx="154.0" cy="123.1" r="3.4" fill="#B45309"/><circle cx="241.2" cy="182.2" r="3.4" fill="#B45309"/><circle cx="296.2" cy="212.5" r="3.4" fill="#B45309"/><circle cx="351.2" cy="258.3" r="3.4" fill="#B45309"/><circle cx="76.2" cy="54.7" r="3.8" fill="#14161A"/><text x="84.2" y="48.7" class="xs">f=2, c=2</text><circle cx="154.0" cy="121.7" r="3.8" fill="#14161A"/><text x="162.0" y="115.7" class="xs">f=4, c=3</text><circle cx="241.2" cy="167.0" r="3.8" fill="#14161A"/><text x="251.2" y="161.0" class="xs">f=8, c=4</text><circle cx="296.2" cy="197.5" r="3.8" fill="#14161A"/><text x="304.2" y="215.5" class="xs">f=16, c=8</text><circle cx="241.2" cy="168.5" r="3.8" fill="#14161A"/><text x="251.2" y="147.5" class="xs">f=16, c=16</text><circle cx="351.2" cy="218.6" r="3.8" fill="#14161A"/><text x="359.2" y="212.6" class="xs">f=32, c=16</text><circle cx="241.2" cy="193.0" r="3.8" fill="#14161A"/><text x="233.2" y="197.0" class="xs" text-anchor="end">f=32, c=64</text><text x="460" y="14" class="ph">重建 R-FID（越低越好，对数坐标）</text><path d="M504 253.51622701932953 H834" class="thin" stroke-opacity=".5"/><text x="496" y="257.51622701932956" class="xs" text-anchor="end">0.1</text><path d="M504 172.1828936859962 H834" class="thin" stroke-opacity=".5"/><text x="496" y="176.1828936859962" class="xs" text-anchor="end">1</text><path d="M504 90.84956035266285 H834" class="thin" stroke-opacity=".5"/><text x="496" y="94.84956035266285" class="xs" text-anchor="end">10</text><path d="M536.1729375396636 278 v5" class="ax"/><text x="536.1729375396636" y="297" class="xs" text-anchor="middle">6</text><path d="M614 278 v5" class="ax"/><text x="614" y="297" class="xs" text-anchor="middle">16</text><path d="M701.1729375396636 278 v5" class="ax"/><text x="701.1729375396636" y="297" class="xs" text-anchor="middle">48</text><path d="M756.1729375396635 278 v5" class="ax"/><text x="756.1729375396635" y="297" class="xs" text-anchor="middle">96</text><path d="M811.1729375396636 278 v5" class="ax"/><text x="811.1729375396636" y="297" class="xs" text-anchor="middle">192</text><path d="M504 34 V278 H834" class="ax"/><text x="669" y="316" class="sm" text-anchor="middle">压缩比 3f² / c（对数坐标）</text><path d="M536.2 258.8 L614.0 218.4 L701.2 175.9 L756.2 138.0 L811.2 102.0" class="ink"/><path d="M536.2 236.9 L614.0 191.4 L701.2 167.6 L756.2 114.3 L811.2 50.0" class="grad"/><circle cx="536.2" cy="236.9" r="3.4" fill="#B45309"/><circle cx="614.0" cy="191.4" r="3.4" fill="#B45309"/><circle cx="701.2" cy="167.6" r="3.4" fill="#B45309"/><circle cx="756.2" cy="114.3" r="3.4" fill="#B45309"/><circle cx="811.2" cy="50.0" r="3.4" fill="#B45309"/><circle cx="536.2" cy="258.8" r="3.8" fill="#14161A"/><text x="544.2" y="272.8" class="xs">f=2, c=2</text><circle cx="614.0" cy="218.4" r="3.8" fill="#14161A"/><text x="622.0" y="232.4" class="xs">f=4, c=3</text><circle cx="701.2" cy="175.9" r="3.8" fill="#14161A"/><text x="711.2" y="191.9" class="xs">f=8, c=4</text><circle cx="756.2" cy="138.0" r="3.8" fill="#14161A"/><text x="766.2" y="146.0" class="xs">f=16, c=8</text><circle cx="701.2" cy="177.1" r="3.8" fill="#14161A"/><text x="711.2" y="207.1" class="xs">f=16, c=16</text><circle cx="811.2" cy="102.0" r="3.8" fill="#14161A"/><text x="821.2" y="116.0" class="xs">f=32, c=16</text><circle cx="701.2" cy="147.0" r="3.8" fill="#14161A"/><text x="693.2" y="151.0" class="xs" text-anchor="end">f=32, c=64</text><path d="M640 328 h26" class="ink"/><circle cx="653" cy="328" r="3.8" fill="#14161A"/><text x="672" y="332" class="sm">KL 正则化</text><path d="M750 328 h26" class="grad"/><circle cx="763" cy="328" r="3.4" fill="#B45309"/><text x="782" y="332" class="sm">VQ 正则化</text>
+</svg>
+<figcaption>第一阶段模型的重建质量，数据来自论文表 8，在 OpenImages 上训练，在 ImageNet 验证集上评估。压缩比相同时可以用不同的 f、c 组合，比如 f=8, c=4 和 f=16, c=16 都是 48 倍，两者重建质量接近。</figcaption></figure>
+    <p>图上能看出三点。第一，压缩比越大，重建越差，这条关系相当稳定。第二，压缩比相同时，只要通道数相应增加，<span class="m"><i>f</i></span> 可以取得更大：<span class="m"><i>f</i>=8, <i>c</i>=4</span> 和 <span class="m"><i>f</i>=16, <i>c</i>=16</span> 的 PSNR 和 R-FID 几乎相同。第三，KL 正则化的重建一般好于 VQ 正则化。</p>
+    <p>第一阶段不是压缩得越少越好。论文比较了 <span class="m"><i>f</i></span> 从 1 到 32 的类别条件模型，所有模型参数量相近，都在一块 A100 上训练 200 万步。结果有两个失败方向：</p>
+    <ul><li><span class="m"><i>f</i> = 1, 2</span> 时训练很慢。感知压缩仍由扩散模型承担，算力大部分用于高频细节。训练 200 万步后，LDM-1 与 LDM-8 的 FID 相差 38。</li><li><span class="m"><i>f</i> = 32</span> 时很早就停滞。第一阶段丢失了太多信息，后面的扩散模型无法弥补。</li></ul>
+    <p><span class="m"><i>f</i> = 4</span> 到 <span class="m">16</span> 取得较好的平衡，其中 <span class="m"><i>f</i> = 4</span> 和 <span class="m">8</span> 最好。ImageNet 这样复杂的数据集需要更低的压缩率。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig6.jpg" alt="原论文图 6。ImageNet 上类别条件模型的 FID 和 IS 随训练步数的变化。" loading="lazy" style="max-width:640px"></div><figcaption>原论文图 6。ImageNet 上类别条件模型的 FID 和 IS 随训练步数的变化。</figcaption></figure>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig7.jpg" alt="原论文图 7。不同压缩率的模型取 10 至 200 步 DDIM 时的吞吐量和 FID，左为 CelebA-HQ，右为 ImageNet。像素空间的 LDM-1 吞吐量低，过度压缩的模型质量受限。" loading="lazy" style="max-width:640px"></div><figcaption>原论文图 7。不同压缩率的模型取 10 至 200 步 DDIM 时的吞吐量和 FID，左为 CelebA-HQ，右为 ImageNet。像素空间的 LDM-1 吞吐量低，过度压缩的模型质量受限。</figcaption></figure>
+    <p>计算量的差异可以从批量大小直接看出。表 13 中，参数量都在 3.9 亿左右的模型，在同一块 A100 上，LDM-1 的批量只有 7，LDM-4 是 40，LDM-8 是 64。图 1 则对比了同一张图的重建：<span class="m"><i>f</i> = 4</span> 的自编码器 PSNR 27.4、R-FID 0.58；DALL·E 的 <span class="m"><i>f</i> = 8</span> 自编码器 PSNR 22.8、R-FID 32.01；VQGAN 的 <span class="m"><i>f</i> = 16</span> 自编码器 PSNR 19.9、R-FID 4.98。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig1.jpg" alt="原论文图 1。扩散模型允许较温和的下采样，重建能保留更多细节。" loading="lazy" style="max-width:620px"></div><figcaption>原论文图 1。扩散模型允许较温和的下采样，重建能保留更多细节。</figcaption></figure>
+    <p>之所以能用这么温和的压缩，是因为第二阶段换成了卷积网络。VQGAN 和 DALL·E 要把隐变量排成一维序列交给自回归 Transformer，token 增加时计算量增长很快，也丢掉了二维结构。U-Net 直接在二维隐变量上卷积，归纳偏置和图像一致，可以处理 64×64 这样大的隐变量。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-ldm">
+    <h2><span class="n">8</span><span>第二阶段：在隐空间训练扩散模型</span></h2>
+    <p>自编码器冻结后，每张图像都可以编码成隐变量 <span class="m"><i>z</i><sub>0</sub> = ℰ(<i>x</i>)</span>。第二阶段就是在这些隐变量上训练一个普通的扩散模型，前向过程、预测噪声的目标都和 DDPM 相同，只是把 <span class="m"><i>x</i></span> 换成 <span class="m"><i>z</i></span>：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>L</i><sub><i>D</i><i>M</i></sub> = 𝔼<sub><i>x</i>, <i>ε</i>∼<i>N</i>(0,1), <i>t</i></sub> [ ‖<i>ε</i> − <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>)‖<sup>2</sup> ]</span></span><span class="dc">论文式 (1)，像素空间，即 DDPM 的简化损失</span></div><div><span class="df"><span class="m"><i>L</i><sub><i>L</i><i>D</i><i>M</i></sub> = 𝔼<sub>ℰ(<i>x</i>), <i>ε</i>∼<i>N</i>(0,1), <i>t</i></sub> [ ‖<i>ε</i> − <i>ε</i><sub><i>θ</i></sub>(<i>z</i><sub><i>t</i></sub>, <i>t</i>)‖<sup>2</sup> ]</span></span><span class="dc">论文式 (2)，隐空间</span></div><div><span class="df"><span class="m"><i>L</i><sub><i>L</i><i>D</i><i>M</i></sub> = 𝔼<sub>ℰ(<i>x</i>), <i>y</i>, <i>ε</i>∼<i>N</i>(0,1), <i>t</i></sub> [ ‖<i>ε</i> − <i>ε</i><sub><i>θ</i></sub>(<i>z</i><sub><i>t</i></sub>, <i>t</i>, τ<sub><i>θ</i></sub>(<i>y</i>))‖<sup>2</sup> ]</span></span><span class="dc">论文式 (3)，加上条件 y</span></div></div>
+    <p>前向过程没有可学习参数，所以 <span class="m"><i>z</i><sub><i>t</i></sub></span> 可以一步算出：<span class="m"><i>z</i><sub><i>t</i></sub> = √<i class="aov">α</i><sub><i>t</i></sub> <i>z</i><sub>0</sub> + √(1 − <i class="aov">α</i><sub><i>t</i></sub>) <i>ε</i></span>。训练时编码器不参与反向传播，图像甚至可以预先编码存好，只读取隐变量。</p>
+    <p>损失是在隐空间度量的。这相当于把「哪些差异重要」的判断交给了自编码器：感知上不重要的差异已被压缩掉，隐空间的 L2 距离比像素空间的 L2 距离更接近语义差异。</p>
+    <pre class="code"><code># 训练一步（diffusers 接口的示意，未在本页环境运行）
+with torch.no_grad():
+    z0 = vae.encode(x).latent_dist.sample() * 0.18215   # x: 512×512×3 → z0: 64×64×4
+    ctx = text_encoder(tokens).last_hidden_state         # 77×768，Stable Diffusion 的文本编码器是冻结的
+
+t = torch.randint(0, 1000, (x.size(0),), device=x.device)
+eps = torch.randn_like(z0)
+zt = scheduler.add_noise(z0, eps, t)                     # √ᾱ_t z0 + √(1−ᾱ_t) eps
+
+# 无分类器引导：以 10% 概率把条件换成空文本
+drop = torch.rand(x.size(0), device=x.device) &lt; 0.1
+ctx[drop] = empty_ctx
+
+loss = F.mse_loss(unet(zt, t, encoder_hidden_states=ctx).sample, eps)
+loss.backward(); opt.step(); opt.zero_grad()</code></pre>
+    
+    
+    <div class="note"><p><span class="lbl">补充</span>前向过程的闭式解、证据下界和简化损失的推导见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/ddpm/#o-simple" target="_blank" rel="noreferrer">DDPM 专题的综述</a>。论文附录 B 用信噪比重新写了一遍，结论相同。</p></div>
+    
+  </section>
+<section class="aisec" id="o-unet">
+    <h2><span class="n">9</span><span>去噪网络：U-Net 和其中的 Transformer 块</span></h2>
+    <p>去噪网络是 ADM 的「消融 U-Net (Ablated U-Net)」的改进版：卷积残差块组成的编码-解码结构，配跳跃连接，时间 <span class="m"><i>t</i></span> 通过嵌入调制每个残差块。主要改动是把若干层的自注意力换成一个浅层 Transformer，每个块包含自注意力、交叉注意力和逐位置 MLP。</p>
+    <div class="tbl"><table><thead><tr><th>配置项</th><th>论文文本生成图像模型</th><th>Stable Diffusion v1</th></tr></thead><tbody><tr><td>隐变量</td><td>32×32×4（训练分辨率 256<sup>2</sup>）</td><td>64×64×4（微调分辨率 512<sup>2</sup>）</td></tr><tr><td>基础通道数</td><td>320</td><td>320</td></tr><tr><td>通道倍数</td><td>1, 2, 4, 4</td><td>1, 2, 4, 4</td></tr><tr><td>交叉注意力所在分辨率</td><td>32, 16, 8</td><td>64, 32, 16（配置中为下采样 1、2、4 倍处）</td></tr><tr><td>注意力头数</td><td>8</td><td>8</td></tr><tr><td>文本编码器</td><td>随模型训练的 Transformer：深度 32，维度 1280，长度 77</td><td>冻结的 CLIP ViT-L/14：维度 768，长度 77</td></tr><tr><td>扩散步数</td><td>1000，线性方差表</td><td>1000，β 从 0.00085 到 0.012</td></tr><tr><td>参数量</td><td>14.5 亿（论文表 15）</td><td>U-Net 8.6 亿，文本编码器 1.23 亿</td></tr></tbody></table><p class="tnote">论文模型的数字来自表 15、表 17，Stable Diffusion 的数字来自官方 README 和 v1-inference.yaml。</p></div>
+    <p>代码里还有一个细节：<code>SpatialTransformer</code> 最后的输出卷积初始化为零，所以训练开始时整个 Transformer 块相当于恒等映射，注意力的影响从零逐渐增大。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-cross">
+    <h2><span class="n">10</span><span>条件机制一：交叉注意力</span></h2>
+    <p>LDM 之前，扩散模型的条件主要是两种：类别标签（通过嵌入加到时间向量上）和模糊图像（拼接到输入）。文本这样可变长度、含有多个概念的条件，需要一种能让图像的不同位置关注不同词的机制。</p>
+    <p>论文用的是 Transformer 里的交叉注意力。图像特征作为查询 (Query)，条件序列作为键 (Key) 和值 (Value)：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>Q</i> = <i>W</i><sub><i>Q</i></sub><sup>(<i>i</i>)</sup> · φ<sub><i>i</i></sub>(<i>z</i><sub><i>t</i></sub>)</span></span><span class="dc"><span class="m">φ<sub><i>i</i></sub>(<i>z</i><sub><i>t</i></sub>)</span> 是 U-Net 第 <span class="m"><i>i</i></span> 层展平后的特征</span></div><div><span class="df"><span class="m"><i>K</i> = <i>W</i><sub><i>K</i></sub><sup>(<i>i</i>)</sup> · τ<sub><i>θ</i></sub>(<i>y</i>),   <i>V</i> = <i>W</i><sub><i>V</i></sub><sup>(<i>i</i>)</sup> · τ<sub><i>θ</i></sub>(<i>y</i>)</span></span><span class="dc"><span class="m">τ<sub><i>θ</i></sub>(<i>y</i>) ∈ ℝ<sup><i>M</i>×<i>d</i><sub><i>τ</i></sub></sup></span> 是条件序列</span></div><div><span class="df"><span class="m">Attention(<i>Q</i>, <i>K</i>, <i>V</i>) = softmax(<i>Q</i><i>K</i><sup>T</sup> / √<i>d</i>) · <i>V</i></span></span><span class="dc">每个图像位置在 <span class="m"><i>M</i></span> 个 token 上算一组权重</span></div></div>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 896 222" width="896" height="222" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="crossattn4-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="crossattn4-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="crossattn4-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-8" y="-8" width="896" height="222" fill="#fff"/>
+<text x="0" y="13" class="ph">图像特征：U-Net 第一层注意力</text><rect x="0" y="28" width="150" height="54" rx="7" class="mWarm"/><text x="75" y="50" class="pb" text-anchor="middle">特征图</text><text x="75" y="70" class="xs" text-anchor="middle">32 × 32 × 320</text><path d="M150 55 H186" class="ink" marker-end="url(#crossattn4-a)"/><rect x="190" y="28" width="150" height="54" rx="7" class="mG"/><text x="265" y="50" class="pb" text-anchor="middle">展平</text><text x="265" y="70" class="xs" text-anchor="middle">1024 个位置，320 维</text><path d="M340 55 H376" class="ink" marker-end="url(#crossattn4-a)"/><rect x="380" y="28" width="96" height="54" rx="7" class="mW"/><text x="428" y="60" text-anchor="middle"><tspan class="v" style="font-size:15px">W</tspan><tspan class="v" baseline-shift="-20%" style="font-size:10.5px">Q</tspan></text><path d="M476 55 H546" class="ink" marker-end="url(#crossattn4-a)"/><text x="511" y="46" class="xs" text-anchor="middle">Q</text><text x="0" y="124" class="ph">条件：文本经过 τ</text><rect x="0" y="140" width="150" height="54" rx="7" class="mG"/><text x="75" y="162" class="pb" text-anchor="middle">文本编码器输出</text><text x="75" y="182" class="xs" text-anchor="middle">77 个 token，1280 维</text><path d="M150 158 H376" class="ink" marker-end="url(#crossattn4-a)"/><path d="M150 182 H376" class="ink" marker-end="url(#crossattn4-a)"/><rect x="380" y="134" width="96" height="32" rx="7" class="mW"/><text x="428" y="155" text-anchor="middle"><tspan class="v" style="font-size:15px">W</tspan><tspan class="v" baseline-shift="-20%" style="font-size:10.5px">K</tspan></text><rect x="380" y="170" width="96" height="32" rx="7" class="mW"/><text x="428" y="191" text-anchor="middle"><tspan class="v" style="font-size:15px">W</tspan><tspan class="v" baseline-shift="-20%" style="font-size:10.5px">V</tspan></text><path d="M476 150 H512 V96 H546" class="ink" marker-end="url(#crossattn4-a)"/><text x="524" y="124" class="xs">K</text><rect x="550" y="28" width="150" height="84" rx="7" class="mWarm"/><text x="625" y="54" class="pb" text-anchor="middle">softmax(QKᵀ / √d)</text><text x="625" y="76" class="xs" text-anchor="middle">1024 × 77</text><text x="625" y="94" class="xs" text-anchor="middle">每个位置对 token 的权重</text><path d="M476 186 H625 V168" class="ink"/><path d="M625 168 V116" class="ink" marker-end="url(#crossattn4-a)"/><text x="640" y="150" class="xs">V</text><path d="M700 70 H736" class="ink" marker-end="url(#crossattn4-a)"/><rect x="740" y="28" width="140" height="84" rx="7" class="mW"/><text x="810" y="54" class="pb" text-anchor="middle">加回特征图</text><text x="810" y="76" class="xs" text-anchor="middle">1024 个位置</text><text x="810" y="94" class="xs" text-anchor="middle">仍为 320 维</text>
+</svg>
+<figcaption>交叉注意力的维度，取论文文本模型在 32×32 分辨率上的数值。注意力权重矩阵是 1024 × 77，所以输出的位置数与图像特征相同，token 数量可以变化。论文里写的 W 维度有笔误，见常见问题。</figcaption></figure>
+    <p>这个结构有两个重要性质。第一，条件的长度和模态都不受限制，只要有一个编码器 <span class="m">τ<sub><i>θ</i></sub></span> 把条件变成 token 序列即可。论文用它做了三种条件：文本（BERT 分词器加 Transformer）、布局（每个框编码成左上角、右下角和类别三个 token）、类别（一个 512 维嵌入，即长度为 1 的序列）。第二，注意力图有明确的空间含义，每个词对应一张权重图，后来的 Prompt-to-Prompt 正是通过修改这些图做图像编辑。</p>
+    <p><span class="m">τ<sub><i>θ</i></sub></span> 不以时间步 <span class="m"><i>t</i></span> 为条件，这样每次采样只需编码一次。论文中 <span class="m">τ<sub><i>θ</i></sub></span> 和 <span class="m"><i>ε</i><sub><i>θ</i></sub></span> 联合训练，这一点与 Stable Diffusion 不同。</p>
+    <pre class="code"><code># ldm/modules/attention.py，CrossAttention.forward（省略掩码）
+q = self.to_q(x)                 # x: 图像特征，b × N × dim
+context = default(context, x)    # 没有条件时退化为自注意力
+k = self.to_k(context)           # context: 条件序列，b × M × context_dim
+v = self.to_v(context)
+q, k, v = map(lambda t: rearrange(t, 'b n (h d) -&gt; (b h) n d', h=h), (q, k, v))
+sim = einsum('b i d, b j d -&gt; b i j', q, k) * self.scale   # N × M 的相似度
+attn = sim.softmax(dim=-1)
+out = einsum('b i j, b j d -&gt; b i d', attn, v)</code></pre>
+    
+    
+    
+    <p class="refs"><a href="https://github.com/CompVis/latent-diffusion/blob/main/ldm/modules/attention.py" target="_blank" rel="noreferrer">官方代码 attention.py ↗</a></p>
+  </section>
+<section class="aisec" id="o-concat">
+    <h2><span class="n">11</span><span>条件机制二：拼接</span></h2>
+    <p>如果条件本身是一张和图像对齐的图，比如低分辨率图像、带掩码的图像或语义图，更直接的办法是把它和 <span class="m"><i>z</i><sub><i>t</i></sub></span> 按通道拼接，作为 U-Net 的输入。这时 <span class="m">τ<sub><i>θ</i></sub></span> 可以是恒等映射或一个下采样操作。图 3 中的开关表示这两种接入方式的选择。</p>
+    <div class="tbl"><table><thead><tr><th>任务</th><th>条件</th><th>接入方式</th><th><span class="m"><i>f</i></span></th><th>数据集</th></tr></thead><tbody><tr><td>文本生成图像</td><td>文本</td><td>交叉注意力</td><td>8</td><td>LAION-400M</td></tr><tr><td>布局生成图像</td><td>边界框序列</td><td>交叉注意力</td><td>4 或 8</td><td>OpenImages、COCO</td></tr><tr><td>类别条件</td><td>类别标签</td><td>交叉注意力</td><td>4</td><td>ImageNet</td></tr><tr><td>超分辨率</td><td>低分辨率图像</td><td>拼接</td><td>4</td><td>ImageNet</td></tr><tr><td>图像修复</td><td>带掩码的图像</td><td>拼接</td><td>4</td><td>Places</td></tr><tr><td>语义合成</td><td>语义图</td><td>拼接</td><td>8（表 15）</td><td>风景图像</td></tr></tbody></table><p class="tnote">来自论文表 15。</p></div>
+    <p>拼接的好处是条件和隐变量位置严格对齐，因此卷积网络能在不同分辨率上直接运行，这是下面卷积采样的基础。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-cfg">
+    <h2><span class="n">12</span><span>引导：用无分类器引导换取保真度</span></h2>
+    <p>论文 v2 的文本模型和类别条件模型都使用了<b>无分类器引导 (Classifier-Free Guidance)</b>。训练时以一定概率丢弃条件，让同一个网络同时学会有条件和无条件的预测。采样时每步计算两次，再做外推：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>ε̂</i> = <i>ε</i><sub><i>θ</i></sub>(<i>z</i><sub><i>t</i></sub>, <i>t</i>, ∅) + <i>s</i> · ( <i>ε</i><sub><i>θ</i></sub>(<i>z</i><sub><i>t</i></sub>, <i>t</i>, τ<sub><i>θ</i></sub>(<i>y</i>)) − <i>ε</i><sub><i>θ</i></sub>(<i>z</i><sub><i>t</i></sub>, <i>t</i>, ∅) )</span></span><span class="dc"><span class="m"><i>s</i> = 1</span> 时等于普通的条件预测，<span class="m"><i>s</i> &<i>g</i><i>t</i>; 1</span> 时更强调条件</span></div></div>
+    <p>引导对指标影响很大。表 2 中，文本模型不用引导时 FID 23.31，<span class="m"><i>s</i> = 1.5</span> 时降到 12.63，与 GLIDE（12.24，60 亿参数）和 Make-A-Scene（11.84，40 亿参数）基本相当，而模型只有 14.5 亿参数。表 10 中，LDM-4 在 ImageNet 上从 FID 10.56 降到 3.60（<span class="m"><i>s</i> = 1.5</span>）。</p>
+    <p>指标最好的 <span class="m"><i>s</i></span> 和视觉效果最好的 <span class="m"><i>s</i></span> 并不相同。评估 FID 时用 <span class="m"><i>s</i> = 1.5</span>，但图 5 展示的样本用 <span class="m"><i>s</i> = 10</span>。较大的 <span class="m"><i>s</i></span> 使图像更符合提示，但样本多样性下降，FID 变差。Stable Diffusion 后来的常用值是 7.5 左右。</p>
+    <p>论文附录 C 还给出另一种引导：训练后用任意可微的目标引导采样，比如用 <span class="m"><i>L</i><sub>2</sub></span> 或 LPIPS 让解码结果在下采样后接近一张目标图像。这种方法可以在不改模型的情况下提高超分辨率的 PSNR。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noreferrer">Classifier-Free Guidance ↗</a></p>
+  </section>
+<section class="aisec" id="o-sample">
+    <h2><span class="n">13</span><span>采样：在隐空间迭代，解码一次</span></h2>
+    <p>生成时不需要编码器。从标准正态分布采样 <span class="m"><i>z</i><sub><i>T</i></sub></span>，用 DDIM 等采样器迭代调用 U-Net，最后把 <span class="m"><i>z</i><sub>0</sub></span> 除以缩放系数，交给解码器。</p>
+    <pre class="code"><code># 采样（diffusers 接口的示意，未在本页环境运行）
+ctx  = text_encoder(tokens).last_hidden_state
+null = text_encoder(empty_tokens).last_hidden_state
+z = torch.randn(n, 4, 64, 64, device=device)
+scheduler.set_timesteps(50)
+
+for t in scheduler.timesteps:
+    pred = unet(torch.cat([z, z]), t, encoder_hidden_states=torch.cat([null, ctx])).sample
+    pred_u, pred_c = pred.chunk(2)
+    eps = pred_u + 7.5 * (pred_c - pred_u)    # 无分类器引导
+    z = scheduler.step(eps, t, z).prev_sample
+
+image = vae.decode(z / 0.18215).sample        # 解码器只运行这一次</code></pre>
+    <p>单步的计算量由隐变量尺寸决定。像素空间的 DDPM 要在 256×256 上运行 1000 次，LDM-8 只在 32×32 上运行，且常用 50 至 250 步。表 18 给出单块 A100 上的吞吐量：LSUN Bedrooms 上，ADM（1000 步）每秒 0.03 个样本，LDM-4（200 步）每秒 1.07 个样本。</p>
+    <p>隐空间的轨迹也比较平滑。教程第二部分引用 Vahdat 等人 2021 年的结果：在 CelebA-HQ 上，隐空间的黑盒 ODE 求解器只需约 23 次函数计算，明显少于像素空间。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-conv">
+    <h2><span class="n">14</span><span>卷积采样：生成比训练时更大的图像</span></h2>
+    <p>U-Net 主要由卷积构成，隐变量的空间尺寸可以在采样时改变。论文利用这一点，用 256<sup>2</sup> 上训练的模型直接生成更大的图像。条件是空间对齐的任务（语义合成、超分辨率、图像修复）效果最好，因为条件图给出了每个位置该有的内容，模型可以生成 512<sup>2</sup> 到 1024<sup>2</sup> 的图像。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig9.jpg" alt="原论文图 9。在 256² 上训练的语义合成模型，以卷积方式生成 512×1024 的风景图像。" loading="lazy" style="max-width:620px"></div><figcaption>原论文图 9。在 256<sup>2</sup> 上训练的语义合成模型，以卷积方式生成 512×1024 的风景图像。</figcaption></figure>
+    <p>这种方式能否成功取决于信噪比。第 6 节提到，不缩放的 KL 隐空间信噪比偏高，卷积采样会出现不连贯的结构；缩放后明显改善。缩放再加上无分类器引导，文本模型也能直接合成 256<sup>2</sup> 以上的图像，但由于注意力层只见过训练时的序列长度，全局结构可能变差。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig13.jpg" alt="原论文图 13。14.5 亿参数的文本模型，用无分类器引导和卷积采样生成比训练分辨率更大的图像。" loading="lazy" style="max-width:620px"></div><figcaption>原论文图 13。14.5 亿参数的文本模型，用无分类器引导和卷积采样生成比训练分辨率更大的图像。</figcaption></figure>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-results">
+    <h2><span class="n">15</span><span>实验结果</span></h2>
+    <p>论文在五类任务上评估。下面几张表取主要结果，完整的表格见论文 tab。</p>
+    <p><b>无条件生成</b>（表 1，FID 越低越好）。LDM 在 CelebA-HQ 上取得当时的最好成绩，在 LSUN 上好于 DDPM，但在 FFHQ 和 LSUN 上不如当时最好的 GAN（ProjectedGAN）。</p>
+    <div class="tbl"><table><thead><tr><th>数据集 (256<sup>2</sup>)</th><th>LDM</th><th>扩散基线</th><th>最好的 GAN</th></tr></thead><tbody><tr><td>CelebA-HQ</td><td><b>5.11</b>（LDM-4，500 步）</td><td>LSGM 7.22，UDM 7.16</td><td>PGGAN 8.0</td></tr><tr><td>FFHQ</td><td>4.98（LDM-4，200 步）</td><td>UDM 5.54</td><td>ProjectedGAN 3.08</td></tr><tr><td>LSUN-Churches</td><td>4.02（LDM-8，200 步）</td><td>DDPM 7.89</td><td>ProjectedGAN 1.59</td></tr><tr><td>LSUN-Bedrooms</td><td>2.95（LDM-4，200 步）</td><td>ADM 1.90，DDPM 4.9</td><td>ProjectedGAN 1.52</td></tr></tbody></table></div>
+    <p><b>类别条件和计算量</b>（表 3、表 18）。这组数字最能说明方法的价值：FID 不差于 ADM，训练算力少得多，吞吐量高得多。V100 日由 A100 日按 2.2 倍换算。</p>
+    <div class="tbl"><table><thead><tr><th>模型</th><th>FID</th><th>训练算力（V100 日）</th><th>参数量</th><th>吞吐量（样本/秒）</th></tr></thead><tbody><tr><td>ADM（ImageNet，250 步）</td><td>10.94</td><td>916</td><td>5.54 亿</td><td>0.12</td></tr><tr><td>LDM-4（ImageNet，250 步）</td><td>10.56</td><td>271</td><td>4 亿</td><td>0.7</td></tr><tr><td>ADM-G（ImageNet，250 步，分类器引导）</td><td>4.59</td><td>962</td><td>6.08 亿</td><td>0.07</td></tr><tr><td>LDM-4-G（ImageNet，250 步，<span class="m"><i>s</i>=1.5</span>）</td><td><b>3.60</b></td><td>271</td><td>4 亿</td><td>0.4</td></tr><tr><td>ADM（LSUN-Bedrooms，1000 步）</td><td>1.9</td><td>232</td><td>5.52 亿</td><td>0.03</td></tr><tr><td>LDM-4（LSUN-Bedrooms，200 步）</td><td>2.95</td><td>55 至 60</td><td>2.74 亿</td><td>1.07</td></tr></tbody></table></div>
+    <p><b>文本生成图像</b>（表 2，MS-COCO 256<sup>2</sup>）。不用引导的 LDM 已经优于 CogView（27.10）和 LAFITE（26.94）；加引导后与最新方法相当，参数量少得多。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig5.jpg" alt="原论文图 5。LDM-8 (KL) 在 LAION 上训练，提示由用户自定义，200 步 DDIM，引导系数 s = 10。" loading="lazy"></div><figcaption>原论文图 5。LDM-8 (KL) 在 LAION 上训练，提示由用户自定义，200 步 DDIM，引导系数 s = 10。</figcaption></figure>
+    <p><b>超分辨率</b>（表 5，ImageNet 64→256）。LDM-4 的 FID 为 2.8（用训练集特征计算时为 4.8），好于 SR3 的 5.2，但 PSNR（24.4）和 IS（166.3）都低于 SR3（26.4，180.1）。简单的回归模型 PSNR 最高（27.9），但图像偏模糊。用户研究中，受试者更偏好 LDM-4，在两种生成结果中选择时 LDM-4 占 70.6%，像素空间基线占 29.4%。</p>
+    <p><b>图像修复</b>（表 6、表 7，Places）。同样参数量下，LDM-4 比像素空间的 LDM-1 至少快 2.7 倍，FID 从 24.74 降到 14.99。微调后的大模型在 40% 至 50% 掩码的困难样本上 FID 9.39，刷新了当时的记录，优于 LaMa（12.31）和 CoModGAN（10.4）。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig11.jpg" alt="原论文图 11。用图像修复模型移除物体的结果。" loading="lazy" style="max-width:460px"></div><figcaption>原论文图 11。用图像修复模型移除物体的结果。</figcaption></figure>
+    <p>模型和代码同时公开，地址是 github.com/CompVis/latent-diffusion。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-limits">
+    <h2><span class="n">16</span><span>局限</span></h2>
+    <p>论文自己列了两点。采样仍然是顺序的，比 GAN 慢。需要像素级精度的任务上，自编码器的重建能力可能成为瓶颈，超分辨率已经受到一定影响。</p>
+    <p>后来的实践和讨论又补充了几点：</p>
+    <ul><li><b>解码器会编造细节。</b> 对抗训练让解码器合成看起来真实的局部纹理。一般图像生成可以接受，但 Rombach 在教程圆桌里提到，医学图像这类应用就不合适。</li><li><b>小尺度结构容易失真。</b> 人脸、手、文字在 8 倍下采样后占的隐变量很少，扩散模型和解码器都难以准确还原。后来的模型通过增加隐变量通道数来缓解，比如 Stable Diffusion 3 把通道数从 4 增加到 16。</li><li><b>隐空间的统计特性不够理想。</b> 只有一个全局缩放系数，各通道方差并不相同，噪声表也是沿用像素空间的。Stable Diffusion v1 的噪声表在最后一步 <span class="m"><i class="aov">α</i><sub><i>T</i></sub> ≈ 0.0047</span>，<span class="m"><i>z</i><sub><i>T</i></sub></span> 中仍残留少量信号，而采样从纯噪声开始，两者并不一致。</li><li><b>存在先后依赖。</b> Sander Dieleman 在圆桌里指出，扩散模型依赖固定的隐空间。自编码器一旦要改，已经训练几周的扩散模型只能从头开始。像素空间的级联模型没有这个问题。</li><li><b>文本理解有限。</b> 用一个 77 token 的序列和交叉注意力表达复杂的组合关系并不容易，比如多个物体各自的属性和位置。教程圆桌上，吴英年和 Rombach 都把组合性列为主要的开放问题。</li></ul>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-sd">
+    <h2><span class="n">17</span><span>从 LDM 到 Stable Diffusion</span></h2>
+    <p>Stable Diffusion v1 由 CompVis 组与 Stability AI、Runway 合作完成，算力由 Stability AI 捐赠，权重于 2022-08-22 公开。结构上它仍然是 LDM，主要差别在数据和文本编码器。</p>
+    <div class="tbl"><table><thead><tr><th>项目</th><th>论文 LDM-KL-8-G</th><th>Stable Diffusion v1</th></tr></thead><tbody><tr><td>训练数据</td><td>LAION-400M</td><td>LAION-5B 的子集，如 laion-aesthetics v2 5+</td></tr><tr><td>分辨率</td><td>256<sup>2</sup></td><td>先 256<sup>2</sup> 后 512<sup>2</sup></td></tr><tr><td>文本编码器</td><td>与 U-Net 联合训练的 Transformer，1280 维</td><td>冻结的 CLIP ViT-L/14，768 维</td></tr><tr><td>隐变量缩放</td><td>按标准差缩放</td><td><code>scale_factor</code> = 0.18215</td></tr><tr><td>文本丢弃</td><td>论文未写比例</td><td>v1-3、v1-4 以 10% 概率丢弃文本条件</td></tr><tr><td>模型规模</td><td>14.5 亿参数</td><td>U-Net 8.6 亿，文本编码器 1.23 亿</td></tr><tr><td>硬件需求</td><td>论文未写</td><td>至少 10 GB 显存</td></tr><tr><td>许可</td><td>代码和模型公开</td><td>CreativeML OpenRAIL-M，含使用限制</td></tr></tbody></table></div>
+    <p>真正带来变化的是权重公开，并且一张消费级显卡就能运行。此前的高质量文本生成图像模型要么只提供接口，要么需要大量算力。研究者可以直接在它上面做微调、控制和编辑。圆桌讨论里，吴英年和 Chenlin Meng 都提到，没有这份公开权重，学术界很难接触到训练良好的大规模扩散模型，Zero-1-to-3 这类工作也无从做起。</p>
+    <p>这个自编码器本身也影响深远。Rombach 在圆桌里说，它是用一块 GPU 训练的，后来被 DALL·E 3 使用；DiT 同样使用了 Stable Diffusion 的预训练自编码器。第一阶段的成本也明显低于第二阶段：表 18 中第一阶段是 29 至 66 个 V100 日，ImageNet 上的第二阶段是 79 至 271 个。</p>
+    
+    
+    
+    <p class="refs"><a href="https://github.com/CompVis/stable-diffusion" target="_blank" rel="noreferrer">Stable Diffusion 官方仓库 ↗</a><a href="https://github.com/CompVis/stable-diffusion/blob/main/configs/stable-diffusion/v1-inference.yaml" target="_blank" rel="noreferrer">v1-inference.yaml ↗</a></p>
+  </section>
+<section class="aisec" id="o-after">
+    <h2><span class="n">18</span><span>后续发展</span></h2>
+    <p>几年来，大多数图像和视频生成模型都保留了「先压缩、在隐空间生成」的骨架，但每个部件都被替换过。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 910 468" width="910" height="468" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="lineage5-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="lineage5-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="lineage5-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-8" y="-8" width="910" height="468" fill="#fff"/>
+<text x="0" y="34" class="ph">开放模型</text><rect x="92" y="0" width="262" height="56" rx="7" class="mW"/><text x="102" y="16" class="xs">2022-08-22</text><text x="174" y="16" class="pb">Stable Diffusion v1</text><text x="102" y="40" class="sm">LAION 数据，CLIP 文本编码器</text><rect x="362" y="0" width="262" height="56" rx="7" class="mW"/><text x="372" y="16" class="xs">2023-07-04</text><text x="444" y="16" class="pb">SDXL</text><text x="372" y="40" class="sm">26 亿参数 U-Net，两个文本编码器</text><rect x="632" y="0" width="262" height="56" rx="7" class="mW"/><text x="642" y="16" class="xs">2024-08-01</text><text x="714" y="16" class="pb">FLUX.1</text><text x="642" y="40" class="sm">Black Forest Labs，整流 Transformer</text><text x="0" y="100" class="ph">去噪网络</text><path d="M0 61 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="66" width="262" height="56" rx="7" class="mW"/><text x="102" y="82" class="xs">2022-12-19</text><text x="174" y="82" class="pb">DiT</text><text x="102" y="106" class="sm">用图块 Transformer 替换 U-Net</text><rect x="362" y="66" width="262" height="56" rx="7" class="mW"/><text x="372" y="82" class="xs">2024-03-05</text><text x="444" y="82" class="pb">Stable Diffusion 3</text><text x="372" y="106" class="sm">文本和图像联合注意力</text><text x="0" y="166" class="ph">采样加速</text><path d="M0 127 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="132" width="262" height="56" rx="7" class="mW"/><text x="102" y="148" class="xs">2023-10-06</text><text x="174" y="148" class="pb">Latent Consistency Models</text><text x="102" y="172" class="sm">隐空间一致性蒸馏，2 至 4 步</text><rect x="362" y="132" width="262" height="56" rx="7" class="mW"/><text x="372" y="148" class="xs">2023-11-28</text><text x="444" y="148" class="pb">SDXL Turbo (ADD)</text><text x="372" y="172" class="sm">蒸馏加判别器，1 至 4 步</text><rect x="632" y="132" width="262" height="56" rx="7" class="mW"/><text x="642" y="148" class="xs">2023-11-30</text><text x="714" y="148" class="pb">DMD</text><text x="642" y="172" class="sm">分布匹配蒸馏，1 步</text><text x="0" y="232" class="ph">控制和编辑</text><path d="M0 193 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="198" width="262" height="56" rx="7" class="mW"/><text x="102" y="214" class="xs">2022-08-02</text><text x="174" y="214" class="pb">Prompt-to-Prompt</text><text x="102" y="238" class="sm">替换交叉注意力图做编辑</text><rect x="362" y="198" width="262" height="56" rx="7" class="mW"/><text x="372" y="214" class="xs">2022-11-17</text><text x="444" y="214" class="pb">InstructPix2Pix</text><text x="372" y="238" class="sm">按文字指令改图</text><rect x="632" y="198" width="262" height="56" rx="7" class="mW"/><text x="642" y="214" class="xs">2023-02-10</text><text x="714" y="214" class="pb">ControlNet</text><text x="642" y="238" class="sm">复制编码器，接入边缘、姿态</text><text x="0" y="298" class="ph">视频</text><path d="M0 259 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="264" width="262" height="56" rx="7" class="mW"/><text x="102" y="280" class="xs">2023-04-18</text><text x="174" y="280" class="pb">Align your Latents</text><text x="102" y="304" class="sm">给图像模型插入时间层</text><rect x="362" y="264" width="262" height="56" rx="7" class="mW"/><text x="372" y="280" class="xs">2023-11-25</text><text x="444" y="280" class="pb">Stable Video Diffusion</text><text x="372" y="304" class="sm">开放权重的隐空间视频模型</text><rect x="632" y="264" width="262" height="56" rx="7" class="mW"/><text x="642" y="280" class="xs">2024-02-15</text><text x="714" y="280" class="pb">Sora</text><text x="642" y="304" class="sm">时空图块上的扩散 Transformer</text><text x="0" y="364" class="ph">压缩器</text><path d="M0 325 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="330" width="262" height="56" rx="7" class="mW"/><text x="102" y="346" class="xs">2024-03-05</text><text x="174" y="346" class="pb">16 通道隐空间</text><text x="102" y="370" class="sm">Stable Diffusion 3 把 4 通道增到 16</text><rect x="362" y="330" width="262" height="56" rx="7" class="mW"/><text x="372" y="346" class="xs">2024-10-14</text><text x="444" y="346" class="pb">DC-AE</text><text x="372" y="370" class="sm">下采样 32 至 128 倍</text><rect x="632" y="330" width="262" height="56" rx="7" class="mW"/><text x="642" y="346" class="xs">2025-02-13</text><text x="714" y="346" class="pb">EQ-VAE</text><text x="642" y="370" class="sm">约束隐空间的等变性</text><text x="0" y="430" class="ph">回到像素</text><path d="M0 391 H894" class="thin" stroke-opacity=".5"/><rect x="92" y="396" width="262" height="56" rx="7" class="mW"/><text x="102" y="412" class="xs">2023-01-26</text><text x="174" y="412" class="pb">simple diffusion</text><text x="102" y="436" class="sm">调整噪声表，端到端训练高分辨率</text><rect x="362" y="396" width="262" height="56" rx="7" class="mW"/><text x="372" y="412" class="xs">2025-11-17</text><text x="444" y="412" class="pb">Back to Basics</text><text x="372" y="436" class="sm">直接预测干净图像，不用自编码器</text>
+</svg>
+<figcaption>2022 年以后的七个方向，日期是 arXiv 首版或官方发布日。</figcaption></figure>
+    <p><b>开放模型。</b> Stable Diffusion 2.0（2022-11-24）把文本编码器换成 OpenCLIP ViT-H。SDXL（2023-07-04）把 U-Net 扩大到 26 亿参数，使用 CLIP ViT-L 和 OpenCLIP ViT-bigG 两个文本编码器，分辨率提高到 1024<sup>2</sup>。FLUX.1（2024-08-01）由 Stable Diffusion 的原作者们在 Black Forest Labs 发布。</p>
+    <p><b>去噪网络。</b> DiT（2022-12-19）把隐变量切成图块，用 Transformer 替换 U-Net，在 ImageNet 256<sup>2</sup> 上 FID 达到 2.27。Stable Diffusion 3（2024-03-05）让文本和图像 token 在同一个注意力中联合计算，并改用整流 (Rectified Flow) 训练。在这类模型里，联合注意力取代了 U-Net 的交叉注意力。</p>
+    <p><b>采样加速。</b> 隐空间扩散模型特别适合蒸馏，因为教师模型已经公开且足够好。Latent Consistency Models（2023-10-06）把生成压缩到 2 至 4 步，SDXL Turbo 所用的对抗扩散蒸馏（2023-11-28）和分布匹配蒸馏（2023-11-30）进一步减少到 1 步。</p>
+    <p><b>控制和编辑。</b> ControlNet（2023-02-10）复制一份预训练编码器，用零初始化的卷积接回原模型，加入边缘、姿态等条件，不需要重新训练主模型。Prompt-to-Prompt（2022-08-02）和 InstructPix2Pix（2022-11-17）则在已有模型上实现文字编辑。这些工作的共同前提是公开权重。</p>
+    <p><b>视频。</b> Align your Latents（2023-04-18）冻结图像 LDM 的空间层，在每层后插入时间层。Stable Video Diffusion（2023-11-25）把这个做法扩大到大规模数据。Sora（2024-02-15）把视频压缩到隐空间，再切成时空图块，用扩散 Transformer 生成。Rombach 在 2023 年的圆桌里提到，逐帧编码的隐变量仍有大量冗余，更好的视频分词器是值得做的方向，后来的视频模型普遍使用同时压缩时间和空间的自编码器。</p>
+    <p><b>压缩器。</b> 第一阶段也在改进。Stable Diffusion 3 把隐变量通道从 4 增加到 16。DC-AE（2024-10-14）把下采样提高到 32 倍以上，让高分辨率生成更便宜。EQ-VAE（2025-02-13）在隐空间加入等变性约束，让隐变量对空间变换的表现更规律。</p>
+    <p><b>回到像素。</b> 也有研究质疑自编码器是否必要。Imagen（2022-05-23）用像素空间的级联模型。simple diffusion（2023-01-26）通过调整噪声表和损失权重，在高分辨率上做端到端的像素空间扩散。Back to Basics（2025-11-17）让网络直接预测干净图像，在高维像素空间中用 Transformer 训练。隐空间方案的优势主要是成本，这些工作说明它并不是唯一的选择。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2307.01952" target="_blank" rel="noreferrer">SDXL ↗</a><a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noreferrer">DiT ↗</a><a href="https://arxiv.org/abs/2403.03206" target="_blank" rel="noreferrer">Stable Diffusion 3 ↗</a><a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noreferrer">ControlNet ↗</a><a href="https://arxiv.org/abs/2310.04378" target="_blank" rel="noreferrer">Latent Consistency Models ↗</a><a href="https://arxiv.org/abs/2304.08818" target="_blank" rel="noreferrer">Align your Latents ↗</a><a href="https://arxiv.org/abs/2311.15127" target="_blank" rel="noreferrer">Stable Video Diffusion ↗</a><a href="https://arxiv.org/abs/2410.10733" target="_blank" rel="noreferrer">DC-AE ↗</a><a href="https://arxiv.org/abs/2502.09509" target="_blank" rel="noreferrer">EQ-VAE ↗</a><a href="https://arxiv.org/abs/2301.11093" target="_blank" rel="noreferrer">simple diffusion ↗</a><a href="https://arxiv.org/abs/2511.13720" target="_blank" rel="noreferrer">Back to Basics ↗</a></p>
+  </section>
+<section class="aisec" id="o-relation">
+    <h2><span class="n">19</span><span>和 VAE、VQGAN、DDPM 的关系</span></h2>
+    <div class="tbl"><table><thead><tr><th>模型</th><th>隐变量和先验</th><th>第二阶段</th><th>和 LDM 的差别</th></tr></thead><tbody><tr><td>VAE</td><td>低维向量，固定的标准正态先验</td><td>无</td><td>LDM 的 KL 权重小几个数量级，隐变量并不接近标准正态，因此需要学习一个先验</td></tr><tr><td>VQ-VAE、VQGAN</td><td>离散 token 网格</td><td>自回归模型</td><td>LDM 沿用第一阶段的设计，第二阶段换成扩散模型，压缩可以更温和</td></tr><tr><td>DDPM</td><td>与图像同维，无压缩</td><td>无（本身就是迭代生成）</td><td>LDM 的扩散部分和 DDPM 相同，只是工作在隐变量上</td></tr><tr><td>LSGM</td><td>连续隐变量，联合训练</td><td>联合训练的扩散先验</td><td>LDM 分两阶段，不需要在重建和生成之间加权</td></tr></tbody></table></div>
+    <p>从 VAE 的角度看，LDM 也可以理解为一个分层模型：解码器加上一个强大的扩散先验。论文的选择是把两部分分开学习，先得到好的重建，再让先验去拟合得到的隐变量分布。</p>
+    
+    
+    
+    
+  </section>
+  </article>
+</div>
+</div>
+<div class="view" id="view-paper">
+<iframe class="paperframe" data-src="__ASSETS__/paper.html?v=538cdb53d5" title="《High-Resolution Image Synthesis with Latent Diffusion Models》中英对照"></iframe>
+</div>
+<div class="view" id="view-faq">
+<div class="faqdoc">
+  <p class="lede">这些问题来自两处：对照论文时容易混淆的符号和说法，以及 NeurIPS 2023 教程的提问和圆桌讨论。答案尽量短，展开的内容链到「综述」和「资料」。</p>
+  <div class="eptools"><span>15 个问题 · 点问题展开</span>
+    <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <section class="faqgrp"><h2>整体思路</h2>
+    <details class="faq" id="faq-name"><summary>Latent Diffusion、LDM、Stable Diffusion 是什么关系？</summary><div class="faqa">
+      <p>Latent Diffusion Model (LDM) 是方法的名字，也是这篇论文提出的模型类别。Stable Diffusion 是这种方法的一个具体模型，由同一批作者与 Stability AI、Runway 合作，用 LAION-5B 的子集和更大的算力训练，并公开权重。</p>
+      <p>所以 Stable Diffusion 一定是 LDM，LDM 不一定是 Stable Diffusion。Meta 的 Emu 也是 LDM。Stable Diffusion 3 和 FLUX.1 换成了 Transformer 和整流，但仍在隐空间工作，属于这个思路的延续。</p>
+      <p class="refs"><a href="#o-sd">综述：从 LDM 到 Stable Diffusion →</a></p>
+    </div></details>
+    <details class="faq" id="faq-why-not-vae"><summary>隐变量已经加了 KL 正则，为什么不能直接从标准正态采样再解码？</summary><div class="faqa">
+      <p>因为 KL 权重只有约 10<sup>−6</sup>，隐变量的分布远离标准正态。这里的 KL 项只是防止方差失控，不要求聚合后的分布接近先验。从标准正态采样后解码，得到的基本是没有结构的纹理。</p>
+      <p>普通 VAE 把这个权重取得较大，生成可以直接从先验采样，代价是重建模糊。LDM 选择把重建做好，把「隐变量的分布长什么样」交给第二阶段的扩散模型来学习。</p>
+      <p class="refs"><a href="#o-ae">综述：第一阶段 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-why-two-stage"><summary>为什么分两阶段训练，联合训练不是更优吗？</summary><div class="faqa">
+      <p>两个阶段的目标不同。第一阶段追求逼真，用感知损失和判别器；第二阶段是基于似然的扩散目标，追求覆盖数据分布。联合训练要在重建和生成之间设置权重，很难调。</p>
+      <p>圆桌上 Dieleman 的说法是，联合训练只有在两部分优化同一个损失时才有意义，而那样恰好失去了这个结构的主要好处。Rombach 说 LDM 论文的审稿人也问过这个问题，他们试过联合训练，在复杂数据上效果并不好。吴英年补充了反方向的情况：需要结构化先验，或者分布在优化中持续变化（如分子设计）时，联合训练更合理。</p>
+      <p class="refs"><a href="#o-frame">综述：整体结构 →</a><a href="#p2-s8">教程：圆桌 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-why-spatial"><summary>为什么隐变量要保留空间结构，压成一个向量不是更紧凑吗？</summary><div class="faqa">
+      <p>扩散模型的优势来自卷积 U-Net 的归纳偏置，而卷积需要二维结构。隐变量保持 <span class="m"><i>h</i>×<i>w</i>×<i>c</i></span> 的形状后，每个位置主要对应图像的一块局部区域，U-Net 可以像处理小图一样处理它。</p>
+      <p>这还带来两个实际好处：空间对齐的条件可以直接拼接，采样时也可以改变尺寸来生成更大的图。如果压成一维向量，这两点都做不到，VQGAN 和 DALL·E 排成一维序列后也丢失了大部分结构信息。</p>
+      <p class="refs"><a href="#o-f">综述：压缩倍数 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-pixels-vs-latent"><summary>隐空间的扩散和像素空间的扩散，算法上有区别吗？</summary><div class="faqa">
+      <p>几乎没有。损失的形式相同，噪声表和采样器都可以照用。第二阶段可以当成在一个 64×64×4 的「图像」数据集上训练 DDPM。</p>
+      <p>区别在数据统计特性。隐变量的尺度和相关性都与像素不同，所以需要缩放，最合适的噪声表也可能不同。Chenlin Meng 在圆桌上提到，同一个噪声表换一个隐空间，效果可能明显变差。</p>
+      <p class="refs"><a href="#o-ldm">综述：第二阶段 →</a><a href="#o-scale">综述：隐空间的尺度 →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>自编码器</h2>
+    <details class="faq" id="faq-scale-factor"><summary>代码里的 0.18215 是什么，换一个自编码器还能用吗？</summary><div class="faqa">
+      <p>它是 Stable Diffusion v1 的自编码器算出的缩放系数，等于隐变量标准差的倒数，<span class="m"><i>σ̂</i></span> 约为 5.49。论文附录 G 给出了方法：取第一个批量算标准差，把隐变量除以它，使缩放后的标准差约为 1。</p>
+      <p>这个数字绑定特定的自编码器。换一个自编码器就要重新估计，比如 SDXL 的配置用的是 0.13025。训练和采样都要用相同的系数：编码后乘，解码前除。</p>
+      <p class="refs"><a href="#o-scale">综述：隐空间的尺度 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-disc"><summary>判别器生成的细节是「真的」吗？</summary><div class="faqa">
+      <p>不是。这些细节没有编码在隐变量里，是解码器根据局部上下文合成的，所以看起来真实，却和输入不一样。这也是 PSNR 不算高但 FID 很低的原因。</p>
+      <p>对一般图像生成这没有问题，但如果要做精确重建，比如医学影像，这是需要避免的。论文也说明了超分辨率模型在这方面已经受到限制。</p>
+      <p class="refs"><a href="#o-ae">综述：第一阶段 →</a><a href="#p1-s5">教程：判别器 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-f-c"><summary>f 和 c 怎么选？为什么 Stable Diffusion 是 f = 8、c = 4？</summary><div class="faqa">
+      <p><span class="m"><i>f</i></span> 决定 U-Net 的计算量，<span class="m"><i>c</i></span> 决定每个位置保留的信息。论文的结论是 <span class="m"><i>f</i> = 4</span> 或 <span class="m">8</span> 最好。文本模型在 256<sup>2</sup> 上训练时选 <span class="m"><i>f</i> = 8</span>，隐变量 32×32×4，压缩比 48 倍，R-FID 0.90；512<sup>2</sup> 时隐变量是 64×64，计算量仍然可以接受。</p>
+      <p>后来 4 个通道被认为偏少，小尺度细节容易丢失。Stable Diffusion 3 改成 16 个通道，代价是第二阶段的建模难度增加，它的论文显示 <span class="m"><i>d</i> = 16</span> 的模型需要更大的网络才能发挥优势。</p>
+      <p class="refs"><a href="#o-f">综述：压缩倍数 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-vq-kl"><summary>KL 和 VQ 两种正则化怎么选？</summary><div class="faqa">
+      <p>论文的实验没有绝对的胜者：VQ 的重建指标略差，但有些 LDM 反而在 VQ 隐空间上样本质量更好，比如 CelebA-HQ、FFHQ 和 LSUN-Bedrooms 都用 VQ。文本模型选的是 KL。后来的主流模型基本都用 KL，一个原因是连续隐空间不需要量化，结构更简单。</p>
+      <p>无论哪种，论文都在 VQ 情形下让扩散模型工作在量化之前的连续隐变量上，所以扩散部分的代码相同。</p>
+      <p class="refs"><a href="#o-ae">综述：第一阶段 →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>条件和采样</h2>
+    <details class="faq" id="faq-cross-vs-concat"><summary>什么时候用交叉注意力，什么时候用拼接？</summary><div class="faqa">
+      <p>条件和图像位置一一对应时用拼接，比如低分辨率图像、语义图、带掩码的图。条件是序列或者和位置无关时用交叉注意力，比如文本、类别、边界框序列。</p>
+      <p>两者可以同时使用。图 3 的开关表示的就是这两条支路。Stable Diffusion 的图像修复版本把掩码和带掩码图像的隐变量拼接到输入上，同时用交叉注意力接收文本。</p>
+      <p class="refs"><a href="#o-cross">综述：交叉注意力 →</a><a href="#o-concat">综述：拼接 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-clip-vs-bert"><summary>论文的文本编码器是训练出来的，为什么 Stable Diffusion 用冻结的 CLIP？</summary><div class="faqa">
+      <p>论文里 <span class="m">τ<sub><i>θ</i></sub></span> 是一个 32 层的 Transformer，与 U-Net 联合训练，只用了公开的 BERT 分词器。Stable Diffusion 改用预训练的 CLIP ViT-L/14 文本编码器并冻结。官方 README 只说明了做法类似 Imagen，没有展开原因。</p>
+      <p>一个合理的解释是预训练的文本编码器已经包含图文对应关系，还能省去这部分的训练和显存。配置里 <code>cond_stage_trainable: false</code> 的注释也写着这和他们之前训练的版本不同。</p>
+      <p class="refs"><a href="#o-sd">综述：从 LDM 到 Stable Diffusion →</a></p>
+    </div></details>
+    <details class="faq" id="faq-s-value"><summary>论文的引导系数 s = 1.5 和图 5 的 s = 10 差这么多，到底该用哪个？</summary><div class="faqa">
+      <p>两者优化的目标不同。FID 同时衡量质量和多样性，<span class="m"><i>s</i></span> 太大时多样性下降，所以最优值较小，这里是 1.5。人看单张图时更看重是否符合提示、是否清晰，所以展示用的 <span class="m"><i>s</i></span> 更大。</p>
+      <p><span class="m"><i>s</i></span> 过大也会出现颜色过饱和等问题。Stable Diffusion 的默认值是 7.5。</p>
+      <p class="refs"><a href="#o-cfg">综述：引导 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-terminal"><summary>采样从纯噪声开始，但前向过程的终点真是纯噪声吗？</summary><div class="faqa">
+      <p>严格来说不是。LDM 代码里的 <code>linear</code> 表是先对 β 开方、线性插值后再平方。Stable Diffusion v1 取 β 从 0.00085 到 0.012，计算得 <span class="m"><i class="aov">α</i><sub>1000</sub> ≈ 0.0047</span>，即 <span class="m"><i>z</i><sub><i>T</i></sub></span> 中还有约 <span class="m">√0.0047 ≈ 0.068</span> 倍的原始信号。作为对比，DDPM 的 <span class="m"><i class="aov">α</i><sub>1000</sub> ≈ 4 × 10<sup>−5</sup></span>。</p>
+      <p>残留的信号主要是低频信息，因此模型在训练时能看到一点平均亮度，采样时却从纯噪声开始。教程里提到 Stable Video Diffusion 专门调整了噪声表来解决这个不一致。</p>
+      <p class="refs"><a href="#o-limits">综述：局限 →</a><a href="#p2-s5">教程：视频 →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>论文细节</h2>
+    <details class="faq" id="faq-typos"><summary>论文里有几处数字和公式对不上，哪些是笔误？</summary><div class="faqa">
+      <p>对照全文和官方代码，至少有这几处：</p>
+      <ul><li>式 (3) 之后写的 <span class="m"><i>W</i><sub><i>V</i></sub><sup>(<i>i</i>)</sup> ∈ ℝ<sup><i>d</i>×<i>d</i><sub><i>ε</i></sub><sup><i>i</i></sup></sup></span>、<span class="m"><i>W</i><sub><i>Q</i></sub><sup>(<i>i</i>)</sup> ∈ ℝ<sup><i>d</i>×<i>d</i><sub><i>τ</i></sub></sup></span> 中，Q 和 V 的维度写反了。Q 来自图像特征，维度应为 <span class="m"><i>d</i>×<i>d</i><sub><i>ε</i></sub><sup><i>i</i></sup></span>；K、V 来自条件，维度应为 <span class="m"><i>d</i>×<i>d</i><sub><i>τ</i></sub></span>。代码中 <code>to_q</code> 的输入是 <code>query_dim</code>，<code>to_k</code>、<code>to_v</code> 的输入是 <code>context_dim</code>。</li><li>表 13、表 14 中 LDM-32 的隐变量写成「88 × 8 × 32」，应为 8 × 8 × 32。</li><li>第 4.3.2 节说语义合成用 <span class="m"><i>f</i> = 4</span> 模型，表 15 写的是 <span class="m"><i>f</i> = 8</span>。</li><li>表 18 中 LDM-4 在 LSUN-Bedrooms 上生成器算力 60，总算力 55，总数小于部分。同表 LDM-8 写 410K 步，表 12 写 500k。</li><li>图 28 写 FID 5.15、图 30 写 4.48，表 1 分别是 5.11 和 4.02。</li><li>附录 E.2.1 和表 16 把 Transformer 块写成「自注意力、MLP、交叉注意力」，代码 <code>BasicTransformerBlock</code> 的顺序是自注意力、交叉注意力、MLP。</li></ul>
+      <p>这些不影响结论。中英对照页按原文翻译，没有修改这些数字。</p>
+      <p class="refs"><a href="#o-cross">综述：交叉注意力 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-conv-pure"><summary>同样的模型能生成任意大的图吗？</summary><div class="faqa">
+      <p>不能。U-Net 的卷积部分不依赖尺寸，但注意力层和感受野都有训练时形成的尺度。尺寸差得太多时，会出现重复物体、全局结构不连贯。图 14 就展示了无条件卷积采样的这个问题。</p>
+      <p>空间条件任务效果好，是因为条件图已经给定了全局布局。无条件或文本任务可以先生成低分辨率的结果，再用它引导更大尺寸的采样，附录 C 的 <span class="m"><i>L</i><sub>2</sub></span> 引导就是这样做的。</p>
+      <p class="refs"><a href="#o-conv">综述：卷积采样 →</a></p>
+    </div></details>
+  </section>
+</div>
+</div>
+<div class="view" id="view-res">
+<div class="resdoc">
+  <p class="lede">NeurIPS 2023 教程《Latent Diffusion Models: Is the Generative AI Revolution Happening in Latent Space?》的笔记收在这里，共两段视频。两份笔记默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
+  <div class="eptools"><span>2 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <details class="res" id="res-p1">
+  <summary><span class="rt"><b>NeurIPS 2023 教程第一部分：入门</b><em>43 分钟，Karsten Kreis 讲扩散模型回顾、LDM 框架、判别器、率失真和正则化</em></span></summary>
+  <div class="resb">
+<div class="intro"><p>这是 NeurIPS 2023 的一场教程，主讲人是 NVIDIA 的 Karsten Kreis、Arash Vahdat 和 Google DeepMind 的 Ruiqi Gao，最后有 30 分钟圆桌。B 站搬运分成两段视频，第二段把 Vahdat、Gao 的讲解和圆桌连在一起。</p><p>笔记按幻灯片的内容分节转述，截图来自录像。字幕是自动转写的，公式和人名可能有误差，有疑问时以课程官网的幻灯片为准。</p></div>
+<details class="ep" id="p1" data-bv="BV1wFNCehED7" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">一</span>
+    <span class="tt"><b>第一部分：隐空间扩散模型入门</b><em>NeurIPS 2023 教程 · B 站搬运第 1 段</em><span class="hook">先用 15 分钟回顾扩散模型，再讲 LDM 的框架、判别器的作用和率失真曲线：解码器合成的局部细节不需要编码进隐空间，这是 LDM 高效的主要原因。</span></span>
+    <span class="side"><span class="chip">Karsten Kreis</span><span class="len">43:21</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">这一段的重点在后半部分。Kreis 用一张松鼠尾巴的对比说明判别器的作用，再用率失真曲线说明，如果在像素空间训练，模型的容量大部分花在了察觉不到的细节上。</p>
+      <p class="lede">Kreis 给出的 LDM 配方有两步：先训练一个强的自编码器，它是生成质量的上限；再在隐空间训练一个高效的扩散模型。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1wFNCehED7/?p=1" target="_blank" rel="noreferrer">B 站搬运 ↗</a><a href="https://neurips2023-ldm-tutorial.github.io/" target="_blank" rel="noreferrer">课程官网和幻灯片 ↗</a><a href="https://nips.cc/virtual/2023/tutorial/73957" target="_blank" rel="noreferrer">NeurIPS 会议页 ↗</a></p>
+      <section class="sec" id="p1-s0">
+      <h4><button class="ts" type="button" data-t="3">0:03</button><span>开场：为什么讲这个主题</span></h4>
+      <p>Kreis 的判断是，视觉领域近期的突破主要来自扩散模型，其中最突出的一类就是隐空间扩散模型。Stable Diffusion XL、Meta 的 Emu 都属于这一类，它们也用于视频、三维、分子，还有语义分割、关键点检测这些下游任务。</p>
+      <p>教程分四部分：Kreis 讲基础框架，Vahdat 讲端到端训练、加速采样和控制，Gao 讲图像以外的数据，最后是圆桌。圆桌嘉宾原定 Durk Kingma、Chenlin Meng、Robin Rombach、Sander Dieleman、吴英年，Kingma 当天因病缺席。</p>
+      
+      
+    </section>
+<section class="sec" id="p1-s1">
+      <h4><button class="ts" type="button" data-t="251">4:11</button><span>回顾：离散和连续的扩散过程</span></h4>
+      <p>离散形式就是 DDPM：前向过程每一步把信号略微缩小并加一点噪声，<span class="m"><i>β</i><sub><i>t</i></sub></span> 称为噪声表 (Noise Schedule)，一千步后信息被完全破坏。逆向过程也取条件高斯，均值由神经网络预测，方差通常作为超参数。</p>
+      <p>连续形式把这个过程写成随机微分方程 (SDE)。Anderson 的结果说明，前向 SDE 对应一个沿时间反向运行的 SDE，方程中唯一未知的量是分数函数 (Score Function)，即加噪后边际分布的对数密度梯度 <span class="m">∇<sub><i>x</i></sub> log <i>q</i><sub><i>t</i></sub>(<i>x</i>)</span>。训练扩散模型就是学习这个函数的神经网络近似。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-330.jpg" alt="离散的前向过程：逐步给图像加噪，每步是一个高斯转移核。讲解一直以 Vahdat 的猫 Peanut 为例。" loading="lazy"><figcaption><button class="ts" type="button" data-t="330">5:30</button>离散的前向过程：逐步给图像加噪，每步是一个高斯转移核。讲解一直以 Vahdat 的猫 Peanut 为例。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-580.jpg" alt="连续视角：图像分布沿 SDE 向噪声分布扩散，背景是边际分布，绿线是单条轨迹。" loading="lazy"><figcaption><button class="ts" type="button" data-t="580">9:40</button>连续视角：图像分布沿 SDE 向噪声分布扩散，背景是边际分布，绿线是单条轨迹。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s2">
+      <h4><button class="ts" type="button" data-t="742">12:22</button><span>回顾：训练目标和网络结构</span></h4>
+      <p>边际分布的分数算不出来，所以用去噪分数匹配：随机取时间 <span class="m"><i>t</i></span> 和一张图，只加噪这一张图。条件分布 <span class="m"><i>q</i><sub><i>t</i></sub>(<i>x</i><sub><i>t</i></sub>|<i>x</i><sub>0</sub>)</span> 是高斯，分数有解析式，可以作为回归目标。同一个 <span class="m"><i>x</i><sub><i>t</i></sub></span> 可能来自很多不同的 <span class="m"><i>x</i><sub>0</sub></span>，训练时这些目标被平均，网络收敛到的正是边际分布的分数。变分下界的推导最后也得到相同的形式。</p>
+      <p>网络通常是 U-Net：残差块加跳跃连接，配自注意力层捕捉长距离相关；时间经正弦嵌入或随机傅里叶特征后，用相加或自适应归一化接入。Kreis 提到 2023 年纯 Transformer 结构已有研究，但最成功的模型大多仍用 U-Net 的变体。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-800.jpg" alt="去噪分数匹配的目标：对时间、数据和加噪结果取期望，全部用蒙特卡洛采样估计。" loading="lazy"><figcaption><button class="ts" type="button" data-t="800">13:20</button>去噪分数匹配的目标：对时间、数据和加噪结果取期望，全部用蒙特卡洛采样估计。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-1000.jpg" alt="扩散模型常用的 U-Net：每个分辨率上有残差块，上下采样之间有跳跃连接，时间嵌入接入主干。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1000">16:40</button>扩散模型常用的 U-Net：每个分辨率上有残差块，上下采样之间有跳跃连接，时间嵌入接入主干。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s3">
+      <h4><button class="ts" type="button" data-t="1120">18:40</button><span>LDM 框架：两阶段</span></h4>
+      <p>第一步不是训练扩散模型，而是训练自编码器。编码器把 512×512 的图像压缩到例如 64×64×4 的隐空间。隐空间仍保留空间结构，近似于逐块的局部编码。解码器大体是编码器的镜像，用来重建图像。</p>
+      <p>第二步把数据都编码成隐变量，在这些隐变量上做常规的扩散模型训练。生成时，先采样隐变量，再经过解码器。</p>
+      <p>历史方面，Kreis 把这个框架追溯到 Vahdat 等人的 LSGM，同期还有 D2C 和符号音乐生成的工作。Kreis 认为 Rombach 等人的论文是真正把这类模型推广开来的工作，这一部分也基本沿用它的形式。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-1160.jpg" alt="第一阶段：训练自编码器，下采样倍数通常是 4 或 8。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1160">19:20</button>第一阶段：训练自编码器，下采样倍数通常是 4 或 8。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-1325.jpg" alt="两阶段连起来：第二阶段在隐变量上训练扩散模型，生成时再用解码器还原图像。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1325">22:05</button>两阶段连起来：第二阶段在隐变量上训练扩散模型，生成时再用解码器还原图像。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s4">
+      <h4><button class="ts" type="button" data-t="1343">22:23</button><span>LDM 的优点和结构</span></h4>
+      <p>优点有两类。第一是效率：隐空间分辨率低，正则化后也更平滑，扩散模型的任务更容易，有时还能减少采样步数。第二是灵活：自编码器可以针对数据定制，比如输入多视角图像、输出辐射场，或者把离散数据嵌入连续空间，隐空间里的扩散模型不需要改动。</p>
+      <p>隐空间的网络结构和像素空间几乎一样。值得强调的是条件接入：Rombach 等人把 U-Net 中的自注意力层扩展成同时对文本 token 做交叉注意力。Kreis 说，到 2023 年几乎所有扩散模型都采用了这个机制。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-1380.jpg" alt="隐空间扩散模型的优点：压缩后的隐空间、灵活的自编码器。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1380">23:00</button>隐空间扩散模型的优点：压缩后的隐空间、灵活的自编码器。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-1500.jpg" alt="Rombach 等人论文的结构图，右边的条件通过交叉注意力接入 U-Net。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1500">25:00</button>Rombach 等人论文的结构图，右边的条件通过交叉注意力接入 U-Net。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s5">
+      <h4><button class="ts" type="button" data-t="1591">26:31</button><span>判别器：解码器补出细节</span></h4>
+      <p>要达到高性能，只有重建损失是不够的。自编码器通常还要加一个基于图块的判别器。压缩会损失信息，判别器迫使解码器像一个小型 GAN 那样，把丢失的纹理重新合成出来。</p>
+      <p>松鼠尾巴的对比很直观。没有判别器时，语义和形状都对，但细节全部模糊。加上判别器后，毛发看起来完美。Kreis 特意指出这并不是完美重建：这些毛发是解码器新生成的，看起来真实，但并未编码在隐空间中。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-1700.jpg" alt="左为输入，中为不带判别器的重建，右为带判别器的重建。右图毛发清晰，但并非原图的毛发。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1700">28:20</button>左为输入，中为不带判别器的重建，右为带判别器的重建。右图毛发清晰，但并非原图的毛发。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s6">
+      <h4><button class="ts" type="button" data-t="1728">28:48</button><span>率失真：容量花在哪里</span></h4>
+      <p>这是这一部分的核心。一张好图需要两种东西：正确的全局结构（老虎的眼睛、耳朵的位置和条纹模式）和真实的局部细节（每一根毛的形态）。用户主要在意前者，但模型也必须生成后者。</p>
+      <p>率失真曲线上每个点对应一个噪声水平。横轴是率，即加噪图中保留的关于原图的信息量，单位是比特每维；纵轴是失真，即从这张加噪图一步重建原图的误差。曲线显示，只需较低的率就能把失真降到较低水平，这一段编码的是大尺度结构。要把失真继续降到零，率会急剧上升，这部分信息是察觉不到的局部细节。</p>
+      <p>结论是，如果在像素空间直接训练，模型几乎所有容量都用来编码这些细节。LDM 的做法是把它们交给判别器和解码器，隐变量不再编码这些细节，扩散模型就能集中处理语义压缩。Kreis 认为这是理解 LDM 高性能的关键。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-1780.jpg" alt="什么使一张图显得真实：全局结构，例如眼睛的位置和条纹模式。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1780">29:40</button>什么使一张图显得真实：全局结构，例如眼睛的位置和条纹模式。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-2010.jpg" alt="率失真曲线：左上是噪声很大的状态，右下是几乎干净的状态。把失真压到零需要的率急剧上升。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2010">33:30</button>率失真曲线：左上是噪声很大的状态，右下是几乎干净的状态。把失真压到零需要的率急剧上升。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-2130.jpg" alt="语义压缩和感知压缩的分界。LDM 用自编码器和判别器处理后者。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2130">35:30</button>语义压缩和感知压缩的分界。LDM 用自编码器和判别器处理后者。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>综述里的图 2 就是这条曲线，见 <a class="ilink" href="#o-problem">要解决的问题</a>。</p></div>
+    </section>
+<section class="sec" id="p1-s7">
+      <h4><button class="ts" type="button" data-t="2187">36:27</button><span>隐空间正则化：KL 和 VQ</span></h4>
+      <p>除了下采样倍数和通道数，还可以用正则化控制隐空间的信息量。KL 正则化让编码器输出一个窄高斯，再加上一个指向标准正态的惩罚项，权重越大，隐变量携带的信息越少。追求感知质量时权重取得很小；Vahdat 接下来讲的最大似然训练则要用大权重。</p>
+      <p>VQ 正则化用一个可学习的有限码本把隐变量离散化。码本很大时相当于弱正则化，码本很小时相当于强正则化。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-2250.jpg" alt="KL 正则化：编码器输出高斯分布，权重控制信息量。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2250">37:30</button>KL 正则化：编码器输出高斯分布，权重控制信息量。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p1-2300.jpg" alt="VQ 正则化：码本大小控制正则化强度。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2300">38:20</button>VQ 正则化：码本大小控制正则化强度。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s8">
+      <h4><button class="ts" type="button" data-t="2320">38:40</button><span>LDM 配方</span></h4>
+      <p>第一步，训练强的自编码器：下采样 4 倍或 8 倍，精心调整隐空间的正则化，保证重建的视觉质量。这是生成质量的上限，因为无论扩散模型生成什么，都要经过同一个解码器，扩散模型无法修复解码器的问题。</p>
+      <p>第二步，训练高效的隐空间扩散模型。人们通常以为压缩和重建之间存在取舍，但判别器让高压缩下仍能得到好的视觉重建，因为局部细节是重新生成而不是编码的。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-2350.jpg" alt="LDM 的配方：先训练强自编码器，再训练隐空间扩散模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2350">39:10</button>LDM 的配方：先训练强自编码器，再训练隐空间扩散模型。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p1-s9">
+      <h4><button class="ts" type="button" data-t="2469">41:09</button><span>图像生成的现状</span></h4>
+      <p>Stable Diffusion 和 Emu 都是 LDM，也有证据表明 DALL·E 3 是 LDM。Kreis 的观察是，这项技术用于实际图像生成已经相当成熟，近期的进展主要依靠数据标注、过滤和微调。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p1-2490.jpg" alt="当时最好的文本生成图像系统几乎都是隐空间扩散模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2490">41:30</button>当时最好的文本生成图像系统几乎都是隐空间扩散模型。</figcaption></figure></div>
+      
+    </section>
+      
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/p1-1160.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1wFNCehED7/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="3"><b>0:03</b><span>开场：为什么讲这个主题</span></button></li><li><button type="button" data-t="251"><b>4:11</b><span>回顾：离散和连续的扩散过程</span></button></li><li><button type="button" data-t="742"><b>12:22</b><span>回顾：训练目标和网络结构</span></button></li><li><button type="button" data-t="1120"><b>18:40</b><span>LDM 框架：两阶段</span></button></li><li><button type="button" data-t="1343"><b>22:23</b><span>LDM 的优点和结构</span></button></li><li><button type="button" data-t="1591"><b>26:31</b><span>判别器：解码器补出细节</span></button></li><li><button type="button" data-t="1728"><b>28:48</b><span>率失真：容量花在哪里</span></button></li><li><button type="button" data-t="2187"><b>36:27</b><span>隐空间正则化：KL 和 VQ</span></button></li><li><button type="button" data-t="2320"><b>38:40</b><span>LDM 配方</span></button></li><li><button type="button" data-t="2469"><b>41:09</b><span>图像生成的现状</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+  </div>
+</details>
+  <details class="res" id="res-p2">
+  <summary><span class="rt"><b>NeurIPS 2023 教程第二部分：进阶和圆桌</b><em>1 小时 48 分，Arash Vahdat 讲端到端、加速、逆问题和控制，Ruiqi Gao 讲视频、三维、文本和分子，最后是圆桌讨论</em></span></summary>
+  <div class="resb">
+<div class="intro"><p>这一段把三个部分连在一起：Arash Vahdat 讲进阶方法（到 37 分钟），Ruiqi Gao 讲视频、三维、文本和分子（到 73 分钟），最后 35 分钟是圆桌。</p><p>提到的具体工作很多，这里只记方法的思路，完整的论文列表在课程官网。圆桌的发言人字幕里没有标注，笔记按座次和上下文判断。</p></div>
+<details class="ep" id="p2" data-bv="BV1wFNCehED7" data-p="2" data-start="0" open>
+  <summary>
+    <span class="no">二</span>
+    <span class="tt"><b>第二部分：进阶方法、其他数据和圆桌</b><em>NeurIPS 2023 教程 · B 站搬运第 2 段</em><span class="hook">端到端还是两阶段，隐空间为什么好加速，视频和三维的做法，以及四位研究者对这类模型的判断：Dieleman 认为扩散可能只是深度网络尚不可训练时的一种替代方案。</span></span>
+    <span class="side"><span class="chip">Vahdat · Gao · 圆桌</span><span class="len">108:30</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">Vahdat 和 Gao 的部分适合当索引，每种方法几分钟，方便找到想读的论文。圆桌更值得细看，几位嘉宾在端到端训练、隐空间能否推广到文本这些问题上有明确的立场。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1wFNCehED7/?p=2" target="_blank" rel="noreferrer">B 站搬运 ↗</a><a href="https://neurips2023-ldm-tutorial.github.io/" target="_blank" rel="noreferrer">课程官网和幻灯片 ↗</a></p>
+      <section class="sec" id="p2-s0">
+      <h4><button class="ts" type="button" data-t="82">1:22</button><span>Vahdat：端到端训练</span></h4>
+      <p>这里讲的是 LSGM 的做法：变分自编码器加一个隐空间扩散先验，联合优化。先把自编码器在正态先验下预训练，使隐变量分布接近正态，再联合训练。</p>
+      <p>优点：隐变量接近正态，扩散动力学平滑，采样容易；引入隐变量提高了表达能力；图、文本、三维这些难以直接扩散的数据也能处理。缺点是要同时维护两个结构，有规模上的问题。</p>
+      <p>目标仍是证据下界。把 KL 拆成熵和交叉熵后，前两项和普通 VAE 相同，可以用重参数化优化。关键是交叉熵项，它可以写成一个加权的去噪分数匹配。隐变量接近正态这一点还可以作为先验知识，用于重要性采样和分数函数的参数化。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-180.jpg" alt="端到端训练的结构：编码器、解码器和隐空间扩散先验联合优化。" loading="lazy"><figcaption><button class="ts" type="button" data-t="180">3:00</button>端到端训练的结构：编码器、解码器和隐空间扩散先验联合优化。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-390.jpg" alt="目标函数：交叉熵项写成加权的去噪分数匹配。" loading="lazy"><figcaption><button class="ts" type="button" data-t="390">6:30</button>目标函数：交叉熵项写成加权的去噪分数匹配。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s1">
+      <h4><button class="ts" type="button" data-t="439">7:19</button><span>加速采样和蒸馏</span></h4>
+      <p>反向 SDE 可能要调用网络一千次。对应的概率流 ODE 没有噪声注入，轨迹是确定的，可以用成熟的数值求解器。由于隐变量接近正态，隐空间的轨迹更平滑，步数更少：2021 年的实验中，在 CelebA 上用现成的 ODE 求解器，隐空间只需约 23 次函数计算。</p>
+      <p>ODE 的确定性映射还可以用神经网络直接学习，这就是蒸馏。渐进蒸馏 (Progressive Distillation) 让学生网络的一步模仿教师网络的两步，学生再作为下一轮的教师，步数逐轮减半。Meng 等人在 CVPR 2023 上把隐空间的文本生成图像做到了 2 至 4 步。</p>
+      <p>一致性蒸馏 (Consistency Distillation) 利用同一条轨迹上的点都到达同一个终点这一性质，训练一个让它们输出相同 <span class="m"><i>x</i><sub>0</sub></span> 的函数，隐空间版本可以做到约 4 步。对抗方向也重新受到关注。分布匹配蒸馏 (Distribution Matching Distillation) 把回归损失和反向 KL 结合，反向 KL 的梯度是真实分数和虚假分数之差，一步采样约 90 毫秒。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-490.jpg" alt="从 SDE 到 ODE：没有噪声注入，轨迹是确定的。" loading="lazy"><figcaption><button class="ts" type="button" data-t="490">8:10</button>从 SDE 到 ODE：没有噪声注入，轨迹是确定的。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-585.jpg" alt="隐空间的 ODE 求解：同样的求解器，隐空间比像素空间需要的函数计算次数少。" loading="lazy"><figcaption><button class="ts" type="button" data-t="585">9:45</button>隐空间的 ODE 求解：同样的求解器，隐空间比像素空间需要的函数计算次数少。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-700.jpg" alt="渐进蒸馏：学生的一步模仿教师的两步，步数逐轮减半。" loading="lazy"><figcaption><button class="ts" type="button" data-t="700">11:40</button>渐进蒸馏：学生的一步模仿教师的两步，步数逐轮减半。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-810.jpg" alt="一致性蒸馏：一条轨迹上的点应当输出相同的干净数据。" loading="lazy"><figcaption><button class="ts" type="button" data-t="810">13:30</button>一致性蒸馏：一条轨迹上的点应当输出相同的干净数据。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1060.jpg" alt="分布匹配蒸馏的一步生成结果和其他方法的对比。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1060">17:40</button>分布匹配蒸馏的一步生成结果和其他方法的对比。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s2">
+      <h4><button class="ts" type="button" data-t="1089">18:09</button><span>逆问题</span></h4>
+      <p>逆问题指的是从退化的观测（低分辨率、缺失像素、模糊）恢复干净信号。线性情形下 <span class="m"><i>y</i> = <i>H</i><i>x</i><sub>0</sub> + <i>n</i></span>，退化模型已知。有了扩散先验，就可以从后验采样，用贝叶斯公式把条件分数拆成数据分数和似然分数两项。</p>
+      <p>数据分数已有，似然分数算不出来。重建引导 (Reconstruction Guidance) 的近似是：每一步用去噪网络预测 <span class="m"><i>x</i><sub>0</sub></span>，代入退化模型，以它与 <span class="m"><i>y</i></span> 的距离的梯度作为引导。</p>
+      <p>另一种思路是变分推断。假设变分分布是狄拉克分布，就得到 MAP 估计，目标函数是重建损失加一项类似分数蒸馏的损失。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-1170.jpg" alt="逆问题的定义：从观测中采样后验分布。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1170">19:30</button>逆问题的定义：从观测中采样后验分布。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1250.jpg" alt="重建引导：用预测的 x₀ 和观测的距离来近似似然分数。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1250">20:50</button>重建引导：用预测的 x<sub>0</sub> 和观测的距离来近似似然分数。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1390.jpg" alt="变分推断的目标：重建损失加上简化后的 KL 项。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1390">23:10</button>变分推断的目标：重建损失加上简化后的 KL 项。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s3">
+      <h4><button class="ts" type="button" data-t="1416">23:36</button><span>控制和编辑</span></h4>
+      <p>控制方面：ControlNet 复制预训练模型的编码部分，原模型锁定，副本可训练，两者通过零初始化的卷积连接，所以初始时输出和原模型完全相同，之后逐渐学会调制。GLIGEN 的思路相近，在自注意力和交叉注意力之间加入门控自注意力，初始化时相当于跳跃连接，用它能控制物体的位置和大小。</p>
+      <p>编辑方面：SDEdit 利用「两个分布扩散后会靠近」这一事实，给笔画图加噪后反向采样，得到真实图像，不需要额外训练。Prompt-to-Prompt 发现图像布局主要由交叉注意力图决定，所以修改提示词时固定其他词的注意力图，只替换改变的词。InstructPix2Pix 没有现成的编辑前后数据集，就先用 GPT-3 生成成对的文本，再用 Prompt-to-Prompt 生成成对的图像，最后训练一个以指令为条件的扩散模型。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-1530.jpg" alt="ControlNet：锁定的原模型和可训练的副本通过零卷积连接。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1530">25:30</button>ControlNet：锁定的原模型和可训练的副本通过零卷积连接。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1630.jpg" alt="GLIGEN：门控自注意力接入位置等条件。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1630">27:10</button>GLIGEN：门控自注意力接入位置等条件。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1760.jpg" alt="SDEdit：笔画图和真实图像加噪后分布接近。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1760">29:20</button>SDEdit：笔画图和真实图像加噪后分布接近。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1850.jpg" alt="Prompt-to-Prompt：替换词的交叉注意力图，保持其他内容不变。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1850">30:50</button>Prompt-to-Prompt：替换词的交叉注意力图，保持其他内容不变。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-1950.jpg" alt="InstructPix2Pix：先合成成对的数据，再训练条件模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1950">32:30</button>InstructPix2Pix：先合成成对的数据，再训练条件模型。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s4">
+      <h4><button class="ts" type="button" data-t="2044">34:04</button><span>现场提问</span></h4>
+      <p>有人问蒸馏出来的采样器为什么是正确的。Vahdat 的回答是没有保证：它们和 ODE 求解一样有累积误差，只要能很好地模拟 ODE 轨迹，就能近似数据分布。</p>
+      <p>另一个问题是编辑里的注意力图怎么在隐空间得到。回答是这些操作本来就在隐空间进行：隐变量是卷积得到的，和图像有一一对应的空间关系，展示时只是把 64×64 的图放大了。</p>
+      
+      
+    </section>
+<section class="sec" id="p2-s5">
+      <h4><button class="ts" type="button" data-t="2241">37:21</button><span>Gao：视频</span></h4>
+      <p>从这里开始是 Ruiqi Gao 的部分。LDM 不依赖具体的数据模态，只要有一个把数据映射到连续隐空间的自编码器。</p>
+      <p>视频最常见的结构是在每帧上重复 2D U-Net，中间加入时间注意力或时间卷积。Align your Latents 冻结图像 LDM 的空间层，只训练新增的时间层；编码器保持不变，解码器加入时间层和时间判别器微调，这一步对消除闪烁很关键。长视频用级联方式：关键帧模型、时间上采样、空间上采样。</p>
+      <p>Stable Video Diffusion 把这个框架放大，强调三点：先做图像预训练、再做视频预训练和高质量微调；数据筛选非常重要；要平移噪声表，保证最高噪声处没有残留信息。Emu Video 把任务拆成文本生成单帧、再由单帧生成其余帧。</p>
+      <p>开放问题包括：如何生成长的高分辨率视频、能否在时间上压缩、如何准确捕捉运动（当前模型的容量大部分仍用于单帧质量）、如何保持角色和场景一致、如何评估运动质量。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-2390.jpg" alt="Align your Latents：加入时间层后，各帧的隐变量相互对齐。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2390">39:50</button>Align your Latents：加入时间层后，各帧的隐变量相互对齐。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-2480.jpg" alt="白色的空间层冻结，绿色的时间层是新增的可训练部分。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2480">41:20</button>白色的空间层冻结，绿色的时间层是新增的可训练部分。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-2610.jpg" alt="Stable Video Diffusion：三阶段训练和数据筛选。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2610">43:30</button>Stable Video Diffusion：三阶段训练和数据筛选。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-2680.jpg" alt="Emu Video：先生成图像，再由图像生成视频。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2680">44:40</button>Emu Video：先生成图像，再由图像生成视频。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-2730.jpg" alt="视频 LDM 的开放问题。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2730">45:30</button>视频 LDM 的开放问题。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s6">
+      <h4><button class="ts" type="button" data-t="2902">48:22</button><span>三维</span></h4>
+      <p>三维有两类做法。第一类是直接在三维表示上做 LDM，关键是设计自编码器。LION 用点云和点体素 CNN，隐空间有形状和点两层。Diffusion-SDF 输入查询点，输出符号距离函数。Shap-E 把点云和渲染视图编码，解码成 NeRF 的 MLP 权重，扩散模型生成这些权重的隐变量。NeuralField-LDM 用体素网格表示场景，并在隐空间做分层扩散。</p>
+      <p>第二类用 2D 模型作为先验，因为高质量三维数据远少于图像。DreamFusion 提出分数蒸馏采样，用预训练的文本生成图像模型作为评判器，梯度经可微渲染回传到 NeRF。问题是只看单个视角，不同视角可能给出不一致的结果。</p>
+      <p>后续工作减少这种不确定性。Zero-1-to-3 微调 Stable Diffusion，让它以一张图和相对相机位姿为条件。ReconFusion 以多张图为条件，更接近三维重建。MVDream 把模型改造成多视角模型，加入类似视频的跨视角注意力。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-2970.jpg" alt="LION：点云的分层隐空间扩散。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2970">49:30</button>LION：点云的分层隐空间扩散。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3100.jpg" alt="Diffusion-SDF：输入点云，输出符号距离函数。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3100">51:40</button>Diffusion-SDF：输入点云，输出符号距离函数。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3240.jpg" alt="Shap-E：在 NeRF 权重的隐空间上做扩散。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3240">54:00</button>Shap-E：在 NeRF 权重的隐空间上做扩散。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3360.jpg" alt="NeuralField-LDM：体素网格表示和分层隐空间。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3360">56:00</button>NeuralField-LDM：体素网格表示和分层隐空间。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3460.jpg" alt="DreamFusion：用 2D 文本生成图像模型作为三维生成的先验。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3460">57:40</button>DreamFusion：用 2D 文本生成图像模型作为三维生成的先验。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3570.jpg" alt="Zero-1-to-3：以输入图像和相对位姿为条件。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3570">59:30</button>Zero-1-to-3：以输入图像和相对位姿为条件。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3650.jpg" alt="ReconFusion：多视角条件。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3650">60:50</button>ReconFusion：多视角条件。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3710.jpg" alt="MVDream：多视角扩散模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3710">61:50</button>MVDream：多视角扩散模型。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s7">
+      <h4><button class="ts" type="button" data-t="3760">62:40</button><span>文本、分子和感知任务</span></h4>
+      <p>文本领域仍以自回归模型为主。两者都把生成拆成迭代细化，都用监督式目标。自回归模型训练效率高（一次前向得到所有时间步的训练信号），但结构受限、采样慢；扩散模型结构更灵活，采样也能用求解器、蒸馏和引导。Diffusion-LM 用最简单的嵌入层作为自编码器，好处是能用分类器引导控制生成。CDCD（Dieleman 的工作）在连续扩散中使用交叉熵，分数可以写成条件分数的加权和，权重正是需要学习的 <span class="m"><i>p</i>(<i>x</i><sub>0</sub>|<i>x</i>)</span>。</p>
+      <p>分子方面，几何 LDM 用等变图神经网络作为编码器和解码器，保证旋转、平移后概率不变。冷冻电镜工作用 VAE 编码二维投影，隐空间的扩散模型用来学习分子构象的分布。</p>
+      <p>预训练 LDM 的特征也可用于感知任务：在冻结的 LDM 上学习掩码生成器做分割；把深度图也编码进隐空间，以图像隐变量为条件做单目深度估计。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-3800.jpg" alt="扩散模型和自回归模型的对比。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3800">63:20</button>扩散模型和自回归模型的对比。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3860.jpg" alt="Diffusion-LM：在词嵌入空间做连续扩散。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3860">64:20</button>Diffusion-LM：在词嵌入空间做连续扩散。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-3930.jpg" alt="CDCD：用交叉熵训练连续扩散模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3930">65:30</button>CDCD：用交叉熵训练连续扩散模型。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-4070.jpg" alt="几何 LDM：在等变的隐空间上生成三维分子。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4070">67:50</button>几何 LDM：在等变的隐空间上生成三维分子。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-4180.jpg" alt="冷冻电镜结构的 LDM。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4180">69:40</button>冷冻电镜结构的 LDM。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-4250.jpg" alt="基于预训练 LDM 特征的分割。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4250">70:50</button>基于预训练 LDM 特征的分割。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/p2-4290.jpg" alt="单目深度估计：图像和深度共用同一个编码器。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4290">71:30</button>单目深度估计：图像和深度共用同一个编码器。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="p2-s8">
+      <h4><button class="ts" type="button" data-t="4380">73:00</button><span>圆桌讨论</span></h4>
+      <p>主持人是 Kreis，到场的有吴英年 (UCLA)、Chenlin Meng (Pika)、Robin Rombach (Stability AI)、Sander Dieleman (Google DeepMind)，Durk Kingma 因病缺席。下面按问题整理。发言人是按座次和上下文判断的。</p>
+      <p><b>为什么成功。</b> Rombach 认为有两个原因：框架通用，领域专家可以设计自编码器，生成模型专家再在隐空间训练扩散；感知数据可以大幅压缩，训练和推理都快。Dieleman 补充说这是有损压缩，图像中有大量感知上无关的熵。他举的例子是：把草地纹理整体平移一个像素，人根本看不出差别。</p>
+      <p><b>隐空间和像素空间。</b> 隐空间的代价是解码器会编造局部细节，医学图像这类应用不合适。Dieleman 还指出一个工程问题：隐空间造成两次训练之间的先后依赖，改动自编码器后，训练了几周的扩散模型要从头开始，像素级联没有这个问题。</p>
+      <p><b>端到端还是两阶段。</b> Dieleman 明确选两阶段：学习隐变量时要追求逼真而不是多样性，这也是 GAN 能以这种形式留下来的原因；有了隐空间后，扩散模型的损失就应该在隐空间度量。如果两部分优化同一个损失，反而失去了这种结构的优势。Rombach 说 LDM 论文的第一批审稿问题就包括这一点，他们试过但效果不好。吴英年承认自己可能就是那位审稿人，并补充了联合训练合理的两种情形：需要结构化先验，或者分布在优化过程中不断变化。</p>
+      <p><b>图像之外。</b> 吴英年看好语言：可以一次生成整段文字，类似系统二的慢思考。Rombach 看好视频分词器。Dieleman 提醒自编码器的做法不能照搬到文本：自编码器倾向于忽略熵最高的部分，在图像中那是噪声，而在语言中，名字、地点这些最难预测的词恰恰承载了最多信息。</p>
+      <p><b>和其他生成模型的关系。</b> Dieleman 说扩散模型在不同视角下可以看作自回归模型、流模型或 VAE 的特例，它的特别之处是迭代细化。他的一个说法是，这或许只是因为我们还不知道怎么训练 10 万层的网络；如果反向传播不成问题，也许十年后只用 VAE 就够了。Rombach 指出，实际表现好的系统本来就是组合：VAE 加对抗损失，隐空间扩散，再加判别器做蒸馏。</p>
+      <p><b>控制和组合性。</b> 吴英年认为组合性是大问题，词之间的结构没有被好好利用。Rombach 提议用大语言模型先设计场景布局，再以布局为条件生成。Meng 指出控制方法依赖隐空间的结构，同样的噪声表换一个隐空间也可能失效。</p>
+      <p><b>给研究者的建议。</b> Dieleman 提到 NVIDIA 芬兰组的工作，最大的实验也只到 ImageNet 512<sup>2</sup>，说明不需要大量算力也能写出好论文。他自己在思考：扩散模型是在寻找噪声和数据之间的双射，当前的损失方差很高，能否找到更高效的方法。Rombach 建议研究视频编码器：LDM 的自编码器只用一块 GPU 训练，现在被 DALL·E 3 使用；从预训练模型提取判别知识也不需要太多资源。</p>
+      <p><b>开放权重的影响。</b> 吴英年和 Meng 都认为 Stable Diffusion 改变了研究的基础条件：没有它，学术界接触不到大规模模型，三维生成和轻量的控制方法都无从做起。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/p2-4440.jpg" alt="圆桌嘉宾：吴英年、Chenlin Meng、Robin Rombach、Sander Dieleman、Durk Kingma（当天缺席）。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4440">74:00</button>圆桌嘉宾：吴英年、Chenlin Meng、Robin Rombach、Sander Dieleman、Durk Kingma（当天缺席）。</figcaption></figure></div>
+      
+    </section>
+      
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/p2-2390.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1wFNCehED7/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="82"><b>1:22</b><span>Vahdat：端到端训练</span></button></li><li><button type="button" data-t="439"><b>7:19</b><span>加速采样和蒸馏</span></button></li><li><button type="button" data-t="1089"><b>18:09</b><span>逆问题</span></button></li><li><button type="button" data-t="1416"><b>23:36</b><span>控制和编辑</span></button></li><li><button type="button" data-t="2044"><b>34:04</b><span>现场提问</span></button></li><li><button type="button" data-t="2241"><b>37:21</b><span>Gao：视频</span></button></li><li><button type="button" data-t="2902"><b>48:22</b><span>三维</span></button></li><li><button type="button" data-t="3760"><b>62:40</b><span>文本、分子和感知任务</span></button></li><li><button type="button" data-t="4380"><b>73:00</b><span>圆桌讨论</span></button></li><li><button type="button" data-t="4561"><b>76:01</b><span>圆桌：为什么成功</span></button></li><li><button type="button" data-t="4798"><b>79:58</b><span>圆桌：隐空间和像素空间</span></button></li><li><button type="button" data-t="4937"><b>82:17</b><span>圆桌：端到端还是两阶段</span></button></li><li><button type="button" data-t="5222"><b>87:02</b><span>圆桌：图像之外</span></button></li><li><button type="button" data-t="5462"><b>91:02</b><span>圆桌：和其他生成模型的关系</span></button></li><li><button type="button" data-t="5764"><b>96:04</b><span>圆桌：控制和组合性</span></button></li><li><button type="button" data-t="5933"><b>98:53</b><span>圆桌：给研究者的建议</span></button></li><li><button type="button" data-t="6313"><b>105:13</b><span>圆桌：开放权重的影响</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+  </div>
+</details>
+</div>
+</div>
+</main>
+<div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
+<script>(function(){
+  /* ── tab ── */
+  function showTab(v){
+    document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+    var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
+    // 原论文对照是 iframe，第一次切过来才加载（10 MB 的页不该拖慢首屏）
+    var f=document.querySelector('#view-'+v+' iframe[data-src]');if(f&&!f.src)f.src=f.dataset.src;
+  }
+  // iframe 那个 tab 要让它贴着 tab 栏铺满一屏，不然底下一截在屏幕外，得先滚外层
+  function settle(v){
+    var view=document.getElementById('view-'+v);
+    if(view&&view.querySelector('iframe')){var bar=document.querySelector('.bar');scrollTo(0,view.getBoundingClientRect().top+scrollY-bar.offsetHeight);}
+    else scrollTo(0,0);
+  }
+  document.querySelectorAll('.tb').forEach(function(b){
+    b.addEventListener('click',function(){
+      showTab(b.dataset.v);
+      history.replaceState(null,'',b===document.querySelector('.tb')?location.pathname+location.search:'#'+b.dataset.v);
+      settle(b.dataset.v);
+    });
+  });
+
+  /* ── 全部展开 / 收起（只管当前 tab） ── */
+  document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
+    var open=b.dataset.all==='open';b.closest('.view').querySelectorAll('details.ep,details.faq,details.res').forEach(function(d){d.open=open;});});});
+
+  /* ── 播放器：本地有原片就放本地（data-src），没有就用 B 站播放器。时间码都是原片里的秒；点封面从 data-start 开始放
+   * （CS231n 的卡片只截了一讲里的一段，封面从这段的开头放） ── */
+  function player(ep){
+    if(ep._pl)return ep._pl;
+    var box=ep.querySelector('.pl'), which=ep.querySelector('.plwhich'), tl=[].slice.call(ep.querySelectorAll('.tl button'));
+    var st={mode:null,el:null};
+    function bili(t){
+      var f=document.createElement('iframe');
+      f.allow='autoplay;fullscreen;picture-in-picture';f.setAttribute('allowfullscreen','');
+      f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('scrolling','no');
+      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&p='+ep.dataset.p+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
+      box.innerHTML='';box.appendChild(f);st.mode='bili';st.el=f;
+      which.textContent=ep.dataset.src?'B 站播放器（本地没找到视频文件）':'B 站播放器';
+    }
+    function mark(t){var cur=null;tl.forEach(function(b){if(+b.dataset.t<=t+0.5)cur=b;});
+      tl.forEach(function(b){b.classList.toggle('on',b===cur);});}
+    function local(t){
+      var v=document.createElement('video');v.controls=true;v.preload='auto';v.playsInline=true;
+      v.src=ep.dataset.src;
+      v.addEventListener('error',function(){if(st.mode==='local')bili(st.want);},{once:true});
+      v.addEventListener('loadedmetadata',function(){v.currentTime=st.want||0;v.play().catch(function(){});},{once:true});
+      v.addEventListener('timeupdate',function(){mark(v.currentTime);});
+      box.innerHTML='';box.appendChild(v);st.mode='local';st.el=v;
+      which.textContent='本地视频 '+ep.dataset.src.split('/').pop();
+    }
+    function play(t){
+      st.want=t;
+      if(!st.mode){if(ep.dataset.src)local(t);else bili(t);}
+      else if(st.mode==='local'){if(st.el.readyState>=1){st.el.currentTime=t;st.el.play().catch(function(){});}}
+      else bili(t);
+      if(st.mode==='bili')mark(t);
+    }
+    return ep._pl={play:play};
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.ts,.tl button,.plgo');if(!b)return;
+    var ep=b.closest('.ep');if(!ep)return;
+    e.preventDefault();
+    player(ep).play(+(b.dataset.t||ep.dataset.start||0));
+    var pl=ep.querySelector('.pl'),r=pl.getBoundingClientRect();
+    if(r.bottom<60||r.top>innerHeight-80)pl.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+
+  /* ── 截图大图，左右键切同一张卡片里的图 ── */
+  var lb=document.getElementById('lightbox'),list=[],at=-1;
+  function show(i){at=(i+list.length)%list.length;var im=list[at];lb.querySelector('img').src=im.src;
+    var cap=im.closest('.shot').querySelector('figcaption').cloneNode(true),t=cap.querySelector('.ts');if(t)t.remove();
+    lb.querySelector('figcaption').innerHTML=cap.innerHTML+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
+    lb.querySelectorAll('.lb-nav').forEach(function(n){n.hidden=list.length<2;});}
+  document.addEventListener('click',function(e){
+    var im=e.target.closest('.shot img');
+    if(im){list=[].slice.call(im.closest('.ep').querySelectorAll('.shot img'));lb.classList.add('on');show(list.indexOf(im));return;}
+    if(!lb.classList.contains('on'))return;
+    var n=e.target.closest('.lb-nav');if(n){show(at+(n.classList.contains('lb-next')?1:-1));return;}
+    lb.classList.remove('on');
+  });
+  addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;
+    if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
+
+  /* ── 地址栏：#kl 这类是 tab；其余是页内任意 id（#l13-s4、#kl-gauss、#faq-collapse），切到它所在的 tab、展开外面的折叠块再滚过去 ──
+   * 截图是懒加载的，图片撑开以后位置会变，load 之后和图片加载完各再定位一次 */
+  function openHash(){
+    var id=decodeURIComponent(location.hash.slice(1));if(!id)return;
+    if(document.getElementById('view-'+id)){showTab(id);return;}
+    var el=document.getElementById(id);if(!el)return;
+    var v=el.closest('.view');if(v)showTab(v.id.slice(5));
+    for(var d=el.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true;
+    el.scrollIntoView({block:'start'});
+  }
+  openHash();addEventListener('hashchange',openHash);
+  addEventListener('load',function(){setTimeout(openHash,0);setTimeout(openHash,600);});
+})();
+</script>
+</body></html>
