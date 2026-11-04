@@ -313,7 +313,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
     <p><b>去噪扩散概率模型 (Denoising Diffusion Probabilistic Model, DDPM)</b> 是一种图像生成模型，由 UC Berkeley 的 Jonathan Ho、Ajay Jain 和 Pieter Abbeel 在 2020 年提出。</p>
     <p>它定义两个方向相反的过程：前向过程给图像逐步加高斯噪声，加 1000 步后接近纯噪声；逆向过程由神经网络参数化，每一步去除一部分噪声。</p>
     <p>前向过程是固定的，没有可学习参数。模型只学习逆向过程。训练时，网络接收一张加噪图和对应的时间步，回归其中的噪声；生成时，从标准正态分布采样一张噪声图，迭代调用网络 1000 次，得到一张训练集里没有的图。</p>
-    <p>名称的三个词分别对应：Denoising 指网络完成的任务，Diffusion 指前向的加噪过程（图像结构像墨水在水中扩散一样逐渐消失），Probabilistic 指它是一个概率模型，每一步都定义一个分布，生成时每一步都要采样。</p>
+    <p>名称的三个词分别对应：Denoising 指逆向的去噪过程，Diffusion 指前向的加噪过程（图像结构像墨水在水中扩散一样逐渐消失），Probabilistic 指它是一个概率模型，每一步都定义一个分布，生成时每一步都要采样。</p>
     <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 940 356" width="940" height="356" data-padded="20" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
 <style>
   .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
