@@ -585,6 +585,7 @@ function wrapText(html, text, open, close, pre) {
  *  译文里的公式和引用不重写，用占位符指回英文原文里的第 k 个：
  *    {m3} 第 3 个行内公式（原样复用那段 MathML）  {c1} 第 1 处文献引用  {r2} 第 2 个交叉引用（2.4 节、式 (3)）
  *    {f1} 第 1 个脚注角标
+ *    {r1:第 4 节} 交叉引用换一段中文文字，链接不变
  *  算法框另有 lines: [...]，一行伪代码一条，也可以用占位符，指的是那一行里的第 k 个。 */
 function zhSplit(html) {
   const parts = { m: [], c: [], r: [], f: [] };
@@ -610,10 +611,12 @@ function zhSkel(html) {
 /** 译文里的占位符换回原文的那段标记。复用的公式去掉 id，不然一页里两个元素同 id */
 function zhFill(zh, html, where) {
   const { parts } = zhSplit(html);
-  return zh.replace(/\{([mcrf])(\d+)\}/g, (all, k, n) => {
+  return zh.replace(/\{([mcrf])(\d+)(?::([^}]*))?\}/g, (all, k, n, label) => {
     const x = parts[k][n - 1];
     if (!x) throw new Error(`译文占位符 ${all} 在原文里没有（${where}）`);
-    return x.replace(/\sid=(?:"[^"]*"|'[^']*'|[^\s>]+)/g, '');
+    const y = x.replace(/\sid=(?:"[^"]*"|'[^']*'|[^\s>]+)/g, '');
+    // {r1:第 4 节}：链接保留，文字换成中文。LaTeXML 的 cleveref 输出是「Section 4」，夹在中文句子里不好读
+    return label == null ? y : y.replace(/^(<a\b[^>]*>)[\s\S]*<\/a>$/, `$1${label}</a>`);
   });
 }
 
@@ -862,7 +865,8 @@ function render(doc, notes, loose, refnotes = {}, posters = [], res = null, docs
     .replace(/&nbsp;/g, ' ').replace(/&[a-z]+;|&#\d+;/gi, 'x').replace(/\s+/g, ' ').trim().length;
   const chars = notes.reduce((n, x) => n + words(x.q) + words(x.a), 0);
   const figs = notes.reduce((n, x) => n + (String(x.a || '').match(/<svg\b/gi) || []).length, 0);
-  const meta = `<div class="ep-meta" data-chars="${chars}">` + [
+  // --plain 1：纯中英对照，不带批注，标题下的统计行、批注图例和开关都不要
+  const meta = o.plain ? '' : `<div class="ep-meta" data-chars="${chars}">` + [
     // 「万字」整个留在常规体里，别让粗细断在词中间
     [notes.length, ' 条批注'], [wan(chars).split(' ')[0], ' ' + (wan(chars).split(' ')[1] || '') + '字'], [figs, ' 张插图'],
   ].map(([n, k]) => `<span><b>${n}</b>${k}</span>`).join('') + '</div>';
@@ -1040,14 +1044,14 @@ ${o.embed ? '' : `<header class="topbar"><div class="wrap">
       `<button class="tb${FIRST === `doc-${i + 1}` ? ' on' : ''}" type="button" role="tab" data-v="doc-${i + 1}" aria-selected="${FIRST === `doc-${i + 1}`}">${esc(d.label)}</button>`)).join('')}
     ${hasRes ? `<button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资源</button>` : ''}
   </div>
-  <div class="legend">
+  <div class="legend"${o.plain ? ' style="display:none"' : ''}>
     ${Object.entries(KINDS).map(([k, v]) =>
       `<span class="lg" title="${esc(v.desc)}"><i style="background:${v.c};border-color:${v.ln}"></i>${k}</span>`).join('')}
     <span class="lg" title="读完之后想留给下一个读者看的句子"><u class="key">划重点</u></span>
   </div>
   <div class="swbox">
-    <button class="sw" id="sw-all" type="button" aria-pressed="false"><i></i>展开全部批注</button>
-    <button class="sw" id="sw-off" type="button" aria-pressed="false"><i></i>隐藏所有批注</button>${
+    <button class="sw" id="sw-all" type="button" aria-pressed="false"${o.plain ? ' style="display:none"' : ''}><i></i>展开全部批注</button>
+    <button class="sw" id="sw-off" type="button" aria-pressed="false"${o.plain ? ' style="display:none"' : ''}><i></i>隐藏所有批注</button>${
     o.zh ? `
     <button class="sw" id="sw-zh" type="button" aria-pressed="false"><i></i>隐藏译文</button>` : ''}
   </div>

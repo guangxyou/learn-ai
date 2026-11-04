@@ -1,0 +1,513 @@
+[
+{
+"en": "We present high quality image synthe",
+"zh": "我们用扩散概率模型 (Diffusion Probabilistic Model) 给出高质量的图像合成结果。这是一类受非平衡热力学启发的隐变量模型。我们最好的结果来自一个加权的变分下界，它是根据扩散概率模型与「去噪分数匹配 + Langevin 动力学」之间的一种新联系设计的。我们的模型还天然支持一种渐进式的有损解压方案，这种方案可以解释为自回归解码的推广。在无条件 CIFAR10 数据集上，我们得到 Inception Score 9.46 和当前最好的 FID 3.17。在 256×256 的 LSUN 上，样本质量与 ProgressiveGAN 相近。代码见 {r1}。"
+},
+{
+"en": "Introduction",
+"zh": "引言"
+},
+{
+"en": "Deep generative models of all kinds",
+"zh": "近来各类深度生成模型在多种数据形态上都给出了高质量的样本。生成对抗网络 (GAN)、自回归模型、流模型和变分自编码器 (VAE) 合成了令人印象深刻的图像和音频样本 {c1}；基于能量的建模和分数匹配也取得了显著进展，生成的图像已可与 GAN 相比 {c2}。"
+},
+{
+"en": "This paper presents progress in diff",
+"zh": "本文介绍扩散概率模型 {c1} 方面的进展。扩散概率模型（为简便下文称「扩散模型」）是一条参数化的马尔可夫链，用变分推断训练，使其在有限步之后产生与数据分布相符的样本。这条链的转移被训练用来反转一个扩散过程。扩散过程也是一条马尔可夫链，它沿与采样相反的方向逐步给数据加噪，直到信号被破坏。当扩散由少量高斯噪声构成时，采样链的转移也取条件高斯就足够了，于是神经网络的参数化可以做得特别简单。"
+},
+{
+"en": "Diffusion models are straightforward",
+"zh": "扩散模型定义简单、训练高效，但据我们所知，此前还没有人证明它能生成高质量样本。我们证明扩散模型确实可以生成高质量样本，有时甚至优于其他类型生成模型已发表的结果（{r1:第 4 节}）。此外，我们证明扩散模型的某种参数化，在训练时等价于多个噪声水平上的去噪分数匹配，在采样时等价于退火 Langevin 动力学（{r2:第 3.2 节}）{c1}。我们用这种参数化得到了最好的样本质量（{r3:第 4.2 节}），因此把这个等价关系视为本文的主要贡献之一。"
+},
+{
+"en": "Despite their sample quality, our mo",
+"zh": "尽管样本质量高，我们模型的对数似然与其他基于似然的模型相比并不占优（不过，退火重要性采样 (Annealed Importance Sampling) 对基于能量的模型和分数匹配给出的估计值很大，我们的对数似然好于这些估计 {c1}）。我们发现，模型无损码长的大部分用于描述人眼察觉不到的图像细节（{r1:第 4.3 节}）。我们用有损压缩的语言对这一现象做了更细致的分析，并证明扩散模型的采样过程是一种渐进解码，它类似于沿某种比特顺序做自回归解码，而这种顺序大大超出了自回归模型通常能实现的范围。"
+},
+{
+"en": "Background",
+"zh": "背景"
+},
+{
+"en": "Diffusion models {c1:[ 53 ]} are lat",
+"zh": "扩散模型 {c1} 是形如 {m1} 的隐变量模型，其中 {m2} 是与数据 {m3} 同维的隐变量。联合分布 {m4} 称为<em>逆向过程</em> (Reverse Process)，定义为一条从 {m5} 出发、转移为可学习高斯分布的马尔可夫链："
+},
+{
+"en": "What distinguishes diffusion models",
+"zh": "扩散模型与其他隐变量模型的区别在于，近似后验 {m1}，即<em>前向过程</em> (Forward Process) 或<em>扩散过程</em> (Diffusion Process)，被固定为一条马尔可夫链，它按方差表 {m2} 逐步给数据加高斯噪声："
+},
+{
+"en": "Figure 2 : The directed graphical mo",
+"zh": "<b>图 2：</b>本文研究的有向图模型。"
+},
+{
+"en": "Training is performed by optimizing",
+"zh": "训练通过优化负对数似然常用的变分下界进行："
+},
+{
+"en": "The forward process variances {m1:\\b",
+"zh": "前向过程的方差 {m1} 可以用重参数化学习 {c1}，也可以作为超参数固定。逆向过程的表达能力部分来自 {m2} 取高斯条件分布，因为当 {m3} 很小时两个过程的函数形式相同 {c2}。前向过程有一个值得注意的性质：可以用闭式解在任意时间步 {m5} 采样 {m4}。记 {m6}、{m7}，有"
+},
+{
+"en": "Efficient training is therefore poss",
+"zh": "因此，可以用随机梯度下降优化 {m1} 的随机项，高效地完成训练。把 {m2} {r1:(3)} 改写成下式可以降低方差，进一步改进训练："
+},
+{
+"en": "(See {r1:Appendix A} for details. Th",
+"zh": "（推导见{r1:附录 A}。各项的标号在{r2:第 3 节}使用。）{r3:式 (5)} 用 KL 散度把 {m1} 与前向过程的后验直接比较。以 {m2} 为条件时，这个后验是可解的："
+},
+{
+"en": "Consequently, all KL divergences in",
+"zh": "因此，{r1:式 (5)} 中所有的 KL 散度都是高斯分布之间的比较，可以用闭式表达式以 Rao-Blackwell 化的方式计算，无需高方差的蒙特卡洛估计。"
+},
+{
+"en": "Diffusion models and denoising autoe",
+"zh": "扩散模型与去噪自编码器"
+},
+{
+"en": "Diffusion models might appear to be",
+"zh": "扩散模型看起来是一类受限的隐变量模型，但实现上有很大的自由度。需要选择前向过程的方差 {m1}，以及逆向过程的模型结构和高斯分布的参数化方式。为指导这些选择，我们建立了扩散模型与去噪分数匹配之间一种新的显式联系（{r1:第 3.2 节}），它导出了扩散模型的一个简化的加权变分下界目标（{r2:第 3.4 节}）。我们的模型设计最终由其简洁性和实验结果来支持（{r3:第 4 节}）。下面按{r4:式 (5)} 的各项分别讨论。"
+},
+{
+"en": "Forward process and LT",
+"zh": "前向过程与 L<sub>T</sub>"
+},
+{
+"en": "We ignore the fact that the forward",
+"zh": "前向过程的方差 {m1} 本可以用重参数化学习，我们不采用这一点，而是把它们固定为常数（细节见{r1:第 4 节}）。因此在我们的实现中，近似后验 {m2} 没有可学习参数，{m3} 在训练中是常数，可以忽略。"
+},
+{
+"en": "Reverse process and L1:T−1",
+"zh": "逆向过程与 L<sub>1:T−1</sub>"
+},
+{
+"en": "Now we discuss our choices in {m1:p_",
+"zh": "现在讨论 {m1}（{m2}）的选择。第一，令 {m3}，取为不参与训练、只依赖时间的常数。实验中 {m4} 和 {m5} 的结果相近。前者对 {m6} 最优，后者对 {m7} 确定地取某一点时最优。对于各坐标方差为 1 的数据，这两种选择分别对应逆向过程熵的上界和下界 {c1}。"
+},
+{
+"en": "Second, to represent the mean {m1:{\\",
+"zh": "第二，为了表示均值 {m1}，我们根据下面对 {m2} 的分析提出一种特定的参数化。取 {m3}，可以写出："
+},
+{
+"en": "where {m1:C} is a constant that does",
+"zh": "其中 {m1} 是与 {m2} 无关的常数。由此可见，{m3} 最直接的参数化，是让模型预测前向过程后验的均值 {m4}。不过，把{r2:式 (4)} 重参数化为 {m5}（{m6}），再代入前向过程后验公式 {r3:(7)}，可以把{r1:式 (8)} 进一步展开："
+},
+{
+"en": "{r1:Equation 10} reveals that {m1:{\\",
+"zh": "{r1:式 (10)} 表明，给定 {m3} 时，{m1} 必须预测 {m2}。由于 {m4} 是模型的输入，可以选择如下参数化："
+},
+{
+"en": "where {m1:{\\boldsymbol{\\epsilon}}_{\\",
+"zh": "其中 {m1} 是一个函数逼近器，用来从 {m3} 预测 {m2}。采样 {m4} 就是计算 {m5}，其中 {m6}。完整的采样过程（{r1:算法 2}）类似于 Langevin 动力学，{m7} 相当于学到的数据密度梯度。此外，采用参数化 {r2:(11)} 后，{r3:式 (10)} 简化为："
+},
+{
+"en": "which resembles denoising score matc",
+"zh": "这类似于以 {m1} 为索引的多个噪声尺度上的去噪分数匹配 {c1}。{r1:式 (12)} 等于类 Langevin 逆向过程 {r2:(11)} 的变分下界（的一项），由此可知：优化一个类似去噪分数匹配的目标，等价于用变分推断拟合一条类似 Langevin 动力学的采样链的有限时间边际分布。"
+},
+{
+"en": "To summarize, we can train the rever",
+"zh": "总结一下，可以训练逆向过程均值的函数逼近器 {m1} 去预测 {m2}，也可以修改参数化，训练它去预测 {m3}。（还可以预测 {m4}，但我们早期的实验发现这会使样本质量变差。）我们已经说明，预测 {m5} 的参数化既类似 Langevin 动力学，又把扩散模型的变分下界简化为类似去噪分数匹配的目标。尽管如此，它只是 {m6} 的另一种参数化，所以我们在{r1:第 4 节}用消融实验比较预测 {m7} 和预测 {m8}，验证其有效性。"
+},
+{
+"en": "Algorithm 1 Training Algorithm 2 Sam",
+"zh": "<b>算法 1</b>　训练　<b>算法 2</b>　采样",
+"lines": [
+"重复",
+"从数据分布采样 {m1}",
+"均匀采样时间步 {m1}",
+"采样噪声 {m1}",
+"执行一步梯度下降，梯度为",
+"",
+"直到收敛",
+"采样初始噪声 {m1}",
+"对 {m1} 循环",
+"若 {m2}，采样 {m1}；否则 {m3}",
+"计算 {m1}",
+"结束循环",
+"返回 {m1}"
+]
+},
+{
+"en": "Data scaling, reverse process decode",
+"zh": "数据缩放、逆向过程解码器与 L<sub>0</sub>"
+},
+{
+"en": "We assume that image data consists o",
+"zh": "假设图像数据是 {m1} 中的整数，线性缩放到 {m2}。这样，神经网络逆向过程从标准正态先验 {m3} 开始，处理的输入尺度始终一致。为了得到离散的对数似然，我们把逆向过程的最后一项设为一个独立的离散解码器，它由高斯分布 {m4} 导出："
+},
+{
+"en": "where {m1:D} is the data dimensional",
+"zh": "其中 {m1} 是数据维数，上标 {m2} 表示取出某一个坐标。（也可以换成更强的解码器，比如条件自回归模型，实现并不困难，这一点留待以后的工作。）与 VAE 解码器和自回归模型中使用的离散化连续分布 {c1} 类似，这里的选择保证变分下界是离散数据的无损码长，既不需要给数据加噪，也不需要把缩放操作的雅可比行列式计入对数似然。采样结束时，我们不加噪声地显示 {m3}。"
+},
+{
+"en": "Simplified training objective",
+"zh": "简化的训练目标"
+},
+{
+"en": "With the reverse process and decoder",
+"zh": "有了上面定义的逆向过程和解码器，由{r1:式 (12)} 和 {r2:(13)} 导出的各项组成的变分下界显然对 {m1} 可微，可以直接用于训练。不过我们发现，用下面这个变分下界的变体训练，对样本质量更有利，实现也更简单："
+},
+{
+"en": "where {m1:t} is uniform between {m2:",
+"zh": "其中 {m1} 在 {m2} 和 {m3} 之间均匀分布。{m4} 的情形对应 {m5}，此时离散解码器定义 {r1:(13)} 中的积分被近似为高斯概率密度乘以区间宽度，忽略了 {m6} 和边缘效应。{m7} 的情形对应{r2:式 (12)} 去掉权重后的版本，类似于 NCSN 去噪分数匹配模型所用的损失加权 {c1}。（{m8} 没有出现，因为前向过程的方差 {m9} 是固定的。）{r3:算法 1} 给出了用这个简化目标训练的完整流程。"
+},
+{
+"en": "Since our simplified objective {r1:1",
+"zh": "由于简化目标 {r1:(14)} 舍弃了{r2:式 (12)} 中的权重，它是一个加权的变分下界，与标准变分下界 {c1} 相比，侧重重建的不同方面。具体来说，{r3:第 4 节}的扩散过程设置使简化目标降低了小 {m1} 对应损失项的权重。这些项训练网络对只含极少噪声的数据去噪，降低它们的权重，网络就能集中处理大 {m2} 时更困难的去噪任务。实验会显示，这种重新加权带来了更好的样本质量。"
+},
+{
+"en": "Experiments",
+"zh": "实验"
+},
+{
+"en": "We set {m1:T=1000} for all experimen",
+"zh": "所有实验取 {m1}，使采样所需的神经网络计算次数与已有工作 {c1} 一致。前向过程的方差设为常数，从 {m2} 线性增加到 {m3}。相对于缩放到 {m4} 的数据，这些常数取得很小，保证逆向过程和前向过程有近似相同的函数形式，同时让 {m5} 处的信噪比尽量小（实验中 {m6} 比特每维）。"
+},
+{
+"en": "To represent the reverse process, we",
+"zh": "逆向过程用类似无掩码 PixelCNN++ 的 U-Net 主干 {c1}，全程使用 Group Normalization {c2}。参数在各时间步之间共享，时间用 Transformer 的正弦位置嵌入告诉网络 {c3}。在 {m1} 分辨率的特征图上使用自注意力 (Self-Attention) {c4}。细节见{r1:附录 B}。"
+},
+{
+"en": "Sample quality",
+"zh": "样本质量"
+},
+{
+"en": "Table 1 : CIFAR10 results. NLL measu",
+"zh": "<b>表 1：</b>CIFAR10 结果，NLL 的单位是比特每维。<b>表 2：</b>无条件 CIFAR10 上逆向过程参数化与训练目标的消融实验。空白项训练不稳定，生成的样本很差，分数超出正常范围。"
+},
+{
+"en": "{r1:Table 1} shows Inception scores,",
+"zh": "{r1:表 1} 给出 CIFAR10 上的 Inception Score、FID 和负对数似然（无损码长）。FID 为 3.17，我们的无条件模型样本质量好于文献中的大多数模型，其中也包括类别条件模型。按惯例，FID 相对训练集计算；相对测试集计算时为 5.24，仍好于文献中许多相对训练集的 FID。"
+},
+{
+"en": "We find that training our models on",
+"zh": "如预期，用真实变分下界训练得到的码长比用简化目标好，但简化目标得到的样本质量最好。CIFAR10 和 CelebA-HQ {m1} 的样本见{r1:图 1}，LSUN {m2} 的样本见{r2:图 3} 和{r3:图 4} {c1}，更多样本见{r4:附录 D}。"
+},
+{
+"en": "Figure 3 : LSUN Church samples. FID=",
+"zh": "<b>图 3：</b>LSUN Church 样本，FID = {m1}。<b>图 4：</b>LSUN Bedroom 样本，FID = {m1}。"
+},
+{
+"en": "Reverse process parameterization and",
+"zh": "逆向过程参数化与训练目标的消融实验"
+},
+{
+"en": "In {r1:Table 2} , we show the sample",
+"zh": "{r1:表 2} 给出逆向过程参数化和训练目标（{r2:第 3.2 节}）对样本质量的影响。作为基线的预测 {m1} 只有在用真实变分下界训练时才表现良好，用不加权的均方误差（类似{r3:式 (14)} 的简化目标）训练则不行。学习逆向过程的方差（把参数化的对角矩阵 {m2} 纳入变分下界）会导致训练不稳定，样本质量也比固定方差差。我们提出的预测 {m3}，在固定方差、用变分下界训练时与预测 {m4} 大致相当，用我们的简化目标训练时则好得多。"
+},
+{
+"en": "Progressive coding",
+"zh": "渐进编码"
+},
+{
+"en": "{r1:Table 1} also shows the codeleng",
+"zh": "{r1:表 1} 还给出了 CIFAR10 模型的码长。训练集和测试集之间的差距最多为 0.03 比特每维，与其他基于似然的模型报告的差距相当，说明扩散模型没有过拟合（最近邻可视化见{r2:附录 D}）。尽管如此，虽然我们的无损码长好于用退火重要性采样报告的基于能量的模型和分数匹配的较大估计值 {c1}，但与其他类型的基于似然的生成模型相比仍不占优 {c2}。"
+},
+{
+"en": "Since our samples are nonetheless of",
+"zh": "既然样本质量依然很高，我们得出结论：扩散模型具有一种归纳偏置，使它成为出色的有损压缩器。把变分下界的 {m1} 视为率 (Rate)，{m2} 视为失真 (Distortion)，样本质量最高的 CIFAR10 模型的率为 1.78 比特每维，失真为 1.97 比特每维，相当于 0 到 255 尺度上 0.95 的均方根误差。无损码长的一半以上用于描述察觉不到的失真。"
+},
+{
+"en": "Progressive lossy compression",
+"zh": "渐进有损压缩"
+},
+{
+"en": "We can probe further into the rate-d",
+"zh": "我们可以引入一种与{r1:式 (5)} 形式对应的渐进有损编码，进一步考察模型的率失真行为，见{r2:算法 3} 和{r3:算法 4}。这两个算法假设存在一种过程，例如最小随机编码 (Minimal Random Coding) {c1}，对于任意分布 {m3} 和 {m4}（接收方事先只知道 {m5}），平均用约 {m2} 比特就能传输一个样本 {m1}。"
+},
+{
+"en": "Algorithm 3 Sending {m1:\\mathbf{x}_{",
+"zh": "<b>算法 3</b>　发送 {m1}　<b>算法 4</b>　接收",
+"lines": [
+"用 {m2} 发送 {m1}",
+"对 {m1} 循环",
+"用 {m2} 发送 {m1}",
+"结束循环",
+"用 {m2} 发送 {m1}",
+"用 {m2} 接收 {m1}",
+"对 {m1} 循环",
+"用 {m2} 接收 {m1}",
+"结束循环",
+"返回 {m1}"
+]
+},
+{
+"en": "When applied to {m1:\\mathbf{x}_{0}\\s",
+"zh": "应用于 {m1} 时，{r1:算法 3} 和{r2:算法 4} 依次传输 {m2}，总的期望码长等于{r3:式 (5)}。接收方在任意时刻 {m3} 都完整持有部分信息 {m4}，可以渐进地估计："
+},
+{
+"en": "due to {r1:Eq. 4} . (A stochastic re",
+"zh": "这由{r1:式 (4)} 得到。（随机重建 {m1} 也成立，但这里不考虑，因为它使失真更难评估。）{r2:图 5} 给出 CIFAR10 测试集上的率失真曲线。在每个时刻 {m2}，失真按均方根误差 {m3} 计算，率按时刻 {m4} 为止累计收到的比特数计算。在率失真曲线的低率区域，失真急剧下降，说明大部分比特确实分配给了察觉不到的失真。"
+},
+{
+"en": "Figure 5 : Unconditional CIFAR10 tes",
+"zh": "<b>图 5：</b>无条件 CIFAR10 测试集的率失真随时间的变化。失真以 {m1} 尺度上的均方根误差衡量。细节见{r1:表 4}。"
+},
+{
+"en": "Progressive generation",
+"zh": "渐进生成"
+},
+{
+"en": "We also run a progressive unconditio",
+"zh": "我们还运行了一个渐进的无条件生成过程，即从随机比特开始渐进解压。也就是说，在用{r1:算法 2} 从逆向过程采样的同时，预测逆向过程的结果 {m1}。{r2:图 6} 和{r3:图 10} 给出 {m2} 在逆向过程中的样本质量。大尺度的图像特征先出现，细节最后出现。{r4:图 7} 给出在不同 {m5} 下固定 {m4} 的随机预测 {m3}。{m6} 小时，除细节外都保留下来；{m7} 大时，只保留大尺度特征。这或许是概念压缩 (Conceptual Compression) {c1} 的迹象。"
+},
+{
+"en": "Figure 6 : Unconditional CIFAR10 pro",
+"zh": "<b>图 6：</b>无条件 CIFAR10 渐进生成（{m1} 随时间变化，从左到右）。扩展样本和样本质量指标随时间的变化见附录（{r1:图 14} 和{r2:图 10}）。"
+},
+{
+"en": "Figure 7 : When conditioned on the s",
+"zh": "<b>图 7：</b>以同一个隐变量为条件时，CelebA-HQ {m1} 样本具有相同的高层属性。右下象限是 {m2}，其余象限是从 {m3} 采样的样本。"
+},
+{
+"en": "Connection to autoregressive decodin",
+"zh": "与自回归解码的联系"
+},
+{
+"en": "Note that the variational bound {r1:",
+"zh": "注意变分下界 {r1:(5)} 可以改写为："
+},
+{
+"en": "(See {r1:Appendix A} for a derivatio",
+"zh": "（推导见{r1:附录 A}。）现在考虑这样的设置：扩散过程长度 {m1} 取数据维数；前向过程定义为 {m2} 把全部概率质量放在「遮掉前 {m4} 个坐标的 {m3}」上（即 {m5} 遮掉第 {m6} 个坐标）；{m7} 把全部质量放在一张空白图上；为便于论证，假设 {m8} 是表达能力完备的条件分布。这样 {m9}，最小化 {m10} 就是训练 {m11} 原样复制坐标 {m12}，并根据 {m14} 预测第 {m13} 个坐标。因此，用这种特定的扩散训练 {m15}，就是在训练一个自回归模型。"
+},
+{
+"en": "We can therefore interpret the Gauss",
+"zh": "因此可以把高斯扩散模型 {r1:(2)} 理解为一种自回归模型，它的比特顺序是推广的，无法通过重排数据坐标来表达。已有工作表明，这种重排引入的归纳偏置会影响样本质量 {c1}，所以我们推测高斯扩散也有类似作用，而且效果可能更强，因为相比遮挡噪声，高斯噪声加到图像上可能更自然。此外，高斯扩散的长度不必等于数据维数：比如我们取 {m1}，小于实验中 {m2} 或 {m3} 图像的维数。高斯扩散可以缩短以加快采样，也可以加长以提高模型表达能力。"
+},
+{
+"en": "Interpolation",
+"zh": "插值"
+},
+{
+"en": "We can interpolate source images {m1",
+"zh": "可以把 {m2} 当作随机编码器，在隐空间中对源图像 {m1} 插值：先得到 {m3}，再用逆向过程把线性插值后的隐变量 {m4} 解码回图像空间，{m5}。实际效果是，用逆向过程去除对加噪源图像做线性插值产生的伪影，如{r1:图 8}（左）所示。对不同的 {m6} 固定噪声，使 {m7} 和 {m8} 保持不变。{r2:图 8}（右）给出 CelebA-HQ {m9} 原图的插值和重建（{m10}）。逆向过程给出高质量的重建，以及合理的插值，姿态、肤色、发型、表情和背景都平滑变化，但眼镜不会。{m11} 越大，插值越粗略、变化越大，{m12} 时得到全新的样本（附录{r3:图 9}）。"
+},
+{
+"en": "Figure 8 : Interpolations of CelebA-",
+"zh": "<b>图 8：</b>CelebA-HQ 256×256 图像在 500 步扩散下的插值。"
+},
+{
+"en": "Related Work",
+"zh": "相关工作"
+},
+{
+"en": "While diffusion models might resembl",
+"zh": "扩散模型看起来与流模型 {c1} 和 VAE {c2} 相似，但扩散模型的设计使 {m1} 没有参数，顶层隐变量 {m2} 与数据 {m3} 的互信息几乎为零。我们预测 {m4} 的逆向过程参数化，建立了扩散模型与「多噪声水平去噪分数匹配 + 退火 Langevin 动力学采样」之间的联系 {c3}。不过，扩散模型可以直接计算对数似然，训练过程也用变分推断显式地训练 Langevin 动力学采样器（细节见{r1:附录 C}）。这个联系反过来也成立：某种加权形式的去噪分数匹配，等同于用变分推断训练类 Langevin 采样器。学习马尔可夫链转移算子的其他方法还有 infusion training {c4}、variational walkback {c5}、生成随机网络 (Generative Stochastic Network) {c6} 等 {c7}。"
+},
+{
+"en": "By the known connection between scor",
+"zh": "由于分数匹配与基于能量的建模之间已知的联系，我们的工作可能对近期其他基于能量的模型 {c1} 也有启示。我们的率失真曲线是在一次变分下界计算中沿时间得到的，这让人联想到在一次退火重要性采样中沿失真惩罚计算率失真曲线的做法 {c2}。我们关于渐进解码的论证在 convolutional DRAW 及相关模型 {c3} 中也能看到，并可能为自回归模型的子尺度顺序或采样策略带来更一般的设计 {c4}。"
+},
+{
+"en": "Conclusion",
+"zh": "结论"
+},
+{
+"en": "We have presented high quality image",
+"zh": "我们用扩散模型给出了高质量的图像样本，并发现扩散模型与用于训练马尔可夫链的变分推断、去噪分数匹配和退火 Langevin 动力学（由此延伸到基于能量的模型）、自回归模型以及渐进有损压缩之间的联系。扩散模型对图像数据似乎有出色的归纳偏置，我们期待研究它在其他数据形态上的作用，以及作为其他类型生成模型和机器学习系统组件的作用。"
+},
+{
+"en": "Broader Impact",
+"zh": "更广泛的影响"
+},
+{
+"en": "Our work on diffusion models takes o",
+"zh": "我们在扩散模型上的工作，与其他类型深度生成模型上的已有工作范围相近，比如改进 GAN、流模型、自回归模型的样本质量。本文使扩散模型朝这类技术中通用工具的方向前进了一步，因此可能放大生成模型已经（和将会）对社会产生的影响。"
+},
+{
+"en": "Unfortunately, there are numerous we",
+"zh": "遗憾的是，生成模型有许多众所周知的恶意用途。样本生成技术可以用来为政治目的制作知名人物的虚假图像和视频。虚假图像早在软件工具出现之前就有人手工制作，但我们这样的生成模型使制作变得更容易。所幸目前卷积网络生成的图像有细微瑕疵，可以检测出来 {c1}，但生成模型的改进可能使检测更困难。生成模型还会反映训练数据集中的偏见。许多大型数据集由自动化系统从互联网收集，这些偏见很难去除，尤其是图像没有标注的时候。如果在这些数据集上训练的生成模型的样本在互联网上大量传播，这些偏见只会进一步加强。"
+},
+{
+"en": "On the other hand, diffusion models",
+"zh": "另一方面，扩散模型可能对数据压缩有用。随着数据分辨率提高、全球互联网流量增长，压缩对保障广大用户访问互联网可能至关重要。我们的工作也可能有助于在无标注原始数据上做表示学习，服务于从图像分类到强化学习的大量下游任务；扩散模型还可能用于艺术、摄影和音乐方面的创作。"
+},
+{
+"en": "Acknowledgments and Disclosure of Fu",
+"zh": "致谢与资金披露"
+},
+{
+"en": "This work was supported by ONR PECAS",
+"zh": "本工作得到 ONR PECASE 和 NSF 研究生研究奖学金（资助号 DGE-1752814）的支持。Google 的 TensorFlow Research Cloud (TFRC) 提供了 Cloud TPU。"
+},
+{
+"en": "Extra information",
+"zh": "补充信息"
+},
+{
+"en": "LSUN",
+"zh": "LSUN"
+},
+{
+"en": "FID scores for LSUN datasets are inc",
+"zh": "LSUN 数据集的 FID 见{r1:表 3}。标 ∗ 的分数是 StyleGAN2 作为基线报告的，其余分数由各自作者报告。"
+},
+{
+"en": "Table 3 : FID scores for LSUN {m1:25",
+"zh": "<b>表 3：</b>LSUN {m1} 数据集的 FID。"
+},
+{
+"en": "Progressive compression",
+"zh": "渐进压缩"
+},
+{
+"en": "Our lossy compression argument in {r",
+"zh": "{r1:第 4.3 节}关于有损压缩的论证只是概念验证，因为{r2:算法 3} 和{r3:算法 4} 依赖最小随机编码 {c1} 这样的过程，而它对高维数据不可行。这两个算法是对 {c2} 的变分下界 {r4:(5)} 的一种压缩解释，还不是实用的压缩系统。"
+},
+{
+"en": "Table 4 : Unconditional CIFAR10 test",
+"zh": "<b>表 4：</b>无条件 CIFAR10 测试集的率失真数值（配合{r1:图 5}）。"
+},
+{
+"en": "Extended derivations",
+"zh": "扩展推导"
+},
+{
+"en": "Below is a derivation of {r1:Eq. 5}",
+"zh": "下面是{r1:式 (5)} 的推导，即扩散模型降方差形式的变分下界。这部分内容来自 {c1}，收在这里只是为了完整。"
+},
+{
+"en": "The following is an alternate versio",
+"zh": "下面是 {m1} 的另一种形式。它无法估计，但对{r1:第 4.3 节}的讨论有用。"
+},
+{
+"en": "Experimental details",
+"zh": "实验细节"
+},
+{
+"en": "Our neural network architecture foll",
+"zh": "我们的神经网络结构沿用 PixelCNN++ {c1} 的主干，这是一个基于 Wide ResNet {c3} 的 U-Net {c2}。我们把 Weight Normalization {c4} 换成 Group Normalization {c5}，使实现更简单。{m1} 的模型使用四种特征图分辨率（从 {m2} 到 {m3}），{m4} 的模型使用六种。所有模型每个分辨率层有两个卷积残差块，并在 {m5} 分辨率的卷积块之间加入自注意力块 {c6}。扩散时间 {m6} 通过把 Transformer 正弦位置嵌入加到每个残差块中来指定 {c7}。CIFAR10 模型有 3570 万参数，LSUN 和 CelebA-HQ 模型有 1.14 亿参数。我们还通过增加卷积核数量，训练了一个约 2.56 亿参数的更大的 LSUN Bedroom 模型。"
+},
+{
+"en": "We used TPU v3-8 (similar to 8 V100",
+"zh": "所有实验使用 TPU v3-8（约相当于 8 块 V100 GPU）。CIFAR 模型在批量 128 时每秒训练 21 步（训练完 80 万步需 10.6 小时），采样一批 256 张图需 17 秒。CelebA-HQ 和 LSUN（256²）模型在批量 64 时每秒训练 2.2 步，采样一批 128 张图需 300 秒。CelebA-HQ 训练 50 万步，LSUN Bedroom 训练 240 万步，LSUN Cat 训练 180 万步，LSUN Church 训练 120 万步。更大的 LSUN Bedroom 模型训练了 115 万步。"
+},
+{
+"en": "Apart from an initial choice of hype",
+"zh": "除了早期为满足内存限制初步选定网络规模的超参数外，我们的超参数搜索主要以 CIFAR10 样本质量为优化目标，然后把得到的设置沿用到其他数据集："
+},
+{
+"en": "We chose the {m1:\\beta_{t}} schedule",
+"zh": "我们从常数、线性、二次三种 {m1} 方差表中选择，并都约束 {m2}。{m3} 没有搜索，方差表选择从 {m4} 到 {m5} 的线性表。"
+},
+{
+"en": "We set the dropout rate on CIFAR10 t",
+"zh": "CIFAR10 的 dropout 率通过搜索 {m2} 定为 {m1}。CIFAR10 上不用 dropout 时，样本变差，类似未加正则的 PixelCNN++ 的过拟合伪影 {c1}。其他数据集的 dropout 率未经搜索，直接设为零。"
+},
+{
+"en": "We used random horizontal flips duri",
+"zh": "CIFAR10 训练时使用随机水平翻转；我们对比了有无翻转的训练，翻转使样本质量略有提高。除 LSUN Bedroom 外，其他数据集也使用随机水平翻转。"
+},
+{
+"en": "We tried Adam {c1:[ 31 ]} and RMSPro",
+"zh": "实验早期尝试了 Adam {c1} 和 RMSProp，选择了前者。超参数保持默认值。学习率未经搜索设为 {m1}，{m3} 图像降到 {m2}，因为较大的学习率下这些图像的训练看起来不稳定。"
+},
+{
+"en": "We set the batch size to 128 for CIF",
+"zh": "CIFAR10 的批量大小为 128，更大的图像为 64。这些值未经搜索。"
+},
+{
+"en": "We used EMA on model parameters with",
+"zh": "模型参数使用指数滑动平均 (Exponential Moving Average, EMA)，衰减系数 0.9999。这个值未经搜索。"
+},
+{
+"en": "Final experiments were trained once",
+"zh": "最终实验只训练一次，并在训练过程中持续评估样本质量。样本质量分数和对数似然取训练过程中 FID 最小时的值。CIFAR10 上用 OpenAI {c1} 和 TTUR {c2} 代码库的原始代码，在 50000 个样本上分别计算 Inception Score 和 FID。LSUN 上用 StyleGAN2 {c3} 代码库的代码，在 50000 个样本上计算 FID。CIFAR10 和 CelebA-HQ 按 TensorFlow Datasets（{r1}）提供的方式加载，LSUN 用 StyleGAN 的代码准备。数据集划分（或不划分）沿用这些数据集首次用于生成建模的论文的标准做法。全部细节见发布的源代码。"
+},
+{
+"en": "Discussion on related work",
+"zh": "相关工作讨论"
+},
+{
+"en": "Our model architecture, forward proc",
+"zh": "我们的模型结构、前向过程定义和先验与 NCSN {c1} 有一些细微但重要的差别，这些差别提高了样本质量。而且，我们把采样器作为隐变量模型直接训练，而不是训练完再补上。具体如下："
+},
+{
+"en": "We use a U-Net with self-attention;",
+"zh": "我们用带自注意力的 U-Net；NCSN 用带空洞卷积的 RefineNet。我们把 Transformer 正弦位置嵌入加进去，让所有层都以 {m1} 为条件；NCSN 只在归一化层（NCSNv1）或只在输出端（v2）引入条件。"
+},
+{
+"en": "Diffusion models scale down the data",
+"zh": "扩散模型在每个前向步都按 {m1} 缩小数据，使加噪时方差不增长，从而给逆向过程的神经网络提供尺度一致的输入。NCSN 没有这个缩放系数。"
+},
+{
+"en": "Unlike NCSN, our forward process des",
+"zh": "与 NCSN 不同，我们的前向过程会破坏信号（{m1}），保证 {m2} 的先验与聚合后验接近。同样与 NCSN 不同，我们的 {m3} 很小，保证前向过程可以被转移为条件高斯的马尔可夫链反转。这两点都能防止采样时的分布偏移。"
+},
+{
+"en": "Our Langevin-like sampler has coeffi",
+"zh": "我们的类 Langevin 采样器的系数（学习率、噪声尺度等）都由前向过程的 {m1} 严格导出。因此训练过程直接训练采样器，使其在 {m2} 步后与数据分布相符：这是用变分推断把采样器当隐变量模型来训练。相比之下，NCSN 采样器的系数是事后手工设定的，其训练过程也不保证直接优化采样器的质量指标。"
+},
+{
+"en": "Samples",
+"zh": "样本"
+},
+{
+"en": "Additional samples",
+"zh": "更多样本"
+},
+{
+"en": "{r1:Figure 11} , {r2:13} , {r3:16} ,",
+"zh": "{r1:图 11}、{r2:图 13}、{r3:图 16}、{r4:图 17}、{r5:图 18} 和{r6:图 19} 给出在 CelebA-HQ、CIFAR10 和 LSUN 数据集上训练的扩散模型未经挑选的样本。"
+},
+{
+"en": "Latent structure and reverse process",
+"zh": "隐变量结构与逆向过程的随机性"
+},
+{
+"en": "During sampling, both the prior {m1:",
+"zh": "采样时，先验 {m1} 和 Langevin 动力学都是随机的。为了解第二个噪声来源的作用，我们在 CelebA {m2} 数据集上，以同一个中间隐变量为条件采样多张图。{r1:图 7} 给出在 {m5} 时共享隐变量 {m4}、从逆向过程多次采样 {m3} 的结果。做法是：从先验采样一次，运行一条逆向链，在中间时间步把链分叉，采样多张图。在先验采样之后、{m6} 处分叉时，样本差别很大；在更多步之后分叉时，样本具有相同的高层属性，比如性别、发色、眼镜、饱和度、姿态和表情。这说明 {m7} 这样的中间隐变量编码了这些属性，尽管人眼察觉不到。"
+},
+{
+"en": "Coarse-to-fine interpolation",
+"zh": "由粗到细的插值"
+},
+{
+"en": "{r1:Figure 9} shows interpolations b",
+"zh": "{r1:图 9} 给出一对 CelebA {m1} 源图像之间的插值，其中改变的是隐空间插值前的扩散步数。扩散步数越多，源图像的结构破坏得越多，模型在逆向过程中将其补全。这样既能做细粒度插值，也能做粗粒度插值。极限情况下，扩散 {m2} 步时，插值就是在像素空间混合源图像；扩散 {m3} 步后，源图像的信息全部丢失，插值结果是全新的样本。"
+},
+{
+"en": "Figure 9 : Coarse-to-fine interpolat",
+"zh": "<b>图 9：</b>由粗到细的插值，改变的是隐变量混合之前的扩散步数。"
+},
+{
+"en": "Figure 10 : Unconditional CIFAR10 pr",
+"zh": "<b>图 10：</b>无条件 CIFAR10 渐进采样质量随时间的变化。"
+},
+{
+"en": "Figure 11 : CelebA-HQ {m1:256\\times",
+"zh": "<b>图 11：</b>CelebA-HQ {m1} 生成样本。"
+},
+{
+"en": "(a) Pixel space nearest neighbors (b",
+"zh": "(a) 像素空间最近邻　(b) Inception 特征空间最近邻<br><b>图 12：</b>CelebA-HQ {m1} 最近邻，在人脸周围 {m2} 的裁剪区域上计算。最左列是生成样本，其余列是训练集中的最近邻。"
+},
+{
+"en": "Figure 13 : Unconditional CIFAR10 ge",
+"zh": "<b>图 13：</b>无条件 CIFAR10 生成样本。"
+},
+{
+"en": "Figure 14 : Unconditional CIFAR10 pr",
+"zh": "<b>图 14：</b>无条件 CIFAR10 渐进生成。"
+},
+{
+"en": "(a) Pixel space nearest neighbors (b",
+"zh": "(a) 像素空间最近邻　(b) Inception 特征空间最近邻<br><b>图 15：</b>无条件 CIFAR10 最近邻。最左列是生成样本，其余列是训练集中的最近邻。"
+},
+{
+"en": "Figure 16 : LSUN Church generated sa",
+"zh": "<b>图 16：</b>LSUN Church 生成样本，FID = {m1}。"
+},
+{
+"en": "Figure 17 : LSUN Bedroom generated s",
+"zh": "<b>图 17：</b>LSUN Bedroom 生成样本，大模型，FID = {m1}。"
+},
+{
+"en": "Figure 18 : LSUN Bedroom generated s",
+"zh": "<b>图 18：</b>LSUN Bedroom 生成样本，小模型，FID = {m1}。"
+},
+{
+"en": "Figure 19 : LSUN Cat generated sampl",
+"zh": "<b>图 19：</b>LSUN Cat 生成样本，FID = {m1}。"
+}
+]
