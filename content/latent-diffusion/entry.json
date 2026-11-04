@@ -10,6 +10,7 @@
   "date": "2021-12",
   "studied": "2026-11",
   "published": "2026-11-04",
+  "after": "ddpm",
   "summary": "四个 tab：综述、原论文中英对照、15 个常见问题，NeurIPS 2023 教程的两份笔记默认折叠在资料里。",
   "source": {
     "name": "High-Resolution Image Synthesis with Latent Diffusion Models · Rombach, Blattmann, Lorenz, Esser, Ommer",
