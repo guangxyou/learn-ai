@@ -1,0 +1,118 @@
+{
+"1": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1211.5590"
+},
+"2": {
+"venue": "Now Publishers",
+"url": "https://doi.org/10.1561/2200000006"
+},
+"3": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1207.4404"
+},
+"4": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1305.6663"
+},
+"5": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1306.1091"
+},
+"6": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1306.1091"
+},
+"7": {
+"venue": "SciPy",
+"url": "https://conference.scipy.org/proceedings/scipy2010/bergstra.html"
+},
+"8": {
+"venue": "Neural Computation",
+"url": "https://doi.org/10.1162/NECO_a_00158"
+},
+"9": {
+"venue": "AISTATS",
+"url": "https://proceedings.mlr.press/v15/glorot11a.html"
+},
+"10": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1302.4389"
+},
+"11": {
+"venue": "NIPS",
+"url": "https://papers.nips.cc/paper/2013/hash/0bb4aec1710521c12ee76289d9440817-Abstract.html"
+},
+"12": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1308.4214"
+},
+"13": {
+"venue": "AISTATS",
+"url": "https://proceedings.mlr.press/v9/gutmann10a.html"
+},
+"14": {
+"venue": "IEEE SPM",
+"url": "https://doi.org/10.1109/MSP.2012.2205597"
+},
+"15": {
+"venue": "Science",
+"url": "https://doi.org/10.1126/science.7761831"
+},
+"16": {
+"venue": "Neural Computation",
+"url": "https://doi.org/10.1162/neco.2006.18.7.1527"
+},
+"17": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1207.0580"
+},
+"18": {
+"venue": "JMLR",
+"url": "https://jmlr.org/papers/v6/hyvarinen05a.html"
+},
+"19": {
+"venue": "ICCV",
+"url": "https://doi.org/10.1109/ICCV.2009.5459469"
+},
+"20": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1312.6114"
+},
+"21": {
+"venue": "技术报告",
+"url": "https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf"
+},
+"22": {
+"venue": "NIPS",
+"url": "https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html"
+},
+"23": {
+"venue": "Proc. IEEE",
+"url": "https://doi.org/10.1109/5.726791"
+},
+"24": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1401.4082"
+},
+"25": {
+"venue": "arXiv",
+"url": "https://arxiv.org/abs/1206.6434"
+},
+"26": {
+"venue": "AISTATS",
+"url": "https://proceedings.mlr.press/v5/salakhutdinov09a.html"
+},
+"29": {
+"venue": "ICML",
+"url": "https://doi.org/10.1145/1390156.1390290"
+},
+"30": {
+"venue": "ICML",
+"url": "https://doi.org/10.1145/1390156.1390294"
+},
+"31": {
+"venue": "Stochastics",
+"url": "https://doi.org/10.1080/17442509908834179"
+}
+}

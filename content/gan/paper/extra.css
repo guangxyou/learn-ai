@@ -1,0 +1,9 @@
+/* LaTeXML 的 flex 拼版和 span 表格，make-paper 的样式默认不含这些规则 */
+.ltx_flex_figure{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 10px}
+.ltx_flex_cell{flex:1 1 40%;min-width:0;text-align:center}
+.ltx_flex_size_1{flex:1 1 100%}
+.ltx_flex_break{flex-basis:100%;height:0}
+.ltx_flex_cell img{max-width:100%;height:auto}
+[id="S5.T2"] table{zoom:.9}
+[id="S5.T2"] td,[id="S5.T2"] th{white-space:normal;min-width:96px;vertical-align:top}
+figure.ltx_table{overflow-x:auto}

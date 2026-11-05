@@ -1,0 +1,31 @@
+{
+  "id": "gan",
+  "kind": "paper",
+  "title": "GAN",
+  "subtitle": "生成对抗网络 (Generative Adversarial Network) 的来历、完整推导和后续发展，附原论文逐段中英对照",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2014-06",
+  "studied": "2026-11",
+  "published": "2026-11-05",
+  "before": "vae",
+  "summary": "四个 tab：综述（含一个实际运行的玩具实验）、原论文中英对照、14 个常见问题，基础知识和 CS231n 第 14 讲笔记默认折叠在资料里。",
+  "source": {
+    "name": "Generative Adversarial Nets · Goodfellow, Pouget-Abadie, Mirza, Xu, Warde-Farley, Ozair, Courville, Bengio",
+    "url": "https://arxiv.org/abs/1406.2661"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>4</b> 个 tab",
+    "<b>6</b> 张示意图",
+    "<b>14</b> 个常见问题"
+  ],
+  "build": {
+    "note": "输入在 22_GAN/ 下（content/*.mjs 正文、figures/ 示意图、code/ 玩具实验），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，22_GAN/ 在时构建会先重新生成。第二个 tab 是原论文中英对照（无批注），build.mjs 调 tools/make-paper.mjs --embed 1 --plain 1 生成 assets/paper.html，用 iframe 嵌进来；译文、文献链接和样式在 content/gan/paper/，论文源 22_GAN/paper/ 不进仓库。",
+    "tool": "22_GAN/build.mjs",
+    "requires": "22_GAN/build.mjs",
+    "args": []
+  }
+}
