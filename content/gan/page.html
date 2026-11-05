@@ -307,7 +307,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
   <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-oneline">概述</a></li><li><a href="#o-history">来历</a></li><li><a href="#o-problem">要解决的问题</a></li><li><a href="#o-frame">整体结构</a></li><li><a href="#o-value">目标函数</a></li><li><a href="#o-algo">训练算法</a></li><li><a href="#o-optd">最优判别器</a></li><li><a href="#o-global">全局最优</a></li><li><a href="#o-converge">收敛条件</a></li><li><a href="#o-nonsat">非饱和目标</a></li><li><a href="#o-exp">原论文实验</a></li><li><a href="#o-eval">评估</a></li><li><a href="#o-hard">训练难点</a></li><li><a href="#o-wgan">改进目标函数</a></li><li><a href="#o-arch">改进网络结构</a></li><li><a href="#o-cond">条件和翻译</a></li><li><a href="#o-after">后续发展</a></li><li><a href="#o-relation">相关模型</a></li></ol></nav>
   <article class="aidoc">
     <h2 class="aih">GAN 综述：来历、推导与后续发展</h2>
-    <p class="lede">这一页按计算顺序讲生成对抗网络。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间六节依次讲目标函数、训练算法、最优判别器、全局最优、收敛条件和非饱和目标，附一段实际运行过的代码；后面八节讲原论文的实验、评估、训练难点、目标函数和结构的改进、条件生成、被扩散模型超过的过程，以及和其他生成模型的关系。</p><p class="lede">论文逐段中英对照在「论文」tab，常见问题在「常见问题」tab。KL 散度、JS 散度和极小极大博弈的基础，以及跟李沐学AI 的论文精读和 CS231n 第 14 讲的笔记，都收在「资料」tab，默认折叠。</p>
+    <p class="lede">这一页按计算顺序讲生成对抗网络。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间六节依次讲目标函数、训练算法、最优判别器、全局最优、收敛条件和非饱和目标，附一段实际运行过的代码；后面八节讲原论文的实验、评估、训练难点、目标函数和结构的改进、条件生成、被扩散模型超过的过程，以及和其他生成模型的关系。</p><p class="lede">论文逐段中英对照在「论文」tab，用的是 NeurIPS 2014 终版，常见问题在「常见问题」tab。KL 散度、JS 散度和极小极大博弈的基础，以及跟李沐学AI 的论文精读和 CS231n 第 14 讲的笔记，都收在「资料」tab，默认折叠。</p>
     <section class="aisec" id="o-oneline">
     <h2><span class="n">1</span><span>概述：用一个分类器训练生成器</span></h2>
     <p><b>生成对抗网络 (Generative Adversarial Network, GAN)</b> 是一种生成模型，由蒙特利尔大学的 Ian Goodfellow、Jean Pouget-Abadie、Mehdi Mirza、Bing Xu、David Warde-Farley、Sherjil Ozair、Aaron Courville 和 Yoshua Bengio 提出。论文 2014-06-10 发布在 arXiv，发表于 NIPS 2014。</p>
@@ -355,16 +355,16 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
     <p>当时的主要生成模型有几类。受限玻尔兹曼机和深度玻尔兹曼机要处理配分函数及其梯度，只能用马尔可夫链蒙特卡洛估计，混合困难。深度信念网络同时继承了有向和无向模型的计算困难。生成随机网络 (GSN) 不需要写出密度，但采样仍要运行马尔可夫链。几个月前的 VAE（2013-12-20）用反向传播训练生成网络，代价是优化证据下界，并且需要一个推断网络。</p>
     <p>Goodfellow 的想法是把密度估计问题改写成分类问题。分类已经是深度学习最擅长的事，分类器能告诉生成器它的样本哪里不像真实数据。这样既不需要配分函数，也不需要马尔可夫链，还能直接使用分段线性单元。</p>
     <p>论文致谢里写着感谢「Les Trois Brasseurs」激发创造力，这是蒙特利尔的一家酒吧。Goodfellow 在 DeepLearning.AI 的访谈中说，想法来自和朋友在那里的一次讨论，他当晚回家写了第一版代码。</p>
-    <p>思路本身有更早的来源。噪声对比估计（Gutmann、Hyvärinen）已经用判别准则训练生成模型，但判别的对象是一个固定的噪声分布，所以模型一旦学到近似分布，学习就会变慢。GAN 让判别器和生成器一起变化，避开了这个问题。arXiv v1 的相关工作讨论了这一点。NeurIPS 终版重写了这一节，并回应了 Predictability Minimization，见常见问题。</p>
+    <p>思路本身有更早的来源，论文终版的相关工作对此有详细讨论。噪声对比估计（Gutmann、Hyvärinen）已经用判别准则训练生成模型，但它的「判别器」由噪声分布和模型分布的密度之比定义，要能计算这两个密度。Schmidhuber 的 Predictability Minimization（1992）也让两个网络竞争，但它只是让隐藏单元统计独立的正则项，比较的是一个标量。论文专门列了三点区别。</p>
     
     
     
-    <p class="refs"><a href="https://arxiv.org/abs/1406.2661" target="_blank" rel="noreferrer">原论文 ↗</a><a href="https://www.deeplearning.ai/the-batch/ian-goodfellow-a-man-a-plan-a-gan" target="_blank" rel="noreferrer">Goodfellow 访谈 (DeepLearning.AI) ↗</a><a href="https://arxiv.org/abs/1701.00160" target="_blank" rel="noreferrer">NIPS 2016 Tutorial ↗</a></p>
+    <p class="refs"><a href="https://papers.nips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html" target="_blank" rel="noreferrer">原论文 (NeurIPS 2014) ↗</a><a href="https://arxiv.org/abs/1406.2661" target="_blank" rel="noreferrer">arXiv v1 ↗</a><a href="https://www.deeplearning.ai/the-batch/ian-goodfellow-a-man-a-plan-a-gan" target="_blank" rel="noreferrer">Goodfellow 访谈 (DeepLearning.AI) ↗</a><a href="https://arxiv.org/abs/1701.00160" target="_blank" rel="noreferrer">NIPS 2016 Tutorial ↗</a></p>
   </section>
 <section class="aisec" id="o-problem">
     <h2><span class="n">3</span><span>要解决的问题：写出 p(x) 的代价</span></h2>
     <p>大多数生成模型先定义一个带参数的密度 <span class="m"><i>p</i><sub><i>θ</i></sub>(<i>x</i>)</span>，再最大化训练数据的似然。这要求密度能计算或能近似，于是模型结构受限，训练或采样要付出额外的代价。论文的表 2 把这些代价放在一起比较：</p>
-    <div class="tbl"><table><thead><tr><th>操作</th><th>有向图模型</th><th>无向图模型</th><th>生成式自编码器</th><th>对抗模型</th></tr></thead><tbody><tr><td>训练</td><td>训练时需要推断</td><td>需要推断，配分函数的梯度要靠马尔可夫链近似</td><td>混合能力和重建生成能力之间有取舍</td><td>判别器和生成器要保持同步</td></tr><tr><td>推断</td><td>学习近似推断</td><td>变分推断</td><td>基于马尔可夫链的推断</td><td>学习近似推断</td></tr><tr><td>采样</td><td>没有困难</td><td>需要马尔可夫链</td><td>需要马尔可夫链</td><td>没有困难</td></tr><tr><td>计算 <span class="m"><i>p</i>(<i>x</i>)</span></td><td>不可解，可用 AIS 近似</td><td>不可解，可用 AIS 近似</td><td>没有显式表示，可用 Parzen 窗近似</td><td>没有显式表示，可用 Parzen 窗近似</td></tr><tr><td>模型设计</td><td>几乎都非常困难</td><td>要仔细设计以保证多种性质</td><td>理论上允许任意可微函数</td><td>理论上允许任意可微函数</td></tr></tbody></table><p class="tnote">据论文表 2 翻译。「对抗模型」的训练项在原表里还有一个词 Helvetica，指模式坍缩，见常见问题。</p></div>
+    <div class="tbl"><table><thead><tr><th>操作</th><th>有向图模型</th><th>无向图模型</th><th>生成式自编码器</th><th>对抗模型</th></tr></thead><tbody><tr><td>训练</td><td>训练时需要推断</td><td>需要推断，配分函数的梯度要靠马尔可夫链近似</td><td>混合能力和重建生成能力之间有取舍</td><td>判别器和生成器要保持同步</td></tr><tr><td>推断</td><td>学习近似推断</td><td>变分推断</td><td>基于马尔可夫链的推断</td><td>学习近似推断</td></tr><tr><td>采样</td><td>没有困难</td><td>需要马尔可夫链</td><td>需要马尔可夫链</td><td>没有困难</td></tr><tr><td>计算 <span class="m"><i>p</i>(<i>x</i>)</span></td><td>不可解，可用 AIS 近似</td><td>不可解，可用 AIS 近似</td><td>没有显式表示，可用 Parzen 窗近似</td><td>没有显式表示，可用 Parzen 窗近似</td></tr><tr><td>模型设计</td><td>要配合所需的推断方案来设计，有些方案支持和 GAN 类似的模型族</td><td>要仔细设计以保证多种性质</td><td>理论上允许任意可微函数</td><td>理论上允许任意可微函数</td></tr></tbody></table><p class="tnote">据论文表 2 翻译。「对抗模型」的训练项在原表里还有一个词 Helvetica，指模式坍缩，见常见问题。</p></div>
     <p>对抗模型的特点是：放弃密度，换来采样和模型设计上的自由。代价有两个，一是算不出 <span class="m"><i>p</i><sub><i>g</i></sub>(<i>x</i>)</span>，二是训练时两个网络要保持同步。第二个代价在此后几年里成为这个领域的主要问题。</p>
     
     
@@ -494,7 +494,7 @@ for step in range(20001):
     <h2><span class="n">9</span><span>理论结果三：收敛结论的前提</span></h2>
     <p>命题 2 说：如果 <span class="m"><i>G</i></span> 和 <span class="m"><i>D</i></span> 容量足够，每一步都把 <span class="m"><i>D</i></span> 训练到最优，并且 <span class="m"><i>p</i><sub><i>g</i></sub></span> 按更新后的准则改进，那么 <span class="m"><i>p</i><sub><i>g</i></sub></span> 收敛到 <span class="m"><i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub></span>。证明依据的是 <span class="m"><i>V</i></span> 关于 <span class="m"><i>p</i><sub><i>g</i></sub></span> 是凸的，而凸函数族上确界的次梯度包含取到上确界那一个函数的梯度。</p>
     <p>这个结论的前提和实际算法有三处差别：</p>
-    <ul><li><b>优化的对象不同。</b> 证明直接更新函数 <span class="m"><i>p</i><sub><i>g</i></sub></span>，实际优化的是网络参数 <span class="m"><i>θ</i><sub><i>g</i></sub></span>，关于参数并不是凸的。论文承认这一点，并说多层感知机在实践中的出色表现说明它仍是合理的选择。</li><li><b>判别器不是最优的。</b> 证明要求每一步都把 <span class="m"><i>D</i></span> 训练到最优，算法只更新一步。</li><li><b>目标也换了。</b> 实际使用的通常是下面的非饱和目标，它已经不是这个极小极大博弈。</li></ul>
+    <ul><li><b>优化的对象不同。</b> 证明直接更新函数 <span class="m"><i>p</i><sub><i>g</i></sub></span>，实际优化的是网络参数 <span class="m"><i>θ</i><sub><i>g</i></sub></span>，关于参数并不是凸的。论文直接写明这些证明不适用，并说多层感知机在实践中的出色表现说明它仍是合理的选择。</li><li><b>判别器不是最优的。</b> 证明要求每一步都把 <span class="m"><i>D</i></span> 训练到最优，算法只更新一步。</li><li><b>目标也换了。</b> 实际使用的通常是下面的非饱和目标，它已经不是这个极小极大博弈。</li></ul>
     <p>后来的研究确实发现了问题。Mescheder 等人（2018-01-13）构造了一个只有两个参数的简单例子，证明未加正则化的 GAN 在分布不连续时不一定收敛，并提出了 R1 梯度惩罚。Arjovsky 和 Bottou（2017-01-17）指出，如果 <span class="m"><i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub></span> 和 <span class="m"><i>p</i><sub><i>g</i></sub></span> 位于不重合的低维流形上，最优判别器能完美区分，生成器的梯度就会消失。</p>
     
     
@@ -732,7 +732,7 @@ for step in range(20001):
 </div>
 </div>
 <div class="view" id="view-paper">
-<iframe class="paperframe" data-src="__ASSETS__/paper.html?v=85f535674c" title="《Generative Adversarial Nets》中英对照"></iframe>
+<iframe class="paperframe" data-src="__ASSETS__/paper.html?v=d8148fd54a" title="《Generative Adversarial Nets》中英对照"></iframe>
 </div>
 <div class="view" id="view-faq">
 <div class="faqdoc">
@@ -812,10 +812,10 @@ for step in range(20001):
       <p>中英对照页的英文保持原样，译文也按原文，没有修改这些符号。</p>
       <p class="refs"><a href="#paper">论文 tab →</a></p>
     </div></details>
-    <details class="faq" id="faq-versions"><summary>arXiv 版和 NeurIPS 版有什么不同，本页用的是哪个？</summary><div class="faqa">
-      <p>本页论文 tab 是 arXiv v1（2014-06-10）。李沐的视频读的是 NeurIPS 2014 终版，作者没有把终版更新到 arXiv。两版差别最大的是第 2 节相关工作：</p>
+    <details class="faq" id="faq-versions"><summary>arXiv 版和 NeurIPS 版有什么不同？本页用的是哪个？</summary><div class="faqa">
+      <p>本页论文 tab 用的是 NeurIPS 2014 终版，和李沐的视频相同。arXiv 上只有较早的 v1（2014-06-10），作者没有把终版更新上去。两版差别最大的是第 2 节相关工作：</p>
       <ul><li>arXiv v1 主要讨论玻尔兹曼机、深度信念网络、分数匹配、噪声对比估计和生成随机网络。</li><li>NeurIPS 终版重写了这一节，讨论生成机器、VAE（说明作者当时不知道这项工作）、噪声对比估计和 Predictability Minimization，并列出与后者的三点区别，最后区分了对抗样本。</li></ul>
-      <p>终版还在第 2 节使用了 GAN 这个缩写，arXiv v1 通篇没有。第 3 节以后的算法和证明两版基本相同。</p>
+      <p>其他差别很小：终版在第 2 节开始使用 GAN 这个缩写，arXiv v1 通篇没有；第 3 节去掉了和 SML/PCD 的类比；第 4.2 节把「多层感知机引入多个临界点」改成了「证明不适用」；表 2 改了一个单元格；文献从 31 条改为 29 条，编号全部变化。算法和证明本身相同。</p>
       <p class="refs"><a href="#m-s4">李沐：相关工作 →</a><a href="#m-s5">李沐：PM 争议 →</a></p>
     </div></details>
     <details class="faq" id="faq-eq3"><summary>式 (3) 从 z 换到 x，要求 G 可逆吗？</summary><div class="faqa">
@@ -904,7 +904,7 @@ for step in range(20001):
   <details class="res" id="res-m">
   <summary><span class="rt"><b>跟李沐学AI：GAN 论文逐段精读</b><em>46 分钟，按论文顺序逐段讲解，包括游戏截图的例子、两样本检验、命名和 Predictability Minimization 的轶事，以及论文的写法</em></span></summary>
   <div class="resb">
-<div class="intro"><p>这一期按论文顺序逐段讲解：标题、摘要、导论、相关工作、目标函数、图 1、算法 1、两个理论结果，最后评价论文的写法和算法本身的影响。</p><p>讲者读的是 NeurIPS 2014 的终版，第 2 节相关工作和本页论文 tab 的 arXiv v1 完全不同，相关工作一节专门说明了这一点。其他章节两版基本相同。</p><p>笔记按视频顺序分节转述，时间码跳到对应位置。讲者口述时有几处说法不够严格，对照论文和后来的工作，放在各节的「注」里。</p></div>
+<div class="intro"><p>这一期按论文顺序逐段讲解：标题、摘要、导论、相关工作、目标函数、图 1、算法 1、两个理论结果，最后评价论文的写法和算法本身的影响。</p><p>讲者读的是 NeurIPS 2014 的终版，本页论文 tab 也是这个版本。arXiv 上的 v1 第 2 节相关工作完全不同，相关工作一节专门说明了这一点。</p><p>笔记按视频顺序分节转述，时间码跳到对应位置。讲者口述时有几处说法不够严格，对照论文和后来的工作，放在各节的「注」里。</p></div>
 <details class="ep" id="m" data-bv="BV1rb4y187vD" data-p="1" data-start="0" open>
   <summary>
     <span class="no">读</span>
@@ -951,7 +951,7 @@ for step in range(20001):
       <p>讲者读的是 NeurIPS 上的终版。arXiv 上的是较早的版本，作者没有再更新。两版的主要差别就在相关工作：讲者认为 arXiv 版基本没有写真正相关的东西，终版才写了很多。讲者的猜测是，作者是自己想出这个方法的，并没有事先调研，写完才被人告知哪些工作相关。</p>
       <p>终版的第一段先说此前方法的问题：它们构造一个带参数的分布函数，通过最大化对数似然来学习，高维时计算困难。于是出现了生成机器 (Generative Machines)，不再构造分布，只学习一个能生成样本的模型。前者清楚分布是什么，后者计算简单，但不知道分布长什么样。</p>
       <p>接着提到两点。作者当时不知道 VAE，VAE 和 GAN 是非常相似的工作。用判别模型帮助生成模型也不是新想法，比如噪声对比估计 (NCE)，但它的损失函数更复杂，求解性能不如 GAN。</p>
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-750.jpg" alt="NeurIPS 终版的相关工作，和 arXiv v1 内容不同。" loading="lazy"><figcaption><button class="ts" type="button" data-t="750">12:30</button>NeurIPS 终版的相关工作，和 arXiv v1 内容不同。</figcaption></figure></div>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-750.jpg" alt="NeurIPS 终版的相关工作。" loading="lazy"><figcaption><button class="ts" type="button" data-t="750">12:30</button>NeurIPS 终版的相关工作。</figcaption></figure></div>
       <div class="note"><p><span class="lbl">注</span>讲者说「对 f 的期望求导等价于对 f 自己求导」，论文终版的原式是 <span class="m">lim<sub><i>σ</i>→0</sub> ∇<sub><i>x</i></sub> 𝔼<sub><i>ε</i>∼<i>N</i>(0, <i>σ</i><sup>2</sup><i>I</i>)</sub> <i>f</i>(<i>x</i> + <i>ε</i>) = ∇<sub><i>x</i></sub> <i>f</i>(<i>x</i>)</span>，也就是生成器不加噪声（方差趋于 0）时才成立。</p><p>终版对 VAE 的说法比「非常相似」更具体：两者都把可微的生成网络和第二个网络配对，VAE 的第二个网络做近似推断。GAN 要对可见单元求导，不能建模离散数据；VAE 要对隐藏单元求导，不能有离散隐变量。</p></div>
     </section>
 <section class="sec" id="m-s5">
