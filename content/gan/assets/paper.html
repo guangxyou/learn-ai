@@ -503,8 +503,8 @@ figure.ltx_table{overflow-x:auto}
 
 <div class="wrap"><section class="ep-head">
   <div class="ep-kicker"><span class="topic">论文</span>
-    <span>《Generative Adversarial Nets》 · NIPS 2014 ·
-      <a href="https://arxiv.org/abs/1406.2661" target="_blank" rel="noreferrer">arXiv:1406.2661 ↗</a></span>
+    <span>《Generative Adversarial Nets》 · NeurIPS 2014 ·
+      <a href="https://papers.nips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html" target="_blank" rel="noreferrer">NeurIPS 2014 论文集 ↗</a></span>
   </div>
   <h1>《Generative Adversarial Nets<span class="nb">》中英对照</span></h1>
   
@@ -564,15 +564,15 @@ probability distributions over the kinds of data encountered in artificial intel
 such as natural images, audio waveforms containing speech, and symbols in natural language corpora.
 So far, the most striking successes in deep learning have involved discriminative models,
 usually those that map a high-dimensional, rich sensory input to a class
-label <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib14" title="" class="ltx_ref">14</a>, <a href="#bib.bib22" title="" class="ltx_ref">22</a>]</cite>. These
+label <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib14" title="" class="ltx_ref">14</a>, <a href="#bib.bib20" title="" class="ltx_ref">20</a>]</cite>. These
 striking successes have primarily been based on the backpropagation and dropout algorithms, using
 piecewise linear units
- <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>, <a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite> which have a particularly well-behaved gradient
+ <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>, <a href="#bib.bib8" title="" class="ltx_ref">8</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite> which have a particularly well-behaved gradient
 . Deep <span id="S1.p1.1.1" class="ltx_text ltx_font_italic">generative</span> models have had less of an impact, due to the difficulty of approximating
 many intractable probabilistic computations that arise in maximum likelihood estimation and
 related strategies, and due to difficulty of leveraging the benefits of piecewise linear units in
 the generative context. We propose a new generative model estimation procedure that sidesteps these difficulties.<sup class="fnm">1</sup></p>
-    <p class="pp zh" lang="zh-Hans">深度学习的前景是发现丰富的层次化模型 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>，用来表示人工智能应用中各类数据的概率分布，比如自然图像、含语音的音频波形以及自然语言语料中的符号。到目前为止，深度学习最引人注目的成功都在判别模型上，这类模型通常把高维、信息丰富的感官输入映射到类别标签 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib14" title="" class="ltx_ref">14</a>, <a href="#bib.bib22" title="" class="ltx_ref">22</a>]</cite>。这些成功主要依靠反向传播和 Dropout 算法，并使用梯度性质特别好的分段线性单元 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>, <a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite>。深度生成模型的影响要小一些，原因有二：最大似然估计及相关策略中有许多难以计算的概率量，近似它们很困难；在生成的场景中也难以发挥分段线性单元的优势。我们提出一种新的生成模型估计过程，绕开了这些困难。<sup class="fnm">1</sup></p>
+    <p class="pp zh" lang="zh-Hans">深度学习的前景是发现丰富的层次化模型 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>，用来表示人工智能应用中各类数据的概率分布，比如自然图像、含语音的音频波形以及自然语言语料中的符号。到目前为止，深度学习最引人注目的成功都在判别模型上，这类模型通常把高维、信息丰富的感官输入映射到类别标签 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib14" title="" class="ltx_ref">14</a>, <a href="#bib.bib20" title="" class="ltx_ref">20</a>]</cite>。这些成功主要依靠反向传播和 Dropout 算法，并使用梯度性质特别好的分段线性单元 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>, <a href="#bib.bib8" title="" class="ltx_ref">8</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite>。深度生成模型的影响要小一些，原因有二：最大似然估计及相关策略中有许多难以计算的概率量，近似它们很困难；在生成的场景中也难以发挥分段线性单元的优势。我们提出一种新的生成模型估计过程，绕开了这些困难。<sup class="fnm">1</sup></p>
     
   </div>
 <div class="blk">
@@ -594,10 +594,10 @@ algorithm. In this article, we explore the special case when the generative mode
 samples by passing random noise through a multilayer perceptron, and the discriminative model
 is also a multilayer perceptron. We refer to this special case as <span id="S1.p3.1.1" class="ltx_text ltx_font_italic">adversarial nets</span>.
 In this case, we can train both models using only
-the highly successful backpropagation and dropout algorithms <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>]</cite>
+the highly successful backpropagation and dropout algorithms <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite>
 and sample from the generative
 model using only forward propagation. No approximate inference or Markov chains are necessary.</p>
-    <p class="pp zh" lang="zh-Hans">这个框架可以为多种模型和优化算法导出具体的训练算法。本文研究其中的特例：生成模型把随机噪声输入多层感知机来生成样本，判别模型也是多层感知机。我们把这个特例称为对抗网络 (Adversarial Nets)。这种情况下，两个模型都可以只用非常成功的反向传播和 Dropout 算法 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>]</cite> 训练，从生成模型采样也只需前向传播，不需要近似推断或马尔可夫链。</p>
+    <p class="pp zh" lang="zh-Hans">这个框架可以为多种模型和优化算法导出具体的训练算法。本文研究其中的特例：生成模型把随机噪声输入多层感知机来生成样本，判别模型也是多层感知机。我们把这个特例称为对抗网络 (Adversarial Nets)。这种情况下，两个模型都可以只用非常成功的反向传播和 Dropout 算法 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite> 训练，从生成模型采样也只需前向传播，不需要近似推断或马尔可夫链。</p>
     
   </div>
 <div class="fnsec"><span class="fnsec-h">脚注</span><p><sup>1</sup>
@@ -608,68 +608,39 @@ model using only forward propagation. No approximate inference or Markov chains 
 <span class="lxa" id="S2"></span><h2 class="ph" id="s2"><span class="hn">2</span>Related work<span class="hzh">相关工作</span></h2>
 <div class="blk">
     
-    <p class="pp">An alternative to directed graphical models with latent variables are undirected graphical models
-with latent variables, such as restricted Boltzmann machines (RBMs) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib27" title="" class="ltx_ref">27</a>, <a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite>,
-deep Boltzmann machines (DBMs) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib26" title="" class="ltx_ref">26</a>]</cite> and their numerous variants.
-The interactions within such models are represented as the product of
-unnormalized potential functions, normalized by a global
-summation/integration over all states of the random variables.
-This quantity (the <span id="S2.p1.1.1" class="ltx_text ltx_font_italic">partition function</span>) and
-its gradient are intractable for all but the most trivial
-instances, although they can be estimated by Markov chain Monte
-Carlo (MCMC) methods. Mixing poses a significant problem for learning
-algorithms that rely on
-MCMC <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>.</p>
-    <p class="pp zh" lang="zh-Hans">带隐变量的有向图模型的一种替代方案，是带隐变量的无向图模型，比如受限玻尔兹曼机 (RBM) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib27" title="" class="ltx_ref">27</a>, <a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite>、深度玻尔兹曼机 (DBM) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib26" title="" class="ltx_ref">26</a>]</cite> 及其众多变体。这类模型内部的相互作用表示为未归一化势函数的乘积，再用对随机变量所有状态的全局求和或积分来归一化。除了最简单的情形，这个量（配分函数，Partition Function）及其梯度都难以计算，只能用马尔可夫链蒙特卡洛 (MCMC) 方法估计。对依赖 MCMC 的学习算法来说，混合是一个严重问题 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>。</p>
+    <p class="pp">Until recently, most work on deep generative models focused on models that provided a parametric specification of a probability distribution function. The model can then be trained by maximizing the log likelihood. In this family of model, perhaps the most succesful is the deep Boltzmann machine <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib25" title="" class="ltx_ref">25</a>]</cite>. Such models generally have intractable likelihood functions and therefore require numerous approximations to the likelihood gradient. These difficulties motivated the development of “generative machines”–models that do not explicitly represent the likelihood, yet are able to generate samples from the desired distribution. Generative stochastic networks <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite> are an example of a generative machine that can be trained with exact backpropagation rather than the numerous approximations required for Boltzmann machines. This work extends the idea of a generative machine by eliminating the Markov chains used in generative stochastic networks.</p>
+    <p class="pp zh" lang="zh-Hans">直到最近，深度生成模型的工作大多集中在给出概率分布函数参数化形式的模型上，这样的模型可以通过最大化对数似然来训练。这类模型中最成功的大概是深度玻尔兹曼机 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib25" title="" class="ltx_ref">25</a>]</cite>。这些模型的似然函数通常难以计算，因此需要对似然梯度做大量近似。这些困难推动了「生成机器 (Generative Machines)」的发展，这类模型不显式表示似然，却能从目标分布中生成样本。生成随机网络 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite> 就是一种生成机器，它可以用精确的反向传播训练，不需要玻尔兹曼机那样的大量近似。本文扩展了生成机器的思想，去掉了生成随机网络中使用的马尔可夫链。</p>
     
   </div>
 <div class="blk">
     
-    <p class="pp">Deep belief networks (DBNs) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite> are hybrid models containing a single undirected layer and several directed layers.
-While a fast approximate layer-wise training criterion exists, DBNs incur the computational
-difficulties associated with both undirected and directed models.</p>
-    <p class="pp zh" lang="zh-Hans">深度信念网络 (DBN) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite> 是混合模型，包含一个无向层和若干有向层。虽然存在快速的近似逐层训练准则，但 DBN 同时面临无向模型和有向模型的计算困难。</p>
+    <p class="pp">Our work backpropagates derivatives through generative processes by using the observation that</p>
+    <p class="pp zh" lang="zh-Hans">我们的工作通过以下观察，让导数在生成过程中反向传播：</p>
+    
+  </div>
+<div class="eqbox"><table id="S2.Ex1" class="ltx_equation ltx_eqn_table"><tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline"><td class="ltx_eqn_cell ltx_eqn_center_padleft"></td><td class="ltx_eqn_cell ltx_align_center"><math id="S2.Ex1.m1" class="ltx_Math" alttext="\lim_{\sigma\to 0}\nabla_{\bm{x}}\mathbb{E}_{\epsilon\sim\mathcal{N}(0,\sigma^{2}\bm{I})}f(\bm{x}+\epsilon)=\nabla_{\bm{x}}f(\bm{x})." display="block"><mrow><munder><mi>lim</mi><mrow><mi>σ</mi><mo>→</mo><mn>0</mn></mrow></munder><mo lspace="0.167em">⁡</mo><msub><mo>∇</mo><mi mathvariant="bold-italic">x</mi></msub><msub><mi>𝔼</mi><mrow><mi>ϵ</mi><mo>∼</mo><mi class="ltx_font_mathcaligraphic">𝒩</mi><mo stretchy="false">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold-italic">I</mi><mo stretchy="false">)</mo></mrow></msub><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo>+</mo><mi>ϵ</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∇</mo><mi mathvariant="bold-italic">x</mi></msub><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo stretchy="false">)</mo><mo lspace="0em">.</mo></mrow></math></td><td class="ltx_eqn_cell ltx_eqn_center_padright"></td></tr></tbody></table></div>
+<div class="blk">
+    
+    <p class="pp">We were unaware at the time we developed this work that Kingma and Welling <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite> and Rezende et al. <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite> had developed more general stochastic backpropagation rules, allowing one to backpropagate through Gaussian distributions with finite variance, and to backpropagate to the covariance parameter as well as the mean. These backpropagation rules could allow one to learn the conditional variance of the generator, which we treated as a hyperparameter in this work. Kingma and Welling <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite> and Rezende et al. <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite> use stochastic backpropagation to train variational autoencoders (VAEs). Like generative adversarial networks, variational autoencoders pair a differentiable generator network with a second neural network. Unlike generative adversarial networks, the second network in a VAE is a recognition model that performs approximate inference. GANs require differentiation through the visible units, and thus cannot model discrete data, while VAEs require differentiation through the hidden units, and thus cannot have discrete latent variables. Other VAE-like approaches exist <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib12" title="" class="ltx_ref">12</a>, <a href="#bib.bib22" title="" class="ltx_ref">22</a>]</cite> but are less closely related to our method.</p>
+    <p class="pp zh" lang="zh-Hans">我们做这项工作时，并不知道 Kingma 和 Welling <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite>、Rezende 等人 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite> 已经提出了更一般的随机反向传播规则，可以对方差有限的高斯分布做反向传播，并且不仅对均值、也对协方差参数做反向传播。这些规则可以用来学习生成器的条件方差，本文把它作为超参数处理。Kingma 和 Welling <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite>、Rezende 等人 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite> 用随机反向传播训练变分自编码器 (VAE)。与生成对抗网络一样，变分自编码器把一个可微的生成网络和第二个神经网络配对。与生成对抗网络不同的是，VAE 的第二个网络是做近似推断的识别模型。GAN 需要对可见单元求导，因此不能建模离散数据；VAE 需要对隐藏单元求导，因此不能有离散隐变量。也有其他类似 VAE 的方法 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib12" title="" class="ltx_ref">12</a>, <a href="#bib.bib22" title="" class="ltx_ref">22</a>]</cite>，但与我们的方法关系较远。</p>
     
   </div>
 <div class="blk">
     
-    <p class="pp">Alternative criteria that do not approximate or bound
-the log-likelihood have also been proposed, such as score matching <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite>
-and noise-contrastive estimation (NCE) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite>.
-Both of these require the learned probability density to be analytically specified
-up to a normalization constant. Note that in many interesting generative models with several
-layers of latent variables (such as
-DBNs and DBMs), it is not even possible to derive a tractable unnormalized probability density.
-Some models such as denoising auto-encoders <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib30" title="" class="ltx_ref">30</a>]</cite> and contractive
-autoencoders have learning rules very similar to score matching applied to RBMs.
-In NCE, as in this work, a discriminative training criterion is
-employed to fit a generative model. However, rather than fitting a separate discriminative
-model, the generative model itself is used to discriminate generated data from samples
-a fixed noise distribution. Because NCE uses a fixed noise distribution, learning slows
-dramatically after the model has learned even an approximately correct distribution over
-a small subset of the observed variables.</p>
-    <p class="pp zh" lang="zh-Hans">也有人提出不近似、也不约束对数似然的其他准则，比如分数匹配 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib18" title="" class="ltx_ref">18</a>]</cite> 和噪声对比估计 (NCE) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite>。这两种方法都要求所学的概率密度在相差一个归一化常数的意义下有解析形式。注意，在许多有多层隐变量的有趣生成模型中（比如 DBN 和 DBM），甚至无法导出可计算的未归一化概率密度。去噪自编码器 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib30" title="" class="ltx_ref">30</a>]</cite> 和收缩自编码器等模型的学习规则，与应用在 RBM 上的分数匹配非常相似。NCE 和本文一样采用判别式的训练准则来拟合生成模型，但它不拟合一个单独的判别模型，而是用生成模型本身来区分生成数据和来自某个固定噪声分布的样本。由于 NCE 使用固定的噪声分布，模型在观测变量的一小部分上学到近似正确的分布后，学习就会急剧变慢。</p>
+    <p class="pp">Previous work has also taken the approach of using a discriminative criterion to train a generative model <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib29" title="" class="ltx_ref">29</a>, <a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite>. These approaches use criteria that are intractable for deep generative models. These methods are difficult even to approximate for deep models because they involve ratios of probabilities which cannot be approximated using variational approximations that lower bound the probability. Noise-contrastive estimation (NCE) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite> involves training a generative model by learning the weights that make the model useful for discriminating data from a fixed noise distribution. Using a previously trained model as the noise distribution allows training a sequence of models of increasing quality. This can be seen as an informal competition mechanism similar in spirit to the formal competition used in the adversarial networks game. The key limitation of NCE is that its “discriminator” is defined by the ratio of the probability densities of the noise distribution and the model distribution, and thus requires the ability to evaluate and backpropagate through both densities.</p>
+    <p class="pp zh" lang="zh-Hans">此前也有工作用判别准则训练生成模型 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib29" title="" class="ltx_ref">29</a>, <a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite>。这些方法使用的准则对深度生成模型来说难以计算，即使近似也很困难，因为其中涉及概率的比值，而比值无法用给概率提供下界的变分近似来逼近。噪声对比估计 (NCE) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite> 训练生成模型的方式是学习一组权重，使模型能够把数据和一个固定的噪声分布区分开。用一个已训练好的模型作为噪声分布，可以训练出一系列质量逐步提高的模型。这可以看作一种非正式的竞争机制，精神上类似于对抗网络博弈中的正式竞争。NCE 的主要局限是，它的「判别器」由噪声分布和模型分布的概率密度之比定义，因此要能计算这两个密度，并通过它们做反向传播。</p>
     
   </div>
 <div class="blk">
     
-    <p class="pp">Finally, some techniques do not involve defining a probability distribution explicitly,
-but rather train a generative machine to draw samples from the desired distribution.
-This approach has the advantage that such machines can be designed to be trained by
-back-propagation. Prominent recent work in this area includes the generative stochastic network
-(GSN) framework <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>, which extends generalized denoising
-auto-encoders <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite>: both can be seen as defining a
-parameterized Markov chain, i.e., one learns the parameters of a machine that
-performs one step of a generative Markov chain.
-Compared to GSNs, the adversarial nets framework does not require a Markov chain for
-sampling. Because adversarial nets do not require feedback loops during generation,
-they are better able to leverage piecewise linear
-units <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>, <a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite>,
-which improve the performance of backpropagation but have problems with unbounded activation when used ina feedback loop.
-More recent examples of training a generative machine by back-propagating into it
-include recent work on auto-encoding variational Bayes <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib20" title="" class="ltx_ref">20</a>]</cite>
-and stochastic backpropagation <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib24" title="" class="ltx_ref">24</a>]</cite>.</p>
-    <p class="pp zh" lang="zh-Hans">最后，有些技术不显式定义概率分布，而是训练一个生成机器，从目标分布中采样。这种方法的优点是这类机器可以设计成用反向传播训练。这方面近期的突出工作包括生成随机网络 (GSN) 框架 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>，它扩展了广义去噪自编码器 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite>：两者都可以看作定义一条参数化的马尔可夫链，也就是学习一个机器的参数，由它执行生成式马尔可夫链的一步。与 GSN 相比，对抗网络框架采样时不需要马尔可夫链。由于对抗网络生成时不需要反馈回路，它们能更好地利用分段线性单元 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>, <a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite>。这类单元能改善反向传播的表现，但用在反馈回路中时存在激活值无界的问题。通过反向传播训练生成机器的更多近期例子，还有自编码变分贝叶斯 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib20" title="" class="ltx_ref">20</a>]</cite> 和随机反向传播 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib24" title="" class="ltx_ref">24</a>]</cite>。</p>
+    <p class="pp">Some previous work has used the general concept of having two neural networks compete. The most relevant work is predictability minimization <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib26" title="" class="ltx_ref">26</a>]</cite>. In predictability minimization, each hidden unit in a neural network is trained to be different from the output of a second network, which predicts the value of that hidden unit given the value of all of the other hidden units. This work differs from predictability minimization in three important ways: 1) in this work, the competition between the networks is the sole training criterion, and is sufficient on its own to train the network. Predictability minimization is only a regularizer that encourages the hidden units of a neural network to be statistically independent while they accomplish some other task; it is not a primary training criterion. 2) The nature of the competition is different. In predictability minimization, two networks’ outputs are compared, with one network trying to make the outputs similar and the other trying to make the outputs different. The output in question is a single scalar. In GANs, one network produces a rich, high dimensional vector that is used as the input to another network, and attempts to choose an input that the other network does not know how to process. 3) The specification of the learning process is different. Predictability minimization is described as an optimization problem with an objective function to be minimized, and learning approaches the minimum of the objective function. GANs are based on a minimax game rather than an optimization problem, and have a value function that one agent seeks to maximize and the other seeks to minimize. The game terminates at a saddle point that is a minimum with respect to one player’s strategy and a maximum with respect to the other player’s strategy.</p>
+    <p class="pp zh" lang="zh-Hans">此前也有工作使用了让两个神经网络竞争的一般概念，其中最相关的是 Predictability Minimization (PM) <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib26" title="" class="ltx_ref">26</a>]</cite>。在 PM 中，神经网络的每个隐藏单元被训练得与第二个网络的输出不同，第二个网络根据所有其他隐藏单元的值预测这个隐藏单元的值。本文与 PM 有三点重要区别：1) 本文中网络之间的竞争是唯一的训练准则，仅靠它就足以训练网络。PM 只是一个正则项，鼓励神经网络的隐藏单元在完成其他任务的同时保持统计独立，它不是主要的训练准则。2) 竞争的性质不同。PM 比较两个网络的输出，一个网络试图让输出相似，另一个试图让输出不同，比较的输出是单个标量。GAN 中，一个网络生成丰富的高维向量作为另一个网络的输入，并试图选择另一个网络不知道如何处理的输入。3) 学习过程的设定不同。PM 被描述为一个优化问题，有一个要最小化的目标函数，学习趋近这个目标函数的最小值。GAN 基于极小极大博弈而不是优化问题，有一个价值函数，一方试图最大化，另一方试图最小化。博弈终止于一个鞍点，这个点对一方的策略是最小值，对另一方的策略是最大值。</p>
+    
+  </div>
+<div class="blk">
+    
+    <p class="pp">Generative adversarial networks has been sometimes confused with the related concept of “adversarial examples” <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib28" title="" class="ltx_ref">28</a>]</cite>. Adversarial examples are examples found by using gradient-based optimization directly on the input to a classification network, in order to find examples that are similar to the data yet misclassified. This is different from the present work because adversarial examples are not a mechanism for training a generative model. Instead, adversarial examples are primarily an analysis tool for showing that neural networks behave in intriguing ways, often confidently classifying two images differently with high confidence even though the difference between them is imperceptible to a human observer. The existence of such adversarial examples does suggest that generative adversarial network training could be inefficient, because they show that it is possible to make modern discriminative networks confidently recognize a class without emulating any of the human-perceptible attributes of that class.</p>
+    <p class="pp zh" lang="zh-Hans">生成对抗网络有时会和相关概念「对抗样本 (Adversarial Examples)」<cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib28" title="" class="ltx_ref">28</a>]</cite> 混淆。对抗样本是直接对分类网络的输入做基于梯度的优化而找到的样本，它们与数据相似却被错误分类。这和本文不同，因为对抗样本不是训练生成模型的机制。它主要是一种分析工具，用来显示神经网络的奇特行为：两张人眼无法察觉差异的图像，常常被高置信度地分到不同类别。对抗样本的存在确实提示生成对抗网络的训练可能效率不高，因为它们说明，可以让现代判别网络高置信度地识别某个类别，而不需要具备该类别任何人眼可感知的属性。</p>
     
   </div>
 <span class="lxa" id="S3"></span><h2 class="ph" id="s3"><span class="hn">3</span>Adversarial nets<span class="hzh">对抗网络</span></h2>
@@ -683,8 +654,8 @@ represented by a multilayer perceptron with parameters <math id="S3.p1.m6" class
 multilayer perceptron <math id="S3.p1.m7" class="ltx_Math" alttext="D(\bm{x};\theta_{d})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo>,</mo><msub><mi>θ</mi><mi>d</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math> that outputs a single scalar. <math id="S3.p1.m8" class="ltx_Math" alttext="D(\bm{x})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> represents
 the probability that <math id="S3.p1.m9" class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> came from the data rather than <math id="S3.p1.m10" class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math>. We train <math id="S3.p1.m11" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> to maximize the
 probability of assigning the correct label to both training examples and samples from <math id="S3.p1.m12" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math>.
-We simultaneously train <math id="S3.p1.m13" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> to minimize <math id="S3.p1.m14" class="ltx_Math" alttext="\log(1-D(G(\bm{z})))" display="inline" intent=":literal"><semantics><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></semantics></math>:</p>
-    <p class="pp zh" lang="zh-Hans">当两个模型都是多层感知机时，对抗建模框架最容易应用。为了学习生成器在数据 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 上的分布 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math>，我们为输入噪声变量定义先验 <math class="ltx_Math" alttext="p_{\bm{z}}(\bm{z})" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>𝒛</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，再把到数据空间的映射表示为 <math class="ltx_Math" alttext="G(\bm{z};\theta_{g})" display="inline" intent=":literal"><semantics><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo>,</mo><msub><mi>θ</mi><mi>g</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，其中 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 是一个可微函数，由参数为 <math class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math> 的多层感知机表示。我们还定义第二个多层感知机 <math class="ltx_Math" alttext="D(\bm{x};\theta_{d})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo>,</mo><msub><mi>θ</mi><mi>d</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，它输出一个标量。<math class="ltx_Math" alttext="D(\bm{x})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 表示 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 来自数据而非 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 的概率。我们训练 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math>，使它对训练样本和来自 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 的样本都给出正确标签的概率最大；同时训练 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math>，使 <math class="ltx_Math" alttext="\log(1-D(G(\bm{z})))" display="inline" intent=":literal"><semantics><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 最小：</p>
+We simultaneously train <math id="S3.p1.m13" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> to minimize <math id="S3.p1.m14" class="ltx_Math" alttext="\log(1-D(G(\bm{z})))" display="inline" intent=":literal"><semantics><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></semantics></math>.</p>
+    <p class="pp zh" lang="zh-Hans">当两个模型都是多层感知机时，对抗建模框架最容易应用。为了学习生成器在数据 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 上的分布 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math>，我们为输入噪声变量定义先验 <math class="ltx_Math" alttext="p_{\bm{z}}(\bm{z})" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>𝒛</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，再把到数据空间的映射表示为 <math class="ltx_Math" alttext="G(\bm{z};\theta_{g})" display="inline" intent=":literal"><semantics><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo>,</mo><msub><mi>θ</mi><mi>g</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，其中 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 是一个可微函数，由参数为 <math class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math> 的多层感知机表示。我们还定义第二个多层感知机 <math class="ltx_Math" alttext="D(\bm{x};\theta_{d})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo>,</mo><msub><mi>θ</mi><mi>d</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，它输出一个标量。<math class="ltx_Math" alttext="D(\bm{x})" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒙</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 表示 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 来自数据而非 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 的概率。我们训练 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math>，使它对训练样本和来自 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 的样本都给出正确标签的概率最大；同时训练 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math>，使 <math class="ltx_Math" alttext="\log(1-D(G(\bm{z})))" display="inline" intent=":literal"><semantics><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 最小。</p>
     
   </div>
 <div class="blk">
@@ -712,12 +683,9 @@ In practice, we must implement the game using an iterative, numerical approach. 
 inner loop of training is computationally prohibitive,
 and on finite datasets would result in overfitting. Instead, we alternate between <math id="S3.p4.m4" class="ltx_Math" alttext="k" display="inline" intent=":literal"><semantics><mi>k</mi></semantics></math> steps
 of optimizing <math id="S3.p4.m5" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> and one step of optimizing <math id="S3.p4.m6" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math>. This results in <math id="S3.p4.m7" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> being maintained
-near its optimal solution, so long as <math id="S3.p4.m8" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> changes slowly enough. This strategy is analogous
-to the way that SML/PCD <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib31" title="" class="ltx_ref">31</a>, <a href="#bib.bib29" title="" class="ltx_ref">29</a>]</cite> training maintains samples from a Markov chain from one
-learning step to the next in order to avoid burning in a Markov chain as part of the inner loop
-of learning. The procedure is formally presented
+near its optimal solution, so long as <math id="S3.p4.m8" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> changes slowly enough. The procedure is formally presented
 in Algorithm <a href="#alg1" title="Algorithm 1 ‣ 3 Adversarial nets ‣ Generative Adversarial Nets" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>.</p>
-    <p class="pp zh" lang="zh-Hans">下一节给出对抗网络的理论分析，主要说明在 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 和 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 容量足够（也就是非参数极限）时，这个训练准则可以恢复数据生成分布。<a href="#S3.F1" title="Figure 1 ‣ 3 Adversarial nets ‣ Generative Adversarial Nets" class="ltx_ref">图 1</a> 对这种方法给出了一个不那么形式化、更便于理解的解释。实践中必须用迭代的数值方法实现这个博弈。在训练的内层循环中把 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 优化到收敛，计算上不可行，在有限数据集上还会过拟合。所以我们交替进行 <math class="ltx_Math" alttext="k" display="inline" intent=":literal"><semantics><mi>k</mi></semantics></math> 步 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 的优化和一步 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 的优化。只要 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 变化得足够慢，<math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 就能保持在最优解附近。这个策略类似于 SML/PCD <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib31" title="" class="ltx_ref">31</a>, <a href="#bib.bib29" title="" class="ltx_ref">29</a>]</cite> 训练：在学习步之间保留马尔可夫链的样本，避免把马尔可夫链的预烧放进内层循环。完整过程见<a href="#alg1" title="Algorithm 1 ‣ 3 Adversarial nets ‣ Generative Adversarial Nets" class="ltx_ref">算法 1</a>。</p>
+    <p class="pp zh" lang="zh-Hans">下一节给出对抗网络的理论分析，主要说明在 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 和 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 容量足够（也就是非参数极限）时，这个训练准则可以恢复数据生成分布。<a href="#S3.F1" title="Figure 1 ‣ 3 Adversarial nets ‣ Generative Adversarial Nets" class="ltx_ref">图 1</a> 对这种方法给出了一个不那么形式化、更便于理解的解释。实践中必须用迭代的数值方法实现这个博弈。在训练的内层循环中把 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 优化到收敛，计算上不可行，在有限数据集上还会过拟合。所以我们交替进行 <math class="ltx_Math" alttext="k" display="inline" intent=":literal"><semantics><mi>k</mi></semantics></math> 步 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 的优化和一步 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 的优化。只要 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 变化得足够慢，<math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> 就能保持在最优解附近。完整过程见<a href="#alg1" title="Algorithm 1 ‣ 3 Adversarial nets ‣ Generative Adversarial Nets" class="ltx_ref">算法 1</a>。</p>
     
   </div>
 <div class="blk">
@@ -973,11 +941,10 @@ At that point, <math id="Thmtheorem1.p1.m3" class="ltx_Math" alttext="C(G)" disp
 </table></div>
 <div class="blk">
     
-    <p class="pp"><span id="S4.SS1.p10.1.1" class="ltx_text">Since the Jensen–Shannon divergence between two distributions is always non-negative and zero only
-when they are equal, we have shown that <math id="S4.SS1.p10.m1" class="ltx_Math" alttext="C^{*}=-\log(4)" display="inline" intent=":literal"><semantics><mrow><msup><mi>C</mi><mo>∗</mo></msup><mo>=</mo><mrow><mo rspace="0.167em">−</mo><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></semantics></math> is the global minimum of <math id="S4.SS1.p10.m2" class="ltx_Math" alttext="C(G)" display="inline" intent=":literal"><semantics><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> and
-that the only solution is <math id="S4.SS1.p10.m3" class="ltx_Math" alttext="p_{g}=p_{\text{data}}" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>g</mi></msub><mo>=</mo><msub><mi>p</mi><mtext>data</mtext></msub></mrow></semantics></math>, i.e., the generative model perfectly replicating the data generating process.
+    <p class="pp"><span id="S4.SS1.p10.1.1" class="ltx_text">Since the Jensen–Shannon divergence between two distributions is always non-negative, and zero iff they are equal, we have shown that <math id="S4.SS1.p10.m1" class="ltx_Math" alttext="C^{*}=-\log(4)" display="inline" intent=":literal"><semantics><mrow><msup><mi>C</mi><mo>∗</mo></msup><mo>=</mo><mrow><mo rspace="0.167em">−</mo><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></semantics></math> is the global minimum of <math id="S4.SS1.p10.m2" class="ltx_Math" alttext="C(G)" display="inline" intent=":literal"><semantics><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> and
+that the only solution is <math id="S4.SS1.p10.m3" class="ltx_Math" alttext="p_{g}=p_{\text{data}}" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>g</mi></msub><mo>=</mo><msub><mi>p</mi><mtext>data</mtext></msub></mrow></semantics></math>, i.e., the generative model perfectly replicating the data distribution.
 ∎</span></p>
-    <p class="pp zh" lang="zh-Hans">两个分布之间的 Jensen–Shannon 散度总是非负，只有两者相等时才为零。这就证明了 <math class="ltx_Math" alttext="C^{*}=-\log(4)" display="inline" intent=":literal"><semantics><mrow><msup><mi>C</mi><mo>∗</mo></msup><mo>=</mo><mrow><mo rspace="0.167em">−</mo><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></semantics></math> 是 <math class="ltx_Math" alttext="C(G)" display="inline" intent=":literal"><semantics><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 的全局最小值，唯一解是 <math class="ltx_Math" alttext="p_{g}=p_{\text{data}}" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>g</mi></msub><mo>=</mo><msub><mi>p</mi><mtext>data</mtext></msub></mrow></semantics></math>，也就是生成模型完美复现了数据生成过程。∎</p>
+    <p class="pp zh" lang="zh-Hans">两个分布之间的 Jensen–Shannon 散度总是非负，当且仅当两者相等时为零。这就证明了 <math class="ltx_Math" alttext="C^{*}=-\log(4)" display="inline" intent=":literal"><semantics><mrow><msup><mi>C</mi><mo>∗</mo></msup><mo>=</mo><mrow><mo rspace="0.167em">−</mo><mrow><mi>log</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></semantics></math> 是 <math class="ltx_Math" alttext="C(G)" display="inline" intent=":literal"><semantics><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 的全局最小值，唯一解是 <math class="ltx_Math" alttext="p_{g}=p_{\text{data}}" display="inline" intent=":literal"><semantics><mrow><msub><mi>p</mi><mi>g</mi></msub><mo>=</mo><msub><mi>p</mi><mtext>data</mtext></msub></mrow></semantics></math>，也就是生成模型完美复现了数据分布。∎</p>
     
   </div>
 <span class="lxa" id="S4.SS2"></span><h3 class="ph" id="s4-2"><span class="hn">4.2</span>Convergence of Algorithm 1<span class="hzh">算法 1 的收敛性</span></h3>
@@ -1010,26 +977,24 @@ that the only solution is <math id="S4.SS1.p10.m3" class="ltx_Math" alttext="p_{
 <div class="blk">
     
     <p class="pp">In practice, adversarial nets represent a limited family of <math id="S4.SS2.p2.m1" class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> distributions via the function <math id="S4.SS2.p2.m2" class="ltx_Math" alttext="G(\bm{z};\theta_{g})" display="inline" intent=":literal"><semantics><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo>,</mo><msub><mi>θ</mi><mi>g</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>,
-and we optimize <math id="S4.SS2.p2.m3" class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math> rather than <math id="S4.SS2.p2.m4" class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> itself. Using a multilayer perceptron to define <math id="S4.SS2.p2.m5" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> introduces multiple
-critical points in parameter space.
-However, the excellent performance of multilayer
+and we optimize <math id="S4.SS2.p2.m3" class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math> rather than <math id="S4.SS2.p2.m4" class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> itself, so the proofs do not apply. However, the excellent performance of multilayer
 perceptrons in practice suggests that they are a reasonable model to use despite their lack of theoretical guarantees.</p>
-    <p class="pp zh" lang="zh-Hans">实践中，对抗网络通过函数 <math class="ltx_Math" alttext="G(\bm{z};\theta_{g})" display="inline" intent=":literal"><semantics><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo>,</mo><msub><mi>θ</mi><mi>g</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 表示有限的一族 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 分布，我们优化的是 <math class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math>，而不是 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 本身。用多层感知机定义 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 会在参数空间中引入多个临界点。不过，多层感知机在实践中的出色表现说明，尽管缺乏理论保证，它们仍是合理的选择。</p>
+    <p class="pp zh" lang="zh-Hans">实践中，对抗网络通过函数 <math class="ltx_Math" alttext="G(\bm{z};\theta_{g})" display="inline" intent=":literal"><semantics><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>𝒛</mi><mo>,</mo><msub><mi>θ</mi><mi>g</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math> 表示有限的一族 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 分布，我们优化的是 <math class="ltx_Math" alttext="\theta_{g}" display="inline" intent=":literal"><semantics><msub><mi>θ</mi><mi>g</mi></msub></semantics></math>，而不是 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 本身，所以上面的证明不适用。不过，多层感知机在实践中的出色表现说明，尽管缺乏理论保证，它们仍是合理的选择。</p>
     
   </div>
 <span class="lxa" id="S5"></span><h2 class="ph" id="s5"><span class="hn">5</span>Experiments<span class="hzh">实验</span></h2>
 <div class="blk">
     
-    <p class="pp">We trained adversarial nets an a range of datasets including MNIST<cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite>, the
-Toronto Face Database (TFD) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib28" title="" class="ltx_ref">28</a>]</cite>, and CIFAR-10 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib21" title="" class="ltx_ref">21</a>]</cite>.
+    <p class="pp">We trained adversarial nets an a range of datasets including MNIST<cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib21" title="" class="ltx_ref">21</a>]</cite>, the
+Toronto Face Database (TFD) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib27" title="" class="ltx_ref">27</a>]</cite>, and CIFAR-10 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>]</cite>.
 The generator nets used a mixture of rectifier linear
-activations <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite> and sigmoid
-activations, while the discriminator net used maxout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite> activations.
-Dropout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>]</cite> was applied in training the
+activations <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>, <a href="#bib.bib8" title="" class="ltx_ref">8</a>]</cite> and sigmoid
+activations, while the discriminator net used maxout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite> activations.
+Dropout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite> was applied in training the
 discriminator net. While our theoretical framework permits the use of dropout and other noise
 at intermediate layers of the generator, we used noise as the input to only the bottommost layer
 of the generator network.</p>
-    <p class="pp zh" lang="zh-Hans">我们在一系列数据集上训练了对抗网络，包括 MNIST <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib23" title="" class="ltx_ref">23</a>]</cite>、Toronto Face Database (TFD) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib28" title="" class="ltx_ref">28</a>]</cite> 和 CIFAR-10 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib21" title="" class="ltx_ref">21</a>]</cite>。生成器网络混合使用整流线性激活 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite> 和 sigmoid 激活，判别器网络使用 maxout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite> 激活。训练判别器网络时使用了 Dropout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>]</cite>。虽然理论框架允许在生成器的中间层使用 Dropout 和其他噪声，我们只把噪声输入生成器网络的最底层。</p>
+    <p class="pp zh" lang="zh-Hans">我们在一系列数据集上训练了对抗网络，包括 MNIST <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib21" title="" class="ltx_ref">21</a>]</cite>、Toronto Face Database (TFD) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib27" title="" class="ltx_ref">27</a>]</cite> 和 CIFAR-10 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib19" title="" class="ltx_ref">19</a>]</cite>。生成器网络混合使用整流线性激活 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="" class="ltx_ref">17</a>, <a href="#bib.bib8" title="" class="ltx_ref">8</a>]</cite> 和 sigmoid 激活，判别器网络使用 maxout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite> 激活。训练判别器网络时使用了 Dropout <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite>。虽然理论框架允许在生成器的中间层使用 Dropout 和其他噪声，我们只把噪声输入生成器网络的最底层。</p>
     
   </div>
 <div class="blk">
@@ -1037,15 +1002,15 @@ of the generator network.</p>
     <p class="pp">We estimate probability of the test set data under <math id="S5.p2.m1" class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> by fitting a Gaussian Parzen window to the samples
 generated with <math id="S5.p2.m2" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> and reporting the log-likelihood under this distribution.
 The <math id="S5.p2.m3" class="ltx_Math" alttext="\sigma" display="inline" intent=":literal"><semantics><mi>σ</mi></semantics></math> parameter of the Gaussians
-was obtained by cross validation on the validation set. This procedure was introduced in <cite class="ltx_cite ltx_citemacro_citet"><a href="#bib.bib8" title="" class="ltx_ref">Breuleux et al. [8]</a></cite>
+was obtained by cross validation on the validation set. This procedure was introduced in <cite class="ltx_cite ltx_citemacro_citet"><a href="#bib.bib7" title="" class="ltx_ref">Breuleux et al. [7]</a></cite>
 and used for various generative models for which the exact likelihood is
 not
-tractable <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib25" title="" class="ltx_ref">25</a>, <a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>. Results
+tractable <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib24" title="" class="ltx_ref">24</a>, <a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite>. Results
 are reported in Table <a href="#S5.T1" title="Table 1 ‣ 5 Experiments ‣ Generative Adversarial Nets" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>. This method of estimating the likelihood has somewhat high variance
 and does not perform well in high dimensional spaces but it is the best method available to our knowledge.
 Advances in generative models that can sample but not estimate likelihood directly motivate further research
 into how to evaluate such models.</p>
-    <p class="pp zh" lang="zh-Hans">我们对 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 生成的样本拟合高斯 Parzen 窗，报告这个分布下的对数似然，以此估计测试集数据在 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 下的概率。高斯的 <math class="ltx_Math" alttext="\sigma" display="inline" intent=":literal"><semantics><mi>σ</mi></semantics></math> 参数通过验证集上的交叉验证得到。这个过程由 <cite class="ltx_cite ltx_citemacro_citet"><a href="#bib.bib8" title="" class="ltx_ref">Breuleux et al. [8]</a></cite> 提出，并已用于多种精确似然难以计算的生成模型 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib25" title="" class="ltx_ref">25</a>, <a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>。结果见<a href="#S5.T1" title="Table 1 ‣ 5 Experiments ‣ Generative Adversarial Nets" class="ltx_ref">表 1</a>。这种估计似然的方法方差较大，在高维空间中表现不好，但据我们所知这是现有的最好方法。能采样但不能直接估计似然的生成模型取得的进展，也推动了对如何评估这类模型的进一步研究。</p>
+    <p class="pp zh" lang="zh-Hans">我们对 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 生成的样本拟合高斯 Parzen 窗，报告这个分布下的对数似然，以此估计测试集数据在 <math class="ltx_Math" alttext="p_{g}" display="inline" intent=":literal"><semantics><msub><mi>p</mi><mi>g</mi></msub></semantics></math> 下的概率。高斯的 <math class="ltx_Math" alttext="\sigma" display="inline" intent=":literal"><semantics><mi>σ</mi></semantics></math> 参数通过验证集上的交叉验证得到。这个过程由 <cite class="ltx_cite ltx_citemacro_citet"><a href="#bib.bib7" title="" class="ltx_ref">Breuleux et al. [7]</a></cite> 提出，并已用于多种精确似然难以计算的生成模型 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib24" title="" class="ltx_ref">24</a>, <a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite>。结果见<a href="#S5.T1" title="Table 1 ‣ 5 Experiments ‣ Generative Adversarial Nets" class="ltx_ref">表 1</a>。这种估计似然的方法方差较大，在高维空间中表现不好，但据我们所知这是现有的最好方法。能采样但不能直接估计似然的生成模型取得的进展，也推动了对如何评估这类模型的进一步研究。</p>
     
   </div>
 <div class="floatbox"><figure id="S5.T1" class="ltx_table">
@@ -1066,7 +1031,7 @@ into how to evaluate such models.</p>
 <td id="S5.T1.1.3.2" class="ltx_td ltx_align_center ltx_border_r"><math id="S5.T1.m3" class="ltx_Math" alttext="121\pm 1.6" display="inline" intent=":literal"><semantics><mrow><mn>121</mn><mo>±</mo><mn>1.6</mn></mrow></semantics></math></td>
 <td id="S5.T1.1.3.3" class="ltx_td ltx_align_center"><math id="S5.T1.m4" class="ltx_Math" alttext="\mathbf{2110\pm 50}" display="inline" intent=":literal"><semantics><mrow><mn>𝟐𝟏𝟏𝟎</mn><mo>±</mo><mn>𝟓𝟎</mn></mrow></semantics></math></td></tr>
 <tr id="S5.T1.1.4" class="ltx_tr">
-<th id="S5.T1.1.4.1" class="ltx_td ltx_align_center ltx_th ltx_th_row ltx_border_r">Deep GSN <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib6" title="" class="ltx_ref">6</a>]</cite></th>
+<th id="S5.T1.1.4.1" class="ltx_td ltx_align_center ltx_th ltx_th_row ltx_border_r">Deep GSN <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite></th>
 <td id="S5.T1.1.4.2" class="ltx_td ltx_align_center ltx_border_r"><math id="S5.T1.m5" class="ltx_Math" alttext="214\pm 1.1" display="inline" intent=":literal"><semantics><mrow><mn>214</mn><mo>±</mo><mn>1.1</mn></mrow></semantics></math></td>
 <td id="S5.T1.1.4.3" class="ltx_td ltx_align_center"><math id="S5.T1.m6" class="ltx_Math" alttext="1890\pm 29" display="inline" intent=":literal"><semantics><mrow><mn>1890</mn><mo>±</mo><mn>29</mn></mrow></semantics></math></td></tr>
 <tr id="S5.T1.1.5" class="ltx_tr">
@@ -1225,7 +1190,7 @@ coordinates in <math id="S5.F3.m2" class="ltx_Math" alttext="\bm{z}" display="in
 <th id="S5.T2.1.6.1" class="ltx_td ltx_align_center ltx_th ltx_th_row ltx_border_r ltx_border_t">Model design</th>
 <td id="S5.T2.1.6.2" class="ltx_td ltx_align_left ltx_align_middle ltx_border_r ltx_border_t">
 <span id="S5.T2.1.6.2.1" class="ltx_inline-block ltx_align_middle" style="width:72.3pt;">
-<span id="S5.T2.1.6.2.1.1" class="ltx_p ltx_align_left">Nearly all models incur extreme difficulty</span>
+<span id="S5.T2.1.6.2.1.1" class="ltx_p ltx_align_left">Models need to be designed to work with the desired inference scheme — some inference schemes support similar model families as GANs</span>
 </span></td>
 <td id="S5.T2.1.6.3" class="ltx_td ltx_align_left ltx_align_middle ltx_border_r ltx_border_t">
 <span id="S5.T2.1.6.3.1" class="ltx_inline-block ltx_align_middle" style="width:72.3pt;">
@@ -1306,8 +1271,8 @@ net has finished training.</p>
     <p class="pp">One can approximately model all conditionals <math id="S7.I1.i3.p1.m1" class="ltx_Math" alttext="p(\bm{x}_{S}\mid\bm{x}_{\not S})" display="inline" intent=":literal"><semantics><mrow><mi>p</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝒙</mi><mi>S</mi></msub><mo fence="true" lspace="0em" rspace="0em">∣</mo><msub><mi>𝒙</mi><mi class="ltx_mathvariant_italic" mathvariant="italic">S̸</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math> where <math id="S7.I1.i3.p1.m2" class="ltx_Math" alttext="S" display="inline" intent=":literal"><semantics><mi>S</mi></semantics></math> is a subset of
 the indices of <math id="S7.I1.i3.p1.m3" class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math>
 by training a family of conditional models that share parameters. Essentially, one can use adversarial nets to implement
-a stochastic extension of the deterministic MP-DBM <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib11" title="" class="ltx_ref">11</a>]</cite>.</p>
-    <p class="pp zh" lang="zh-Hans">可以训练一族共享参数的条件模型，近似地建模所有条件分布 <math class="ltx_Math" alttext="p(\bm{x}_{S}\mid\bm{x}_{\not S})" display="inline" intent=":literal"><semantics><mrow><mi>p</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝒙</mi><mi>S</mi></msub><mo fence="true" lspace="0em" rspace="0em">∣</mo><msub><mi>𝒙</mi><mi class="ltx_mathvariant_italic" mathvariant="italic">S̸</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，其中 <math class="ltx_Math" alttext="S" display="inline" intent=":literal"><semantics><mi>S</mi></semantics></math> 是 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 下标的子集。本质上，可以用对抗网络实现确定性 MP-DBM <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib11" title="" class="ltx_ref">11</a>]</cite> 的随机扩展。</p>
+a stochastic extension of the deterministic MP-DBM <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite>.</p>
+    <p class="pp zh" lang="zh-Hans">可以训练一族共享参数的条件模型，近似地建模所有条件分布 <math class="ltx_Math" alttext="p(\bm{x}_{S}\mid\bm{x}_{\not S})" display="inline" intent=":literal"><semantics><mrow><mi>p</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝒙</mi><mi>S</mi></msub><mo fence="true" lspace="0em" rspace="0em">∣</mo><msub><mi>𝒙</mi><mi class="ltx_mathvariant_italic" mathvariant="italic">S̸</mi></msub><mo stretchy="false">)</mo></mrow></mrow></semantics></math>，其中 <math class="ltx_Math" alttext="S" display="inline" intent=":literal"><semantics><mi>S</mi></semantics></math> 是 <math class="ltx_Math" alttext="\bm{x}" display="inline" intent=":literal"><semantics><mi>𝒙</mi></semantics></math> 下标的子集。本质上，可以用对抗网络实现确定性 MP-DBM <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite> 的随机扩展。</p>
     
   </div>
 <div class="blk li">
@@ -1319,7 +1284,7 @@ of classifiers when limited labeled data is available.</p>
   </div>
 <div class="blk li">
     
-    <p class="pp"><span id="S7.I1.i5.p1.1.1" class="ltx_text ltx_font_italic">Efficiency improvements:</span> training could be accelerated greatly by divising better methods for
+    <p class="pp"><span id="S7.I1.i5.p1.1.1" class="ltx_text ltx_font_italic">Efficiency improvements:</span> training could be accelerated greatly by devising better methods for
 coordinating <math id="S7.I1.i5.p1.m1" class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> and <math id="S7.I1.i5.p1.m2" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math> or determining better distributions to sample <math id="S7.I1.i5.p1.m3" class="ltx_Math" alttext="\mathbf{z}" display="inline" intent=":literal"><semantics><mi>𝐳</mi></semantics></math> from during training.</p>
     <p class="pp zh" lang="zh-Hans">提高效率：设计更好的方法来协调 <math class="ltx_Math" alttext="G" display="inline" intent=":literal"><semantics><mi>G</mi></semantics></math> 和 <math class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi></semantics></math>，或者确定训练时采样 <math class="ltx_Math" alttext="\mathbf{z}" display="inline" intent=":literal"><semantics><mi>𝐳</mi></semantics></math> 的更好分布，可以大大加快训练。</p>
     
@@ -1337,352 +1302,19 @@ directions could prove useful.</p>
     <p class="pp">We would like to acknowledge Patrice Marcotte, Olivier Delalleau, Kyunghyun Cho, Guillaume Alain and Jason Yosinski for helpful discussions.
 Yann Dauphin shared his Parzen window evaluation code with us.
 We would like to thank the developers of
-Pylearn2 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib12" title="" class="ltx_ref">12</a>]</cite>
+Pylearn2 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib11" title="" class="ltx_ref">11</a>]</cite>
 and
-Theano <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib7" title="" class="ltx_ref">7</a>, <a href="#bib.bib1" title="" class="ltx_ref">1</a>]</cite>, particularly
+Theano <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib6" title="" class="ltx_ref">6</a>, <a href="#bib.bib1" title="" class="ltx_ref">1</a>]</cite>, particularly
 Frédéric Bastien who rushed a Theano feature specifically to benefit this project.
 Arnaud Bergeron provided much-needed support with <span id="S7.SS0.SSSx1.p1.1.1" class="ltx_text ltx_LaTeX_logo" style="letter-spacing:-0.2em; margin-right:0.1em;">L<span id="S7.SS0.SSSx1.p1.1.1.1" class="ltx_text" style="position:relative; bottom:0.4ex;font-variant:small-caps;;">a</span>T<span id="S7.SS0.SSSx1.p1.1.1.2" class="ltx_text" style="position:relative; bottom:-0.2ex;font-variant:small-caps;font-size:120%;">e</span>X</span> typesetting.
 We would also like to thank CIFAR, and Canada Research Chairs for funding, and Compute Canada, and Calcul Québec
 for providing computational resources. Ian Goodfellow is supported by the 2013 Google Fellowship in Deep
 Learning. Finally, we would like to thank Les Trois Brasseurs for stimulating our creativity.</p>
-    <p class="pp zh" lang="zh-Hans">感谢 Patrice Marcotte、Olivier Delalleau、Kyunghyun Cho、Guillaume Alain 和 Jason Yosinski 的有益讨论。Yann Dauphin 向我们分享了他的 Parzen 窗评估代码。感谢 Pylearn2 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib12" title="" class="ltx_ref">12</a>]</cite> 和 Theano <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib7" title="" class="ltx_ref">7</a>, <a href="#bib.bib1" title="" class="ltx_ref">1</a>]</cite> 的开发者，特别是 Frédéric Bastien，他为这个项目赶着实现了一项 Theano 功能。Arnaud Bergeron 为 LaTeX 排版提供了不可或缺的支持。还要感谢 CIFAR、加拿大国家研究主席计划提供的资助，以及 Compute Canada 和 Calcul Québec 提供的计算资源。Ian Goodfellow 受 2013 年 Google 深度学习奖学金资助。最后，感谢 Les Trois Brasseurs 激发了我们的创造力。</p>
+    <p class="pp zh" lang="zh-Hans">感谢 Patrice Marcotte、Olivier Delalleau、Kyunghyun Cho、Guillaume Alain 和 Jason Yosinski 的有益讨论。Yann Dauphin 向我们分享了他的 Parzen 窗评估代码。感谢 Pylearn2 <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib11" title="" class="ltx_ref">11</a>]</cite> 和 Theano <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib6" title="" class="ltx_ref">6</a>, <a href="#bib.bib1" title="" class="ltx_ref">1</a>]</cite> 的开发者，特别是 Frédéric Bastien，他为这个项目赶着实现了一项 Theano 功能。Arnaud Bergeron 为 LaTeX 排版提供了不可或缺的支持。还要感谢 CIFAR、加拿大国家研究主席计划提供的资助，以及 Compute Canada 和 Calcul Québec 提供的计算资源。Ian Goodfellow 受 2013 年 Google 深度学习奖学金资助。最后，感谢 Les Trois Brasseurs 激发了我们的创造力。</p>
     
   </div>
-<details class="refs" id="sreferences"><summary>References<span>31 条</span></summary>
-    <ol><li id="bib.bib1"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[1]</span>
-<span class="ltx_bibblock">
-Bastien, F., Lamblin, P., Pascanu, R., Bergstra, J., Goodfellow, I. J.,
-Bergeron, A., Bouchard, N., and Bengio, Y. (2012).
-
-</span>
-<span class="ltx_bibblock">Theano: new features and speed improvements.
-
-</span>
-<span class="ltx_bibblock">Deep Learning and Unsupervised Feature Learning NIPS 2012 Workshop.
-
-</span><a class="rl" href="https://arxiv.org/abs/1211.5590" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§4.1</i>For any ( a , b ) ∈ ℝ 2 ∖ { 0 , 0 } , the function y → a log ⁡ ( y ) + b log ⁡ ( 1 − y ) achieves its maximum in [0,1] at a a + b .</p><p><i>§7</i>We would like to thank the developers of Pylearn2 [12] and Theano [7,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib2"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[2]</span>
-<span class="ltx_bibblock">
-Bengio, Y. (2009).
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib2.1" class="ltx_text ltx_font_italic">Learning deep architectures for AI</span>.
-
-</span>
-<span class="ltx_bibblock">Now Publishers.
-
-</span><a class="rl" href="https://doi.org/10.1561/2200000006" target="_blank" rel="noreferrer">Now Publishers ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>The promise of deep learning is to discover rich, hierarchical models [2] that represent probability distributions over the kinds of data encountered in artificial intelligence applications, such as natural images, audio waveforms containing speech, and symbols in natural language corpora.</p></div></details></li><li id="bib.bib3"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[3]</span>
-<span class="ltx_bibblock">
-Bengio, Y., Mesnil, G., Dauphin, Y., and Rifai, S. (2013a).
-
-</span>
-<span class="ltx_bibblock">Better mixing via deep representations.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib3.1" class="ltx_text ltx_font_italic">ICML’13</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1207.4404" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Mixing poses a significant problem for learning algorithms that rely on MCMC [3,5] .</p><p><i>§5</i>This procedure was introduced in 8Breuleux et al [8] and used for various generative models for which the exact likelihood is not tractable [25,3,5] .</p><p><i>§5</i>列在 Table 1 的对照行里</p></div></details></li><li id="bib.bib4"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[4]</span>
-<span class="ltx_bibblock">
-Bengio, Y., Yao, L., Alain, G., and Vincent, P. (2013b).
-
-</span>
-<span class="ltx_bibblock">Generalized denoising auto-encoders as generative models.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib4.1" class="ltx_text ltx_font_italic">NIPS26</span>. Nips Foundation.
-
-</span><a class="rl" href="https://arxiv.org/abs/1305.6663" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Prominent recent work in this area includes the generative stochastic network (GSN) framework [5] , which extends generalized denoising auto-encoders [4] : both can be seen as defining a parameterized Markov chain, i.e., one learns the parameters of a machine that performs one step of a generative Markov chain.</p></div></details></li><li id="bib.bib5"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[5]</span>
-<span class="ltx_bibblock">
-Bengio, Y., Thibodeau-Laufer, E., and Yosinski, J. (2014a).
-
-</span>
-<span class="ltx_bibblock">Deep generative stochastic networks trainable by backprop.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib5.1" class="ltx_text ltx_font_italic">ICML’14</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1306.1091" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Mixing poses a significant problem for learning algorithms that rely on MCMC [3,5] .</p><p><i>§2</i>Prominent recent work in this area includes the generative stochastic network (GSN) framework [5] , which extends generalized denoising auto-encoders [4] : both can be seen as defining a parameterized Markov chain, i.e., one learns the parameters of a machine that performs one step of a generative Markov chain.</p><p><i>§5</i>This procedure was introduced in 8Breuleux et al [8] and used for various generative models for which the exact likelihood is not tractable [25,3,5] .</p></div></details></li><li id="bib.bib6"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[6]</span>
-<span class="ltx_bibblock">
-Bengio, Y., Thibodeau-Laufer, E., Alain, G., and Yosinski, J. (2014b).
-
-</span>
-<span class="ltx_bibblock">Deep generative stochastic networks trainable by backprop.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib6.1" class="ltx_text ltx_font_italic">Proceedings of the 30th International Conference on Machine
-Learning (ICML’14)</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1306.1091" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>列在 Table 1 的对照行里</p></div></details></li><li id="bib.bib7"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[7]</span>
-<span class="ltx_bibblock">
-Bergstra, J., Breuleux, O., Bastien, F., Lamblin, P., Pascanu, R., Desjardins,
-G., Turian, J., Warde-Farley, D., and Bengio, Y. (2010).
-
-</span>
-<span class="ltx_bibblock">Theano: a CPU and GPU math expression compiler.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib7.1" class="ltx_text ltx_font_italic">Proceedings of the Python for Scientific Computing Conference
-(SciPy)</span>.
-
-</span>
-<span class="ltx_bibblock">Oral Presentation.
-
-</span><a class="rl" href="https://conference.scipy.org/proceedings/scipy2010/bergstra.html" target="_blank" rel="noreferrer">SciPy ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>We would like to thank the developers of Pylearn2 [12] and Theano [7,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib8"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[8]</span>
-<span class="ltx_bibblock">
-Breuleux, O., Bengio, Y., and Vincent, P. (2011).
-
-</span>
-<span class="ltx_bibblock">Quickly generating representative samples from an RBM-derived
-process.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib8.1" class="ltx_text ltx_font_italic">Neural Computation</span>, <span id="bib.bib8.2" class="ltx_text ltx_font_bold">23</span>(8), 2053–2073.
-
-</span><a class="rl" href="https://doi.org/10.1162/NECO_a_00158" target="_blank" rel="noreferrer">Neural Computation ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>This procedure was introduced in 8Breuleux et al [8] and used for various generative models for which the exact likelihood is not tractable [25,3,5] .</p><p><i>§5</i>This procedure was introduced in Breuleux et al. [8] and used for various generative models for which the exact likelihood is not tractable [ 25 , 3 , 5 ] .</p></div></details></li><li id="bib.bib9"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[9]</span>
-<span class="ltx_bibblock">
-Glorot, X., Bordes, A., and Bengio, Y. (2011).
-
-</span>
-<span class="ltx_bibblock">Deep sparse rectifier neural networks.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib9.1" class="ltx_text ltx_font_italic">AISTATS’2011</span>.
-
-</span><a class="rl" href="https://proceedings.mlr.press/v15/glorot11a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [19,9,10] which have a particularly well-behaved gradient .</p><p><i>§2</i>Because adversarial nets do not require feedback loops during generation, they are better able to leverage piecewise linear units [19,9,10] , which improve the performance of backpropagation but have problems with unbounded activation when used ina feedback loop.</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [19,9] and sigmoid activations, while the discriminator net used maxout [10] activations.</p></div></details></li><li id="bib.bib10"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[10]</span>
-<span class="ltx_bibblock">
-Goodfellow, I. J., Warde-Farley, D., Mirza, M., Courville, A., and Bengio, Y.
-(2013a).
-
-</span>
-<span class="ltx_bibblock">Maxout networks.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib10.1" class="ltx_text ltx_font_italic">ICML’2013</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1302.4389" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [19,9,10] which have a particularly well-behaved gradient .</p><p><i>§2</i>Because adversarial nets do not require feedback loops during generation, they are better able to leverage piecewise linear units [19,9,10] , which improve the performance of backpropagation but have problems with unbounded activation when used ina feedback loop.</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [19,9] and sigmoid activations, while the discriminator net used maxout [10] activations.</p></div></details></li><li id="bib.bib11"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[11]</span>
-<span class="ltx_bibblock">
-Goodfellow, I. J., Mirza, M., Courville, A., and Bengio, Y. (2013b).
-
-</span>
-<span class="ltx_bibblock">Multi-prediction deep Boltzmann machines.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib11.1" class="ltx_text ltx_font_italic">NIPS’2013</span>.
-
-</span><a class="rl" href="https://papers.nips.cc/paper/2013/hash/0bb4aec1710521c12ee76289d9440817-Abstract.html" target="_blank" rel="noreferrer">NIPS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>Essentially, one can use adversarial nets to implement a stochastic extension of the deterministic MP-DBM [11] .</p></div></details></li><li id="bib.bib12"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[12]</span>
-<span class="ltx_bibblock">
-Goodfellow, I. J., Warde-Farley, D., Lamblin, P., Dumoulin, V., Mirza, M.,
-Pascanu, R., Bergstra, J., Bastien, F., and Bengio, Y. (2013c).
-
-</span>
-<span class="ltx_bibblock">Pylearn2: a machine learning research library.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib12.1" class="ltx_text ltx_font_italic">arXiv preprint arXiv:1308.4214</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1308.4214" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>We would like to thank the developers of Pylearn2 [12] and Theano [7,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib13"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[13]</span>
-<span class="ltx_bibblock">
-Gutmann, M. and Hyvarinen, A. (2010).
-
-</span>
-<span class="ltx_bibblock">Noise-contrastive estimation: A new estimation principle for
-unnormalized statistical models.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib13.1" class="ltx_text ltx_font_italic">AISTATS’2010</span>.
-
-</span><a class="rl" href="https://proceedings.mlr.press/v9/gutmann10a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Alternative criteria that do not approximate or bound the log-likelihood have also been proposed, such as score matching [18] and noise-contrastive estimation (NCE) [13] .</p></div></details></li><li id="bib.bib14"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[14]</span>
-<span class="ltx_bibblock">
-Hinton, G., Deng, L., Dahl, G. E., Mohamed, A., Jaitly, N., Senior, A.,
-Vanhoucke, V., Nguyen, P., Sainath, T., and Kingsbury, B. (2012a).
-
-</span>
-<span class="ltx_bibblock">Deep neural networks for acoustic modeling in speech recognition.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib14.1" class="ltx_text ltx_font_italic">IEEE Signal Processing Magazine</span>, <span id="bib.bib14.2" class="ltx_text ltx_font_bold">29</span>(6), 82–97.
-
-</span><a class="rl" href="https://doi.org/10.1109/MSP.2012.2205597" target="_blank" rel="noreferrer">IEEE SPM ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>So far, the most striking successes in deep learning have involved discriminative models, usually those that map a high-dimensional, rich sensory input to a class label [14,22] .</p></div></details></li><li id="bib.bib15"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[15]</span>
-<span class="ltx_bibblock">
-Hinton, G. E., Dayan, P., Frey, B. J., and Neal, R. M. (1995).
-
-</span>
-<span class="ltx_bibblock">The wake-sleep algorithm for unsupervised neural networks.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib15.1" class="ltx_text ltx_font_italic">Science</span>, <span id="bib.bib15.2" class="ltx_text ltx_font_bold">268</span>, 1558–1161.
-
-</span><a class="rl" href="https://doi.org/10.1126/science.7761831" target="_blank" rel="noreferrer">Science ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>This is similar to the inference net trained by the wake-sleep algorithm [15] but with the advantage that the inference net may be trained for a fixed generator net after the generator net has finished training.</p></div></details></li><li id="bib.bib16"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[16]</span>
-<span class="ltx_bibblock">
-Hinton, G. E., Osindero, S., and Teh, Y. (2006).
-
-</span>
-<span class="ltx_bibblock">A fast learning algorithm for deep belief nets.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib16.1" class="ltx_text ltx_font_italic">Neural Computation</span>, <span id="bib.bib16.2" class="ltx_text ltx_font_bold">18</span>, 1527–1554.
-
-</span><a class="rl" href="https://doi.org/10.1162/neco.2006.18.7.1527" target="_blank" rel="noreferrer">Neural Computation ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>An alternative to directed graphical models with latent variables are undirected graphical models with latent variables, such as restricted Boltzmann machines (RBMs) [27,16] , deep Boltzmann machines (DBMs) [26] and their numerous variants.</p><p><i>§2</i>Deep belief networks (DBNs) [16] are hybrid models containing a single undirected layer and several directed layers.</p></div></details></li><li id="bib.bib17"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[17]</span>
-<span class="ltx_bibblock">
-Hinton, G. E., Srivastava, N., Krizhevsky, A., Sutskever, I., and
-Salakhutdinov, R. (2012b).
-
-</span>
-<span class="ltx_bibblock">Improving neural networks by preventing co-adaptation of feature
-detectors.
-
-</span>
-<span class="ltx_bibblock">Technical report, arXiv:1207.0580.
-
-</span><a class="rl" href="https://arxiv.org/abs/1207.0580" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>In this case, we can train both models using only the highly successful backpropagation and dropout algorithms [17] and sample from the generative model using only forward propagation.</p><p><i>§5</i>Dropout [17] was applied in training the discriminator net.</p></div></details></li><li id="bib.bib18"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[18]</span>
-<span class="ltx_bibblock">
-Hyvärinen, A. (2005).
-
-</span>
-<span class="ltx_bibblock">Estimation of non-normalized statistical models using score matching.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib18.1" class="ltx_text ltx_font_italic">J. Machine Learning Res.</span>, <span id="bib.bib18.2" class="ltx_text ltx_font_bold">6</span>.
-
-</span><a class="rl" href="https://jmlr.org/papers/v6/hyvarinen05a.html" target="_blank" rel="noreferrer">JMLR ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Alternative criteria that do not approximate or bound the log-likelihood have also been proposed, such as score matching [18] and noise-contrastive estimation (NCE) [13] .</p></div></details></li><li id="bib.bib19"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[19]</span>
-<span class="ltx_bibblock">
-Jarrett, K., Kavukcuoglu, K., Ranzato, M., and LeCun, Y. (2009).
-
-</span>
-<span class="ltx_bibblock">What is the best multi-stage architecture for object recognition?
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib19.1" class="ltx_text ltx_font_italic">Proc. International Conference on Computer Vision
-(ICCV’09)</span>, pages 2146–2153. IEEE.
-
-</span><a class="rl" href="https://doi.org/10.1109/ICCV.2009.5459469" target="_blank" rel="noreferrer">ICCV ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [19,9,10] which have a particularly well-behaved gradient .</p><p><i>§2</i>Because adversarial nets do not require feedback loops during generation, they are better able to leverage piecewise linear units [19,9,10] , which improve the performance of backpropagation but have problems with unbounded activation when used ina feedback loop.</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [19,9] and sigmoid activations, while the discriminator net used maxout [10] activations.</p></div></details></li><li id="bib.bib20"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[20]</span>
-<span class="ltx_bibblock">
-Kingma, D. P. and Welling, M. (2014).
-
-</span>
-<span class="ltx_bibblock">Auto-encoding variational bayes.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib20.1" class="ltx_text ltx_font_italic">Proceedings of the International Conference on Learning
-Representations (ICLR)</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>More recent examples of training a generative machine by back-propagating into it include recent work on auto-encoding variational Bayes [20] and stochastic backpropagation [24] .</p></div></details></li><li id="bib.bib21"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[21]</span>
-<span class="ltx_bibblock">
-Krizhevsky, A. and Hinton, G. (2009).
-
-</span>
-<span class="ltx_bibblock">Learning multiple layers of features from tiny images.
-
-</span>
-<span class="ltx_bibblock">Technical report, University of Toronto.
-
-</span><a class="rl" href="https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf" target="_blank" rel="noreferrer">技术报告 ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [23] , the Toronto Face Database (TFD) [28] , and CIFAR-10 [21] .</p></div></details></li><li id="bib.bib22"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[22]</span>
-<span class="ltx_bibblock">
-Krizhevsky, A., Sutskever, I., and Hinton, G. (2012).
-
-</span>
-<span class="ltx_bibblock">ImageNet classification with deep convolutional neural networks.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib22.1" class="ltx_text ltx_font_italic">NIPS’2012</span>.
-
-</span><a class="rl" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" rel="noreferrer">NIPS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>So far, the most striking successes in deep learning have involved discriminative models, usually those that map a high-dimensional, rich sensory input to a class label [14,22] .</p></div></details></li><li id="bib.bib23"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[23]</span>
-<span class="ltx_bibblock">
-LeCun, Y., Bottou, L., Bengio, Y., and Haffner, P. (1998).
-
-</span>
-<span class="ltx_bibblock">Gradient-based learning applied to document recognition.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib23.1" class="ltx_text ltx_font_italic">Proceedings of the IEEE</span>, <span id="bib.bib23.2" class="ltx_text ltx_font_bold">86</span>(11), 2278–2324.
-
-</span><a class="rl" href="https://doi.org/10.1109/5.726791" target="_blank" rel="noreferrer">Proc. IEEE ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [23] , the Toronto Face Database (TFD) [28] , and CIFAR-10 [21] .</p></div></details></li><li id="bib.bib24"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[24]</span>
-<span class="ltx_bibblock">
-Rezende, D. J., Mohamed, S., and Wierstra, D. (2014).
-
-</span>
-<span class="ltx_bibblock">Stochastic backpropagation and approximate inference in deep
-generative models.
-
-</span>
-<span class="ltx_bibblock">Technical report, arXiv:1401.4082.
-
-</span><a class="rl" href="https://arxiv.org/abs/1401.4082" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>More recent examples of training a generative machine by back-propagating into it include recent work on auto-encoding variational Bayes [20] and stochastic backpropagation [24] .</p></div></details></li><li id="bib.bib25"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[25]</span>
-<span class="ltx_bibblock">
-Rifai, S., Bengio, Y., Dauphin, Y., and Vincent, P. (2012).
-
-</span>
-<span class="ltx_bibblock">A generative process for sampling contractive auto-encoders.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib25.1" class="ltx_text ltx_font_italic">ICML’12</span>.
-
-</span><a class="rl" href="https://arxiv.org/abs/1206.6434" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>This procedure was introduced in 8Breuleux et al [8] and used for various generative models for which the exact likelihood is not tractable [25,3,5] .</p></div></details></li><li id="bib.bib26"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[26]</span>
-<span class="ltx_bibblock">
-Salakhutdinov, R. and Hinton, G. E. (2009).
-
-</span>
-<span class="ltx_bibblock">Deep Boltzmann machines.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib26.1" class="ltx_text ltx_font_italic">AISTATS’2009</span>, pages 448–455.
-
-</span><a class="rl" href="https://proceedings.mlr.press/v5/salakhutdinov09a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>An alternative to directed graphical models with latent variables are undirected graphical models with latent variables, such as restricted Boltzmann machines (RBMs) [27,16] , deep Boltzmann machines (DBMs) [26] and their numerous variants.</p></div></details></li><li id="bib.bib27"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[27]</span>
-<span class="ltx_bibblock">
-Smolensky, P. (1986).
-
-</span>
-<span class="ltx_bibblock">Information processing in dynamical systems: Foundations of harmony
-theory.
-
-</span>
-<span class="ltx_bibblock">In D. E. Rumelhart and J. L. McClelland, editors, <span id="bib.bib27.1" class="ltx_text ltx_font_italic">Parallel
-Distributed Processing</span>, volume 1, chapter 6, pages 194–281. MIT Press,
-Cambridge.
-
-</span></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>An alternative to directed graphical models with latent variables are undirected graphical models with latent variables, such as restricted Boltzmann machines (RBMs) [27,16] , deep Boltzmann machines (DBMs) [26] and their numerous variants.</p></div></details></li><li id="bib.bib28"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[28]</span>
-<span class="ltx_bibblock">
-Susskind, J., Anderson, A., and Hinton, G. E. (2010).
-
-</span>
-<span class="ltx_bibblock">The Toronto face dataset.
-
-</span>
-<span class="ltx_bibblock">Technical Report UTML TR 2010-001, U. Toronto.
-
-</span></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [23] , the Toronto Face Database (TFD) [28] , and CIFAR-10 [21] .</p></div></details></li><li id="bib.bib29"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[29]</span>
-<span class="ltx_bibblock">
-Tieleman, T. (2008).
-
-</span>
-<span class="ltx_bibblock">Training restricted Boltzmann machines using approximations to the
-likelihood gradient.
-
-</span>
-<span class="ltx_bibblock">In W. W. Cohen, A. McCallum, and S. T. Roweis, editors, <span id="bib.bib29.1" class="ltx_text ltx_font_italic">ICML
-2008</span>, pages 1064–1071. ACM.
-
-</span><a class="rl" href="https://doi.org/10.1145/1390156.1390290" target="_blank" rel="noreferrer">ICML ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§3</i>This strategy is analogous to the way that SML/PCD [31,29] training maintains samples from a Markov chain from one learning step to the next in order to avoid burning in a Markov chain as part of the inner loop of learning.</p></div></details></li><li id="bib.bib30"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[30]</span>
-<span class="ltx_bibblock">
-Vincent, P., Larochelle, H., Bengio, Y., and Manzagol, P.-A. (2008).
-
-</span>
-<span class="ltx_bibblock">Extracting and composing robust features with denoising autoencoders.
-
-</span>
-<span class="ltx_bibblock">In <span id="bib.bib30.1" class="ltx_text ltx_font_italic">ICML 2008</span>.
-
-</span><a class="rl" href="https://doi.org/10.1145/1390156.1390294" target="_blank" rel="noreferrer">ICML ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Some models such as denoising auto-encoders [30] and contractive autoencoders have learning rules very similar to score matching applied to RBMs.</p></div></details></li><li id="bib.bib31"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[31]</span>
-<span class="ltx_bibblock">
-Younes, L. (1999).
-
-</span>
-<span class="ltx_bibblock">On the convergence of Markovian stochastic algorithms with rapidly
-decreasing ergodicity rates.
-
-</span>
-<span class="ltx_bibblock"><span id="bib.bib31.1" class="ltx_text ltx_font_italic">Stochastics and Stochastic Reports</span>, <span id="bib.bib31.2" class="ltx_text ltx_font_bold">65</span>(3), 177–228.
-
-</span><a class="rl" href="https://doi.org/10.1080/17442509908834179" target="_blank" rel="noreferrer">Stochastics ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§3</i>This strategy is analogous to the way that SML/PCD [31,29] training maintains samples from a Markov chain from one learning step to the next in order to avoid burning in a Markov chain as part of the inner loop of learning.</p></div></details></li></ol></details></div>
+<details class="refs" id="sreferences"><summary>References<span>29 条</span></summary>
+    <ol><li id="bib.bib1"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[1]</span> <span class="ltx_bibblock">Bastien, F., Lamblin, P., Pascanu, R., Bergstra, J., Goodfellow, I. J., Bergeron, A., Bouchard, N., and Bengio, Y. (2012). Theano: new features and speed improvements. Deep Learning and Unsupervised Feature Learning NIPS 2012 Workshop.</span><a class="rl" href="https://arxiv.org/abs/1211.5590" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§4.1</i>For any ( a , b ) ∈ ℝ 2 ∖ { 0 , 0 } , the function y → a log ⁡ ( y ) + b log ⁡ ( 1 − y ) achieves its maximum in [0,1] at a a + b .</p><p><i>§7</i>We would like to thank the developers of Pylearn2 [11] and Theano [6,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib2"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[2]</span> <span class="ltx_bibblock">Bengio, Y. (2009). Learning deep architectures for AI. Now Publishers.</span><a class="rl" href="https://doi.org/10.1561/2200000006" target="_blank" rel="noreferrer">Now Publishers ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>The promise of deep learning is to discover rich, hierarchical models [2] that represent probability distributions over the kinds of data encountered in artificial intelligence applications, such as natural images, audio waveforms containing speech, and symbols in natural language corpora.</p></div></details></li><li id="bib.bib3"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[3]</span> <span class="ltx_bibblock">Bengio, Y., Mesnil, G., Dauphin, Y., and Rifai, S. (2013). Better mixing via deep representations. In ICML’13.</span><a class="rl" href="https://arxiv.org/abs/1207.4404" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>This procedure was introduced in 7Breuleux et al [7] and used for various generative models for which the exact likelihood is not tractable [24,3,4] .</p><p><i>§5</i>列在 Table 1 的对照行里</p></div></details></li><li id="bib.bib4"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[4]</span> <span class="ltx_bibblock">Bengio, Y., Thibodeau-Laufer, E., and Yosinski, J. (2014a). Deep generative stochastic networks trainable by backprop. In ICML’14.</span><a class="rl" href="https://arxiv.org/abs/1306.1091" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Generative stochastic networks [4] are an example of a generative machine that can be trained with exact backpropagation rather than the numerous approximations required for Boltzmann machines.</p><p><i>§5</i>This procedure was introduced in 7Breuleux et al [7] and used for various generative models for which the exact likelihood is not tractable [24,3,4] .</p></div></details></li><li id="bib.bib5"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[5]</span> <span class="ltx_bibblock">Bengio, Y., Thibodeau-Laufer, E., Alain, G., and Yosinski, J. (2014b). Deep generative stochastic net-works trainable by backprop. In Proceedings of the 30th International Conference on Machine Learning (ICML’14).</span><a class="rl" href="https://arxiv.org/abs/1306.1091" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>列在 Table 1 的对照行里</p></div></details></li><li id="bib.bib6"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[6]</span> <span class="ltx_bibblock">Bergstra, J., Breuleux, O., Bastien, F., Lamblin, P., Pascanu, R., Desjardins, G., Turian, J., Warde-Farley, D., and Bengio, Y. (2010). Theano: a CPU and GPU math expression compiler. In Proceedings of the Python for Scientific Computing Conference (SciPy). Oral Presentation.</span><a class="rl" href="https://conference.scipy.org/proceedings/scipy2010/bergstra.html" target="_blank" rel="noreferrer">SciPy ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>We would like to thank the developers of Pylearn2 [11] and Theano [6,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib7"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[7]</span> <span class="ltx_bibblock">Breuleux, O., Bengio, Y., and Vincent, P. (2011). Quickly generating representative samples from an RBM-derived process. Neural Computation, 23(8), 2053–2073.</span><a class="rl" href="https://doi.org/10.1162/NECO_a_00158" target="_blank" rel="noreferrer">Neural Computation ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>This procedure was introduced in 7Breuleux et al [7] and used for various generative models for which the exact likelihood is not tractable [24,3,4] .</p><p><i>§5</i>This procedure was introduced in Breuleux et al. [7] and used for various generative models for which the exact likelihood is not tractable [ 24 , 3 , 4 ] .</p></div></details></li><li id="bib.bib8"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[8]</span> <span class="ltx_bibblock">Glorot, X., Bordes, A., and Bengio, Y. (2011). Deep sparse rectifier neural networks. In AISTATS’2011.</span><a class="rl" href="https://proceedings.mlr.press/v15/glorot11a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [17,8,9] which have a particularly well-behaved gradient .</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [17,8] and sigmoid activations, while the discriminator net used maxout [9] activations.</p></div></details></li><li id="bib.bib9"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[9]</span> <span class="ltx_bibblock">Goodfellow, I. J., Warde-Farley, D., Mirza, M., Courville, A., and Bengio, Y. (2013a). Maxout networks. In ICML’2013.</span><a class="rl" href="https://arxiv.org/abs/1302.4389" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [17,8,9] which have a particularly well-behaved gradient .</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [17,8] and sigmoid activations, while the discriminator net used maxout [9] activations.</p></div></details></li><li id="bib.bib10"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[10]</span> <span class="ltx_bibblock">Goodfellow, I. J., Mirza, M., Courville, A., and Bengio, Y. (2013b). Multi-prediction deep Boltzmann machines. In NIPS’2013.</span><a class="rl" href="https://papers.nips.cc/paper/2013/hash/0bb4aec1710521c12ee76289d9440817-Abstract.html" target="_blank" rel="noreferrer">NIPS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>Essentially, one can use adversarial nets to implement a stochastic extension of the deterministic MP-DBM [10] .</p></div></details></li><li id="bib.bib11"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[11]</span> <span class="ltx_bibblock">Goodfellow, I. J., Warde-Farley, D., Lamblin, P., Dumoulin, V., Mirza, M., Pascanu, R., Bergstra, J., Bastien, F., and Bengio, Y. (2013c). Pylearn2: a machine learning research library. arXiv preprint arXiv:1308.4214.</span><a class="rl" href="https://arxiv.org/abs/1308.4214" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>We would like to thank the developers of Pylearn2 [11] and Theano [6,1] , particularly Frédéric Bastien who rushed a Theano feature specifically to benefit this project.</p></div></details></li><li id="bib.bib12"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[12]</span> <span class="ltx_bibblock">Gregor, K., Danihelka, I., Mnih, A., Blundell, C., and Wierstra, D. (2014). Deep autoregressive networks. In ICML’2014.</span><a class="rl" href="https://arxiv.org/abs/1310.8499" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Other VAE-like approaches exist [12,22] but are less closely related to our method.</p></div></details></li><li id="bib.bib13"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[13]</span> <span class="ltx_bibblock">Gutmann, M. and Hyvarinen, A. (2010). Noise-contrastive estimation: A new estimation principle for unnormalized statistical models. In Proceedings of The Thirteenth International Conference on Artificial Intelligence and Statistics (AISTATS’10).</span><a class="rl" href="https://proceedings.mlr.press/v9/gutmann10a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Previous work has also taken the approach of using a discriminative criterion to train a generative model [29,13] .</p><p><i>§2</i>Noise-contrastive estimation (NCE) [13] involves training a generative model by learning the weights that make the model useful for discriminating data from a fixed noise distribution.</p></div></details></li><li id="bib.bib14"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[14]</span> <span class="ltx_bibblock">Hinton, G., Deng, L., Dahl, G. E., Mohamed, A., Jaitly, N., Senior, A., Vanhoucke, V., Nguyen, P., Sainath, T., and Kingsbury, B. (2012a). Deep neural networks for acoustic modeling in speech recognition. IEEE Signal Processing Magazine, 29(6), 82–97.</span><a class="rl" href="https://doi.org/10.1109/MSP.2012.2205597" target="_blank" rel="noreferrer">IEEE SPM ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>So far, the most striking successes in deep learning have involved discriminative models, usually those that map a high-dimensional, rich sensory input to a class label [14,20] .</p></div></details></li><li id="bib.bib15"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[15]</span> <span class="ltx_bibblock">Hinton, G. E., Dayan, P., Frey, B. J., and Neal, R. M. (1995). The wake-sleep algorithm for unsupervised neural networks. Science, 268, 1558–1161.</span><a class="rl" href="https://doi.org/10.1126/science.7761831" target="_blank" rel="noreferrer">Science ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§7</i>This is similar to the inference net trained by the wake-sleep algorithm [15] but with the advantage that the inference net may be trained for a fixed generator net after the generator net has finished training.</p></div></details></li><li id="bib.bib16"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[16]</span> <span class="ltx_bibblock">Hinton, G. E., Srivastava, N., Krizhevsky, A., Sutskever, I., and Salakhutdinov, R. (2012b). Improving neural networks by preventing co-adaptation of feature detectors. Technical report, arXiv:1207.0580.</span><a class="rl" href="https://arxiv.org/abs/1207.0580" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>In this case, we can train both models using only the highly successful backpropagation and dropout algorithms [16] and sample from the generative model using only forward propagation.</p><p><i>§5</i>Dropout [16] was applied in training the discriminator net.</p></div></details></li><li id="bib.bib17"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[17]</span> <span class="ltx_bibblock">Jarrett, K., Kavukcuoglu, K., Ranzato, M., and LeCun, Y. (2009). What is the best multi-stage architecture for object recognition? In Proc. International Conference on Computer Vision (ICCV’09), pages 2146–2153. IEEE.</span><a class="rl" href="https://doi.org/10.1109/ICCV.2009.5459469" target="_blank" rel="noreferrer">ICCV ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>These striking successes have primarily been based on the backpropagation and dropout algorithms, using piecewise linear units [17,8,9] which have a particularly well-behaved gradient .</p><p><i>§5</i>The generator nets used a mixture of rectifier linear activations [17,8] and sigmoid activations, while the discriminator net used maxout [9] activations.</p></div></details></li><li id="bib.bib18"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[18]</span> <span class="ltx_bibblock">Kingma, D. P. and Welling, M. (2014). Auto-encoding variational bayes. In Proceedings of the Interna-tional Conference on Learning Representations (ICLR).</span><a class="rl" href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>We were unaware at the time we developed this work that Kingma and Welling [18] and Rezende et al. [23] had developed more general stochastic backpropagation rules, allowing one to backpropagate through Gaussian distributions with finite variance, and to backpropagate to the covariance parameter as well as the mean.</p><p><i>§2</i>Kingma and Welling [18] and Rezende et al. [23] use stochastic backpropagation to train variational autoencoders (VAEs).</p></div></details></li><li id="bib.bib19"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[19]</span> <span class="ltx_bibblock">Krizhevsky, A. and Hinton, G. (2009). Learning multiple layers of features from tiny images. Technical report, University of Toronto.</span><a class="rl" href="https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf" target="_blank" rel="noreferrer">技术报告 ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [21] , the Toronto Face Database (TFD) [27] , and CIFAR-10 [19] .</p></div></details></li><li id="bib.bib20"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[20]</span> <span class="ltx_bibblock">Krizhevsky, A., Sutskever, I., and Hinton, G. (2012). ImageNet classification with deep convolutional neural networks. In NIPS’2012.</span><a class="rl" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" rel="noreferrer">NIPS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§1</i>So far, the most striking successes in deep learning have involved discriminative models, usually those that map a high-dimensional, rich sensory input to a class label [14,20] .</p></div></details></li><li id="bib.bib21"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[21]</span> <span class="ltx_bibblock">LeCun, Y., Bottou, L., Bengio, Y., and Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278–2324.</span><a class="rl" href="https://doi.org/10.1109/5.726791" target="_blank" rel="noreferrer">Proc. IEEE ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [21] , the Toronto Face Database (TFD) [27] , and CIFAR-10 [19] .</p></div></details></li><li id="bib.bib22"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[22]</span> <span class="ltx_bibblock">Mnih, A. and Gregor, K. (2014). Neural variational inference and learning in belief networks. Technical report, arXiv preprint arXiv:1402.0030.</span><a class="rl" href="https://arxiv.org/abs/1402.0030" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Other VAE-like approaches exist [12,22] but are less closely related to our method.</p></div></details></li><li id="bib.bib23"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[23]</span> <span class="ltx_bibblock">Rezende, D. J., Mohamed, S., and Wierstra, D. (2014). Stochastic backpropagation and approximate inference in deep generative models. Technical report, arXiv:1401.4082.</span><a class="rl" href="https://arxiv.org/abs/1401.4082" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>We were unaware at the time we developed this work that Kingma and Welling [18] and Rezende et al. [23] had developed more general stochastic backpropagation rules, allowing one to backpropagate through Gaussian distributions with finite variance, and to backpropagate to the covariance parameter as well as the mean.</p><p><i>§2</i>Kingma and Welling [18] and Rezende et al. [23] use stochastic backpropagation to train variational autoencoders (VAEs).</p></div></details></li><li id="bib.bib24"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[24]</span> <span class="ltx_bibblock">Rifai, S., Bengio, Y., Dauphin, Y., and Vincent, P. (2012). A generative process for sampling contractive auto-encoders. In ICML’12.</span><a class="rl" href="https://arxiv.org/abs/1206.6434" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>This procedure was introduced in 7Breuleux et al [7] and used for various generative models for which the exact likelihood is not tractable [24,3,4] .</p></div></details></li><li id="bib.bib25"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[25]</span> <span class="ltx_bibblock">Salakhutdinov, R. and Hinton, G. E. (2009). Deep Boltzmann machines. In AISTATS’2009, pages 448– 455.</span><a class="rl" href="https://proceedings.mlr.press/v5/salakhutdinov09a.html" target="_blank" rel="noreferrer">AISTATS ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>In this family of model, perhaps the most succesful is the deep Boltzmann machine [25] .</p></div></details></li><li id="bib.bib26"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[26]</span> <span class="ltx_bibblock">Schmidhuber, J. (1992). Learning factorial codes by predictability minimization. Neural Computation, 4(6), 863–879.</span><a class="rl" href="https://doi.org/10.1162/neco.1992.4.6.863" target="_blank" rel="noreferrer">Neural Computation ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>The most relevant work is predictability minimization [26] .</p></div></details></li><li id="bib.bib27"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[27]</span> <span class="ltx_bibblock">Susskind, J., Anderson, A., and Hinton, G. E. (2010). The Toronto face dataset. Technical Report UTML TR 2010-001, U. Toronto.</span></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§5</i>We trained adversarial nets an a range of datasets including MNIST [21] , the Toronto Face Database (TFD) [27] , and CIFAR-10 [19] .</p></div></details></li><li id="bib.bib28"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[28]</span> <span class="ltx_bibblock">Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I. J., and Fergus, R. (2014). Intriguing properties of neural networks. ICLR, abs/1312.6199.</span><a class="rl" href="https://arxiv.org/abs/1312.6199" target="_blank" rel="noreferrer">arXiv ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Generative adversarial networks has been sometimes confused with the related concept of “adversarial examples” [28] .</p></div></details></li><li id="bib.bib29"><details><summary><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">[29]</span> <span class="ltx_bibblock">Tu, Z. (2007). Learning generative models via discriminative approaches. In Computer Vision and Pattern Recognition, 2007. CVPR’07. IEEE Conference on, pages 1–8. IEEE.</span><a class="rl" href="https://doi.org/10.1109/CVPR.2007.383035" target="_blank" rel="noreferrer">CVPR ↗</a></summary><div class="rc"><b>本文在这些地方引用它</b><p><i>§2</i>Previous work has also taken the approach of using a discriminative criterion to train a generative model [29,13] .</p></div></details></li></ol></details></div>
   
 </div>
 
