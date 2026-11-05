@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GAN · 生成对抗网络 (Generative Adversarial Network) 的来历、完整推导和后续发展，附原论文逐段中英对照</title>
-<meta name="description" content="四个 tab：综述（含一个实际运行的玩具实验）、原论文中英对照、14 个常见问题，基础知识和 CS231n 第 14 讲笔记默认折叠在资料里。">
+<meta name="description" content="四个 tab：综述（含一个实际运行的玩具实验）、原论文中英对照、15 个常见问题，基础知识、跟李沐学AI 精读和 CS231n 第 14 讲的笔记默认折叠在资料里。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -307,7 +307,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
   <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-oneline">概述</a></li><li><a href="#o-history">来历</a></li><li><a href="#o-problem">要解决的问题</a></li><li><a href="#o-frame">整体结构</a></li><li><a href="#o-value">目标函数</a></li><li><a href="#o-algo">训练算法</a></li><li><a href="#o-optd">最优判别器</a></li><li><a href="#o-global">全局最优</a></li><li><a href="#o-converge">收敛条件</a></li><li><a href="#o-nonsat">非饱和目标</a></li><li><a href="#o-exp">原论文实验</a></li><li><a href="#o-eval">评估</a></li><li><a href="#o-hard">训练难点</a></li><li><a href="#o-wgan">改进目标函数</a></li><li><a href="#o-arch">改进网络结构</a></li><li><a href="#o-cond">条件和翻译</a></li><li><a href="#o-after">后续发展</a></li><li><a href="#o-relation">相关模型</a></li></ol></nav>
   <article class="aidoc">
     <h2 class="aih">GAN 综述：来历、推导与后续发展</h2>
-    <p class="lede">这一页按计算顺序讲生成对抗网络。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间六节依次讲目标函数、训练算法、最优判别器、全局最优、收敛条件和非饱和目标，附一段实际运行过的代码；后面八节讲原论文的实验、评估、训练难点、目标函数和结构的改进、条件生成、被扩散模型超过的过程，以及和其他生成模型的关系。</p><p class="lede">论文逐段中英对照在「论文」tab，常见问题在「常见问题」tab。KL 散度、JS 散度和极小极大博弈的基础，以及 CS231n 第 14 讲的笔记，都收在「资料」tab，默认折叠。</p>
+    <p class="lede">这一页按计算顺序讲生成对抗网络。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间六节依次讲目标函数、训练算法、最优判别器、全局最优、收敛条件和非饱和目标，附一段实际运行过的代码；后面八节讲原论文的实验、评估、训练难点、目标函数和结构的改进、条件生成、被扩散模型超过的过程，以及和其他生成模型的关系。</p><p class="lede">论文逐段中英对照在「论文」tab，常见问题在「常见问题」tab。KL 散度、JS 散度和极小极大博弈的基础，以及跟李沐学AI 的论文精读和 CS231n 第 14 讲的笔记，都收在「资料」tab，默认折叠。</p>
     <section class="aisec" id="o-oneline">
     <h2><span class="n">1</span><span>概述：用一个分类器训练生成器</span></h2>
     <p><b>生成对抗网络 (Generative Adversarial Network, GAN)</b> 是一种生成模型，由蒙特利尔大学的 Ian Goodfellow、Jean Pouget-Abadie、Mehdi Mirza、Bing Xu、David Warde-Farley、Sherjil Ozair、Aaron Courville 和 Yoshua Bengio 提出。论文 2014-06-10 发布在 arXiv，发表于 NIPS 2014。</p>
@@ -355,7 +355,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
     <p>当时的主要生成模型有几类。受限玻尔兹曼机和深度玻尔兹曼机要处理配分函数及其梯度，只能用马尔可夫链蒙特卡洛估计，混合困难。深度信念网络同时继承了有向和无向模型的计算困难。生成随机网络 (GSN) 不需要写出密度，但采样仍要运行马尔可夫链。几个月前的 VAE（2013-12-20）用反向传播训练生成网络，代价是优化证据下界，并且需要一个推断网络。</p>
     <p>Goodfellow 的想法是把密度估计问题改写成分类问题。分类已经是深度学习最擅长的事，分类器能告诉生成器它的样本哪里不像真实数据。这样既不需要配分函数，也不需要马尔可夫链，还能直接使用分段线性单元。</p>
     <p>论文致谢里写着感谢「Les Trois Brasseurs」激发创造力，这是蒙特利尔的一家酒吧。Goodfellow 在 DeepLearning.AI 的访谈中说，想法来自和朋友在那里的一次讨论，他当晚回家写了第一版代码。</p>
-    <p>思路本身有更早的来源。噪声对比估计（Gutmann、Hyvärinen）已经用判别准则训练生成模型，但判别的对象是一个固定的噪声分布，所以模型一旦学到近似分布，学习就会变慢。GAN 让判别器和生成器一起变化，避开了这个问题。论文在相关工作里讨论了这一点。</p>
+    <p>思路本身有更早的来源。噪声对比估计（Gutmann、Hyvärinen）已经用判别准则训练生成模型，但判别的对象是一个固定的噪声分布，所以模型一旦学到近似分布，学习就会变慢。GAN 让判别器和生成器一起变化，避开了这个问题。arXiv v1 的相关工作讨论了这一点。NeurIPS 终版重写了这一节，并回应了 Predictability Minimization，见常见问题。</p>
     
     
     
@@ -737,7 +737,7 @@ for step in range(20001):
 <div class="view" id="view-faq">
 <div class="faqdoc">
   <p class="lede">这些问题来自对照论文时容易混淆的符号和说法，以及本页自己跑实验时遇到的现象。答案尽量短，展开的推导链到「综述」和「资料」。</p>
-  <div class="eptools"><span>14 个问题 · 点问题展开</span>
+  <div class="eptools"><span>15 个问题 · 点问题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <section class="faqgrp"><h2>基本概念</h2>
     <details class="faq" id="faq-loss"><summary>生成器的损失从哪里来？它连真实数据都没见过。</summary><div class="faqa">
@@ -812,6 +812,12 @@ for step in range(20001):
       <p>中英对照页的英文保持原样，译文也按原文，没有修改这些符号。</p>
       <p class="refs"><a href="#paper">论文 tab →</a></p>
     </div></details>
+    <details class="faq" id="faq-versions"><summary>arXiv 版和 NeurIPS 版有什么不同，本页用的是哪个？</summary><div class="faqa">
+      <p>本页论文 tab 是 arXiv v1（2014-06-10）。李沐的视频读的是 NeurIPS 2014 终版，作者没有把终版更新到 arXiv。两版差别最大的是第 2 节相关工作：</p>
+      <ul><li>arXiv v1 主要讨论玻尔兹曼机、深度信念网络、分数匹配、噪声对比估计和生成随机网络。</li><li>NeurIPS 终版重写了这一节，讨论生成机器、VAE（说明作者当时不知道这项工作）、噪声对比估计和 Predictability Minimization，并列出与后者的三点区别，最后区分了对抗样本。</li></ul>
+      <p>终版还在第 2 节使用了 GAN 这个缩写，arXiv v1 通篇没有。第 3 节以后的算法和证明两版基本相同。</p>
+      <p class="refs"><a href="#m-s4">李沐：相关工作 →</a><a href="#m-s5">李沐：PM 争议 →</a></p>
+    </div></details>
     <details class="faq" id="faq-eq3"><summary>式 (3) 从 z 换到 x，要求 G 可逆吗？</summary><div class="faqa">
       <p>不要求 <span class="m"><i>G</i></span> 可逆，期望的换元只是同一个随机变量的两种写法。但把它写成 <span class="m">∫ <i>p</i><sub><i>g</i></sub>(<i>x</i>) … <i>d</i><i>x</i></span> 需要 <span class="m"><i>p</i><sub><i>g</i></sub></span> 有密度。<span class="m"><i>z</i></span> 维度低于 <span class="m"><i>x</i></span> 时严格说没有密度，这正是 Arjovsky 和 Bottou 后来分析的情形，也是 WGAN 的出发点。</p>
       <p class="refs"><a href="#b-lotus">基础：期望的换元 →</a></p>
@@ -821,8 +827,8 @@ for step in range(20001):
 </div>
 <div class="view" id="view-res">
 <div class="resdoc">
-  <p class="lede">读论文第 4 节需要的基础，以及 CS231n 第 14 讲关于生成对抗网络的笔记收在这里。两份材料默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
-  <div class="eptools"><span>2 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <p class="lede">读论文第 4 节需要的基础，跟李沐学AI 的论文精读笔记，以及 CS231n 第 14 讲关于生成对抗网络的笔记收在这里。三份材料默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
+  <div class="eptools"><span>3 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <details class="res" id="res-basics">
   <summary><span class="rt"><b>基础：散度和博弈</b><em>期望的换元、逐点优化、KL 散度、JS 散度、极小极大博弈、Parzen 窗</em></span></summary>
   <div class="resb">
@@ -893,6 +899,166 @@ for step in range(20001):
   </section>
   </article>
 </div>
+  </div>
+</details>
+  <details class="res" id="res-m">
+  <summary><span class="rt"><b>跟李沐学AI：GAN 论文逐段精读</b><em>46 分钟，按论文顺序逐段讲解，包括游戏截图的例子、两样本检验、命名和 Predictability Minimization 的轶事，以及论文的写法</em></span></summary>
+  <div class="resb">
+<div class="intro"><p>这一期按论文顺序逐段讲解：标题、摘要、导论、相关工作、目标函数、图 1、算法 1、两个理论结果，最后评价论文的写法和算法本身的影响。</p><p>讲者读的是 NeurIPS 2014 的终版，第 2 节相关工作和本页论文 tab 的 arXiv v1 完全不同，相关工作一节专门说明了这一点。其他章节两版基本相同。</p><p>笔记按视频顺序分节转述，时间码跳到对应位置。讲者口述时有几处说法不够严格，对照论文和后来的工作，放在各节的「注」里。</p></div>
+<details class="ep" id="m" data-bv="BV1rb4y187vD" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">读</span>
+    <span class="tt"><b>GAN 论文逐段精读</b><em>跟李沐学AI · B 站 2021-11-10 发布</em><span class="hook">46 分钟逐段读论文：用 4K 游戏截图解释 z 和 x，把目标函数代入具体数值，用二分类解释两样本检验，补充命名和 Schmidhuber 争议的轶事，最后分析这篇论文的写法。</span></span>
+    <span class="side"><span class="chip">跟李沐学AI</span><span class="len">46:18</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">这一期最有价值的不是推导，推导和综述基本一致。它多出三样东西：用游戏程序类比 z 到 x 的映射，指出判别器也是一个通用的两样本检验工具，以及从写作的角度分析这篇论文为什么读起来顺畅。</p>
+      <p class="lede">讲者最后的概括是：GAN 用有监督学习的损失函数做无监督学习，标号来自数据是采样的还是生成的，这个思路后来影响了 BERT 这类自监督模型。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1rb4y187vD/" target="_blank" rel="noreferrer">B 站原视频 ↗</a><a href="https://github.com/mli/paper-reading" target="_blank" rel="noreferrer">论文精读目录 mli/paper-reading ↗</a><a href="https://papers.nips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html" target="_blank" rel="noreferrer">NeurIPS 2014 终版论文 ↗</a></p>
+      <section class="sec" id="m-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>开场：GAN 的影响</span></h4>
+      <p>讲者从 2021 年的状况说起：过去五年里上头条最多的机器学习工作就是 GAN。Reddit 机器学习版的热帖有很多与之相关，比如生成卡通头像、不存在的植物，以及「这个人不存在」网站，每次刷新就给出一张不存在的人脸。</p>
+      <p>这项技术的影响已经进入法律。讲者提到 2019 年加州出台了两条法令，一条禁止未经同意把一个人的脸移到成人内容上，一条禁止用政治人物的影像让其说没说过的话。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-30.jpg" alt="讲者展示的 GAN 应用示例。" loading="lazy"><figcaption><button class="ts" type="button" data-t="30">0:30</button>讲者展示的 GAN 应用示例。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s1">
+      <h4><button class="ts" type="button" data-t="108">1:48</button><span>标题和命名</span></h4>
+      <p>标题三个词。Generative 表示生成模型，它和分类这样的判别模型是机器学习的两大类，目标是生成数据本身。Adversarial 是对抗。Net 是 networks 的简写，讲者建议非母语作者不要这样简写，这种写法可能显得不正式。</p>
+      <p>三个词的首字母组成 GAN。讲者讲了一个轶事，并说明不必太当真：取名时有人告诉 Goodfellow，GAN 的中文读音「干」和英文里 F 开头的那个词有些相似，意思还更丰富。论文正文其实没有使用 GAN 这个缩写，和 AlexNet 一样，名字是后人叫开的。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-150.jpg" alt="标题和作者。" loading="lazy"><figcaption><button class="ts" type="button" data-t="150">2:30</button>标题和作者。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>本页对照核实过：arXiv v1 正文确实通篇写 adversarial nets，没有用 GAN；NeurIPS 终版第 2 节已经出现 GANs 这个缩写。所以「论文没提这个名字」只对 arXiv v1 成立。</p></div>
+    </section>
+<section class="sec" id="m-s2">
+      <h4><button class="ts" type="button" data-t="203">3:23</button><span>作者和摘要</span></h4>
+      <p>第一作者 Ian Goodfellow，除了这篇，最有名的工作是《深度学习》教材，最后一位作者是 Yoshua Bengio。作者当时都在蒙特利尔大学。</p>
+      <p>讲者认为摘要的写法很值得注意：几乎可以直接放进教科书或维基百科，整篇论文也一样，只讲清楚 GAN 是什么。如果工作是全新的，就把重点放在讲清楚自己是什么。如果工作建立在别人的基础上，就要花很多篇幅讲区别和创新。前者更有力，但要工作本身撑得起。</p>
+      <p>摘要的第一句说这是一个框架 (Framework)。讲者提醒，说自己是框架，意味着它比一个具体模型大，写之前要掂量一下。摘要接着给出两个模型、极小极大博弈和唯一解，并说明不需要马尔可夫链。这种写法读者如果不熟悉这个领域，第一次读是读不懂的，所以要权衡读者是谁。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-330.jpg" alt="摘要：两个模型同时训练，G 抓住数据分布，D 估计样本来自真实数据的概率。" loading="lazy"><figcaption><button class="ts" type="button" data-t="330">5:30</button>摘要：两个模型同时训练，G 抓住数据分布，D 估计样本来自真实数据的概率。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s3">
+      <h4><button class="ts" type="button" data-t="441">7:21</button><span>导论：假币和警察</span></h4>
+      <p>第一句说深度学习是发现丰富的层次化模型，用来表示各种数据的概率分布。讲者指出，这是 Bengio 等人一直的观点：深度学习关注的是数据分布的表示，深度神经网络只是手段。</p>
+      <p>接着说深度学习在判别模型上进展大，在生成模型上进展小，难点是最大化似然函数时要做很多近似，计算困难。这篇论文的出发点就是不再近似似然函数。</p>
+      <p>第二段是假币的比喻：生成模型是造假者，判别模型是警察，双方不断提升，最后希望造假者胜出，假币和真币无法区分。第三段说明这是框架的一个特例：两个模型都是多层感知机，噪声通常来自高斯分布，因此可以直接用反向传播，不需要用马尔可夫链对分布做复杂的采样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-570.jpg" alt="导论：造假者和警察的比喻。" loading="lazy"><figcaption><button class="ts" type="button" data-t="570">9:30</button>导论：造假者和警察的比喻。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者这里说噪声通常是高斯分布，这是后来的常见做法。论文只说是先验 <span class="m"><i>p</i><sub><i>z</i></sub>(<i>z</i>)</span>，图 1 的例子用的是均匀分布。</p></div>
+    </section>
+<section class="sec" id="m-s4">
+      <h4><button class="ts" type="button" data-t="638">10:38</button><span>相关工作：两个版本</span></h4>
+      <p>讲者读的是 NeurIPS 上的终版。arXiv 上的是较早的版本，作者没有再更新。两版的主要差别就在相关工作：讲者认为 arXiv 版基本没有写真正相关的东西，终版才写了很多。讲者的猜测是，作者是自己想出这个方法的，并没有事先调研，写完才被人告知哪些工作相关。</p>
+      <p>终版的第一段先说此前方法的问题：它们构造一个带参数的分布函数，通过最大化对数似然来学习，高维时计算困难。于是出现了生成机器 (Generative Machines)，不再构造分布，只学习一个能生成样本的模型。前者清楚分布是什么，后者计算简单，但不知道分布长什么样。</p>
+      <p>接着提到两点。作者当时不知道 VAE，VAE 和 GAN 是非常相似的工作。用判别模型帮助生成模型也不是新想法，比如噪声对比估计 (NCE)，但它的损失函数更复杂，求解性能不如 GAN。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-750.jpg" alt="NeurIPS 终版的相关工作，和 arXiv v1 内容不同。" loading="lazy"><figcaption><button class="ts" type="button" data-t="750">12:30</button>NeurIPS 终版的相关工作，和 arXiv v1 内容不同。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者说「对 f 的期望求导等价于对 f 自己求导」，论文终版的原式是 <span class="m">lim<sub><i>σ</i>→0</sub> ∇<sub><i>x</i></sub> 𝔼<sub><i>ε</i>∼<i>N</i>(0, <i>σ</i><sup>2</sup><i>I</i>)</sub> <i>f</i>(<i>x</i> + <i>ε</i>) = ∇<sub><i>x</i></sub> <i>f</i>(<i>x</i>)</span>，也就是生成器不加噪声（方差趋于 0）时才成立。</p><p>终版对 VAE 的说法比「非常相似」更具体：两者都把可微的生成网络和第二个网络配对，VAE 的第二个网络做近似推断。GAN 要对可见单元求导，不能建模离散数据；VAE 要对隐藏单元求导，不能有离散隐变量。</p></div>
+    </section>
+<section class="sec" id="m-s5">
+      <h4><button class="ts" type="button" data-t="800">13:20</button><span>和 Predictability Minimization 的争议</span></h4>
+      <p>终版用了一长段解释和 Predictability Minimization (PM) 的区别，这是 Schmidhuber 1992 年的工作。讲者转述了一段轶事：Schmidhuber 应该是这篇论文的 NIPS 审稿人，审稿意见认为这就是 PM 的简单变种，建议改名叫 reverse PM。两人通过邮件有过多次交流。后来 Goodfellow 在 NIPS 做报告时，Schmidhuber 当场站起来提出同样的意见，Goodfellow 回应说这些已经在邮件里说清楚了。</p>
+      <p>讲者由此谈到技术史的一个现象：有用的技术会在不同领域被反复发现，并得到新的名字，功劳往往归给教会大家使用它的人，而不是最早发明它的人。LSTM 很幸运，几十年后被重新发掘，功劳也归给了 Schmidhuber，但 PM 这样的算法基本被淹没了。</p>
+      <p>相关工作最后区分了对抗样本 (Adversarial Examples)，它是构造和真实样本很像、能骗过分类器的假样本，用来测试算法的稳定性，和 GAN 是两回事。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>审稿和当场提问的细节，视频里是转述，讲者也用了「应该是」。本页没有查到可靠的一手来源，只能当作轶事。</p><p>论文终版给出的三点区别可以核实：一、GAN 的竞争是唯一的训练准则，PM 只是让隐藏单元统计独立的正则项。二、PM 比较两个网络输出的一个标量，GAN 中一个网络生成高维向量作为另一个网络的输入。三、PM 是最小化一个目标函数，GAN 是极小极大博弈，终止于鞍点。</p></div>
+    </section>
+<section class="sec" id="m-s6">
+      <h4><button class="ts" type="button" data-t="942">15:42</button><span>x 和 z：游戏截图的例子</span></h4>
+      <p>第三节讲算法。讲者用一个例子解释符号：假设要生成 4K 游戏截图，每张约 800 万像素，那么 <span class="m"><i>x</i></span> 就是一个 800 万维的随机变量，真实分布对应游戏程序本身。</p>
+      <p>要生成这些图，第一种办法是反汇编游戏代码，真正知道它是怎么生成的，这对应构造分布的那类方法，计算困难。第二种办法不管程序，只估计画面背后的逻辑大概由 100 个变量控制，比如什么人物在什么位置。于是取一个 100 维的噪声 <span class="m"><i>z</i></span>，每个元素服从标准正态，再用一个多层感知机把它映射成 <span class="m"><i>x</i></span>。多层感知机理论上能拟合任何函数。</p>
+      <p>代价是这个映射并没有真正理解代码：看到一张图时，很难找到它对应的 <span class="m"><i>z</i></span>，只能随机给一个 <span class="m"><i>z</i></span>，看生成的图是否像样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-990.jpg" alt="生成器的定义：先验 p_z(z)，映射 G(z; θ_g)。" loading="lazy"><figcaption><button class="ts" type="button" data-t="990">16:30</button>生成器的定义：先验 p<sub>z</sub>(z)，映射 G(z; θ<sub>g</sub>)。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s7">
+      <h4><button class="ts" type="button" data-t="1117">18:37</button><span>判别器和目标函数</span></h4>
+      <p>判别器输入一张图，输出一个标量，判断它是真实截图还是生成的。数据的来源已知，所以标号也已知，真实为 1，生成为 0，就是训练一个二分类器。</p>
+      <p>讲者把数值代入目标函数说明每一项。判别器完美时，真实样本的 <span class="m"><i>D</i>(<i>x</i>) = 1</span>，<span class="m">log <i>D</i>(<i>x</i>) = 0</span>；生成样本的 <span class="m"><i>D</i>(<i>G</i>(<i>z</i>)) = 0</span>，<span class="m">log(1 − 0) = 0</span>，两项都为 0。判别器有错误时，因为有对数，两项都变成负数，所以判别器要最大化。生成器只影响第二项，要让判别器犯错，所以要最小化。极端情况下 <span class="m"><i>D</i>(<i>G</i>(<i>z</i>)) = 1</span>，第二项变成负无穷。</p>
+      <p>这和一般的目标函数不同，同时有 min 和 max。如果双方都无法再进步，就达到了纳什均衡。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1230.jpg" alt="G 最小化 log(1 − D(G(z)))。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1230">20:30</button>G 最小化 log(1 − D(G(z)))。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-1290.jpg" alt="价值函数 V(G, D) 的两项。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1290">21:30</button>价值函数 V(G, D) 的两项。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s8">
+      <h4><button class="ts" type="button" data-t="1364">22:44</button><span>图 1</span></h4>
+      <p>例子中 <span class="m"><i>z</i></span> 和 <span class="m"><i>x</i></span> 都是一维的，<span class="m"><i>z</i></span> 均匀采样，真实的 <span class="m"><i>x</i></span> 接近高斯。第一步，生成器把均匀分布映射成绿线所示的分布，判别器（蓝线）效果一般。接着更新判别器，它在真实分布集中的区域输出接近 1，在生成分布集中的区域输出接近 0。</p>
+      <p>再更新生成器，把峰值向判别器认为真实的方向移动，让判别器尽量犯错。如此反复，最后生成分布和真实分布重合，判别器处处输出 0.5，无能为力。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1410.jpg" alt="图 1 的四个阶段。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1410">23:30</button>图 1 的四个阶段。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-1470.jpg" alt="讲者在图上标注生成分布的移动方向。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1470">24:30</button>讲者在图上标注生成分布的移动方向。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s9">
+      <h4><button class="ts" type="button" data-t="1530">25:30</button><span>算法 1：k 怎么取</span></h4>
+      <p>每次迭代先做 <span class="m"><i>k</i></span> 步判别器更新，每步采样 <span class="m"><i>m</i></span> 个噪声和 <span class="m"><i>m</i></span> 个真实样本，组成 <span class="m">2<i>m</i></span> 的小批量；再采样 <span class="m"><i>m</i></span> 个噪声更新生成器，这一步只需计算第二项。</p>
+      <p><span class="m"><i>k</i></span> 既不能太小也不能太大。太小时判别器跟不上，生成器更新已经改变的分布，去欺骗一个没有更新的判别器意义不大。太大时判别器完美，第二项变成 0，对 0 求导就无从更新生成器。讲者接着用了比喻：警察太强，造假者直接被端掉，也就没有能力改进工艺；警察太弱，造假者随便造点东西也不会被抓，同样没有动力改进。最好是实力相当。</p>
+      <p>收敛的判断也不容易。一方不动而另一方在动，算不算收敛？双方都在抖动，算不算收敛？讲者说 GAN 的收敛非常不稳定，所以后来有很多改进工作。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1590.jpg" alt="算法 1：k 步判别器更新，一步生成器更新。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1590">26:30</button>算法 1：k 步判别器更新，一步生成器更新。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者说判别器完美时第二项「等于 0，对 0 求导」是直观的说法。严格说是 <span class="m"><i>D</i>(<i>G</i>(<i>z</i>))</span> 接近 0 的区域里梯度趋于 0，综述的<a class="ilink" href="#o-nonsat">非饱和目标</a>一节用实测数字说明了这一点。</p></div>
+    </section>
+<section class="sec" id="m-s10">
+      <h4><button class="ts" type="button" data-t="1723">28:43</button><span>生成器目标的修改</span></h4>
+      <p>训练早期生成器很弱，判别器能完美分开两类，第二项趋于 0，生成器得不到梯度。所以论文建议更新生成器时改为最大化 <span class="m">log <i>D</i>(<i>G</i>(<i>z</i>))</span>。讲者指出这也带来新问题：<span class="m"><i>D</i>(<i>G</i>(<i>z</i>))</span> 为 0 时，<span class="m">log 0</span> 是负无穷，有数值问题，这在后来的工作中得到改进。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1750.jpg" alt="第 3 节末尾：把生成器目标改成最大化 log D(G(z))。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1750">29:10</button>第 3 节末尾：把生成器目标改成最大化 log D(G(z))。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者只讲了这一个问题。这个修改还改变了优化的目标，容易丢失模式，见综述的<a class="ilink" href="#o-nonsat">非饱和目标</a>。</p></div>
+    </section>
+<section class="sec" id="m-s11">
+      <h4><button class="ts" type="button" data-t="1788">29:48</button><span>最优判别器和两样本检验</span></h4>
+      <p>第四节有两部分结论：目标函数的全局最优是 <span class="m"><i>p</i><sub><i>g</i></sub> = <i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub></span>，算法 1 确实能求解。第一个结论从最优判别器开始，<span class="m"><i>D</i>^*(<i>x</i>) = <i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub>(<i>x</i>) / (<i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub>(<i>x</i>) + <i>p</i><sub><i>g</i></sub>(<i>x</i>))</span>。两个分布相同时，这个值处处是 1/2。</p>
+      <p>讲者认为这个结论本身就很有用。从两个分布各采样一些数据，训练一个二分类器。如果分不开，说明两个分布接近；如果能分开，说明它们不同。这在统计上叫两样本检验 (Two-Sample Test)。传统工具如 t 检验在高维上不好用，分类器不需要知道分布是什么形式。</p>
+      <p>实际应用的例子是部署检查：在一个训练集上训练好模型，部署到新环境前，训练一个分类器区分训练数据和新环境的数据。如果能分开，就说明模型可能不适配新环境。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1890.jpg" alt="最优判别器的公式。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1890">31:30</button>最优判别器的公式。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>这个思路在综述里没有展开，也是这一期的独到之处。严格地说，分不开只说明这个分类器在这些样本上看不出差异，不等于两个分布相同。</p></div>
+    </section>
+<section class="sec" id="m-s12">
+      <h4><button class="ts" type="button" data-t="1969">32:49</button><span>证明：逐点求最优</span></h4>
+      <p>先写期望的积分定义，代入价值函数。然后用换元把对 <span class="m"><i>z</i></span> 的积分写成对 <span class="m"><i>x</i></span> 的积分，<span class="m"><i>p</i><sub><i>g</i></sub></span> 是 <span class="m"><i>G</i></span> 对应的分布，两个积分就能合并。讲者强调这里不需要知道 <span class="m"><i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub></span> 和 <span class="m"><i>p</i><sub><i>g</i></sub></span> 具体是什么。</p>
+      <p>积分内部抽象成 <span class="m"><i>a</i> log <i>y</i> + <i>b</i> log(1 − <i>y</i>)</span>，求导令其为零，得到 <span class="m"><i>y</i> = <i>a</i> / (<i>a</i> + <i>b</i>)</span>。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2010.jpg" alt="把价值函数写成积分。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2010">33:30</button>把价值函数写成积分。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-2130.jpg" alt="抽象成关于 y 的函数并求最大值。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2130">35:30</button>抽象成关于 y 的函数并求最大值。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者把这个函数说成二次函数，并按抛物线形状画出来。它不是二次函数，但确实是凹函数，只有一个最大值，结论不受影响。</p></div>
+    </section>
+<section class="sec" id="m-s13">
+      <h4><button class="ts" type="button" data-t="2189">36:29</button><span>定理 1：KL 和 JS 散度</span></h4>
+      <p>把 <span class="m"><i>D</i>^*</span> 代回，得到只关于 <span class="m"><i>G</i></span> 的函数 <span class="m"><i>C</i>(<i>G</i>)</span>。证明的关键是回顾 KL 散度。分子是一个分布，分母 <span class="m"><i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub> + <i>p</i><sub><i>g</i></sub></span> 积分等于 2，不是分布，乘除 1/2 之后就成了分布，多出的常数合并成 <span class="m">−log 4</span>。这样就得到两个 KL 散度。KL 散度非负，只在两个分布相等时为零，所以最优解是 <span class="m"><i>p</i><sub><i>g</i></sub> = <i>p</i><sub><i>d</i><i>a</i><i>t</i><i>a</i></sub></span>。</p>
+      <p>这两个 KL 之和就是 JS 散度。和 KL 不同，它是对称的。讲者提到有人认为使用对称散度使 GAN 更容易训练，但也有后续工作找到了更好的目标函数。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2250.jpg" alt="KL 散度的定义和推导。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2250">37:30</button>KL 散度的定义和推导。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-2310.jpg" alt="两个 KL 散度合成 JS 散度。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2310">38:30</button>两个 KL 散度合成 JS 散度。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者对 KL 的解释是「知道 P 时至少要多少比特把 Q 描述出来」。更准确的说法是：数据来自 <span class="m"><i>p</i></span> 时，用按 <span class="m"><i>q</i></span> 设计的编码比最优编码平均多用的比特数。</p><p>对称性使训练更容易的说法，后来的 WGAN 恰恰认为 JS 散度是训练困难的来源之一，见<a class="ilink" href="#o-wgan">换目标函数</a>。</p></div>
+    </section>
+<section class="sec" id="m-s14">
+      <h4><button class="ts" type="button" data-t="2380">39:40</button><span>命题 2：函数空间上的收敛</span></h4>
+      <p>证明的关键一步是把价值函数看成关于 <span class="m"><i>p</i><sub><i>g</i></sub></span> 的函数。这是函数的函数：输入不再是一个值，而是一个函数。讲者用 Python 打比方，原来函数接收一个向量，现在要接收一个闭包。这样就是在函数空间里做梯度下降。</p>
+      <p>展开后 <span class="m"><i>p</i><sub><i>g</i></sub></span> 只以线性形式出现，所以是凸函数。每一步把 <span class="m"><i>D</i></span> 求到最优，凸函数的上确界仍是凸的，所以对它做梯度下降能得到最优解。</p>
+      <p>但证明假设每一步都把 <span class="m"><i>D</i></span> 优化到最优，实际算法只迭代 <span class="m"><i>k</i></span> 步，所以证明并不能保证算法有效。论文说算法实际表现很好，讲者认为这个说法过于乐观：算法 1 很难收敛，常常出问题，这个问题留给了后面的人。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2430.jpg" alt="命题 2：把 V 看成 p_g 的函数。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2430">40:30</button>命题 2：把 V 看成 p<sub>g</sub> 的函数。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s15">
+      <h4><button class="ts" type="button" data-t="2527">42:07</button><span>实验、优缺点和未来工作</span></h4>
+      <p>实验结果相当粗糙，数字还行，其他图片分辨率很低，也要做很多实验才能选出几张。但在当时已经让人大开眼界，就像电视刚出现时分辨率虽低，大家仍然非常惊讶。所以有大量的人跟进。</p>
+      <p>缺点作者已经意识到：训练困难，<span class="m"><i>G</i></span> 和 <span class="m"><i>D</i></span> 要平衡好。优点方面，论文说生成器没有直接看到真实样本，所以能生成较锐利的边缘，讲者说后来发现并非完全如此。未来工作里第一项就是条件 GAN，因为现在生成是不受控制的。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2550.jpg" alt="原论文的样本。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2550">42:30</button>原论文的样本。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者说样本是「尝试很多实验才能拎几张出来」，这是对训练过程的评价。论文图 2 的说明强调样本是公平的随机采样，没有挑选。</p></div>
+    </section>
+<section class="sec" id="m-s16">
+      <h4><button class="ts" type="button" data-t="2625">43:45</button><span>写法总结</span></h4>
+      <p>这一节谈的是写作。摘要讲 GAN 在做什么，导论很短，加一点故事性，说明为什么做这件事。第 3 节讲目标函数和优化，第 4 节证明，第 5 节简单做实验，最后是未来工作。讲者说，这样过几年再读就很舒服，想读的内容可以一路读下来，至于和别人工作的区别，如果只想了解 GAN，其实不需要。</p>
+      <p>相关工作方面，讲者的看法是，真正伟大的工作不在乎想法是否在别处出现过，关键是能否展示它在应用上取得很好的效果，让别人相信并跟着继续做，把领域做大。</p>
+      <p>这种写法有前提：如果觉得工作几年后还会被反复阅读，就可以这样写；如果开创性没有那么高，就一定要写清楚和别人的区别和自己的贡献。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2670.jpg" alt="结论和未来工作。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2670">44:30</button>结论和未来工作。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s17">
+      <h4><button class="ts" type="button" data-t="2733">45:33</button><span>算法的影响</span></h4>
+      <p>讲者认为 GAN 除了开创一个领域，还有两点更一般的影响：它是无监督学习，不需要标号；它用有监督学习的损失函数做无监督学习，标号来自「数据是采样的还是生成的」，所以训练高效。这也是后来 BERT 这类自监督模型的灵感来源之一。</p>
+      
+      
+    </section>
+      
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/m-1410.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1rb4y187vD/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：GAN 的影响</span></button></li><li><button type="button" data-t="108"><b>1:48</b><span>标题和命名</span></button></li><li><button type="button" data-t="203"><b>3:23</b><span>作者</span></button></li><li><button type="button" data-t="229"><b>3:49</b><span>摘要</span></button></li><li><button type="button" data-t="441"><b>7:21</b><span>导论：假币和警察</span></button></li><li><button type="button" data-t="638"><b>10:38</b><span>相关工作：两个版本</span></button></li><li><button type="button" data-t="800"><b>13:20</b><span>和 Predictability Minimization 的争议</span></button></li><li><button type="button" data-t="942"><b>15:42</b><span>x 和 z：游戏截图的例子</span></button></li><li><button type="button" data-t="1117"><b>18:37</b><span>判别器和目标函数</span></button></li><li><button type="button" data-t="1364"><b>22:44</b><span>图 1</span></button></li><li><button type="button" data-t="1530"><b>25:30</b><span>算法 1：k 怎么取</span></button></li><li><button type="button" data-t="1723"><b>28:43</b><span>生成器目标的修改</span></button></li><li><button type="button" data-t="1788"><b>29:48</b><span>最优判别器和两样本检验</span></button></li><li><button type="button" data-t="1969"><b>32:49</b><span>证明：逐点求最优</span></button></li><li><button type="button" data-t="2189"><b>36:29</b><span>定理 1：KL 和 JS 散度</span></button></li><li><button type="button" data-t="2380"><b>39:40</b><span>命题 2：函数空间上的收敛</span></button></li><li><button type="button" data-t="2527"><b>42:07</b><span>实验、优缺点和未来工作</span></button></li><li><button type="button" data-t="2625"><b>43:45</b><span>写法总结</span></button></li><li><button type="button" data-t="2733"><b>45:33</b><span>算法的影响</span></button></li></ol>
+    </aside>
+  </div>
+</details>
   </div>
 </details>
   <details class="res" id="res-c">
