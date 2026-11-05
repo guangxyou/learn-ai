@@ -3452,7 +3452,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
       <p class="lede">Justin Johnson 讲。开头补完上一讲的自监督：SimCLR 需要很大的批量，MoCo 用负样本队列加动量编码器（指数滑动平均）绕开它，DINO 系列思路相近，DINOv2 把训练数据扩到约 1.42 亿张图，是现在很常用的自监督特征。</p>
       <p class="lede">正题先厘清两条轴：有监督与无监督；判别模型 p(y|x)、生成模型 p(x)、条件生成模型 p(x|y)。关键是概率分布必须归一化，所以要看「谁和谁在争概率质量」：判别模型里只有标签之间在争，图像之间不争，也就没法拒绝不合理的输入；生成模型里所有可能的图像都在争。</p>
       <p class="lede">三者可以用贝叶斯公式互相换算。实际最有用的是条件生成，因为很多问题的输出本来就不唯一。接着画出家族树：显式密度（精确的自回归模型、近似的变分自编码器）和隐式密度（直接采样的生成对抗网络、迭代采样的扩散模型）。</p>
-      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/lec13-1980.jpg" alt="生成模型家族树：显式密度（精确 / 近似）与隐式密度（直接 / 间接）" loading="lazy"><figcaption><button class="ts" type="button" data-t="1980">33:00</button>生成模型家族树：显式密度（精确 / 近似）与隐式密度（直接 / 间接）</figcaption></figure></div>
       <p class="lede">这一讲讲前半边。<b>自回归模型</b>从最大似然出发，用概率的链式法则把联合分布拆成逐个部分的条件分布，循环网络和带掩码的 Transformer 都能做，语言天然合适，图像逐像素做太贵。</p>
       <p class="lede"><b>变分自编码器 (Variational Autoencoder)</b> 在自编码器的基础上强制隐变量服从高斯先验：编码器和解码器都输出对角高斯的参数，推导出证据下界（重建项加 KL 项），用重参数化技巧训练；两项损失互相拉扯，训练好以后从先验采样再解码就能生成。</p>
       
