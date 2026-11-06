@@ -10,7 +10,7 @@
   "date": "2014-06",
   "studied": "2026-11",
   "published": "2026-11-05",
-  "before": "vae",
+  "before": "ddpm",
   "summary": "四个 tab：综述（含一个实际运行的玩具实验）、原论文中英对照、15 个常见问题，基础知识、跟李沐学AI 精读和 CS231n 第 14 讲的笔记默认折叠在资料里。",
   "source": {
     "name": "Generative Adversarial Nets · Goodfellow, Pouget-Abadie, Mirza, Xu, Warde-Farley, Ozair, Courville, Bengio",
