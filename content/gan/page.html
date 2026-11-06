@@ -351,7 +351,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
   </section>
 <section class="aisec" id="o-history">
     <h2><span class="n">2</span><span>来历：不用马尔可夫链，也不用近似推断</span></h2>
-    <p>2014 年的深度学习成就主要在判别模型，比如图像分类和语音识别，依靠的是反向传播、Dropout 和 Piecewise Linear Unit（ReLU、Maxout 这类激活函数）。深度生成模型的影响小得多，因为它们常常要面对难以计算的概率量。</p>
+    <p>2014 年的深度学习成就主要在判别模型，比如图像分类和语音识别，依靠的是反向传播、Dropout 和 Piecewise Linear Unit（分段线性单元，ReLU、Maxout 这类激活函数）。深度生成模型的影响小得多，因为它们常常要面对难以计算的概率量。</p>
     <p>当时的主要生成模型有几类。受限玻尔兹曼机和深度玻尔兹曼机要处理配分函数及其梯度，只能用马尔可夫链蒙特卡洛估计，混合困难。深度信念网络同时继承了有向和无向模型的计算困难。生成随机网络 (GSN) 不需要写出密度，但采样仍要运行马尔可夫链。几个月前的 VAE（2013-12-20）用反向传播训练生成网络，代价是优化证据下界，并且需要一个推断网络。</p>
     <p>Goodfellow 的想法是把密度估计问题改写成分类问题。分类已经是深度学习最擅长的事，分类器能告诉生成器它的样本哪里不像真实数据。这样既不需要配分函数，也不需要马尔可夫链，还能直接使用 ReLU 和 Maxout。</p>
     <p>论文致谢里写着感谢「Les Trois Brasseurs」激发创造力，这是蒙特利尔的一家酒吧。Goodfellow 在 DeepLearning.AI 的访谈中说，想法来自和朋友在那里的一次讨论，他当晚回家写了第一版代码。</p>
