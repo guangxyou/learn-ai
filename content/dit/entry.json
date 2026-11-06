@@ -1,0 +1,32 @@
+{
+  "id": "dit",
+  "kind": "paper",
+  "title": "DiT",
+  "subtitle": "扩散 Transformer (Diffusion Transformer) 的来历、结构和后续发展，附原论文逐段中英对照",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2022-12",
+  "studied": "2026-11",
+  "published": "2026-11-06",
+  "before": "latent-diffusion",
+  "summary": "四个 tab：综述（参数量和恒等初始化用官方代码核对过）、原论文中英对照（含附录和全部样本图）、19 个常见问题，基础知识和 CS231n 第 14 讲的笔记默认折叠在资料里。",
+  "source": {
+    "name": "Scalable Diffusion Models with Transformers · Peebles, Xie",
+    "url": "https://arxiv.org/abs/2212.09748"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>4</b> 个 tab",
+    "<b>6</b> 张示意图",
+    "<b>11</b> 张截图",
+    "<b>19</b> 个常见问题"
+  ],
+  "build": {
+    "note": "输入在 23_DiT/ 下（content/*.mjs 正文、figures/ 示意图、code/ 官方模型和核对脚本、paper/ 论文源和裁图），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，23_DiT/ 在时构建会先重新生成。第二个 tab 是原论文 arXiv v2 的中英对照（无批注），build.mjs 调 tools/make-paper.mjs --embed 1 --plain 1 生成 assets/paper.html，图拆到 assets/paper/，用 iframe 嵌进来；译文、文献链接和表格样式在 content/dit/paper/。",
+    "tool": "23_DiT/build.mjs",
+    "requires": "23_DiT/build.mjs",
+    "args": []
+  }
+}

@@ -1,0 +1,514 @@
+[
+{
+"en": "We explore a new class of diffusion",
+"zh": "我们研究一类基于 Transformer 结构的新扩散模型。我们训练图像的隐空间扩散模型，把常用的 U-Net 骨干换成作用于隐空间图块 (Latent Patch) 的 Transformer。我们以前向计算复杂度（用 Gflops 衡量）为尺度，分析扩散 Transformer (Diffusion Transformer, DiT) 的可扩展性。结果发现，Gflops 更高的 DiT（通过增加 Transformer 的深度和宽度，或增加输入 token 数）FID 始终更低。除了具有良好的可扩展性，我们最大的 DiT-XL/2 模型在类别条件的 ImageNet 512{m1}512 和 256{m2}256 基准上超过了此前所有扩散模型，在后者上取得了当前最好的 FID 2.27。"
+},
+{
+"en": "Introduction",
+"zh": "引言"
+},
+{
+"en": "Figure 1 : Diffusion models with tra",
+"zh": "<b>图 1：</b>采用 Transformer 骨干的扩散模型达到了当前最好的图像质量。这里展示两个在 ImageNet 上训练的类别条件 DiT-XL/2 模型挑选出的样本，分辨率分别为 512{m1}512 和 256{m2}256。"
+},
+{
+"en": "Figure 2 : ImageNet generation with",
+"zh": "<b>图 2：</b>用扩散 Transformer (DiT) 生成 ImageNet 图像。气泡面积表示扩散模型的计算量 (flops)。左：DiT 模型在训练 40 万次迭代时的 FID-50K（越低越好）。随着模型计算量增加，FID 持续改善。右：我们最好的模型 DiT-XL/2 计算效率高，并且优于此前所有基于 U-Net 的扩散模型，如 ADM 和 LDM。"
+},
+{
+"en": "Machine learning is experiencing a r",
+"zh": "机器学习正在经历一场由 Transformer 推动的复兴。过去五年里，自然语言处理 {c1}、视觉 {c2} 以及其他若干领域的神经网络结构，大多已被 Transformer 取代 {c3}。不过，许多图像级生成模型还没有顺应这一趋势：Transformer 在自回归模型中应用广泛 {c4}，在其他生成建模框架中却用得较少。例如，扩散模型处于近期图像级生成模型进展的前沿 {c5}，但它们都把卷积 U-Net 结构作为事实上的默认骨干。"
+},
+{
+"en": "The seminal work of Ho et al. {c1:[",
+"zh": "Ho 等人 {c1} 的开创性工作首次把 U-Net 骨干引入扩散模型。U-Net 最初在像素级自回归模型和条件 GAN {c2} 中取得成功，这里的 U-Net 继承自 PixelCNN++ {c3}，做了少量改动。该模型是卷积网络，主要由 ResNet {c4} 块组成。和标准 U-Net {c5} 不同的是，它在较低分辨率处穿插了额外的空间自注意力块，这是 Transformer 的关键组件。Dhariwal 和 Nichol {c6} 对 U-Net 的若干结构选择做了消融实验，例如用自适应归一化层 (Adaptive Normalization Layer) {c7} 注入条件信息，以及卷积层的通道数。不过，Ho 等人提出的 U-Net 的高层设计基本保持不变。"
+},
+{
+"en": "With this work, we aim to demystify",
+"zh": "本文希望厘清结构选择对扩散模型的意义，并为后续生成建模研究提供经验基线。我们证明 U-Net 的归纳偏置对扩散模型的性能并不关键，可以直接换成 Transformer 这样的标准设计。这样一来，扩散模型有望受益于近来的结构统一趋势，例如继承其他领域的最佳实践和训练方法，同时保留可扩展性、鲁棒性和效率等优良特性。标准化的结构也会为跨领域研究带来新的可能。"
+},
+{
+"en": "In this paper, we focus on a new cla",
+"zh": "本文关注一类基于 Transformer 的新扩散模型，我们称之为<b>扩散 Transformer (Diffusion Transformer)</b>，简称 DiT。DiT 遵循 Vision Transformer (ViT) {c1} 的最佳实践，ViT 在视觉识别上的扩展效果已被证明优于传统卷积网络（如 ResNet {c2}）。"
+},
+{
+"en": "More specifically, we study the scal",
+"zh": "具体来说，我们研究 Transformer 在<b>网络复杂度</b>与<b>样本质量</b>之间的缩放规律。我们在 Latent Diffusion Models (LDM) {c1} 框架（扩散模型在 VAE 的隐空间中训练）下构建并评测 DiT 的设计空间，证明可以成功地用 Transformer 替换 U-Net 骨干。我们进一步证明 DiT 是扩散模型的可扩展结构：网络复杂度（用 Gflops 衡量）和样本质量（用 FID 衡量）之间有很强的相关性。只需扩大 DiT，用高容量骨干（118.6 Gflops）训练 LDM，就能在类别条件的 {m1} ImageNet 生成基准上取得当前最好的 FID 2.27。"
+},
+{
+"en": "Figure 3 : The Diffusion Transformer",
+"zh": "<b>图 3：</b>扩散 Transformer (DiT) 的结构。左：我们训练条件隐空间 DiT 模型。输入隐变量被分解成图块，由若干 DiT 块处理。右：DiT 块的细节。我们试验了标准 Transformer 块的几种变体，分别通过自适应层归一化 (Adaptive Layer Norm)、交叉注意力和额外输入 token 接入条件。自适应层归一化的效果最好。"
+},
+{
+"en": "Related Work",
+"zh": "相关工作"
+},
+{
+"en": "Transformers.",
+"zh": "Transformer"
+},
+{
+"en": "Transformers {c1:[ 60 ]} have replac",
+"zh": "Transformer {c1} 已经在语言、视觉 {c2}、强化学习 {c3} 和元学习 {c4} 等领域取代了专用结构。在语言领域 {c5}、作为通用自回归模型 {c6} 以及作为 ViT {c7} 时，它们都随模型规模、训练算力和数据量的增长表现出出色的扩展性。在语言之外，Transformer 也被训练来自回归地预测像素 {c8}。它们还在离散码本 {c9} 上训练，既作为自回归模型 {c10}，也作为掩码生成模型 {c11}；前者在参数量达到 200 亿时仍有出色的扩展表现 {c12}。最后，Transformer 也被用于 DDPM 来合成非空间数据，例如在 DALL{m1}E 2 中生成 CLIP 图像嵌入 {c13}。本文研究 Transformer 作为图像扩散模型骨干时的扩展性质。"
+},
+{
+"en": "Denoising diffusion probabilistic mo",
+"zh": "去噪扩散概率模型 (Denoising Diffusion Probabilistic Models, DDPM)"
+},
+{
+"en": "Diffusion {c1:[ 54 , 19 ]} and score",
+"zh": "扩散模型 {c1} 和基于分数的生成模型 {c2} 作为图像生成模型特别成功 {c3}，在许多场合超过了此前处于最高水平的生成对抗网络 (GAN) {c4}。过去两年 DDPM 的改进主要来自更好的采样技术 {c5}，其中最突出的是无分类器引导 {c6}、把扩散模型改为预测噪声而非像素 {c7}，以及级联 DDPM 流水线（低分辨率基础扩散模型和上采样模型并行训练）{c8}。对上面列出的所有扩散模型，卷积 U-Net {c9} 都是事实上的默认骨干。同期工作 {c10} 提出了一种基于注意力的新型高效 DDPM 结构；我们研究的是纯 Transformer。"
+},
+{
+"en": "Architecture complexity.",
+"zh": "结构复杂度"
+},
+{
+"en": "When evaluating architecture complex",
+"zh": "在图像生成文献中评估结构复杂度时，通常使用参数量。总的来说，参数量不是衡量图像模型复杂度的好指标，因为它没有考虑图像分辨率等对性能影响很大的因素 {c1}。本文的模型复杂度分析大多采用理论 Gflops。这与结构设计文献一致，那里普遍用 Gflops 衡量复杂度。实践中，最合适的复杂度指标仍有争议，它常常取决于具体的应用场景。Nichol 和 Dhariwal 改进扩散模型的开创性工作 {c2} 和本文最相关，他们分析了 U-Net 结构类的可扩展性和 Gflop 性质。本文关注 Transformer 结构类。"
+},
+{
+"en": "Diffusion Transformers",
+"zh": "扩散 Transformer"
+},
+{
+"en": "Preliminaries",
+"zh": "预备知识"
+},
+{
+"en": "Diffusion formulation.",
+"zh": "扩散过程的表述"
+},
+{
+"en": "Before introducing our architecture,",
+"zh": "在介绍结构之前，先简要回顾理解扩散模型 (DDPM) {c1} 需要的基本概念。高斯扩散模型假设有一个前向加噪过程，逐步向真实数据 {m1} 添加噪声：{m2}，其中常数 {m3} 是超参数。应用重参数化技巧，可以采样 {m4}，其中 {m5}。"
+},
+{
+"en": "Diffusion models are trained to lear",
+"zh": "扩散模型的训练目标是学习反转前向过程破坏的反向过程：{m1}，其中用神经网络预测 {m2} 的统计量。反向过程模型用 {m3} 对数似然的变分下界 {c1} 训练，它化简为 {m4}，这里省略了一个与训练无关的项。由于 {m5} 和 {m6} 都是高斯分布，{m7} 可以用两个分布的均值和协方差计算。把 {m8} 重参数化为噪声预测网络 {m9} 后，模型可以用预测噪声 {m10} 和采样得到的真实高斯噪声 {m11} 之间的简单均方误差训练：{m12}。但要训练带可学习反向过程协方差 {m13} 的扩散模型，需要优化完整的 {m14} 项。我们采用 Nichol 和 Dhariwal 的做法 {c2}：用 {m16} 训练 {m15}，用完整的 {m18} 训练 {m17}。{m19} 训练好之后，新图像的采样方式是：初始化 {m20}，再通过重参数化技巧采样 {m21}。"
+},
+{
+"en": "Classifier-free guidance.",
+"zh": "无分类器引导 (Classifier-Free Guidance)"
+},
+{
+"en": "Conditional diffusion models take ex",
+"zh": "条件扩散模型接收额外信息作为输入，比如类别标签 {m1}。此时反向过程变为 {m2}，其中 {m3} 和 {m4} 以 {m5} 为条件。在这种设定下，无分类器引导可以促使采样过程找到使 {m7} 较高的 {m6} {c1}。由贝叶斯公式，{m8}，因此 {m9}。把扩散模型的输出解释为分数函数后，可以通过下式引导 DDPM 采样，使采样得到的 {m10} 具有较高的 {m11}：{m12}，其中 {m13} 表示引导的强度（注意 {m14} 时恢复为标准采样）。计算 {m15} 时的扩散模型，做法是在训练时随机丢弃 {m16}，替换为一个可学习的「空」嵌入 {m17}。众所周知，无分类器引导得到的样本明显优于一般的采样技术 {c2}，这一趋势对我们的 DiT 模型同样成立。"
+},
+{
+"en": "Latent diffusion models.",
+"zh": "隐空间扩散模型"
+},
+{
+"en": "Training diffusion models directly i",
+"zh": "在高分辨率像素空间直接训练扩散模型，计算量可能大到无法承受。隐空间扩散模型 (LDM) {c1} 用两阶段方法解决这个问题：(1) 学习一个自编码器，用学到的编码器 {m1} 把图像压缩成较小的空间表示；(2) 训练表示 {m2} 的扩散模型，而不是图像 {m3} 的扩散模型（{m4} 固定不变）。生成新图像时，从扩散模型采样一个表示 {m5}，再用学到的解码器解码成图像 {m6}。"
+},
+{
+"en": "As shown in Figure {r1:2} , LDMs ach",
+"zh": "如图 {r1} 所示，LDM 只用像素空间扩散模型（如 ADM）一小部分的 Gflops 就能取得良好性能。我们关心计算效率，因此 LDM 是探索结构的合适起点。本文把 DiT 用在隐空间，不过它也可以不加修改地用在像素空间。这使我们的图像生成流水线成为一种混合方法：使用现成的卷积 VAE 和基于 Transformer 的 DDPM。"
+},
+{
+"en": "Diffusion Transformer Design Space",
+"zh": "扩散 Transformer 的设计空间"
+},
+{
+"en": "We introduce Diffusion Transformers",
+"zh": "我们提出扩散 Transformer (DiT)，一种新的扩散模型结构。我们尽可能贴近标准 Transformer 结构，以保留它的扩展性质。因为我们关注的是训练图像（具体说是图像的空间表示）的 DDPM，所以 DiT 基于 Vision Transformer (ViT) 结构，它处理的是图块序列 {c1}。DiT 保留了 ViT 的许多最佳实践。图 {r1} 给出完整 DiT 结构的概览。本节描述 DiT 的前向计算，以及 DiT 类设计空间的各个组成部分。"
+},
+{
+"en": "Figure 4 : Input specifications for",
+"zh": "<b>图 4：</b>DiT 的输入规格。给定图块大小 {m1}，形状为 {m2} 的空间表示（VAE 输出的加噪隐变量）被 patchify 成长度为 {m3}、隐藏维度为 {m4} 的序列。图块大小 {m5} 越小，序列越长，Gflops 也越高。"
+},
+{
+"en": "Patchify.",
+"zh": "Patchify"
+},
+{
+"en": "The input to DiT is a spatial repres",
+"zh": "DiT 的输入是空间表示 {m1}（对 {m2} 的图像，{m3} 的形状是 {m4}）。DiT 的第一层是 patchify，它对输入的每个图块做线性嵌入，把空间输入转换成 {m5} 个 {m6} 维 token 组成的序列。patchify 之后，我们给所有输入 token 加上标准的 ViT 频率位置编码（正余弦版本）。patchify 产生的 token 数 {m7} 由图块大小超参数 {m8} 决定。如图 {r1} 所示，{m9} 减半会使 {m10} 变成 4 倍，Transformer 的总 Gflops 也至少变成 4 倍。虽然对 Gflops 影响很大，但改变 {m11} 对后续的参数量没有实质影响。"
+},
+{
+"en": "We add {m1:p=2,4,8} to the DiT desig",
+"zh": "我们把 {m1} 加入 DiT 设计空间。"
+},
+{
+"en": "DiT block design.",
+"zh": "DiT 块设计"
+},
+{
+"en": "Following patchify, the input tokens",
+"zh": "patchify 之后，输入 token 由一串 Transformer 块处理。除了加噪的图像输入，扩散模型有时还要处理额外的条件信息，比如噪声时间步 {m1}、类别标签 {m2}、自然语言等。我们研究了四种以不同方式处理条件输入的 Transformer 块变体。这些设计对标准 ViT 块做了微小但重要的修改。所有块的设计见图 {r1}。"
+},
+{
+"en": "Figure 5 : Comparing different condi",
+"zh": "<b>图 5：</b>比较不同的条件接入方式。adaLN-Zero 在训练的所有阶段都优于交叉注意力和 in-context 条件。"
+},
+{
+"en": "In-context conditioning. We simply a",
+"zh": "<b>In-context 条件。</b>我们直接把 {m1} 和 {m2} 的向量嵌入作为两个额外 token 追加到输入序列中，和图像 token 同等对待。这类似于 ViT 的 cls token，可以不加修改地使用标准 ViT 块。在最后一个块之后，我们把条件 token 从序列中移除。这种做法给模型增加的 Gflops 可以忽略。"
+},
+{
+"en": "Cross-attention block. We concatenat",
+"zh": "<b>交叉注意力块。</b>我们把 {m1} 和 {m2} 的嵌入拼接成长度为 2 的序列，与图像 token 序列分开。Transformer 块被修改为在多头自注意力块之后增加一个多头交叉注意力层，这和 Vaswani 等人的原始设计 {c1} 类似，也和 LDM 接入类别标签时使用的设计类似。交叉注意力给模型增加的 Gflops 最多，开销约 15%。"
+},
+{
+"en": "Adaptive layer norm (adaLN) block. F",
+"zh": "<b>自适应层归一化 (adaLN) 块。</b>自适应归一化层 {c1} 已在 GAN {c2} 和采用 U-Net 骨干的扩散模型 {c3} 中广泛使用。沿着这一做法，我们尝试把 Transformer 块中的标准层归一化换成自适应层归一化 (adaLN)。我们不直接学习按维度的缩放和平移参数 {m1} 和 {m2}，而是从 {m3} 和 {m4} 的嵌入向量之和回归得到它们。在我们研究的三种块设计中，adaLN 增加的 Gflops 最少，因此计算效率最高。它也是唯一一种限制为对所有 token 应用相同函数的条件机制。"
+},
+{
+"en": "adaLN-Zero block. Prior work on ResN",
+"zh": "<b>adaLN-Zero 块。</b>此前关于 ResNet 的工作发现，把每个残差块初始化为恒等函数是有益的。例如，Goyal 等人发现，把每个块中最后一个 Batch Normalization 的缩放因子 {m1} 初始化为零，可以加速监督学习场景下的大规模训练 {c1}。扩散 U-Net 模型使用类似的初始化策略，把每个块中残差连接之前的最后一个卷积层初始化为零。我们尝试对 adaLN DiT 块做同样的修改。除了回归 {m2} 和 {m3}，我们还回归按维度的缩放参数 {m4}，它们在 DiT 块内任何残差连接之前立即应用。我们初始化 MLP，使其对所有 {m5} 输出零向量，这样整个 DiT 块被初始化为恒等函数。和普通 adaLN 块一样，adaLN-Zero 给模型增加的 Gflops 可以忽略。"
+},
+{
+"en": "We include the in-context, cross-att",
+"zh": "我们把 in-context、交叉注意力、自适应层归一化和 adaLN-Zero 四种块加入 DiT 设计空间。"
+},
+{
+"en": "Table 1: Details of DiT models. We f",
+"zh": "<b>表 1：</b>DiT 模型的细节。Small (S)、Base (B)、Large (L) 三种规格沿用 ViT {c1} 的模型配置；我们还提出 XLarge (XL) 配置作为最大的模型。"
+},
+{
+"en": "Model size.",
+"zh": "模型规模"
+},
+{
+"en": "We apply a sequence of {m1:N} DiT bl",
+"zh": "我们使用 {m1} 个 DiT 块组成的序列，每个块都工作在隐藏维度 {m2} 上。沿用 ViT，我们采用同时缩放 {m3}、{m4} 和注意力头数的标准 Transformer 配置 {c1}。具体使用四种配置：DiT-S、DiT-B、DiT-L 和 DiT-XL。它们覆盖了很宽的模型规模和计算量范围，从 0.3 到 118.6 Gflops，可以用来评估扩展性能。表 {r1} 给出了配置的细节。"
+},
+{
+"en": "We add B, S, L and XL configs to the",
+"zh": "我们把 B、S、L 和 XL 配置加入 DiT 设计空间。"
+},
+{
+"en": "Figure 6 : Scaling the DiT model imp",
+"zh": "<b>图 6：</b>扩大 DiT 模型在训练的所有阶段都能改善 FID。这里展示 12 个 DiT 模型的 FID-50K 随训练迭代的变化。上行：固定图块大小，比较 FID。下行：固定模型规模，比较 FID。在所有模型规模和图块大小上，扩大 Transformer 骨干都得到更好的生成模型。"
+},
+{
+"en": "Transformer decoder.",
+"zh": "Transformer 解码器"
+},
+{
+"en": "After the final DiT block, we need t",
+"zh": "在最后一个 DiT 块之后，我们需要把图像 token 序列解码成输出的噪声预测和对角协方差预测。这两个输出的形状都和原始空间输入相同。我们用标准的线性解码器完成这一步：应用最后的层归一化（使用 adaLN 时为自适应版本），把每个 token 线性解码成 {m1} 的张量，其中 {m2} 是 DiT 空间输入的通道数。最后把解码后的 token 重排回原来的空间布局，得到预测的噪声和协方差。"
+},
+{
+"en": "The complete DiT design space we exp",
+"zh": "我们研究的完整 DiT 设计空间是图块大小、Transformer 块结构和模型规模。"
+},
+{
+"en": "Experimental Setup",
+"zh": "实验设置"
+},
+{
+"en": "We explore the DiT design space and",
+"zh": "我们探索 DiT 设计空间，研究这类模型的扩展性质。模型按配置和隐空间图块大小 {m1} 命名，例如 DiT-XL/2 表示 XLarge 配置且 {m2}。"
+},
+{
+"en": "Training.",
+"zh": "训练"
+},
+{
+"en": "We train class-conditional latent Di",
+"zh": "我们在 ImageNet 数据集 {c1} 上以 {m1} 和 {m2} 的图像分辨率训练类别条件隐空间 DiT 模型，这是竞争非常激烈的生成建模基准。最后的线性层初始化为零，其余部分使用 ViT 的标准权重初始化方法。所有模型都用 AdamW {c2} 训练。学习率恒定为 {m3}，无权重衰减，批量大小 256。唯一的数据增强是水平翻转。和许多此前的 ViT 工作 {c3} 不同，我们发现训练 DiT 达到高性能不需要学习率预热和正则化。即使没有这些技术，所有模型配置的训练都非常稳定，也没有观察到训练 Transformer 时常见的损失尖峰。按生成建模文献的惯例，我们在训练过程中维护 DiT 权重的指数滑动平均 (Exponential Moving Average, EMA)，衰减率 0.9999。所有报告的结果都使用 EMA 模型。所有 DiT 模型规模和图块大小使用相同的训练超参数。训练超参数几乎全部沿用 ADM。我们没有调整学习率、衰减和预热策略、Adam 的 {m4} / {m5} 以及权重衰减。"
+},
+{
+"en": "Diffusion.",
+"zh": "扩散"
+},
+{
+"en": "We use an off-the-shelf pre-trained",
+"zh": "我们使用 Stable Diffusion {c2} 现成的预训练变分自编码器 (VAE) 模型 {c1}。VAE 编码器的下采样倍数是 8：给定形状为 {m2} 的 RGB 图像 {m1}，{m3} 的形状是 {m4}。本节所有实验中，扩散模型都工作在这个 {m5} 空间。从扩散模型采样得到新的隐变量后，用 VAE 解码器 {m6} 解码成像素。扩散超参数沿用 ADM {c3}：{m7} 的线性方差调度，范围从 {m8} 到 {m9}，以及 ADM 的协方差 {m10} 参数化方式和时间步、标签的嵌入方法。"
+},
+{
+"en": "Evaluation metrics.",
+"zh": "评估指标"
+},
+{
+"en": "We measure scaling performance with",
+"zh": "我们用 Fréchet Inception Distance (FID) {c1} 衡量扩展性能，这是评估图像生成模型的标准指标。"
+},
+{
+"en": "We follow convention when comparing",
+"zh": "与此前工作比较时，我们按惯例报告使用 250 步 DDPM 采样的 FID-50K。FID 对细微的实现细节很敏感 {c1}；为确保比较准确，本文所有数值都通过导出样本并使用 ADM 的 TensorFlow 评估工具 {c2} 得到。除非另有说明，本节报告的 FID 都没有使用无分类器引导。我们还报告 Inception Score {c3}、sFID {c4} 和 Precision/Recall {c5} 作为辅助指标。"
+},
+{
+"en": "Compute.",
+"zh": "算力"
+},
+{
+"en": "We implement all models in JAX {c1:[",
+"zh": "所有模型用 JAX {c1} 实现，在 TPU-v3 集群上训练。计算量最大的模型 DiT-XL/2 在 TPU v3-256 集群上以全局批量 256 训练，速度约每秒 5.7 次迭代。"
+},
+{
+"en": "Experiments",
+"zh": "实验"
+},
+{
+"en": "DiT block design.",
+"zh": "DiT 块设计"
+},
+{
+"en": "We train four of our highest Gflop D",
+"zh": "我们训练四个 Gflops 最高的 DiT-XL/2 模型，各自使用不同的块设计：in-context（119.4 Gflops）、交叉注意力（137.6 Gflops）、自适应层归一化（adaLN，118.6 Gflops）和 adaLN-Zero（118.6 Gflops）。我们在训练过程中测量 FID。结果见图 {r1}。adaLN-Zero 块的 FID 低于交叉注意力和 in-context 条件，同时计算效率最高。在 40 万次训练迭代时，adaLN-Zero 模型的 FID 接近 in-context 模型的一半，说明条件机制对模型质量有决定性影响。初始化同样重要：把每个 DiT 块初始化为恒等函数的 adaLN-Zero 明显优于普通 adaLN。本文后面的所有模型都使用 adaLN-Zero DiT 块。"
+},
+{
+"en": "Figure 7 : Increasing transformer fo",
+"zh": "<b>图 7：</b>增加 Transformer 前向计算的 Gflops 可以提升样本质量。建议放大查看。我们用相同的输入隐空间噪声和类别标签，从训练 40 万步后的全部 12 个 DiT 模型采样。增加模型的 Gflops（增加 Transformer 的深度和宽度，或增加输入 token 数）都能显著提升视觉保真度。"
+},
+{
+"en": "Scaling model size and patch size.",
+"zh": "缩放模型规模和图块大小"
+},
+{
+"en": "We train 12 DiT models, sweeping ove",
+"zh": "我们训练 12 个 DiT 模型，遍历模型配置（S、B、L、XL）和图块大小（8、4、2）。注意 DiT-L 和 DiT-XL 的相对 Gflops 比其他配置之间接近得多。图 {r1}（左）概括了各模型的 Gflops 和 40 万次训练迭代时的 FID。在所有情况下，增大模型规模和减小图块大小都能显著改善扩散模型。"
+},
+{
+"en": "Figure 8 : Transformer Gflops are st",
+"zh": "<b>图 8：</b>Transformer 的 Gflops 和 FID 强相关。图中绘制了每个 DiT 模型的 Gflops 和训练 40 万步后的 FID-50K。"
+},
+{
+"en": "Figure {r1:6} (top) demonstrates how",
+"zh": "图 {r1}（上）展示固定图块大小、增大模型规模时 FID 的变化。在全部四种配置中，把 Transformer 变得更深更宽，在训练的所有阶段都能显著改善 FID。同样，图 {r2}（下）展示固定模型规模、减小图块大小时的 FID。我们再次观察到，只需增加 DiT 处理的 token 数，在参数量基本不变的情况下，整个训练过程的 FID 都有明显改善。"
+},
+{
+"en": "DiT Gflops are critical to improving",
+"zh": "DiT 的 Gflops 是提升性能的关键"
+},
+{
+"en": "The results of Figure {r1:6} suggest",
+"zh": "图 {r1} 的结果说明，参数量不能唯一决定 DiT 模型的质量。固定模型规模、减小图块大小时，Transformer 的总参数量实际上不变（严格说还略有下降），只有 Gflops 增加。这些结果表明，提升模型 Gflops 才是改善性能的关键。为进一步研究这一点，我们在图 {r2} 中绘制了训练 40 万步时的 FID-50K 和模型 Gflops 的关系。结果表明，总 Gflops 相近时，不同 DiT 配置的 FID 也相近（如 DiT-S/2 和 DiT-B/4）。模型 Gflops 和 FID-50K 之间有很强的负相关，说明增加模型算力是改进 DiT 模型的关键因素。在图 {r3}（附录）中，我们发现这一趋势对 Inception Score 等其他指标同样成立。"
+},
+{
+"en": "Larger DiT models are more compute-e",
+"zh": "<b>更大的 DiT 模型计算效率更高。</b>图 {r1} 绘制了所有 DiT 模型的 FID 随总训练算力的变化。我们把训练算力估计为模型 Gflops {m1} 批量大小 {m2} 训练步数 {m3} 3，其中系数 3 大致表示反向传播的计算量是前向计算的两倍。我们发现，小的 DiT 模型即使训练更久，最终也会比训练步数较少的大模型效率低。类似地，除图块大小外完全相同的模型，即使控制训练 Gflops，性能曲线也不同。例如，在约 {m4} Gflops 之后，XL/4 被 XL/2 超过。"
+},
+{
+"en": "Visualizing scaling.",
+"zh": "缩放效果的可视化"
+},
+{
+"en": "We visualize the effect of scaling o",
+"zh": "我们在图 {r1} 中展示缩放对样本质量的影响。在 40 万训练步时，我们用相同的起始噪声 {m1}、采样噪声和类别标签，从 12 个 DiT 模型各采样一张图。这样可以直观地看出缩放如何影响 DiT 的样本质量。增大模型规模和增加 token 数确实都能明显提升视觉质量。"
+},
+{
+"en": "Figure 9 : Larger DiT models use lar",
+"zh": "<b>图 9：</b>更大的 DiT 模型能更高效地利用大算力。图中绘制了 FID 随总训练算力的变化。"
+},
+{
+"en": "State-of-the-Art Diffusion Models",
+"zh": "当前最好的扩散模型"
+},
+{
+"en": "256×256 ImageNet.",
+"zh": "256×256 ImageNet"
+},
+{
+"en": "Following our scaling analysis, we c",
+"zh": "在缩放分析之后，我们继续训练 Gflops 最高的模型 DiT-XL/2，共 700 万步。图 {r1} 展示了模型的样本，并与当前最好的类别条件生成模型比较，结果见表 {r2}。使用无分类器引导时，DiT-XL/2 优于此前所有扩散模型，把 LDM 此前保持的最好 FID-50K 3.60 降到 2.27。图 {r3}（右）显示，DiT-XL/2（118.6 Gflops）相对 LDM-4（103.6 Gflops）这类隐空间 U-Net 模型计算效率较高，相对 ADM（1120 Gflops）或 ADM-U（742 Gflops）这类像素空间 U-Net 模型则高得多。我们的方法取得了此前所有生成模型中最低的 FID，包括此前最好的 StyleGAN-XL {c1}。最后，在所有测试的无分类器引导强度下，DiT-XL/2 的 Recall 都高于 LDM-4 和 LDM-8。只训练 235 万步时（与 ADM 相近），XL/2 的 FID 为 2.55，仍优于此前所有扩散模型。"
+},
+{
+"en": "Table 2 : Benchmarking class-conditi",
+"zh": "<b>表 2：</b>ImageNet 256{m1}256 类别条件图像生成的评测。DiT-XL/2 取得当前最好的 FID。<br><b>表 3：</b>ImageNet 512{m2}512 类别条件图像生成的评测。注意，此前的工作 {c1} 在 {m3} 分辨率上用 1000 个真实样本计算 Precision 和 Recall；为保持一致，我们也这样做。"
+},
+{
+"en": "Figure 10 : Scaling-up sampling comp",
+"zh": "<b>图 10：</b>增加采样算力不能弥补模型算力的不足。对每个训练 40 万次迭代的 DiT 模型，我们用 [16, 32, 64, 128, 256, 1000] 个采样步计算 FID-10K。对每种步数，绘制 FID 以及采样每张图使用的 Gflops。小模型无法达到大模型的性能，即使采样时比大模型使用更多的 Gflops。"
+},
+{
+"en": "512×512 ImageNet.",
+"zh": "512×512 ImageNet"
+},
+{
+"en": "We train a new DiT-XL/2 model on Ima",
+"zh": "我们用与 {m2} 模型相同的超参数，在 {m1} 分辨率的 ImageNet 上训练一个新的 DiT-XL/2 模型，共 300 万次迭代。图块大小为 2 时，这个 XL/2 模型对 {m3} 的输入隐变量做 patchify 后共处理 1024 个 token（524.6 Gflops）。与当前最好方法的比较见表 {r1}。XL/2 在这个分辨率上同样优于此前所有扩散模型，把 ADM 此前保持的最好 FID 3.85 改进到 3.04。即使 token 数增加，XL/2 仍然计算高效。例如，ADM 使用 1983 Gflops，ADM-U 使用 2813 Gflops，XL/2 使用 524.6 Gflops。高分辨率 XL/2 模型的样本见图 {r2} 和附录。"
+},
+{
+"en": "Scaling Model vs. Sampling Compute",
+"zh": "缩放模型算力与采样算力"
+},
+{
+"en": "Diffusion models are unique in that",
+"zh": "扩散模型的特殊之处在于，生成图像时可以增加采样步数，在训练之后继续投入算力。考虑到模型 Gflops 对样本质量的影响，本节研究<b>模型算力</b>较小的 DiT 能否通过使用更多<b>采样算力</b>超过较大的模型。我们对训练 40 万步后的全部 12 个 DiT 模型计算 FID，每张图使用 [16, 32, 64, 128, 256, 1000] 个采样步。主要结果见图 {r1}。考虑用 1000 步的 DiT-L/2 和用 128 步的 DiT-XL/2。此时 L/2 采样每张图使用 {m1} Tflops；XL/2 采样每张图使用的算力比它少 {m2}，为 {m3} Tflops。尽管如此，XL/2 的 FID-10K 更好（23.7 对 25.9）。总的来说，增加采样算力无法弥补模型算力的不足。"
+},
+{
+"en": "Conclusion",
+"zh": "结论"
+},
+{
+"en": "We introduce Diffusion Transformers",
+"zh": "我们提出扩散 Transformer (DiT)，一种简单的基于 Transformer 的扩散模型骨干。它优于此前的 U-Net 模型，并继承了 Transformer 这类模型出色的扩展性质。鉴于本文的缩放结果，后续工作应继续把 DiT 扩大到更大的模型和更多的 token。DiT 也可以作为即插即用的骨干，用于 DALL{m1}E 2 和 Stable Diffusion 这类文本生成图像模型。"
+},
+{
+"en": "Acknowledgements.",
+"zh": "致谢"
+},
+{
+"en": "We thank Kaiming He, Ronghang Hu, Al",
+"zh": "感谢 Kaiming He、Ronghang Hu、Alexander Berg、Shoubhik Debnath、Tim Brooks、Ilija Radosavovic 和 Tete Xiao 的有益讨论。William Peebles 由 NSF GRFP 资助。"
+},
+{
+"en": "Figure 11 : Additional selected samp",
+"zh": "<b>图 11：</b>512{m1}512 和 256{m2}256 分辨率 DiT-XL/2 模型另外挑选的样本。{m3} 模型的无分类器引导系数为 6.0，{m4} 模型为 4.0。两个模型都使用 ft-EMA VAE 解码器。"
+},
+{
+"en": "Table 4: Details of all DiT models.",
+"zh": "<b>表 4：</b>全部 DiT 模型的细节。这里报告本文每个 DiT 模型的详细信息。注意这里的 FID-50K 没有使用无分类器引导。参数量和 flops 不含 VAE 模型，VAE 的编码器和解码器共有 8400 万参数。对 {m1} 和 {m2} 的 DiT-XL/2 模型，我们从未观察到 FID 饱和，只是尽可能地继续训练。本表的数值使用 ft-MSE VAE 解码器。"
+},
+{
+"en": "Additional Implementation Details",
+"zh": "其他实现细节"
+},
+{
+"en": "We include detailed information abou",
+"zh": "表 {r1} 给出全部 DiT 模型的详细信息，包括 {m1} 和 {m2} 的模型。图 {r2} 报告 DiT 的训练损失曲线。最后，表 {r3} 给出 ADM 和 LDM 中 DDPM U-Net 模型的 Gflop 数。"
+},
+{
+"en": "DiT model details.",
+"zh": "DiT 模型细节"
+},
+{
+"en": "To embed input timesteps, we use a 2",
+"zh": "为嵌入输入时间步，我们使用 256 维频率嵌入 {c1}，后接一个两层 MLP，其维度等于 Transformer 的隐藏维度，激活函数为 SiLU。每个 adaLN 层把时间步和类别嵌入之和送入 SiLU 非线性和一个线性层，线性层的输出神经元数是 Transformer 隐藏维度的 {m1}（adaLN）或 {m2}（adaLN-Zero）。Transformer 主体使用 GELU 非线性（用 tanh 近似）{c2}。"
+},
+{
+"en": "Classifier-free guidance on a subset",
+"zh": "只对部分通道做无分类器引导"
+},
+{
+"en": "In our experiments using classifier-",
+"zh": "在使用无分类器引导的实验中，我们只对隐变量的前三个通道做引导，而不是全部四个通道。研究后发现，只要调整系数，三通道引导和四通道引导的结果（按 FID）相近。具体来说，系数为 {m1} 的三通道引导大致可以用系数为 {m2} 的四通道引导近似（例如，系数 {m3} 的三通道引导 FID-50K 为 2.27，系数 {m4} 的四通道引导 FID-50K 为 2.20）。只对部分元素做引导仍能取得良好性能，这一点值得研究，我们留给后续工作进一步探索。"
+},
+{
+"en": "Figure 12 : DiT scaling behavior on",
+"zh": "<b>图 12：</b>DiT 在多种生成建模指标上的缩放规律。左：FID、sFID、Inception Score、Precision 和 Recall 随总训练算力的变化。右：全部 12 个 DiT 变体在 40 万训练步时的性能和 Transformer Gflops 的关系，各指标都呈现强相关。所有数值都用 ft-MSE VAE 解码器计算。"
+},
+{
+"en": "Figure 13 : Training loss curves for",
+"zh": "<b>图 13：</b>全部 DiT 模型的训练损失曲线。图中绘制所有 DiT 模型训练过程中的损失（噪声预测均方误差与 {m1} 之和），并突出了训练早期的情况。注意扩大后的 DiT 模型训练损失更低。"
+},
+{
+"en": "Model Samples",
+"zh": "模型样本"
+},
+{
+"en": "We show samples from our two DiT-XL/",
+"zh": "这里展示两个分别在 {m1} 和 {m2} 分辨率上训练 300 万步和 700 万步的 DiT-XL/2 模型的样本。图 {r1} 和图 {r2} 是两个模型挑选过的样本。图 {r3} 到图 {r4} 是两个模型未经挑选的样本，覆盖一系列无分类器引导系数和输入类别标签（用 250 步 DDPM 采样和 ft-EMA VAE 解码器生成）。和此前使用引导的工作一样，我们观察到系数越大，视觉保真度越高，样本多样性越低。"
+},
+{
+"en": "Additional Scaling Results",
+"zh": "其他缩放结果"
+},
+{
+"en": "Impact of scaling on metrics beyond",
+"zh": "缩放对 FID 之外指标的影响"
+},
+{
+"en": "In Figure {r1:12} , we show the effe",
+"zh": "图 {r1} 展示 DiT 规模对一组评估指标的影响：FID、sFID、Inception Score、Precision 和 Recall。我们发现正文中基于 FID 的分析可以推广到其他指标：在每个指标上，扩大后的 DiT 模型计算效率都更高，模型 Gflops 和性能都高度相关。其中 Inception Score 和 Precision 从模型规模的增加中获益最大。"
+},
+{
+"en": "Impact of scaling on training loss.",
+"zh": "缩放对训练损失的影响"
+},
+{
+"en": "We also examine the impact of scale",
+"zh": "我们还在图 {r1} 中考察规模对训练损失的影响。增加 DiT 模型的 Gflops（通过 Transformer 规模或输入 token 数）会使训练损失下降更快，并在更低的值上饱和。这一现象和语言模型观察到的趋势一致：扩大后的 Transformer 既有更好的损失曲线，在下游评估中的表现也更好 {c1}。"
+},
+{
+"en": "VAE Decoder Ablations",
+"zh": "VAE 解码器消融实验"
+},
+{
+"en": "We used off-the-shelf, pre-trained V",
+"zh": "我们在实验中使用现成的预训练 VAE。VAE 模型（ft-MSE 和 ft-EMA）是原始 LDM「f8」模型的微调版本（只微调解码器权重）。第 {r1} 节的缩放分析用 ft-MSE 解码器监测指标，表 {r2} 和表 {r3} 报告的最终指标用 ft-EMA 解码器。本节比较三种 VAE 解码器：LDM 使用的原版，以及 Stable Diffusion 使用的两个微调版本。由于各模型的编码器相同，可以直接替换解码器，不必重新训练扩散模型。结果见表 {r4}；使用 LDM 解码器时，XL/2 仍然优于此前所有扩散模型。"
+},
+{
+"en": "Table 5 : Decoder ablation. We teste",
+"zh": "<b>表 5：</b>解码器消融实验。我们测试了 {r1} 提供的不同预训练 VAE 解码器权重。不同的预训练解码器权重在 ImageNet {m1} 上得到相近的结果。"
+},
+{
+"en": "Table 6 : Gflop counts for baseline",
+"zh": "<b>表 6：</b>采用 U-Net 骨干的基线扩散模型的 Gflop 数。注意这里只统计 DDPM 部分的 flops。"
+},
+{
+"en": "Figure 14 : Uncurated {m1:512\\times",
+"zh": "<b>图 14：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 北极狼 (arctic wolf，270)"
+},
+{
+"en": "Figure 15 : Uncurated {m1:512\\times",
+"zh": "<b>图 15：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 火山 (volcano，980)"
+},
+{
+"en": "Figure 16 : Uncurated {m1:512\\times",
+"zh": "<b>图 16：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 哈士奇 (husky，250)"
+},
+{
+"en": "Figure 17 : Uncurated {m1:512\\times",
+"zh": "<b>图 17：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 葵花凤头鹦鹉 (sulphur-crested cockatoo，89)"
+},
+{
+"en": "Figure 18 : Uncurated {m1:512\\times",
+"zh": "<b>图 18：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 悬崖 (cliff drop-off，972)"
+},
+{
+"en": "Figure 19 : Uncurated {m1:512\\times",
+"zh": "<b>图 19：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 气球 (balloon，417)"
+},
+{
+"en": "Figure 20 : Uncurated {m1:512\\times",
+"zh": "<b>图 20：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 狮子 (lion，291)"
+},
+{
+"en": "Figure 21 : Uncurated {m1:512\\times",
+"zh": "<b>图 21：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 水獭 (otter，360)"
+},
+{
+"en": "Figure 22 : Uncurated {m1:512\\times",
+"zh": "<b>图 22：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 2.0，类别标签 = 小熊猫 (red panda，387)"
+},
+{
+"en": "Figure 23 : Uncurated {m1:512\\times",
+"zh": "<b>图 23：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 2.0，类别标签 = 大熊猫 (panda，388)"
+},
+{
+"en": "Figure 24 : Uncurated {m1:512\\times",
+"zh": "<b>图 24：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 1.5，类别标签 = 珊瑚礁 (coral reef，973)"
+},
+{
+"en": "Figure 25 : Uncurated {m1:512\\times",
+"zh": "<b>图 25：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 1.5，类别标签 = 金刚鹦鹉 (macaw，88)"
+},
+{
+"en": "Figure 26 : Uncurated {m1:256\\times",
+"zh": "<b>图 26：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 金刚鹦鹉 (macaw，88)"
+},
+{
+"en": "Figure 27 : Uncurated {m1:256\\times",
+"zh": "<b>图 27：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 狗拉雪橇 (dog sled，537)"
+},
+{
+"en": "Figure 28 : Uncurated {m1:256\\times",
+"zh": "<b>图 28：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 北极狐 (arctic fox，279)"
+},
+{
+"en": "Figure 29 : Uncurated {m1:256\\times",
+"zh": "<b>图 29：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 4.0，类别标签 = 红海龟 (loggerhead sea turtle，33)"
+},
+{
+"en": "Figure 30 : Uncurated {m1:256\\times",
+"zh": "<b>图 30：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 2.0，类别标签 = 金毛寻回犬 (golden retriever，207)"
+},
+{
+"en": "Figure 31 : Uncurated {m1:256\\times",
+"zh": "<b>图 31：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 2.0，类别标签 = 湖岸 (lake shore，975)"
+},
+{
+"en": "Figure 32 : Uncurated {m1:256\\times",
+"zh": "<b>图 32：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 1.5，类别标签 = 航天飞机 (space shuttle，812)"
+},
+{
+"en": "Figure 33 : Uncurated {m1:256\\times",
+"zh": "<b>图 33：</b>未经挑选的 {m1} DiT-XL/2 样本。无分类器引导系数 = 1.5，类别标签 = 冰淇淋 (ice cream，928)"
+}
+]

@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DiT · 扩散 Transformer (Diffusion Transformer) 的来历、结构和后续发展，附原论文逐段中英对照</title>
+<meta name="description" content="四个 tab：综述（参数量和恒等初始化用官方代码核对过）、原论文中英对照（含附录和全部样本图）、19 个常见问题，基础知识和 CS231n 第 14 讲的笔记默认折叠在资料里。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+.epmain .lede+.lede{margin-top:10px}
+.atl,.aov{position:relative;display:inline-block}
+.atl::after{content:'~';position:absolute;left:50%;top:-.36em;transform:translateX(-30%);font:normal .8em/1 system-ui,sans-serif}
+.aov::after{content:'';position:absolute;left:24%;right:2%;top:.2em;border-top:1px solid currentColor}
+span.atl::after{transform:translateX(-50%)}span.aov::after{left:6%;right:6%}
+.tl button b{width:7ch}
+.sec,.aisec,.faq{scroll-margin-top:calc(var(--bar-h) + 12px)}
+.intro p{margin:0 0 10px}
+.deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df{white-space:pre}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.aidoc .tbl,.epmain .tbl{margin:14px 0}
+pre.code{margin:14px 0 16px;padding:14px 16px;background:#1C1F26;color:#E8E6E1;border-radius:var(--r-sm);overflow-x:auto;font:12.5px/1.6 var(--mono)}
+pre.code code{background:none;padding:0;color:inherit;font:inherit}
+@media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:680px}}
+.faqdoc{max-width:820px;margin:0 auto}
+.faqgrp h2{font-size:16px;margin:30px 0 10px;color:var(--text)}
+.faq{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);margin:8px 0}
+.faq>summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:600;font-size:15px;line-height:1.6}
+.faq>summary::-webkit-details-marker{display:none}
+.faq>summary::before{content:'问';display:inline-block;font-size:11.5px;color:var(--accent);font-weight:700;margin-right:10px}
+.faq[open]>summary{border-bottom:1px solid var(--line)}
+.faqa{padding:6px 16px 10px;font-size:15px;line-height:1.85}
+.faqa p{margin:10px 0}
+/* 综述：原论文的图 */
+.pfig .pimgs{display:flex;gap:16px;justify-content:center;align-items:flex-start;padding:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm)}
+.pfig .pimgs img{display:block;min-width:0;flex:1 1 0;max-width:360px;height:auto}
+.pfig figcaption{margin-top:6px}
+/* 资料：默认折叠的块 */
+.resdoc>.lede{max-width:860px;color:var(--text);font-size:15px;line-height:1.8;margin:0 0 6px}
+.res{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg);margin:12px 0;scroll-margin-top:calc(var(--bar-h) + 12px)}
+.res>summary{cursor:pointer;list-style:none;padding:14px 18px;display:flex;gap:12px;align-items:center}
+.res>summary::-webkit-details-marker{display:none}
+.res>summary::after{content:'展开';margin-left:auto;flex:none;font-size:12px;color:var(--accent-ink)}
+.res[open]>summary::after{content:'收起'}
+.res[open]>summary{border-bottom:1px solid var(--line)}
+.res .rt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.res .rt b{font-size:16px;color:var(--text)}
+.res .rt em{font-style:normal;font-size:13px;color:var(--text-3);line-height:1.6}
+.resb{padding:18px 18px 8px}
+@media(max-width:640px){.resb{padding:14px 10px 6px}}
+.ep-sub{margin:6px 0 0;font-size:15px;color:var(--text-3)}
+/* 论文：iframe 贴满 tab 栏以下的整屏，论文页自己滚；两侧吃掉 .wrap 的内边距 */
+#view-paper{padding-top:0;margin:0 -24px}
+.paperframe{display:block;width:100%;height:calc(100vh - var(--bar-h) - 1px);height:calc(100dvh - var(--bar-h) - 1px);border:0;background:var(--bg)}
+@media(max-width:640px){#view-paper{margin:0 -16px}}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">专题</span><span>Peebles、Xie，arXiv 2022-12-19，ICCV 2023</span></div>
+  <h1>DiT</h1>
+  <p class="ep-sub">扩散 Transformer (Diffusion Transformer)</p>
+</header></div>
+<nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
+  <button class="tb on" type="button" role="tab" data-v="overview" aria-selected="true">综述</button>
+  <button class="tb" type="button" role="tab" data-v="paper" aria-selected="false">论文</button>
+  <button class="tb" type="button" role="tab" data-v="faq" aria-selected="false">常见问题</button>
+  <button class="tb" type="button" role="tab" data-v="res" aria-selected="false">资料</button>
+</div></div></nav>
+<main class="wrap">
+<div class="view on" id="view-overview">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-oneline">概述</a></li><li><a href="#o-history">来历</a></li><li><a href="#o-problem">要解决的问题</a></li><li><a href="#o-frame">整体结构</a></li><li><a href="#o-patchify">Patchify</a></li><li><a href="#o-cond">条件方式</a></li><li><a href="#o-adaln">adaLN-Zero</a></li><li><a href="#o-decoder">解码</a></li><li><a href="#o-sizes">模型配置</a></li><li><a href="#o-train">训练</a></li><li><a href="#o-cfg">引导</a></li><li><a href="#o-scaling">缩放实验</a></li><li><a href="#o-results">实验结果</a></li><li><a href="#o-limits">局限</a></li><li><a href="#o-after">后续发展</a></li><li><a href="#o-relation">相关模型</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">DiT 综述：来历、结构与后续发展</h2>
+    <p class="lede">这一页按前向计算的顺序讲 DiT。前四节说明它是什么、从哪里来、要解决什么问题、整体结构如何；中间七节依次讲 patchify、四种条件块、adaLN-Zero、解码、模型配置、训练和引导；后面五节讲缩放实验、实验结果、局限、后续发展和相关模型。</p><p class="lede">扩散模型本身不在这里重复，见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题</a>；隐空间和自编码器见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/latent-diffusion/" target="_blank" rel="noreferrer">Latent Diffusion 专题</a>。</p>
+    <section class="aisec" id="o-oneline">
+    <h2><span class="n">1</span><span>概述：用 Transformer 替换扩散模型的 U-Net</span></h2>
+    <p><b>扩散 Transformer (Diffusion Transformer, DiT)</b> 是一种扩散模型的去噪网络，由 UC Berkeley 的 William Peebles 和纽约大学的 Saining Xie 提出。论文 2022-12-19 发布在 arXiv，发表于 ICCV 2023。工作是 Peebles 在 Meta FAIR 实习期间完成的。</p>
+    <p>从 DDPM 到 Stable Diffusion，扩散模型的去噪网络几乎都是 U-Net。DiT 保留了 <a class="ilink" href="https://xslaoxu.cn/learn-ai/latent-diffusion/" target="_blank" rel="noreferrer">Latent Diffusion</a> 的框架，也就是先用自编码器把图像压缩到隐空间，只把 U-Net 换成一个接近标准 Vision Transformer 的网络：把隐变量切成图块，变成 token 序列，经过一串 Transformer 块，再还原成噪声预测。</p>
+    <p>论文有两个主要结论。第一，U-Net 的归纳偏置对扩散模型并非必要。第二，模型的计算量 (Gflops) 和样本质量有很强的相关性：只要加深、加宽或增加 token 数，FID 就持续下降。最大的 DiT-XL/2 在 ImageNet 256×256 上取得 FID 2.27，超过了当时所有扩散模型。</p>
+    <p>这篇论文的影响主要在后面：PixArt、Stable Diffusion 3、FLUX.1 和 Sora 等模型都以 Transformer 为骨干。论文最后说 DiT 可以作为 Stable Diffusion 这类模型的替换骨干，这个判断后来成为现实。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-history">
+    <h2><span class="n">2</span><span>来历：Transformer 进入图像扩散模型的时机</span></h2>
+    <p>U-Net 进入扩散模型是从 DDPM（2020-06-19）开始的。它继承自 PixelCNN++，主要由残差卷积块组成，在低分辨率层穿插自注意力。此后 ADM（2021-05-11）调整了通道数、注意力层和自适应归一化，但整体结构没有变。Latent Diffusion（2021-12-20）把它用到隐空间，并加入交叉注意力。两年多里，大家改进的主要是采样器、引导和级联，骨干网络几乎没人动。</p>
+    <p>另一边，Transformer 已经取代了很多领域的专用结构。Vision Transformer（2020-10-22）把图像切成图块后直接用 Transformer 分类，并且表现出很好的扩展性。在生成模型中，Transformer 用得最多的是自回归模型，比如 VQGAN 的第二阶段和 DALL·E。DALL·E 2 用 Transformer 做扩散先验，但生成的是 CLIP 嵌入，不是图像。</p>
+    <p>在隐空间中做这件事有一个明显的便利：隐变量只有 32×32，序列长度可控。如果在像素空间直接切 2×2 的图块，256×256 的图像会产生 16384 个 token，注意力的计算量无法接受。</p>
+    <p>同时也有其他研究者在尝试。U-ViT（2022-09-25）比 DiT 早近三个月，它把时间、条件和图块都当作 token，并保留了 U-Net 式的长跳跃连接。Jabri 等人（2022-12-22）几乎同时提出了基于注意力的高效结构，DiT 论文把它列为同期工作。DiT 的取向更彻底：不要跳跃连接，尽量贴近标准 Transformer，然后专门研究它的扩展规律。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noreferrer">原论文 ↗</a><a href="https://www.wpeebles.com/DiT" target="_blank" rel="noreferrer">项目主页 ↗</a><a href="https://github.com/facebookresearch/DiT" target="_blank" rel="noreferrer">官方代码 ↗</a><a href="https://arxiv.org/abs/2010.11929" target="_blank" rel="noreferrer">Vision Transformer ↗</a><a href="https://arxiv.org/abs/2209.12152" target="_blank" rel="noreferrer">U-ViT ↗</a></p>
+  </section>
+<section class="aisec" id="o-problem">
+    <h2><span class="n">3</span><span>要解决的问题：结构选择到底有多重要</span></h2>
+    <p>论文提出的问题是：U-Net 的归纳偏置对扩散模型是否关键？如果不关键，扩散模型就可以使用 Transformer 这类标准结构，继承其他领域的训练经验，也能和它们共享研究成果。</p>
+    <p>第二个问题是怎么衡量模型的复杂度。图像生成论文习惯报告参数量，但参数量不考虑图像分辨率。论文改用理论 Gflops，也就是一次前向计算的浮点运算量。下面会看到，这个选择直接决定了结论：改变图块大小时，参数量几乎不变，FID 却变化很大。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 876 244" width="876" height="244" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="compare1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="compare1-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="compare1-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="compare1-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="876" height="244" fill="#fff"/>
+<text x="0" y="14" class="ph">U-Net：多分辨率，有跳跃连接</text><text x="470" y="14" class="ph">DiT：单一分辨率，序列长度和宽度不变</text><rect x="0" y="30" width="40" height="150" rx="4" class="mW"/><path d="M40 105 L57 105" class="ink" marker-end="url(#compare1-a)"/><rect x="360" y="30" width="40" height="150" rx="4" class="mW"/><path d="M40 38 C 90 24, 310 24, 360 38" class="dash" marker-end="url(#compare1-ag)"/><rect x="58" y="43" width="40" height="124" rx="4" class="mW"/><path d="M98 105 L115 105" class="ink" marker-end="url(#compare1-a)"/><rect x="302" y="43" width="40" height="124" rx="4" class="mW"/><path d="M98 51 C 148 37, 252 37, 302 51" class="dash" marker-end="url(#compare1-ag)"/><rect x="116" y="56" width="40" height="98" rx="4" class="mW"/><path d="M156 105 L173 105" class="ink" marker-end="url(#compare1-a)"/><rect x="244" y="56" width="40" height="98" rx="4" class="mW"/><path d="M156 64 C 206 50, 194 50, 244 64" class="dash" marker-end="url(#compare1-ag)"/><rect x="174" y="69" width="40" height="72" rx="4" class="mW"/><path d="M214 105 L243 105" class="ink" marker-end="url(#compare1-a)"/><path d="M284 105 L301 105" class="ink" marker-end="url(#compare1-a)"/><path d="M342 105 L359 105" class="ink" marker-end="url(#compare1-a)"/><text x="200" y="204" class="sm" text-anchor="middle">残差卷积块为主，低分辨率层加注意力</text><text x="200" y="222" class="sm" text-anchor="middle">虚线是跳跃连接，下采样 3 次</text><rect x="470" y="50" width="38" height="110" rx="4" class="mW"/><path d="M508 105 H523" class="ink" marker-end="url(#compare1-a)"/><rect x="524" y="50" width="38" height="110" rx="4" class="mW"/><path d="M562 105 H577" class="ink" marker-end="url(#compare1-a)"/><rect x="578" y="50" width="38" height="110" rx="4" class="mW"/><path d="M616 105 H631" class="ink" marker-end="url(#compare1-a)"/><rect x="632" y="50" width="38" height="110" rx="4" class="mW"/><path d="M670 105 H685" class="ink" marker-end="url(#compare1-a)"/><rect x="686" y="50" width="38" height="110" rx="4" class="mW"/><path d="M724 105 H739" class="ink" marker-end="url(#compare1-a)"/><rect x="740" y="50" width="38" height="110" rx="4" class="mW"/><path d="M778 105 H793" class="ink" marker-end="url(#compare1-a)"/><rect x="794" y="50" width="38" height="110" rx="4" class="mW"/><text x="651" y="204" class="sm" text-anchor="middle">全部是相同的 Transformer 块，没有下采样和跳跃连接</text><text x="651" y="222" class="sm" text-anchor="middle">扩大模型只需增加层数、宽度或减小 p</text>
+</svg>
+<figcaption>U-Net 和 DiT 的结构示意。U-Net 由下采样、上采样和跳跃连接组成，每层的分辨率和通道数都要设计。DiT 的所有块相同，扩大模型的方式只有增加层数、加宽或增加 token 数。</figcaption></figure>
+    <p>结构统一带来的好处是扩展规则简单。U-Net 要决定每个分辨率的通道数、注意力放在哪几层，组合很多；DiT 只有三个旋钮：图块大小 <span class="m"><i>p</i></span>、层数 <span class="m"><i>N</i></span>、宽度 <span class="m"><i>d</i></span>。论文用这三个旋钮加上条件方式组成一个设计空间，并测试了其中的主要组合。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-frame">
+    <h2><span class="n">4</span><span>整体结构：隐空间里的 Vision Transformer</span></h2>
+    <p>整条流水线和 Latent Diffusion 相同。自编码器直接用 Stable Diffusion 预训练好的版本，下采样 8 倍，256×256×3 的图像变成 32×32×4 的隐变量，共 8400 万参数，不参与训练。DiT 只替换中间的去噪网络。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 896 256" width="896" height="256" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="arch2-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="arch2-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="arch2-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="arch2-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="896" height="256" fill="#fff"/>
+<text x="0" y="13" class="ph">以 DiT-XL/2 为例，输入 256×256 的图像</text><rect x="0" y="54" width="112" height="56" rx="7" class="mG"/><text x="56" y="78" class="pb" text-anchor="middle">带噪隐变量</text><text x="56" y="98" text-anchor="middle"><tspan class="v" style="font-size:14px">z</tspan><tspan class="v" baseline-shift="-20%" style="font-size:9.8px">t</tspan></text><text x="56" y="42" class="xs" text-anchor="middle">32 × 32 × 4</text><path d="M112 82 H150" class="ink" marker-end="url(#arch2-a)"/><rect x="154" y="54" width="112" height="56" rx="7" class="mW"/><text x="210" y="79" class="pb" text-anchor="middle">Patchify</text><text x="210" y="96" class="xs" text-anchor="middle">p = 2，线性投影</text><path d="M266 82 H304" class="ink" marker-end="url(#arch2-a)"/><rect x="308" y="54" width="112" height="56" rx="7" class="mWarm"/><text x="364" y="78" class="pb" text-anchor="middle">token 序列</text><text x="364" y="96" class="xs" text-anchor="middle">加正余弦位置编码</text><text x="364" y="42" class="xs" text-anchor="middle">256 × 1152</text><path d="M420 82 H458" class="ink" marker-end="url(#arch2-a)"/><rect x="462" y="54" width="136" height="56" rx="7" class="mW"/><text x="530" y="78" class="pb" text-anchor="middle">DiT 块 × 28</text><text x="530" y="96" class="xs" text-anchor="middle">自注意力 + MLP</text><text x="530" y="42" class="xs" text-anchor="middle">256 × 1152</text><path d="M598 82 H636" class="ink" marker-end="url(#arch2-a)"/><rect x="640" y="54" width="110" height="56" rx="7" class="mW"/><text x="695" y="79" class="pb" text-anchor="middle">线性解码</text><text x="695" y="96" class="xs" text-anchor="middle">每个 token 32 维</text><text x="695" y="42" class="xs" text-anchor="middle">256 × 32</text><path d="M750 82 H776" class="ink" marker-end="url(#arch2-a)"/><rect x="780" y="54" width="100" height="56" rx="7" class="mWarm"/><text x="830" y="78" class="pb" text-anchor="middle">噪声和方差</text><text x="830" y="96" class="xs" text-anchor="middle">重排回平面</text><text x="830" y="42" class="xs" text-anchor="middle">32 × 32 × 8</text><rect x="308" y="146" width="112" height="40" rx="7" class="mG"/><text x="364" y="171" text-anchor="middle"><tspan class="cn" style="font-size:11px">时间步</tspan><tspan class="vr" style="font-size:13.5px"> </tspan><tspan class="v" style="font-size:13.5px">t</tspan></text><rect x="308" y="196" width="112" height="40" rx="7" class="mG"/><text x="364" y="221" text-anchor="middle"><tspan class="cn" style="font-size:11px">类别</tspan><tspan class="vr" style="font-size:13.5px"> </tspan><tspan class="v" style="font-size:13.5px">y</tspan></text><path d="M420 166 H444 V180" class="ink"/><path d="M420 216 H444 V200" class="ink"/><circle cx="444" cy="190" r="9" fill="#fff" stroke="#14161A" stroke-width="1.4"/><text x="444" y="195" class="pb" text-anchor="middle">+</text><path d="M453 190 H500" class="ink" marker-end="url(#arch2-a)"/><rect x="504" y="168" width="52" height="44" rx="7" class="mWarm"/><text x="530" y="196" text-anchor="middle"><tspan class="v" style="font-size:15px">c</tspan></text><path d="M530 168 V112" class="grad" marker-end="url(#arch2-aw)"/><path d="M556 190 H695 V112" class="grad" marker-end="url(#arch2-aw)"/><text x="566" y="212" class="xs">c 是 1152 维向量，每个块用它回归</text><text x="566" y="228" class="xs">6 组缩放和平移系数，解码层回归 2 组</text>
+</svg>
+<figcaption>DiT-XL/2 一次前向计算的维度，取自官方 models.py。橙色虚线表示条件 c 调制每个块和解码层。输出通道是输入的两倍，一半是噪声预测，一半是方差。</figcaption></figure>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig3.jpg" alt="原论文图 3。左边是整体结构，右边是三种条件块：adaLN-Zero、交叉注意力和 in-context。自注意力和 MLP 的结构与标准 Transformer 一致。" loading="lazy"></div><figcaption>原论文图 3。左边是整体结构，右边是三种条件块：adaLN-Zero、交叉注意力和 in-context。自注意力和 MLP 的结构与标准 Transformer 一致。</figcaption></figure>
+    <p><span class="m"><i>t</i></span> 和 <span class="m"><i>y</i></span> 分别嵌入成 <span class="m"><i>d</i></span> 维向量后直接相加，得到条件向量 <span class="m"><i>c</i></span>。时间步先经过 256 维的频率编码，再经过两层 MLP；类别是一个可学习的嵌入表，多出一个类别用于无分类器引导的空条件。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-patchify">
+    <h2><span class="n">5</span><span>Patchify：图块大小决定计算量</span></h2>
+    <p>第一层把空间输入 <span class="m"><i>I</i> × <i>I</i> × <i>C</i></span> 切成 <span class="m"><i>p</i> × <i>p</i></span> 的图块，每块线性投影成 <span class="m"><i>d</i></span> 维 token，得到长度 <span class="m"><i>T</i> = (<i>I</i> / <i>p</i>)<sup>2</sup></span> 的序列。官方代码用一个步长等于 <span class="m"><i>p</i></span> 的卷积实现。然后加上正余弦位置编码，这是不可学习的，和 ViT 的频率编码相同。</p>
+    <p>论文测试了 <span class="m"><i>p</i> = 2, 4, 8</span>。<span class="m"><i>p</i></span> 减半，token 数变成 4 倍，Transformer 的计算量至少变成 4 倍。参数量却几乎不变，因为 Transformer 块的权重和序列长度无关，只有首尾的投影层随 <span class="m"><i>p</i></span> 变化。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 726 286" width="726" height="286" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="patchify3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="patchify3-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="patchify3-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="patchify3-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="726" height="286" fill="#fff"/>
+<text x="0" y="13" class="ph">32 × 32 × 4 的隐变量切成 p × p 的图块（DiT-XL 配置）</text><rect x="0" y="30" width="150" height="150" fill="#E6F4F1" stroke="#0F766E" stroke-width="1.2"/><path d="M37.5 30 V180 M0 67.5 H150" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M75.0 30 V180 M0 105.0 H150" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M112.5 30 V180 M0 142.5 H150" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><text x="75" y="204" text-anchor="middle"><tspan class="v" style="font-size:15px">p</tspan><tspan class="vr" style="font-size:15px"> = 8</tspan></text><text x="75" y="224" class="sm" text-anchor="middle">T = 16 个 token</text><text x="75" y="243" class="sm" text-anchor="middle">7.39 Gflops，参数 676M</text><text x="75" y="262" class="sm" text-anchor="middle">第 40 万步 FID 106.41</text><rect x="280" y="30" width="150" height="150" fill="#E6F4F1" stroke="#0F766E" stroke-width="1.2"/><path d="M298.8 30 V180 M280 48.8 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M317.5 30 V180 M280 67.5 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M336.3 30 V180 M280 86.3 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M355.0 30 V180 M280 105.0 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M373.8 30 V180 M280 123.8 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M392.5 30 V180 M280 142.5 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M411.3 30 V180 M280 161.3 H430" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><text x="355" y="204" text-anchor="middle"><tspan class="v" style="font-size:15px">p</tspan><tspan class="vr" style="font-size:15px"> = 4</tspan></text><text x="355" y="224" class="sm" text-anchor="middle">T = 64 个 token</text><text x="355" y="243" class="sm" text-anchor="middle">29.05 Gflops，参数 675M</text><text x="355" y="262" class="sm" text-anchor="middle">第 40 万步 FID 43.01</text><rect x="560" y="30" width="150" height="150" fill="#E6F4F1" stroke="#0F766E" stroke-width="1.2"/><path d="M569.4 30 V180 M560 39.4 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M578.8 30 V180 M560 48.8 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M588.1 30 V180 M560 58.1 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M597.5 30 V180 M560 67.5 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M606.9 30 V180 M560 76.9 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M616.3 30 V180 M560 86.3 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M625.6 30 V180 M560 95.6 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M635.0 30 V180 M560 105.0 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M644.4 30 V180 M560 114.4 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M653.8 30 V180 M560 123.8 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M663.1 30 V180 M560 133.1 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M672.5 30 V180 M560 142.5 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M681.9 30 V180 M560 151.9 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M691.3 30 V180 M560 161.3 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><path d="M700.6 30 V180 M560 170.6 H710" stroke="#0F766E" stroke-width=".7" stroke-opacity=".7"/><text x="635" y="204" text-anchor="middle"><tspan class="v" style="font-size:15px">p</tspan><tspan class="vr" style="font-size:15px"> = 2</tspan></text><text x="635" y="224" class="sm" text-anchor="middle">T = 256 个 token</text><text x="635" y="243" class="sm" text-anchor="middle">118.64 Gflops，参数 675M</text><text x="635" y="262" class="sm" text-anchor="middle">第 40 万步 FID 19.47</text>
+</svg>
+<figcaption>p 和 token 数的关系，数字来自论文表 4，DiT-XL 配置，第 40 万步，无引导。p 从 8 减到 2，计算量约变成 16 倍，参数量基本不变，FID 从 106.41 降到 19.47。</figcaption></figure>
+    <p>我们用官方代码统计了 12 个配置的可训练参数量，确实如此，而且 <span class="m"><i>p</i></span> 越小，参数量还略有下降：DiT-XL/8 是 6.757 亿，DiT-XL/4 是 6.750 亿，DiT-XL/2 是 6.748 亿。原因是首尾投影层的权重数量和 <span class="m"><i>p</i><sup>2</sup></span> 成正比。这也是后面「参数量不能决定质量」这一结论的来源。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-cond">
+    <h2><span class="n">6</span><span>四种条件方式</span></h2>
+    <p>除了图块，网络还要接收时间步 <span class="m"><i>t</i></span> 和类别 <span class="m"><i>y</i></span>。论文比较了四种做法，都基于标准 Transformer 块做小改动：</p>
+    <div class="tbl"><table><thead><tr><th>条件块</th><th>做法</th><th>Gflops</th><th>参数量</th><th>FID</th></tr></thead><tbody><tr><td>In-context</td><td><span class="m"><i>t</i></span> 和 <span class="m"><i>y</i></span> 作为两个额外 token 追加到序列里，类似 ViT 的 cls token，最后一层后去掉</td><td>119.37</td><td>4.49 亿</td><td>35.24</td></tr><tr><td>交叉注意力</td><td><span class="m"><i>t</i></span> 和 <span class="m"><i>y</i></span> 组成长度为 2 的序列，每个块在自注意力之后加一层交叉注意力，和 Latent Diffusion 的做法相同</td><td>137.62</td><td>5.98 亿</td><td>26.14</td></tr><tr><td>adaLN</td><td>把 LayerNorm 换成自适应版本，缩放和平移系数 <span class="m"><i>γ</i>, <i>β</i></span> 由 <span class="m"><i>c</i></span> 回归</td><td>118.56</td><td>6.00 亿</td><td>25.21</td></tr><tr><td><b>adaLN-Zero</b></td><td>在 adaLN 基础上再回归残差前的缩放系数 <span class="m"><i>α</i></span>，并初始化为零</td><td>118.64</td><td>6.75 亿</td><td><b>19.47</b></td></tr></tbody></table><p class="tnote">DiT-XL/2，ImageNet 256×256，训练 40 万步，FID-50K，无引导。数字来自论文表 4。</p></div>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig5.jpg" alt="原论文图 5。adaLN-Zero 在训练的每个阶段都优于其他做法，第 40 万步时 FID 接近 in-context 的一半。" loading="lazy" style="max-width:520px"></div><figcaption>原论文图 5。adaLN-Zero 在训练的每个阶段都优于其他做法，第 40 万步时 FID 接近 in-context 的一半。</figcaption></figure>
+    <p>从表中可以读出两点。条件方式的影响很大，同样的计算量下 FID 能差近一倍。初始化也很重要，adaLN 和 adaLN-Zero 的结构几乎相同，只多了一组缩放系数和零初始化，FID 就从 25.21 降到 19.47。交叉注意力的表现还不如 adaLN，却多出约 15% 的计算量。此后论文所有实验都用 adaLN-Zero。</p>
+    <p>adaLN 有一个限制，论文也提到了：它对所有 token 应用相同的函数，所以条件只能是一个向量，无法表达「这个词对应图像的这个位置」。类别标签没有这个问题，文本条件就不够了，这也是后来的文本模型要把交叉注意力加回来的原因。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-adaln">
+    <h2><span class="n">7</span><span>adaLN-Zero：从恒等映射开始训练</span></h2>
+    <p>自适应归一化最早来自 GAN 和带条件的 U-Net。在 DiT 里，LayerNorm 本身不带可学习参数，缩放和平移系数由条件向量回归，然后作用到归一化后的 token 上。adaLN-Zero 又多回归了一组系数 <span class="m"><i>α</i></span>，在残差连接之前缩放子层的输出。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 716 660" width="716" height="660" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="block4-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="block4-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="block4-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="block4-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="716" height="660" fill="#fff"/>
+<text x="0" y="14" class="ph">DiT 块（adaLN-Zero）</text><text x="0" y="34" class="sm">数据从下往上流动，画法同论文图 3 右侧。</text><rect x="40" y="66" width="286" height="254" rx="9" fill="#FAF9F6" stroke="#E4E1DA"/><text x="52" y="84" class="pb">子层 2：前馈网络 (MLP)</text><path d="M215 310 H85 V106 H204" class="ink" marker-end="url(#block4-a)"/><circle cx="215" cy="310" r="2.8" fill="#14161A"/><text x="145" y="100" class="xs" text-anchor="middle">残差连接</text><circle cx="215" cy="106" r="10" fill="#fff" stroke="#14161A" stroke-width="1.4"/><text x="215" y="111" class="pb" text-anchor="middle">+</text><path d="M215 130 V117" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="130" width="190" height="28" rx="7" class="mWarm"/><text x="215" y="148" class="pb" text-anchor="middle">Scale</text><path d="M215 172 V159" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="172" width="190" height="40" rx="7" class="mW"/><text x="215" y="196" class="pb" text-anchor="middle">Pointwise Feedforward</text><path d="M215 226 V213" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="226" width="190" height="28" rx="7" class="mWarm"/><text x="215" y="244" class="pb" text-anchor="middle">Scale, Shift</text><path d="M215 268 V255" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="268" width="190" height="28" rx="7" class="mG"/><text x="215" y="286" text-anchor="middle" class="pb">LayerNorm<tspan class="xs" dx="6" style="font-weight:400">无可学习参数</tspan></text><path d="M420 144 H311" class="cnd" marker-end="url(#block4-aw)"/><text x="373" y="137" text-anchor="middle"><tspan class="v" style="font-size:13.5px;fill:#B45309">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">2</tspan></text><path d="M420 240 H311" class="cnd" marker-end="url(#block4-aw)"/><text x="373" y="233" text-anchor="middle"><tspan class="v" style="font-size:13.5px;fill:#B45309">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">2</tspan><tspan class="vr" style="font-size:13.5px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13.5px;fill:#B45309">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">2</tspan></text><text x="434" y="104"><tspan class="v" style="font-size:14px">x</tspan><tspan class="vr" style="font-size:14px"> + </tspan><tspan class="v" style="font-size:14px">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">2</tspan><tspan class="vr" style="font-size:14px"> · </tspan><tspan class="vr" style="font-size:14px">MLP</tspan><tspan class="vr" style="font-size:14px">( … )</tspan></text><text x="434" y="121" class="xs">残差相加，得到这个子层的输出</text><text x="434" y="142"><tspan class="v" style="font-size:14px">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">2</tspan><tspan class="vr" style="font-size:14px"> · </tspan><tspan class="vr" style="font-size:14px">MLP</tspan><tspan class="vr" style="font-size:14px">( … )</tspan></text><text x="434" y="159" class="xs">初始 α = 0，子层输出被完全屏蔽</text><text x="434" y="238"><tspan class="v" style="font-size:14px">x</tspan><tspan class="vr" style="font-size:14px"> · (1 + </tspan><tspan class="v" style="font-size:14px">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">2</tspan><tspan class="vr" style="font-size:14px">) + </tspan><tspan class="v" style="font-size:14px">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">2</tspan></text><text x="434" y="255" class="xs">所有 token 共用同一组系数</text><rect x="40" y="332" width="286" height="254" rx="9" fill="#FAF9F6" stroke="#E4E1DA"/><text x="52" y="350" class="pb">子层 1：自注意力 (MSA)</text><path d="M215 576 H85 V372 H204" class="ink" marker-end="url(#block4-a)"/><circle cx="215" cy="576" r="2.8" fill="#14161A"/><text x="145" y="366" class="xs" text-anchor="middle">残差连接</text><circle cx="215" cy="372" r="10" fill="#fff" stroke="#14161A" stroke-width="1.4"/><text x="215" y="377" class="pb" text-anchor="middle">+</text><path d="M215 396 V383" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="396" width="190" height="28" rx="7" class="mWarm"/><text x="215" y="414" class="pb" text-anchor="middle">Scale</text><path d="M215 438 V425" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="438" width="190" height="40" rx="7" class="mW"/><text x="215" y="462" class="pb" text-anchor="middle">Multi-Head Self-Attention</text><path d="M215 492 V479" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="492" width="190" height="28" rx="7" class="mWarm"/><text x="215" y="510" class="pb" text-anchor="middle">Scale, Shift</text><path d="M215 534 V521" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="534" width="190" height="28" rx="7" class="mG"/><text x="215" y="552" text-anchor="middle" class="pb">LayerNorm<tspan class="xs" dx="6" style="font-weight:400">无可学习参数</tspan></text><path d="M420 410 H311" class="cnd" marker-end="url(#block4-aw)"/><text x="373" y="403" text-anchor="middle"><tspan class="v" style="font-size:13.5px;fill:#B45309">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">1</tspan></text><path d="M420 506 H311" class="cnd" marker-end="url(#block4-aw)"/><text x="373" y="499" text-anchor="middle"><tspan class="v" style="font-size:13.5px;fill:#B45309">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">1</tspan><tspan class="vr" style="font-size:13.5px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13.5px;fill:#B45309">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.4px;fill:#B45309">1</tspan></text><text x="434" y="370"><tspan class="v" style="font-size:14px">x</tspan><tspan class="vr" style="font-size:14px"> + </tspan><tspan class="v" style="font-size:14px">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">1</tspan><tspan class="vr" style="font-size:14px"> · </tspan><tspan class="vr" style="font-size:14px">MSA</tspan><tspan class="vr" style="font-size:14px">( … )</tspan></text><text x="434" y="387" class="xs">残差相加，得到这个子层的输出</text><text x="434" y="408"><tspan class="v" style="font-size:14px">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">1</tspan><tspan class="vr" style="font-size:14px"> · </tspan><tspan class="vr" style="font-size:14px">MSA</tspan><tspan class="vr" style="font-size:14px">( … )</tspan></text><text x="434" y="425" class="xs">初始 α = 0，子层输出被完全屏蔽</text><text x="434" y="504"><tspan class="v" style="font-size:14px">x</tspan><tspan class="vr" style="font-size:14px"> · (1 + </tspan><tspan class="v" style="font-size:14px">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">1</tspan><tspan class="vr" style="font-size:14px">) + </tspan><tspan class="v" style="font-size:14px">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.8px">1</tspan></text><text x="434" y="521" class="xs">所有 token 共用同一组系数</text><path d="M215 361 V297" class="ink" marker-end="url(#block4-a)"/><path d="M215 95 V46" class="ink" marker-end="url(#block4-a)"/><text x="227" y="54" class="sm">输出 token，T × d</text><path d="M215 600 V563" class="ink" marker-end="url(#block4-a)"/><rect x="120" y="600" width="190" height="44" rx="7" class="mG"/><text x="215" y="619" class="pb" text-anchor="middle">Input Tokens</text><text x="215" y="635" class="xs" text-anchor="middle">T 个 token，每个 d 维</text><rect x="342" y="600" width="156" height="44" rx="7" class="mG"/><text x="420" y="620" text-anchor="middle"><tspan class="v" style="font-size:14px">c</tspan><tspan class="vr" style="font-size:14px"> = </tspan><tspan class="v" style="font-size:14px">t</tspan><tspan class="vr" style="font-size:14px"> + </tspan><tspan class="v" style="font-size:14px">y</tspan></text><text x="420" y="636" class="xs" text-anchor="middle">时间和类别嵌入相加</text><path d="M420 600 V579" class="ink" marker-end="url(#block4-a)"/><rect x="342" y="534" width="156" height="44" rx="7" class="mW"/><text x="420" y="553" class="pb" text-anchor="middle">SiLU + Linear</text><text x="420" y="569" class="xs" text-anchor="middle">权重和偏置初始化为零</text><path d="M420 534 V144" class="cnd"/><circle cx="420" cy="506" r="2.8" fill="#B45309"/><circle cx="420" cy="410" r="2.8" fill="#B45309"/><circle cx="420" cy="240" r="2.8" fill="#B45309"/><text x="510" y="550" class="xs">输出 6d 维，切成 6 份，每份 d 维：</text><text x="510" y="570"><tspan class="v" style="font-size:13px;fill:#B45309">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">1</tspan><tspan class="vr" style="font-size:13px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13px;fill:#B45309">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">1</tspan><tspan class="vr" style="font-size:13px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13px;fill:#B45309">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">1</tspan><tspan class="vr" style="font-size:13px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13px;fill:#B45309">γ</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">2</tspan><tspan class="vr" style="font-size:13px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13px;fill:#B45309">β</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">2</tspan><tspan class="vr" style="font-size:13px;fill:#B45309">, </tspan><tspan class="v" style="font-size:13px;fill:#B45309">α</tspan><tspan class="vr" baseline-shift="-20%" style="font-size:9.1px;fill:#B45309">2</tspan></text>
+</svg>
+<figcaption>DiT 块的计算过程，结构取自官方 DiTBlock，从下往上读。输入是 T 个 d 维的 token，先经过自注意力子层，再经过前馈子层 (MLP)，形状始终不变。橙色框的系数都来自条件 c。</figcaption></figure>
+    <p>一个块的计算可以写成：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>x</i> ← <i>x</i> + <i>α</i><sub>1</sub> · MSA( LN(<i>x</i>) · (1 + <i>γ</i><sub>1</sub>) + <i>β</i><sub>1</sub> )</span></span><span class="dc">子层 1：自注意力</span></div><div><span class="df"><span class="m"><i>x</i> ← <i>x</i> + <i>α</i><sub>2</sub> · MLP( LN(<i>x</i>) · (1 + <i>γ</i><sub>2</sub>) + <i>β</i><sub>2</sub> )</span></span><span class="dc">子层 2：前馈网络</span></div><div><span class="df"><span class="m">(<i>γ</i><sub>1</sub>, <i>β</i><sub>1</sub>, <i>α</i><sub>1</sub>, <i>γ</i><sub>2</sub>, <i>β</i><sub>2</sub>, <i>α</i><sub>2</sub>) = Linear( SiLU(<i>c</i>) )</span></span><span class="dc">线性层的权重和偏置都初始化为零</span></div></div>
+    <p>「Zero」指的是这个线性层初始化为零。此时 <span class="m"><i>α</i> = 0</span>，子层的输出被完全屏蔽，每个块都是恒等映射。网络的最后一层也初始化为零，所以模型一开始输出全零，相当于什么都没有预测。这和 ResNet 中把每个残差块最后的 Batch Normalization 缩放系数初始化为零是同一个思路，论文引用了这个做法，扩散模型的 U-Net 也有类似处理。</p>
+    <p>这件事用官方代码很容易验证。我们构造了一个 DiT-S/8，输入随机噪声、时间步和类别，第一个 DiT 块的输出和输入之差的最大绝对值是 0，整个网络的输出也全部是 0。</p>
+    <pre class="code"><code># 官方 models.py 的 DiTBlock，这段代码就是上面三个式子
+class DiTBlock(nn.Module):
+    def __init__(self, hidden_size, num_heads, mlp_ratio=4.0, **block_kwargs):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+        self.attn = Attention(hidden_size, num_heads=num_heads, qkv_bias=True, **block_kwargs)
+        self.norm2 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+        mlp_hidden_dim = int(hidden_size * mlp_ratio)
+        approx_gelu = lambda: nn.GELU(approximate=&quot;tanh&quot;)
+        self.mlp = Mlp(in_features=hidden_size, hidden_features=mlp_hidden_dim, act_layer=approx_gelu, drop=0)
+        self.adaLN_modulation = nn.Sequential(nn.SiLU(), nn.Linear(hidden_size, 6 * hidden_size, bias=True))
+
+    def forward(self, x, c):
+        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = self.adaLN_modulation(c).chunk(6, dim=1)
+        x = x + gate_msa.unsqueeze(1) * self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
+        x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
+        return x
+
+def modulate(x, shift, scale):
+    return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)</code></pre>
+    <p>注意 <code>adaLN_modulation</code> 的代价。线性层输入 <span class="m"><i>d</i></span> 维、输出 <span class="m">6<i>d</i></span> 维，每个块就多出约 <span class="m">6<i>d</i><sup>2</sup></span> 个参数。这解释了前面的表格：DiT-XL/2 中 adaLN-Zero 的参数比 in-context 多 2.26 亿，几乎全部来自这里，但它们只作用在一个向量上，所以 Gflops 几乎不变。</p>
+    
+    
+    
+    <p class="refs"><a href="#faq-firststep">常见问题：全部初始化为零，梯度还能传回去吗 →</a><a href="#b-adanorm">基础：自适应归一化 →</a></p>
+  </section>
+<section class="aisec" id="o-decoder">
+    <h2><span class="n">8</span><span>解码：线性层还原成噪声和方差</span></h2>
+    <p>最后一个块之后，再做一次自适应 LayerNorm，用一个线性层把每个 token 映射成 <span class="m"><i>p</i> × <i>p</i> × 2<i>C</i></span> 的张量，最后按原来的空间位置重排，得到 <span class="m"><i>I</i> × <i>I</i> × 2<i>C</i></span> 的输出。这里没有 U-Net 那样的上采样和跳跃连接，每个图块的输出只由对应的 token 决定。</p>
+    <p>输出通道是输入的两倍，因为它同时预测噪声和对角协方差。这沿用了 Improved DDPM 和 ADM 的做法：噪声用简化损失 <span class="m"><i>L</i><sub><i>s</i><i>i</i><i>m</i><i>p</i><i>l</i><i>e</i></sub></span> 训练，协方差用完整的变分下界 <span class="m"><i>L</i></span> 训练。对 DiT-XL/2 来说，每个 token 输出 <span class="m">2 × 2 × 8 = 32</span> 维，序列长度 256，重排后是 <span class="m">32 × 32 × 8</span>。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-sizes">
+    <h2><span class="n">9</span><span>模型配置：四种规格和三种图块</span></h2>
+    <p>规格沿用 ViT 的命名，同时调整层数 <span class="m"><i>N</i></span>、宽度 <span class="m"><i>d</i></span> 和注意力头数。名字里的数字是图块大小，比如 DiT-XL/2 表示 XLarge 规格、<span class="m"><i>p</i> = 2</span>。</p>
+    <div class="tbl"><table><thead><tr><th>规格</th><th>层数 <span class="m"><i>N</i></span></th><th>宽度 <span class="m"><i>d</i></span></th><th>头数</th><th>参数量</th><th>Gflops（<span class="m"><i>p</i></span> = 8 / 4 / 2）</th></tr></thead><tbody><tr><td>DiT-S</td><td>12</td><td>384</td><td>6</td><td>约 0.33 亿</td><td>0.36 / 1.41 / 6.06</td></tr><tr><td>DiT-B</td><td>12</td><td>768</td><td>12</td><td>约 1.30 亿</td><td>1.42 / 5.56 / 23.01</td></tr><tr><td>DiT-L</td><td>24</td><td>1024</td><td>16</td><td>约 4.58 亿</td><td>5.01 / 19.70 / 80.71</td></tr><tr><td>DiT-XL</td><td>28</td><td>1152</td><td>16</td><td>约 6.75 亿</td><td>7.39 / 29.05 / 118.64</td></tr></tbody></table><p class="tnote">论文表 1、表 4，输入 32×32×4。参数量不含 8400 万参数的自编码器，已用官方代码核对。512×512 的 DiT-XL/2 有 1024 个 token，524.6 Gflops。</p></div>
+    <p>计算量的规律可以直接从结构算出来：MLP 部分和 <span class="m"><i>T</i> · <i>d</i><sup>2</sup></span> 成正比，<span class="m"><i>T</i></span> 变成 4 倍时这部分正好变 4 倍；注意力部分和 <span class="m"><i>T</i><sup>2</sup> · <i>d</i></span> 成正比，<span class="m"><i>T</i></span> 变 4 倍时这部分变 16 倍。表中 DiT-XL 从 <span class="m"><i>p</i> = 4</span> 到 <span class="m"><i>p</i> = 2</span> 只增加了 4.08 倍，说明此时注意力的计算量占比还很小；token 再增加，注意力的占比才会上升。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-train">
+    <h2><span class="n">10</span><span>训练：几乎不调参</span></h2>
+    <p>训练配置很简单，大部分超参数直接沿用 ADM：</p>
+    <ul><li>优化器 AdamW，学习率恒定为 <span class="m">10<sup>−4</sup></span>，无权重衰减，批量 256。</li><li>唯一的数据增强是水平翻转。</li><li>权重做指数滑动平均 (EMA)，衰减 0.9999，所有结果都来自 EMA 模型。</li><li>扩散参数：1000 步，<span class="m"><i>β</i></span> 从 <span class="m">10<sup>−4</sup></span> 线性增加到 <span class="m">2 × 10<sup>−2</sup></span>。</li><li>框架是 JAX，用 TPU v3 训练。DiT-XL/2 在 TPU v3-256 上约每秒 5.7 次迭代。官方开源的是 PyTorch 重写版本。</li></ul>
+    <p>论文特别指出，它不像很多 ViT 工作那样需要学习率预热和正则化，也没有观察到 Transformer 训练中常见的损失尖峰。所有规格和图块大小用同一套超参数，没有专门调整。</p>
+    <p>官方代码的训练循环只有几行，和前面 DDPM、Latent Diffusion 的循环几乎一样：</p>
+    <pre class="code"><code># 官方 train.py 的一步，省略了分布式部分
+with torch.no_grad():
+    x = vae.encode(x).latent_dist.sample().mul_(0.18215)   # 256×256×3 → 32×32×4
+
+t = torch.randint(0, diffusion.num_timesteps, (x.shape[0],), device=device)
+loss = diffusion.training_losses(model, x, t, dict(y=y))[&quot;loss&quot;].mean()   # 噪声 MSE + 方差的 VLB
+
+opt.zero_grad()
+loss.backward()
+opt.step()
+update_ema(ema, model.module)       # EMA 衰减 0.9999</code></pre>
+    
+    
+    <div class="note"><p><span class="lbl">补充</span>两段代码摘自官方仓库 facebookresearch/DiT。<code>modulate</code> 和 <code>DiTBlock</code> 实际运行过，用来统计参数量和检验恒等映射；训练循环本页没有运行。</p></div>
+    
+  </section>
+<section class="aisec" id="o-cfg">
+    <h2><span class="n">11</span><span>无分类器引导：只引导三个通道</span></h2>
+    <p>论文的最好结果使用无分类器引导。训练时以 10% 的概率把类别替换成空嵌入（官方代码 <code>class_dropout_prob=0.1</code>），采样时外推：</p>
+    <div class="deriv"><div><span class="df"><span class="m"><i>ε̂</i> = <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅) + <i>s</i> · ( <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>c</i>) − <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅) )</span></span><span class="dc"><span class="m"><i>s</i> = 1</span> 时等于普通采样</span></div></div>
+    <p>有一个实现细节容易让人意外：论文和官方代码默认只对隐变量的前三个通道做引导，第四个通道不引导。论文附录说明了这个实际做法，并测试了差别：三通道 <span class="m"><i>s</i> = 1.5</span> 的 FID 是 2.27，四通道 <span class="m"><i>s</i> = 1.375</span> 的 FID 是 2.20。三通道系数 <span class="m">1 + <i>x</i></span> 大致相当于四通道系数 <span class="m">1 + 3<i>x</i> / 4</span>。官方代码的注释也说明，这样写是为了能精确复现论文结果。</p>
+    <p>这意味着用四个通道复现时，要把系数相应调小。至于为什么只引导一部分通道还能有好的效果，论文留作了开放问题。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-scaling">
+    <h2><span class="n">12</span><span>缩放实验：计算量决定质量</span></h2>
+    <p>这是论文最核心的实验。在 S、B、L、XL 四种规格和 <span class="m"><i>p</i></span> = 8、4、2 三种图块的组合上训练 12 个模型，每个训练 40 万步。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 776 356" width="776" height="356" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="scaling5-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="scaling5-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="scaling5-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="scaling5-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="776" height="356" fill="#fff"/>
+<path d="M50 296.0 H740" class="thin" stroke-opacity=".5"/><text x="43" y="300" class="xs" text-anchor="end">0</text><path d="M50 213.6 H740" class="thin" stroke-opacity=".5"/><text x="43" y="217.6470588235294" class="xs" text-anchor="end">50</text><path d="M50 131.3 H740" class="thin" stroke-opacity=".5"/><text x="43" y="135.2941176470588" class="xs" text-anchor="end">100</text><path d="M50 48.9 H740" class="thin" stroke-opacity=".5"/><text x="43" y="52.94117647058823" class="xs" text-anchor="end">150</text><path d="M50 16 V296 H740" class="ax"/><path d="M90.5 296 v5" class="ax"/><text x="90.5" y="315" class="xs" text-anchor="middle">0.3</text><path d="M210.8 296 v5" class="ax"/><text x="210.8" y="315" class="xs" text-anchor="middle">1</text><path d="M320.5 296 v5" class="ax"/><text x="320.5" y="315" class="xs" text-anchor="middle">3</text><path d="M440.8 296 v5" class="ax"/><text x="440.8" y="315" class="xs" text-anchor="middle">10</text><path d="M550.5 296 v5" class="ax"/><text x="550.5" y="315" class="xs" text-anchor="middle">30</text><path d="M670.8 296 v5" class="ax"/><text x="670.8" y="315" class="xs" text-anchor="middle">100</text><text x="395" y="334" class="sm" text-anchor="middle">每次前向计算的 Gflops（对数坐标）</text><text transform="translate(12 156) rotate(-90)" class="sm" text-anchor="middle">第 40 万步的 FID-50K（无引导）</text><path d="M108.7 43.0 L245.1 130.6 L390.7 183.3" fill="none" stroke="#868D98" stroke-width="1.5"/><path d="M245.8 93.8 L382.1 183.4 L524.0 224.4" fill="none" stroke="#0F766E" stroke-width="1.5"/><path d="M371.7 100.2 L508.5 220.8 L649.4 257.6" fill="none" stroke="#B45309" stroke-width="1.5"/><path d="M410.6 120.7 L547.3 225.2 L687.8 263.9" fill="none" stroke="#14161A" stroke-width="1.5"/><circle cx="108.7" cy="43.0" r="4" fill="#868D98"/><text x="116.7" y="37.0" class="xs" style="fill:#868D98">S/8</text><circle cx="245.1" cy="130.6" r="4" fill="#868D98"/><text x="253.1" y="124.6" class="xs" style="fill:#868D98">S/4</text><circle cx="390.7" cy="183.3" r="4" fill="#868D98"/><text x="398.7" y="175.3" class="xs" style="fill:#868D98">S/2</text><circle cx="245.8" cy="93.8" r="4" fill="#0F766E"/><text x="237.8" y="85.8" class="xs" text-anchor="end" style="fill:#0F766E">B/8</text><circle cx="382.1" cy="183.4" r="4" fill="#0F766E"/><text x="374.1" y="197.4" class="xs" text-anchor="end" style="fill:#0F766E">B/4</text><circle cx="524.0" cy="224.4" r="4" fill="#0F766E"/><text x="522.0" y="214.4" class="xs" text-anchor="end" style="fill:#0F766E">B/2</text><circle cx="371.7" cy="100.2" r="4" fill="#B45309"/><text x="379.7" y="94.2" class="xs" style="fill:#B45309">L/8</text><circle cx="508.5" cy="220.8" r="4" fill="#B45309"/><text x="500.5" y="234.8" class="xs" text-anchor="end" style="fill:#B45309">L/4</text><circle cx="649.4" cy="257.6" r="4" fill="#B45309"/><text x="641.4" y="272.6" class="xs" text-anchor="end" style="fill:#B45309">L/2</text><circle cx="410.6" cy="120.7" r="4" fill="#14161A"/><text x="418.6" y="114.7" class="xs" style="fill:#14161A">XL/8</text><circle cx="547.3" cy="225.2" r="4" fill="#14161A"/><text x="555.3" y="219.2" class="xs" style="fill:#14161A">XL/4</text><circle cx="687.8" cy="263.9" r="4" fill="#14161A"/><text x="695.8" y="257.9" class="xs" style="fill:#14161A">XL/2</text>
+</svg>
+<figcaption>12 个模型的 Gflops 和 FID，数据来自论文表 4。同色线表示同一规格、不同图块大小。论文报告这两个量的相关系数是 −0.93。</figcaption></figure>
+    <p>图上有三个结论：</p>
+    <ul><li><b>加大规格和减小图块都有效。</b> 固定图块大小，规格越大 FID 越低；固定规格，图块越小 FID 越低。</li><li><b>参数量不能决定质量。</b> 同样是约 6.75 亿参数，DiT-XL/8 的 FID 是 106.41，DiT-XL/2 是 19.47。</li><li><b>计算量相近时，FID 也相近。</b> 比如 DiT-S/2（6.06 Gflops）和 DiT-B/4（5.56 Gflops）的 FID 分别是 68.40 和 68.38，尽管它们的参数量相差 4 倍。</li></ul>
+    <p>论文还考察了两个相关问题。第一，大模型的计算效率也更高：按总训练算力比较（Gflops × 批量 × 步数 × 3），小模型即使训练更久，最终也会落后于大模型。第二，增加采样步数不能弥补模型规模的不足。DiT-L/2 用 1000 步采样，每张图 80.7 Tflops，FID-10K 是 25.9；DiT-XL/2 只用 128 步，每张图 15.2 Tflops，FID-10K 是 23.7。把算力花在训练更大的模型上，比花在采样时更划算。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig7.jpg" alt="原论文图 7。12 个模型用相同的噪声和类别采样。从左到右规格变大，从上到下图块变小，细节明显增加。" loading="lazy" style="max-width:620px"></div><figcaption>原论文图 7。12 个模型用相同的噪声和类别采样。从左到右规格变大，从上到下图块变小，细节明显增加。</figcaption></figure>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-results">
+    <h2><span class="n">13</span><span>实验结果</span></h2>
+    <p>扩展实验之后，论文把最大的 DiT-XL/2 继续训练：256×256 训练 700 万步，512×512 训练 300 万步，用同样的超参数。论文说两个模型的 FID 都没有出现饱和，只是尽可能训练到了这个步数。</p>
+    <div class="tbl"><table><thead><tr><th>ImageNet 256×256</th><th>FID</th><th>IS</th><th>Precision</th><th>Recall</th><th>Gflops</th></tr></thead><tbody><tr><td>BigGAN-deep</td><td>6.95</td><td>171.4</td><td>0.87</td><td>0.28</td><td></td></tr><tr><td>StyleGAN-XL</td><td>2.30</td><td>265.12</td><td>0.78</td><td>0.53</td><td></td></tr><tr><td>ADM-G</td><td>4.59</td><td>186.70</td><td>0.82</td><td>0.52</td><td>1120</td></tr><tr><td>ADM-G, ADM-U</td><td>3.94</td><td>215.84</td><td>0.83</td><td>0.53</td><td>742</td></tr><tr><td>LDM-4-G (<span class="m"><i>s</i></span> = 1.5)</td><td>3.60</td><td>247.67</td><td>0.87</td><td>0.48</td><td>104</td></tr><tr><td>DiT-XL/2（无引导）</td><td>9.62</td><td>121.50</td><td>0.67</td><td>0.67</td><td>118.6</td></tr><tr><td>DiT-XL/2-G (<span class="m"><i>s</i></span> = 1.25)</td><td>3.22</td><td>201.77</td><td>0.76</td><td>0.62</td><td>118.6</td></tr><tr><td><b>DiT-XL/2-G (<span class="m"><i>s</i></span> = 1.5)</b></td><td><b>2.27</b></td><td>278.24</td><td>0.83</td><td>0.57</td><td>118.6</td></tr></tbody></table><p class="tnote">论文表 2、表 6。Gflops 只统计扩散模型部分。ADM-U 是基础模型加上采样模型。</p></div>
+    <div class="tbl"><table><thead><tr><th>ImageNet 512×512</th><th>FID</th><th>IS</th><th>Gflops</th></tr></thead><tbody><tr><td>BigGAN-deep</td><td>8.43</td><td>177.90</td><td></td></tr><tr><td>StyleGAN-XL</td><td>2.41</td><td>267.75</td><td></td></tr><tr><td>ADM-G, ADM-U</td><td>3.85</td><td>221.72</td><td>2813</td></tr><tr><td><b>DiT-XL/2-G (<span class="m"><i>s</i></span> = 1.5)</b></td><td><b>3.04</b></td><td>240.82</td><td>524.6</td></tr></tbody></table><p class="tnote">论文表 3、表 6。</p></div>
+    <p>和扩散模型相比，DiT-XL/2 把 256×256 的最好 FID 从 3.60 降到 2.27，512×512 从 3.85 降到 3.04。计算量和 LDM-4 属于同一量级，比像素空间的 ADM 少约一个量级。值得注意的是 512×512 上 StyleGAN-XL 的 FID 是 2.41，优于 DiT 的 3.04；256×256 上 DiT 才是所有生成模型中最低的。Recall 方面，DiT 也好于同样引导强度的 LDM-4。</p>
+    <figure class="fig pfig"><div class="pimgs"><img src="__ASSETS__/figs/paper-fig1.jpg" alt="原论文图 1。DiT-XL/2 在 ImageNet 512×512 和 256×256 上的样本，这些是挑选过的结果。论文附录另有未挑选的样本。" loading="lazy" style="max-width:640px"></div><figcaption>原论文图 1。DiT-XL/2 在 ImageNet 512×512 和 256×256 上的样本，这些是挑选过的结果。论文附录另有未挑选的样本。</figcaption></figure>
+    <p>论文还测试了不同的解码器权重。自编码器的编码器相同，只换解码器，不需要重新训练扩散模型：原版 FID 2.46，ft-MSE 2.30，ft-EMA 2.27。所以最好的结果还依赖微调过的解码器。</p>
+    
+    
+    
+    
+  </section>
+<section class="aisec" id="o-limits">
+    <h2><span class="n">14</span><span>局限</span></h2>
+    <p>论文只研究了类别条件，下面几点是后来的工作暴露出来的，或者从结构上可以看出来：</p>
+    <ul><li><b>adaLN 不能处理序列条件。</b> 全局向量足以表达类别，表达不了文本的细节。文本模型要么把交叉注意力加回来，要么把文本和图像放进同一个注意力。</li><li><b>算力需求高。</b> 最好的结果用了 TPU v3-256 训练 700 万步。论文说明大模型效率更高，但前提是有足够的算力。</li><li><b>没有多尺度结构。</b> 分辨率翻倍时 token 数变成 4 倍，注意力的计算量变成约 16 倍。U-Net 可以只在低分辨率层放注意力，DiT 没有这个选择。后来的模型通过更大的下采样倍数和更大的图块来控制 token 数。</li><li><b>依赖自编码器。</b> 这是继承自 Latent Diffusion 的特点，解码器的质量同样决定了上限，上面的解码器实验已经显示了这一点。</li><li><b>参数里有一部分只作用在一个向量上。</b> adaLN 的线性层占比不小，所以后来 PixArt-α 提出 adaLN-single，让所有块共享这组参数，以减少参数量。</li></ul>
+    <p>另外，U-Net 并没有被证明不如 Transformer。EDM2（2023-12-05）只改善 U-Net 的训练动态，就把 ImageNet-512 的最好 FID 从 2.41 降到 1.81。论文证明的是 U-Net 并非必要，不是 Transformer 一定更好。Transformer 后来胜出，更多是因为容易扩展和复用其他领域的经验。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2312.02696" target="_blank" rel="noreferrer">EDM2 ↗</a></p>
+  </section>
+<section class="aisec" id="o-after">
+    <h2><span class="n">15</span><span>后续发展</span></h2>
+    <p>论文结尾建议继续扩大模型和 token 数，并把 DiT 用到文本生成图像上。这两件事很快都发生了。</p>
+    <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 910 336" width="910" height="336" data-padded="8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .cnd{fill:none;stroke:#B45309;stroke-width:1.6;stroke-linejoin:round}
+  .ax{fill:none;stroke:#868D98;stroke-width:1}
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .grad{fill:none;stroke:#B45309;stroke-width:1.8;stroke-dasharray:6 4;stroke-linejoin:round}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:5 4}
+  .mW{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .mWarm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .mG{fill:#F4F2EE;stroke:#C8C3BA;stroke-width:1.2}
+  .tile{fill:none;stroke:#14161A;stroke-width:1}
+  .ph{font-size:14px;font-weight:650;fill:#14161A}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .tw{font-size:12px;fill:#B45309}
+  .tc{font-size:12px;fill:#0F766E}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+  .cn{font-style:normal;fill:#14161A}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+</style>
+<defs>
+  <marker id="lineage6-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="lineage6-aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+  <marker id="lineage6-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+  <marker id="lineage6-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-8" y="-8" width="910" height="336" fill="#fff"/>
+<text x="0" y="34" class="ph">同期工作</text><rect x="104" y="0" width="258" height="56" rx="7" class="mW"/><text x="114" y="16" class="xs">2022-09-25</text><text x="186" y="16" class="pb">U-ViT</text><text x="114" y="40" class="sm">ViT 骨干，保留长跳跃连接</text><rect x="370" y="0" width="258" height="56" rx="7" class="mW"/><text x="380" y="16" class="xs">2022-12-19</text><text x="452" y="16" class="pb">DiT</text><text x="380" y="40" class="sm">标准 Transformer，adaLN-Zero</text><rect x="636" y="0" width="258" height="56" rx="7" class="mW"/><text x="646" y="16" class="xs">2022-12-22</text><text x="718" y="16" class="pb">Jabri 等</text><text x="646" y="40" class="sm">Recurrent Interface Networks</text><text x="0" y="100" class="ph">文本生成图像</text><path d="M0 61 H894" class="thin" stroke-opacity=".5"/><rect x="104" y="66" width="258" height="56" rx="7" class="mW"/><text x="114" y="82" class="xs">2023-09-30</text><text x="186" y="82" class="pb">PixArt-α</text><text x="114" y="106" class="sm">adaLN-single，交叉注意力接文本</text><rect x="370" y="66" width="258" height="56" rx="7" class="mW"/><text x="380" y="82" class="xs">2024-03-05</text><text x="452" y="82" class="pb">Stable Diffusion 3</text><text x="380" y="106" class="sm">MMDiT，Rectified Flow</text><rect x="636" y="66" width="258" height="56" rx="7" class="mW"/><text x="646" y="82" class="xs">2024-08-01</text><text x="718" y="82" class="pb">FLUX.1</text><text x="646" y="106" class="sm">先双流后单流，Rectified Flow</text><text x="0" y="166" class="ph">训练框架</text><path d="M0 127 H894" class="thin" stroke-opacity=".5"/><rect x="104" y="132" width="258" height="56" rx="7" class="mW"/><text x="114" y="148" class="xs">2023-03-25</text><text x="186" y="148" class="pb">MDT</text><text x="114" y="172" class="sm">掩码辅助训练</text><rect x="370" y="132" width="258" height="56" rx="7" class="mW"/><text x="380" y="148" class="xs">2024-01-16</text><text x="452" y="148" class="pb">SiT</text><text x="380" y="172" class="sm">同样的骨干，换成随机插值框架</text><text x="0" y="232" class="ph">视频</text><path d="M0 193 H894" class="thin" stroke-opacity=".5"/><rect x="104" y="198" width="258" height="56" rx="7" class="mW"/><text x="114" y="214" class="xs">2024-01-05</text><text x="186" y="214" class="pb">Latte</text><text x="114" y="238" class="sm">空间和时间块分解</text><rect x="370" y="198" width="258" height="56" rx="7" class="mW"/><text x="380" y="214" class="xs">2024-02-15</text><text x="452" y="214" class="pb">Sora</text><text x="380" y="238" class="sm">时空图块上的 DiT</text><rect x="636" y="198" width="258" height="56" rx="7" class="mW"/><text x="646" y="214" class="xs">2024-12-03</text><text x="718" y="214" class="pb">HunyuanVideo</text><text x="646" y="238" class="sm">超过 130 亿参数的开放模型</text><text x="0" y="298" class="ph">仍用 U-Net</text><path d="M0 259 H894" class="thin" stroke-opacity=".5"/><rect x="104" y="264" width="258" height="56" rx="7" class="mW"/><text x="114" y="280" class="xs">2023-07-04</text><text x="186" y="280" class="pb">SDXL</text><text x="114" y="304" class="sm">26 亿参数 U-Net</text><rect x="370" y="264" width="258" height="56" rx="7" class="mW"/><text x="380" y="280" class="xs">2023-12-05</text><text x="452" y="280" class="pb">EDM2</text><text x="380" y="304" class="sm">改善训练动态，保持 U-Net</text>
+</svg>
+<figcaption>DiT 之后的几个方向，日期是 arXiv 首版或官方发布日。</figcaption></figure>
+    <p><b>文本生成图像。</b> PixArt-α（2023-09-30）是较早的开放模型，它在每个块中加入交叉注意力接收文本，并提出 adaLN-single 处理时间步。Stable Diffusion 3（2024-03-05）的 MMDiT 让文本 token 和图像 token 在同一个注意力中计算，两路各有独立的权重，并改用 Rectified Flow 训练。FLUX.1（2024-08-01）先用双流块再用单流块，这种设计后来也被 HunyuanVideo 采用。</p>
+    <p><b>视频。</b> Sora（2024-02-15）把视频压缩到隐空间，切成时空图块，用 DiT 处理。DiT 的第一作者 Bill Peebles 后来担任 Sora 负责人。Latte（2024-01-05）把空间和时间块交替排列，HunyuanVideo（2024-12-03）的参数量超过 130 亿。这条路线的逻辑和 DiT 的结论一致：token 变多，模型变大，质量随之提高。</p>
+    <p><b>训练框架。</b> SiT（2024-01-16）使用完全相同的 DiT 骨干，把扩散过程换成随机插值框架，说明骨干和训练目标是可以分开研究的。MDT（2023-03-25）加入掩码辅助训练。今天很多模型都是「DiT 骨干 + Rectified Flow」的组合。</p>
+    <p><b>仍用 U-Net。</b> 这条线并没有消失。SDXL（2023-07-04）是 26 亿参数的 U-Net，EDM2 也继续使用 U-Net。CS231n 2025 第 14 讲的说法是，相当普通的 Transformer 用在扩散模型上效果很好，没有什么特别的秘方，这也是目前多数大型模型的选择。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2310.00426" target="_blank" rel="noreferrer">PixArt-α ↗</a><a href="https://arxiv.org/abs/2403.03206" target="_blank" rel="noreferrer">Stable Diffusion 3 ↗</a><a href="https://arxiv.org/abs/2401.08740" target="_blank" rel="noreferrer">SiT ↗</a><a href="https://arxiv.org/abs/2401.03048" target="_blank" rel="noreferrer">Latte ↗</a><a href="https://arxiv.org/abs/2412.03603" target="_blank" rel="noreferrer">HunyuanVideo ↗</a><a href="https://arxiv.org/abs/2303.14389" target="_blank" rel="noreferrer">MDT ↗</a></p>
+  </section>
+<section class="aisec" id="o-relation">
+    <h2><span class="n">16</span><span>和 U-Net、LDM、ViT 的关系</span></h2>
+    <div class="tbl"><table><thead><tr><th>项目</th><th>LDM 的 U-Net</th><th>DiT</th><th>ViT</th></tr></thead><tbody><tr><td>任务</td><td>预测噪声</td><td>预测噪声和方差</td><td>分类</td></tr><tr><td>输入</td><td>隐变量</td><td>隐变量的图块序列</td><td>图像的图块序列</td></tr><tr><td>多尺度</td><td>有下采样和跳跃连接</td><td>无</td><td>无</td></tr><tr><td>条件接入</td><td>时间加到残差块，文本用交叉注意力</td><td>adaLN-Zero</td><td>无条件，用 cls token 输出</td></tr><tr><td>位置编码</td><td>不需要（卷积）</td><td>固定的正余弦</td><td>可学习或正余弦</td></tr><tr><td>归一化</td><td>Group Normalization</td><td>无参数 LayerNorm，系数由条件回归</td><td>LayerNorm</td></tr><tr><td>扩大模型</td><td>要设计每层的通道数和注意力</td><td>调整 <span class="m"><i>N</i></span>、<span class="m"><i>d</i></span>、<span class="m"><i>p</i></span></td><td>调整 <span class="m"><i>N</i></span>、<span class="m"><i>d</i></span>、<span class="m"><i>p</i></span></td></tr></tbody></table></div>
+    <p>和 Latent Diffusion 的关系最直接：DiT 替换的只是其中的去噪网络，自编码器和扩散过程都不变。这也是这项工作能快速进入实际系统的原因。</p>
+    
+    
+    
+    
+  </section>
+  </article>
+</div>
+</div>
+<div class="view" id="view-paper">
+<iframe class="paperframe" data-src="__ASSETS__/paper.html?v=4c39ba43b7" title="《Scalable Diffusion Models with Transformers》中英对照"></iframe>
+</div>
+<div class="view" id="view-faq">
+<div class="faqdoc">
+  <p class="lede">这些问题来自对照论文和官方代码时容易混淆的符号与说法，以及本页运行官方模型时观察到的现象。答案尽量简短，展开的内容链接到「综述」和「资料」。</p>
+  <div class="eptools"><span>19 个问题 · 点问题展开</span>
+    <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <section class="faqgrp"><h2>基本概念</h2>
+    <details class="faq" id="faq-what"><summary>DiT 是一种新的生成模型吗？</summary><div class="faqa">
+      <p>DiT 是去噪网络的一种结构，生成框架仍是 DDPM 加 Latent Diffusion：同样的前向加噪过程，同样的预测噪声和方差，同样的自编码器。论文替换的只是 U-Net 这一个部件。</p>
+      <p>所以同一个骨干可以配不同的训练目标。SiT 使用完全相同的骨干，把扩散过程换成随机插值框架。</p>
+      <p class="refs"><a href="#o-relation">综述：和 U-Net、LDM、ViT 的关系 →</a><a href="#o-after">综述：后续发展 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-name"><summary>DiT-XL/2 的「2」是下采样倍数吗？</summary><div class="faqa">
+      <p>「2」是隐变量上的图块大小 <span class="m"><i>p</i></span>。整条路径上有两次尺寸缩小：自编码器的下采样倍数是 8，256×256 变成 32×32；patchify 再以 <span class="m"><i>p</i> = 2</span> 切块，32×32 变成 16×16 个 token，共 256 个。</p>
+      <p>因此一个 token 对应原图 16×16 个像素的区域。DiT-XL/8 的一个 token 对应 64×64 个像素，序列只有 16 个 token。</p>
+      <p class="refs"><a href="#o-patchify">综述：Patchify →</a></p>
+    </div></details>
+    <details class="faq" id="faq-gflops"><summary>为什么论文用 Gflops，而不用参数量衡量复杂度？</summary><div class="faqa">
+      <p>参数量不反映序列长度。Transformer 块的权重和 token 数无关，同一个规格改变 <span class="m"><i>p</i></span>，参数量几乎不变，计算量却相差约 16 倍。DiT-XL/8 和 DiT-XL/2 都约有 6.75 亿参数，FID 分别是 106.41 和 19.47，只看参数量无法解释这个差距。</p>
+      <p>反过来，DiT-S/2 和 DiT-B/4 的参数量相差约 4 倍，Gflops 相近（6.06 和 5.56），FID 也相近（68.40 和 68.38）。</p>
+      <p>论文只写了「理论 Gflops」，没有说明统计工具，也没有说明一次乘加算一次还是两次。不同论文之间的 Gflops 数字未必可以直接比较。</p>
+      <p class="refs"><a href="#o-scaling">综述：缩放实验 →</a><a href="#b-flops">基础：Gflops 怎样随结构变化 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-nearzero"><summary>为什么 <span class="m"><i>p</i></span> 越小，参数量反而略有下降？</summary><div class="faqa">
+      <p>和 <span class="m"><i>p</i></span> 有关的只有首尾两个投影层。输入投影把 <span class="m"><i>p</i> × <i>p</i> × 4</span> 映射到 <span class="m"><i>d</i></span> 维，输出投影把 <span class="m"><i>d</i></span> 维映射到 <span class="m"><i>p</i> × <i>p</i> × 8</span>，这两层的权重都和 <span class="m"><i>p</i><sup>2</sup></span> 成正比。位置编码是固定的，不计入可训练参数。</p>
+      <p>以 DiT-XL 为例：<span class="m"><i>p</i></span> 从 8 减到 2，两层的权重从约 88.5 万减到约 5.5 万，少了约 83 万。官方代码统计的可训练参数从 675,664,640 减到 674,834,720，也少了约 83 万。</p>
+      <p class="refs"><a href="#o-patchify">综述：Patchify →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>条件和初始化</h2>
+    <details class="faq" id="faq-adanorm"><summary>adaLN 和 AdaIN、FiLM 是什么关系？</summary><div class="faqa">
+      <p>三者形式相同：由条件回归一组缩放和平移系数，作用在归一化之后或中间的特征上。差别在作用范围和位置。AdaIN（2017-03-20）用于风格迁移，按通道统计量做实例归一化；FiLM（2017-09-22）把这种调制写成通用的条件层；StyleGAN（2018-12-12）和 ADM（2021-05-11）分别把它用在 GAN 和扩散 U-Net 中。adaLN 用在 Transformer 的 LayerNorm 上，归一化沿 token 的特征维度进行。</p>
+      <p class="refs"><a href="#b-adanorm">基础：自适应归一化 →</a><a href="#o-adaln">综述：adaLN-Zero →</a></p>
+    </div></details>
+    <details class="faq" id="faq-zero"><summary>adaLN-Zero 比 adaLN 只多了什么？</summary><div class="faqa">
+      <p>结构上多回归一组 <span class="m"><i>α</i></span>，乘在两个子层的输出上；线性层的输出从 <span class="m">4<i>d</i></span> 维变成 <span class="m">6<i>d</i></span> 维。初始化上把这个线性层的权重和偏置全部置零，所以 <span class="m"><i>γ</i> = <i>β</i> = <i>α</i> = 0</span>，每个块开始时都是恒等映射。</p>
+      <p>因为多了 <span class="m">2<i>d</i></span> 维输出，每个块多出约 <span class="m">2<i>d</i><sup>2</sup></span> 个参数。DiT-XL/2 中 adaLN 是 6.00 亿参数，adaLN-Zero 是 6.75 亿，FID 从 25.21 降到 19.47。论文没有分别测试「多一组 <span class="m"><i>α</i></span>」和「零初始化」各自的贡献。</p>
+      <p class="refs"><a href="#o-cond">综述：四种条件方式 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-firststep"><summary>全部初始化为零，梯度还能传回去吗？</summary><div class="faqa">
+      <p>可以，只是要经过几步才传到所有参数。我们用官方模型 DiT-S/8 和 AdamW（学习率 <span class="m">10<sup>−4</sup></span>）训练了 4 步，记录每组参数的最大梯度绝对值：</p>
+      <div class="tbl"><table><thead><tr><th>步</th><th>最后的线性层</th><th>adaLN 线性层</th><th>patchify 投影</th><th>时间和类别嵌入</th><th>注意力和 MLP</th></tr></thead><tbody><tr><td>1</td><td>2.45 × 10<sup>−3</sup></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2</td><td>2.50 × 10<sup>−3</sup></td><td>3.43 × 10<sup>−6</sup></td><td>6.38 × 10<sup>−6</sup></td><td>0</td><td>0</td></tr><tr><td>3</td><td>2.66 × 10<sup>−3</sup></td><td>5.33 × 10<sup>−6</sup></td><td>8.53 × 10<sup>−6</sup></td><td>2.26 × 10<sup>−8</sup></td><td>1.18 × 10<sup>−9</sup></td></tr></tbody></table><p class="tnote">目标是随机噪声，只用来观察梯度路径，不代表实际训练时的数值。adaLN 一列取块内和最后一层中较大的值。</p></div>
+      <p>第 1 步，最后的线性层权重是零，它之前的所有参数都被这个零挡住，只有这一层能更新。第 2 步，最后一层不再是零，而每个块仍是恒等映射，所以 patchify 投影和 adaLN 线性层有了梯度；注意力和 MLP 仍然乘着 <span class="m"><i>α</i> = 0</span>，时间和类别嵌入要经过权重为零的 adaLN 线性层，这几组还是零。第 3 步，<span class="m"><i>α</i></span> 不再是零，所有参数都有了梯度。</p>
+      <p>上面的路径是这一次运行观察到的，但它由结构决定，和随机种子无关。从数值可以看到，注意力和 MLP 的梯度一开始比最后一层小 6 个数量级。</p>
+      <p class="refs"><a href="#o-adaln">综述：adaLN-Zero →</a></p>
+    </div></details>
+    <details class="faq" id="faq-output0"><summary>网络一开始输出全零，对应什么样的预测？</summary><div class="faqa">
+      <p>噪声部分预测为 0。方差部分的输出 <span class="m"><i>v</i></span> 按 <span class="m">(<i>v</i> + 1) / 2</span> 映射成插值系数，<span class="m"><i>v</i> = 0</span> 时系数是 0.5，方差取 <span class="m"><i>β</i><sub><i>t</i></sub></span> 和 <span class="m"><i class="atl">β</i><sub><i>t</i></sub></span> 在对数域的中点。这是官方 <code>gaussian_diffusion.py</code> 中 <code>LEARNED_RANGE</code> 的做法，来自 Improved DDPM。</p>
+      <p class="refs"><a href="#b-sigma">基础：为什么还要预测方差 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-text"><summary>既然 adaLN-Zero 最好，为什么文本模型又用回交叉注意力？</summary><div class="faqa">
+      <p>论文比较的是类别条件。<span class="m"><i>t</i></span> 和 <span class="m"><i>y</i></span> 嵌入后相加成一个向量，这个向量足以表达类别，adaLN 又对所有 token 应用同一个函数，计算量最低。</p>
+      <p>文本是一个序列，不同的词要作用到图像的不同位置。把整段文本压成一个向量会丢掉这种对应关系。所以后来的模型通常用 adaLN 接收时间步，用交叉注意力或联合注意力接收文本，CS231n 第 14 讲也是这样总结的。</p>
+      <p class="refs"><a href="#o-cond">综述：四种条件方式 →</a><a href="#c-s2">CS231n：扩散 Transformer →</a></p>
+    </div></details>
+    <details class="faq" id="faq-skip"><summary>没有跳跃连接，细节不会丢吗？</summary><div class="faqa">
+      <p>U-Net 需要跳跃连接，是因为下采样路径丢失了空间分辨率，要把高分辨率特征送回解码路径。DiT 没有下采样，序列长度在所有块中保持不变，每个 token 始终对应同一个图块，所以不存在这类分辨率损失。</p>
+      <p>图块内部的信息是另一回事：一个 token 的 <span class="m"><i>d</i></span> 维向量要表示 <span class="m"><i>p</i> × <i>p</i> × 4</span> 的隐变量，<span class="m"><i>p</i></span> 越大越难重建细节，这和 FID 随 <span class="m"><i>p</i></span> 增大而变差的现象一致。U-ViT 保留了长跳跃连接，DiT 论文没有比较有无跳跃连接的差别。</p>
+      <p class="refs"><a href="#o-decoder">综述：解码 →</a><a href="https://arxiv.org/abs/2209.12152" target="_blank" rel="noreferrer">U-ViT 论文 ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-sigma"><summary>损失函数到底是什么？方差那一项会影响噪声预测吗？</summary><div class="faqa">
+      <p>官方代码的损失是两项之和，<span class="m"><i>L</i> = <i>L</i><sub><i>s</i><i>i</i><i>m</i><i>p</i><i>l</i><i>e</i></sub> + <i>L</i><sub><i>v</i><i>b</i></sub></span>。<span class="m"><i>L</i><sub><i>s</i><i>i</i><i>m</i><i>p</i><i>l</i><i>e</i></sub></span> 是预测噪声的均方误差；<span class="m"><i>L</i><sub><i>v</i><i>b</i></sub></span> 是变分下界，单位是比特。计算 <span class="m"><i>L</i><sub><i>v</i><i>b</i></sub></span> 时，噪声输出被 <code>detach</code>，所以这一项只训练方差输出，不影响噪声预测。</p>
+      <p>论文正文写的是 <span class="m"><i>L</i><sub><i>s</i><i>i</i><i>m</i><i>p</i><i>l</i><i>e</i></sub></span> 训练 <span class="m"><i>ε</i><sub><i>θ</i></sub></span>，完整的 <span class="m"><i>L</i></span> 训练 <span class="m">Σ<sub><i>θ</i></sub></span>，和代码一致。代码里 <span class="m"><i>L</i><sub><i>v</i><i>b</i></sub></span> 没有再乘系数（<code>RESCALED_MSE</code> 默认关闭）。</p>
+      <p class="refs"><a href="#b-sigma">基础：为什么还要预测方差 →</a></p>
+    </div></details>
+  </section>
+<section class="faqgrp"><h2>结果和复现</h2>
+    <details class="faq" id="faq-best"><summary>FID 2.27 是在什么条件下得到的？</summary><div class="faqa">
+      <p>条件都写在论文和附录里：DiT-XL/2，ImageNet 256×256，训练 700 万步，EMA 权重，无分类器引导系数 1.5，只引导三个通道，250 步 DDPM 采样，ft-EMA 解码器，FID-50K 用 ADM 的 TensorFlow 工具计算。</p>
+      <p>其中任何一项改变都会影响数字。不用引导是 9.62；只训练 235 万步是 2.55；换用原版 LDM 解码器是 2.46，ft-MSE 解码器是 2.30；四通道系数 1.375 是 2.20。官方 README 还提到，移植到 PyTorch 的权重用 FP32 采样得到 2.21，略好于论文的 2.27。</p>
+      <p class="refs"><a href="#o-results">综述：实验结果 →</a><a href="https://github.com/facebookresearch/DiT" target="_blank" rel="noreferrer">官方仓库 ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-cfgc"><summary>官方代码的 <code>cfg_scale</code> 为什么只作用在前三个通道？</summary><div class="faqa">
+      <p><code>forward_with_cfg</code> 的注释写的是为了精确复现（For exact reproducibility reasons）。标准做法是作用在全部通道，代码里留了被注释的那一行。论文附录说明两者通过调整系数可以得到相近的 FID：三通道系数 <span class="m">1 + <i>x</i></span> 大致相当于四通道系数 <span class="m">1 + 3<i>x</i> / 4</span>。为什么只引导部分通道仍然有效，论文没有解释。</p>
+      <p class="refs"><a href="#o-cfg">综述：无分类器引导 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-better"><summary>这篇论文证明了 Transformer 比 U-Net 好吗？</summary><div class="faqa">
+      <p>论文的结论是 U-Net 的归纳偏置并非关键，DiT 在同一量级的计算量下取得了更低的 FID。这不能推出 Transformer 总是更好。计算量上 DiT-XL/2 是 118.6 Gflops，LDM-4 是 103.6 Gflops，差距不大，而两者的训练步数、超参数也不相同。</p>
+      <p>后来 EDM2（2023-12-05）只改善 U-Net 的训练动态，把 ImageNet-512 的最好 FID 从 2.41 降到 1.81。Transformer 后来成为多数大模型的选择，主要因为结构统一，扩大模型的规则简单，这是论文强调的可扩展性，和 U-Net 能达到的最好指标是两个问题。</p>
+      <p class="refs"><a href="#o-limits">综述：局限 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-stylegan"><summary>DiT 是当时所有 ImageNet 生成模型中最好的吗？</summary><div class="faqa">
+      <p>要看分辨率和指标。256×256 上，2.27 低于 StyleGAN-XL 的 2.30，是当时所有生成模型中最低的。512×512 上，DiT 的 3.04 只超过了此前的扩散模型，StyleGAN-XL 的 2.41 更低。摘要说的是超过「所有扩散模型」，范围写得很准确。</p>
+      <p class="refs"><a href="#o-results">综述：实验结果 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-corr"><summary>相关系数 −0.93 是怎么算的？</summary><div class="faqa">
+      <p>这个数字印在论文图 8 中，对应 12 个模型在第 40 万步的 FID-50K 和 Gflops。图 8 的横轴是对数坐标，但论文没有说明相关系数是用原始 Gflops 还是取对数后计算的。正文只说是很强的负相关。</p>
+      <p>12 个点来自同一组实验、同一个训练步数，这个系数说明的是这个设计空间内的规律，不代表更大的模型一定有同样的趋势。</p>
+      <p class="refs"><a href="#o-scaling">综述：缩放实验 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-compute"><summary>「总训练算力」里的系数 3 是什么？</summary><div class="faqa">
+      <p>论文估算总训练算力时用 Gflops × 批量大小 × 训练步数 × 3。系数 3 是粗略假设：一次反向传播的计算量是前向计算的两倍，加起来是 3 倍。这是估算，不是实测。</p>
+      <p>用这个口径可以比较不同规模的模型。论文的结论是，同样的总算力下，大模型训练较少的步数，好于小模型训练较多的步数。</p>
+      <p class="refs"><a href="#o-scaling">综述：缩放实验 →</a></p>
+    </div></details>
+    <details class="faq" id="faq-typo"><summary>论文第 3.1 节的损失式 <span class="m">−<i>p</i>(<i>x</i><sub>0</sub> | <i>x</i><sub>1</sub>) + …</span> 是不是少了 log？</summary><div class="faqa">
+      <p>是的。变分下界的重建项是 <span class="m">−log <i>p</i><sub><i>θ</i></sub>(<i>x</i><sub>0</sub> | <i>x</i><sub>1</sub>)</span>，论文（arXiv v2）的这个式子漏写了 log，也省略了 <span class="m"><i>p</i></span> 的下标 <span class="m"><i>θ</i></span>。论文接下来说这个式子省略了一个与训练无关的项，指的是 <span class="m"><i>L</i><sub><i>T</i></sub></span>。这是论文的笔误，中英对照页保留原文。</p>
+      <p class="refs"><a href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题 ↗</a></p>
+    </div></details>
+    <details class="faq" id="faq-pytorch"><summary>官方开源的 PyTorch 版和论文的结果一样吗？</summary><div class="faqa">
+      <p>论文的模型用 JAX 在 TPU 上训练，官方仓库的权重由 JAX 模型移植而来。README 报告用 PyTorch 重新训练的结果：DiT-XL/2 训练 40 万步，FID-50K 是 18.1，JAX 版是 19.5；DiT-B/4 是 68.3 和 68.9（两个种子），JAX 版是 68.4。这些数字用 250 步 DDPM、ft-MSE 解码器，不使用引导。作者认为差异在合理的随机波动范围内。</p>
+      <p class="refs"><a href="https://github.com/facebookresearch/DiT" target="_blank" rel="noreferrer">官方仓库 ↗</a></p>
+    </div></details>
+  </section>
+</div>
+</div>
+<div class="view" id="view-res">
+<div class="resdoc">
+  <p class="lede">读论文需要的基础，以及 CS231n 第 14 讲关于扩散 Transformer 的笔记收在这里。两份材料默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
+  <div class="eptools"><span>2 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <details class="res" id="res-basics">
+  <summary><span class="rt"><b>基础：ViT、自适应归一化和方差学习</b><em>Vision Transformer、Gflops 的估算、自适应归一化的来历、恒等初始化、两种正余弦编码、方差学习和评估指标</em></span></summary>
+  <div class="resb">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#b-vit">Vision Transformer</a></li><li><a href="#b-flops">Gflops 怎样随结构变化</a></li><li><a href="#b-adanorm">自适应归一化</a></li><li><a href="#b-identity">把残差块初始化为恒等映射</a></li><li><a href="#b-pos">两种正余弦编码</a></li><li><a href="#b-sigma">为什么还要预测方差</a></li><li><a href="#b-metrics">FID 和其他指标</a></li></ol></nav>
+  <article class="aidoc">
+    <h2 class="aih">基础：ViT、自适应归一化和方差学习</h2>
+    <p class="lede">论文默认读者了解 ViT、自适应归一化和 Improved DDPM 的方差学习。这里按论文用到的顺序整理这些内容。扩散过程本身见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题</a>，自编码器和隐空间见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/latent-diffusion/" target="_blank" rel="noreferrer">Latent Diffusion 专题</a>。</p>
+    <section class="aisec" id="b-vit">
+    <h2><span class="n">1</span><span>Vision Transformer：把图像变成序列</span></h2>
+    <p>Vision Transformer (ViT, 2020-10-22) 把图像切成不重叠的图块，每块线性投影成一个向量，加上位置编码后送入标准的 Transformer 编码器。DiT 沿用了这个做法，差别在于输入是隐变量，并且不需要分类用的 cls token。</p>
+    <p>图块的线性投影等价于一个卷积核大小和步长都等于 <span class="m"><i>p</i></span> 的卷积层，官方代码就是这样实现的。设输入为 <span class="m"><i>I</i> × <i>I</i> × <i>C</i></span>，序列长度 <span class="m"><i>T</i> = (<i>I</i> / <i>p</i>)<sup>2</sup></span>。这个序列长度在所有块中保持不变，这是它和 U-Net 最大的结构差别。</p>
+    <p>每个 Transformer 块由两个子层组成，都带残差连接。多头自注意力让所有 token 相互交换信息，MLP 则对每个 token 单独变换。DiT 的 MLP 隐藏层是宽度的 4 倍，激活函数是用 tanh 近似的 GELU。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2010.11929" target="_blank" rel="noreferrer">ViT 论文 ↗</a><a href="#o-patchify">综述：Patchify →</a></p>
+  </section>
+<section class="aisec" id="b-flops">
+    <h2><span class="n">2</span><span>Gflops 怎样随结构变化</span></h2>
+    <p>Gflops 是一次前向计算的浮点运算量，以 10<sup>9</sup> 为单位。对 Transformer，可以按层估算：</p>
+    <div class="deriv"><div><span class="df"><span class="m">MLP：∝ <i>T</i> · <i>d</i><sup>2</sup></span></span><span class="dc">每个 token 过两个线性层，宽度 d 到 4d 再回到 d</span></div><div><span class="df"><span class="m">自注意力的 <i>Q</i>、<i>K</i>、<i>V</i> 投影：∝ <i>T</i> · <i>d</i><sup>2</sup></span></span><span class="dc">每个 token 一次线性变换</span></div><div><span class="df"><span class="m">自注意力的点积：∝ <i>T</i><sup>2</sup> · <i>d</i></span></span><span class="dc">每对 token 算一次，头数只改变分组，不改变总量级</span></div><div><span class="df"><span class="m"><i>N</i> 个块：以上各项 × <i>N</i></span></span><span class="dc">总量和层数成正比</span></div></div>
+    <p>由此可以读出论文的结果。<span class="m"><i>d</i></span> 加倍时，<span class="m"><i>T</i> · <i>d</i><sup>2</sup></span> 这部分变成 4 倍；<span class="m"><i>T</i></span> 变成 4 倍（<span class="m"><i>p</i></span> 减半）时，<span class="m"><i>T</i> · <i>d</i><sup>2</sup></span> 这部分变成 4 倍，<span class="m"><i>T</i><sup>2</sup> · <i>d</i></span> 这部分变成 16 倍。序列较短时前者占主导，所以 <span class="m"><i>p</i></span> 减半时总量接近 4 倍；序列较长时后者的比重才明显上升，所以高分辨率的代价增长更快。</p>
+    <p>参数量只和 <span class="m"><i>N</i></span>、<span class="m"><i>d</i></span> 有关，基本不含 <span class="m"><i>T</i></span>。这是「参数量相同、计算量相差 16 倍」的来源。</p>
+    
+    
+    
+    <p class="refs"><a href="#o-sizes">综述：模型配置 →</a><a href="#faq-gflops">常见问题：为什么用 Gflops →</a></p>
+  </section>
+<section class="aisec" id="b-adanorm">
+    <h2><span class="n">3</span><span>自适应归一化：用条件控制特征的缩放和平移</span></h2>
+    <p>普通归一化的最后一步是乘一个可学习的 <span class="m"><i>γ</i></span>，再加一个可学习的 <span class="m"><i>β</i></span>。自适应归一化把这两个系数改成由条件回归，使同一个网络在不同条件下对特征做不同的变换。</p>
+    <div class="tbl"><table><thead><tr><th>做法</th><th>日期</th><th>归一化</th><th>条件来自</th><th>用途</th></tr></thead><tbody><tr><td>AdaIN</td><td>2017-03-20</td><td>Instance Normalization</td><td>风格图的特征统计量</td><td>风格迁移</td></tr><tr><td>FiLM</td><td>2017-09-22</td><td>不要求归一化</td><td>任意条件的线性回归</td><td>视觉问答</td></tr><tr><td>StyleGAN 的 AdaIN</td><td>2018-12-12</td><td>Instance Normalization</td><td>隐变量 <span class="m"><i>w</i></span> 的线性回归</td><td>GAN 生成器</td></tr><tr><td>ADM 的 AdaGN</td><td>2021-05-11</td><td>Group Normalization</td><td>时间步和类别的嵌入</td><td>扩散 U-Net</td></tr><tr><td>DiT 的 adaLN</td><td>2022-12-19</td><td>Layer Normalization</td><td>时间步和类别的嵌入之和</td><td>扩散 Transformer</td></tr></tbody></table></div>
+    <p>LayerNorm 对每个 token 沿特征维度做归一化，不依赖批量。官方 DiT 块的 LayerNorm 设置了 <code>elementwise_affine=False</code>，自身没有参数，<span class="m"><i>γ</i></span> 和 <span class="m"><i>β</i></span> 完全由条件给出。调制的写法是 <span class="m"><i>x</i> · (1 + <i>γ</i>) + <i>β</i></span>，所以 <span class="m"><i>γ</i> = <i>β</i> = 0</span> 时特征不变，这也是零初始化能得到恒等映射的前提。</p>
+    <p>同一组系数作用到所有 token 上，每个块只回归一个 <span class="m">6<i>d</i></span> 维的向量，所以 adaLN 几乎不增加 Gflops，只增加参数。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noreferrer">AdaIN ↗</a><a href="https://arxiv.org/abs/1709.07871" target="_blank" rel="noreferrer">FiLM ↗</a><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noreferrer">Layer Normalization ↗</a><a href="#faq-firststep">常见问题：梯度路径 →</a></p>
+  </section>
+<section class="aisec" id="b-identity">
+    <h2><span class="n">4</span><span>把残差块初始化为恒等映射</span></h2>
+    <p>残差块写成 <span class="m"><i>x</i> + <i>F</i>(<i>x</i>)</span>。如果让 <span class="m"><i>F</i></span> 在初始化时输出 0，整个块就是恒等映射，深层网络在训练开始时等价于一个浅层网络，信号和梯度都更容易传播。</p>
+    <p>Goyal 等人（2017-06-08）在 ImageNet 大批量训练中，把每个残差块最后一个 Batch Normalization 的 <span class="m"><i>γ</i></span> 初始化为 0，发现这有助于加速大规模训练。扩散模型的 U-Net 把残差连接前的最后一个卷积层初始化为 0，目的相同。DiT 的做法是把 <span class="m"><i>α</i></span> 回归层初始化为 0，效果和这两种相同，只是实现位置在条件调制上。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1706.02677" target="_blank" rel="noreferrer">Goyal 等人的论文 ↗</a><a href="#o-adaln">综述：adaLN-Zero →</a></p>
+  </section>
+<section class="aisec" id="b-pos">
+    <h2><span class="n">5</span><span>两种正余弦编码：位置和时间步</span></h2>
+    <p>DiT 用了两处固定的频率编码，形式相近，来源不同。</p>
+    <p><b>图块位置。</b> 二维位置编码把维度分成两半，一半编码行号，一半编码列号，每一半都是 Transformer 原论文的正余弦形式。官方代码的 <code>pos_embed</code> 设置了 <code>requires_grad=False</code>，不参与训练。</p>
+    <p><b>时间步。</b> 时间步 <span class="m"><i>t</i></span> 先编码成 256 维的频率向量，再经过两层 MLP 变成 <span class="m"><i>d</i></span> 维，激活函数是 SiLU：</p>
+    <div class="deriv"><div><span class="df"><span class="m">ω<sub><i>i</i></sub> = 10000<sup>−<i>i</i> / 128</sup>，  <i>i</i> = 0, 1, …, 127</span></span><span class="dc">128 个频率</span></div><div><span class="df"><span class="m">emb(<i>t</i>) = [ cos(<i>t</i> ω<sub>0</sub>), …, cos(<i>t</i> ω<sub>127</sub>), sin(<i>t</i> ω<sub>0</sub>), …, sin(<i>t</i> ω<sub>127</sub>) ]</span></span><span class="dc">256 维</span></div><div><span class="df"><span class="m"><i>c</i> = MLP( emb(<i>t</i>) ) + Embedding(<i>y</i>)</span></span><span class="dc">和类别嵌入直接相加</span></div></div>
+    <p>类别嵌入表有 1001 项，多出的一项是无分类器引导的空条件。训练时以 10% 的概率把类别替换成它。</p>
+    
+    
+    
+    <p class="refs"><a href="#o-frame">综述：整体结构 →</a></p>
+  </section>
+<section class="aisec" id="b-sigma">
+    <h2><span class="n">6</span><span>为什么还要预测方差</span></h2>
+    <p>DDPM 把反向过程的方差 <span class="m">Σ<sub><i>θ</i></sub></span> 固定为 <span class="m"><i>β</i><sub><i>t</i></sub></span> 或 <span class="m"><i class="atl">β</i><sub><i>t</i></sub></span>，只学习均值。Improved DDPM（2021-02-18）发现，学习方差可以提高对数似然，并允许用更少的采样步数。它让网络多输出一组 <span class="m"><i>v</i></span>，在两个固定值之间做对数域插值：</p>
+    <div class="deriv"><div><span class="df"><span class="m">Σ<sub><i>θ</i></sub> = exp( <i>f</i> · log <i>β</i><sub><i>t</i></sub> + (1 − <i>f</i>) · log <i class="atl">β</i><sub><i>t</i></sub> )</span></span><span class="dc">对数域插值</span></div><div><span class="df"><span class="m"><i>f</i> = (<i>v</i> + 1) / 2</span></span><span class="dc">官方代码中的 <code>LEARNED_RANGE</code></span></div></div>
+    <p>方差项无法用噪声的均方误差训练，只能用变分下界 <span class="m"><i>L</i><sub><i>v</i><i>b</i></sub></span>。为了不影响噪声预测，计算 <span class="m"><i>L</i><sub><i>v</i><i>b</i></sub></span> 时噪声输出被 <code>detach</code>。DiT 的总损失是 <span class="m"><i>L</i><sub><i>s</i><i>i</i><i>m</i><i>p</i><i>l</i><i>e</i></sub> + <i>L</i><sub><i>v</i><i>b</i></sub></span>，这也是输出通道数是输入两倍的原因。</p>
+    <p>论文的采样步数是 250。图 10 还测试了 16 到 1000 步。步数较少时，学到的方差更有价值；这一点来自 Improved DDPM，DiT 论文没有单独做固定方差的对比。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/2102.09672" target="_blank" rel="noreferrer">Improved DDPM ↗</a><a href="#o-decoder">综述：解码 →</a><a href="#faq-sigma">常见问题：损失函数 →</a></p>
+  </section>
+<section class="aisec" id="b-metrics">
+    <h2><span class="n">7</span><span>FID 和其他指标</span></h2>
+    <p><b>FID (Fréchet Inception Distance)</b> 用 Inception 网络提取真实图像和生成图像的特征，分别拟合成高斯分布，再计算两个高斯之间的 Fréchet 距离。数值越低越好，FID-50K 表示用 5 万张生成图计算：</p>
+    <div class="deriv"><div><span class="df"><span class="m">FID = ‖<i>μ</i><sub><i>r</i></sub> − <i>μ</i><sub><i>g</i></sub>‖<sup>2</sup> + Tr( Σ<sub><i>r</i></sub> + Σ<sub><i>g</i></sub> − 2 (Σ<sub><i>r</i></sub> Σ<sub><i>g</i></sub>)<sup>1/2</sup> )</span></span><span class="dc">r 为真实图像，g 为生成图像</span></div></div>
+    <p>FID 对实现细节敏感，缩放方式不同就可能改变结果，所以论文明确所有数字都用 ADM 的 TensorFlow 工具计算。</p>
+    <p><b>sFID</b> 用 Inception 中间层的空间特征，对空间结构更敏感。<b>Inception Score (IS)</b> 只看生成图，同时要求单张图的分类明确、整体类别分布均匀，越高越好。<b>Precision</b> 大致衡量生成图中有多少落在真实分布范围内，反映样本质量；<b>Recall</b> 衡量真实分布有多少被生成图覆盖，反映多样性。</p>
+    <p>引导系数增大时，通常 Precision 上升、Recall 下降。DiT-XL/2 从无引导到 <span class="m"><i>s</i> = 1.5</span>，Precision 从 0.67 升到 0.83，Recall 从 0.67 降到 0.57，符合这个规律。论文附录也观察到，系数越大，保真度越高，多样性越低。</p>
+    
+    
+    
+    <p class="refs"><a href="https://arxiv.org/abs/1706.08500" target="_blank" rel="noreferrer">FID 论文 ↗</a><a href="https://arxiv.org/abs/1904.06991" target="_blank" rel="noreferrer">Precision 和 Recall ↗</a><a href="#o-results">综述：实验结果 →</a></p>
+  </section>
+  </article>
+</div>
+  </div>
+</details>
+  <details class="res" id="res-c">
+  <summary><span class="rt"><b>CS231n 第 14 讲：扩散 Transformer</b><em>10 分钟，Justin Johnson 讲现代潜在扩散的完整流程、条件注入、FLUX.1 dev 和视频模型的序列长度</em></span></summary>
+  <div class="resb">
+<div class="intro"><p>第 14 讲前半讲生成对抗网络，后半讲扩散模型。这里只取约 10 分钟，内容是把 DiT 放回今天的完整流水线：编码器和解码器怎么来，扩散 Transformer 怎样接收条件，文本和视频模型在此基础上增加了什么。</p><p>这段没有讲 DiT 论文的缩放实验。它的价值在于说明这篇论文之后的实际做法，和综述的<a class="ilink" href="#o-after">后续发展</a>可以对照来读。</p></div>
+<details class="ep" id="c" data-bv="BV1b1agz5ERC" data-p="14" data-start="3132" open>
+  <summary>
+    <span class="no">讲</span>
+    <span class="tt"><b>CS231n 2025 第 14 讲：扩散 Transformer</b><em>Stanford CS231n 2025 · 第 14 讲 52:12 至 62:21</em><span class="hook">现代潜在扩散的完整流程、两种条件注入方式、FLUX.1 dev 的具体数字，以及视频模型的成本为什么集中在序列长度上。</span></span>
+    <span class="side"><span class="chip">Justin Johnson</span><span class="len">10:09</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">Johnson 对网络结构的评价是：相当普通的 Transformer 就能很好地用于扩散模型，基本是标准的 Transformer 块，没有什么特别的秘方。结构上要解决的主要问题是怎样注入条件。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1b1agz5ERC/?p=14&amp;t=3132" target="_blank" rel="noreferrer">B 站第 14 讲 ↗</a><a href="https://xslaoxu.cn/learn-ai/cs231n/" target="_blank" rel="noreferrer">本站 CS231n 第 14 讲完整笔记 ↗</a></p>
+      <section class="sec" id="c-s0">
+      <h4><button class="ts" type="button" data-t="3132">52:12</button><span>潜在扩散模型</span></h4>
+      <p>实际到处使用的是潜在扩散模型，分多个阶段。先训练编码器和解码器：编码器把图像映射到隐空间，空间下采样 <span class="m"><i>D</i></span> 倍，通道从 3 变成 <span class="m"><i>C</i></span>。然后在隐空间训练扩散模型：图像经编码器得到隐变量，加噪，训练模型去噪。编码器是冻结的，梯度不传回去。推理时采样一个随机隐变量，多次去噪得到干净的隐变量，再由解码器变成图像。</p>
+      <p>课件写的常见设置是 8 倍下采样、16 个通道。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3160.jpg" alt="潜在扩散：编码器把图像压到隐空间，常见是 8 倍下采样、16 通道。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3160">52:40</button>潜在扩散：编码器把图像压到隐空间，常见是 8 倍下采样、16 通道。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c-3220.jpg" alt="在冻结编码器得到的隐空间里训练扩散模型，推理后用解码器还原图像。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3220">53:40</button>在冻结编码器得到的隐空间里训练扩散模型，推理后用解码器还原图像。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>DiT 论文使用 Stable Diffusion 的自编码器，同样是 8 倍下采样，通道数是 4。把通道数增加到 16 是后来的做法，Stable Diffusion 3 就是 16 通道。</p></div>
+    </section>
+<section class="sec" id="c-s1">
+      <h4><button class="ts" type="button" data-t="3256">54:16</button><span>编码器解码器怎么训练</span></h4>
+      <p>编码器和解码器用变分自编码器训练。但变分自编码器的输出模糊，解码器的重建质量会成为后面扩散模型生成质量的上限。解决办法是在解码器后接一个判别器，加入生成对抗损失。</p>
+      <p>于是总共要训练编码器、解码器、判别器和隐空间中的扩散模型。Johnson 的说法是，现代生成建模流水线要训练一个变分自编码器、一个生成对抗网络和一个扩散模型，并且为此道歉说这很混乱。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3315.jpg" alt="编码器解码器用变分自编码器训练；解码器输出模糊，再加一个判别器。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3315">55:15</button>编码器解码器用变分自编码器训练；解码器输出模糊，再加一个判别器。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c-3325.jpg" alt="现代潜在扩散流程 = 变分自编码器 + 生成对抗网络 + 扩散模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3325">55:25</button>现代潜在扩散流程 = 变分自编码器 + 生成对抗网络 + 扩散模型。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>这解释了 DiT 论文的解码器实验：只换解码器，FID 就从 2.46 变成 2.27。详见综述的<a class="ilink" href="#o-results">实验结果</a>。</p></div>
+    </section>
+<section class="sec" id="c-s2">
+      <h4><button class="ts" type="button" data-t="3356">55:56</button><span>扩散 Transformer</span></h4>
+      <p>结构上的主要问题是怎样注入条件。扩散模型要接收三样输入：加噪图像、时间步 <span class="m"><i>t</i></span>、条件信号（比如文本）。注入方式有两类。</p>
+      <ul><li>由条件预测缩放和平移系数，用来调制块内的中间激活。时间步通常这样注入，这就是 DiT 的 adaLN。</li><li>利用 Transformer 处理序列的特点，把时间步、文本等都放进序列，通过交叉注意力或联合注意力处理。</li></ul>
+      <p>他的总结是：现代扩散 Transformer 通常用缩放平移注入时间步，用序列拼接（多为交叉注意力，有时是联合注意力）注入文本等条件。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3390.jpg" alt="课件的 DiT 结构：标准的 Transformer 块，主要问题是怎样注入时间步和文本。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3390">56:30</button>课件的 DiT 结构：标准的 Transformer 块，主要问题是怎样注入时间步和文本。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>课件这张图取自 DiT 论文。DiT 论文只做了类别条件，四种方案中 adaLN-Zero 最好。Johnson 讲的这种组合是后来面向文本的做法，见常见问题<a class="ilink" href="#faq-text">为什么文本模型又用回交叉注意力</a>。</p></div>
+    </section>
+<section class="sec" id="c-s3">
+      <h4><button class="ts" type="button" data-t="3437">57:17</button><span>文本生成图像</span></h4>
+      <p>文本提示经过预训练的文本编码器（通常是 T5、CLIP 这类，一般冻结）得到文本嵌入，和加噪隐变量、时间步一起送入扩散 Transformer，迭代得到干净的隐变量，再经变分自编码器的解码器得到图像。所以除了前面几个模型，还需要一个语言模型。</p>
+      <p>他给出的具体数字是开源模型 <b>FLUX.1 dev</b>：T5 和 CLIP 作文本编码器，自编码器 8 倍下采样，隐变量是 128×128×16，Transformer 有 120 亿参数。课件写明它在隐变量上再做 2×2 patchify，得到 64×64 = 1024 个图像 token。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3460.jpg" alt="文本生成图像的样例，提示词是他前一天写的。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3460">57:40</button>文本生成图像的样例，提示词是他前一天写的。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c-3525.jpg" alt="FLUX.1 dev 的参数：T5 + CLIP，8 倍下采样，120 亿参数，2×2 patchify 得到 1024 个图像 token。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3525">58:45</button>FLUX.1 dev 的参数：T5 + CLIP，8 倍下采样，120 亿参数，2×2 patchify 得到 1024 个图像 token。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>Johnson 口头说的「再做一层下采样」就是 patchify，和 DiT-XL/2 的 <span class="m"><i>p</i> = 2</span> 相同。和 DiT-XL/2 比较：参数量从 6.75 亿到 120 亿，约 18 倍；序列长度从 256 到 1024，正好 4 倍。这和 DiT 论文建议的方向一致，继续扩大模型和 token 数。</p></div>
+    </section>
+<section class="sec" id="c-s4">
+      <h4><button class="ts" type="button" data-t="3530">58:50</button><span>文本生成视频</span></h4>
+      <p>流程基本相同，区别是隐变量多一个时间维度，解码器换成时空自编码器，在空间和时间上都做上采样。示例来自 Meta 的 <b>Movie Gen</b>（2024-10-04）。</p>
+      <p>视频模型训练昂贵，主要原因是序列长度。文本生成图像的 Transformer 处理 1024 个 token；这个视频模型的整体结构相近，却要处理约 7.6 万个视频 token。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3550.jpg" alt="文本生成视频：隐变量多一个时间维度，解码器在时空上都做上采样。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3550">59:10</button>文本生成视频：隐变量多一个时间维度，解码器在时空上都做上采样。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c-3590.jpg" alt="Movie Gen：图像模型 1024 个 token，视频模型约 7.6 万个 token。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3590">59:50</button>Movie Gen：图像模型 1024 个 token，视频模型约 7.6 万个 token。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>这和基础一节的估算相符：自注意力的点积部分和 <span class="m"><i>T</i><sup>2</sup></span> 成正比，序列长度变成约 74 倍时，这部分的计算量变成约 5500 倍。实际的视频模型会用因子化注意力等办法控制这个代价，这里只是量级比较。</p></div>
+    </section>
+<section class="sec" id="c-s5">
+      <h4><button class="ts" type="button" data-t="3620">60:20</button><span>视频扩散模型这一年半</span></h4>
+      <p>他说过去一年基本是视频扩散模型的时代，几乎每周都有新模型，有开源的，有发技术报告的，也有只提供商业服务、不透露细节的。</p>
+      <p>OpenAI 的 <b>Sora</b> 影响很大，它不是第一个视频扩散模型，却是第一个效果非常好的，最早把扩散 Transformer 真正扩展上去。上课当天（2025-05-20）Google 发布了 <b>Veo 3</b>，他认为这几乎可以肯定是当时最好的视频生成模型，它还能联合生成声音。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/c-3640.jpg" alt="视频扩散模型这一年半：几乎每周都有新模型。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3640">60:40</button>视频扩散模型这一年半：几乎每周都有新模型。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/c-3730.jpg" alt="Veo 3 根据文本生成的视频。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3730">62:10</button>Veo 3 根据文本生成的视频。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>Johnson 说 Sora 博客发布于 2024 年 3 月，实际日期是 2024-02-15。DiT 的第一作者 Bill Peebles 后来担任 Sora 的负责人，见综述的<a class="ilink" href="#o-after">后续发展</a>。</p></div>
+    </section>
+      
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/c-3390.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1b1agz5ERC/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="3132"><b>52:12</b><span>潜在扩散模型</span></button></li><li><button type="button" data-t="3256"><b>54:16</b><span>编码器解码器：变分自编码器加判别器</span></button></li><li><button type="button" data-t="3356"><b>55:56</b><span>扩散 Transformer 与条件注入</span></button></li><li><button type="button" data-t="3437"><b>57:17</b><span>文本生成图像：FLUX.1 dev</span></button></li><li><button type="button" data-t="3530"><b>58:50</b><span>文本生成视频：Movie Gen</span></button></li><li><button type="button" data-t="3620"><b>60:20</b><span>视频扩散模型这一年半：Sora 与 Veo 3</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+  </div>
+</details>
+</div>
+</div>
+</main>
+<div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
+<script>(function(){
+  /* ── tab ── */
+  function showTab(v){
+    document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+    var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
+    // 原论文对照是 iframe，第一次切过来才加载（10 MB 的页不该拖慢首屏）
+    var f=document.querySelector('#view-'+v+' iframe[data-src]');if(f&&!f.src)f.src=f.dataset.src;
+  }
+  // iframe 那个 tab 要让它贴着 tab 栏铺满一屏，不然底下一截在屏幕外，得先滚外层
+  function settle(v){
+    var view=document.getElementById('view-'+v);
+    if(view&&view.querySelector('iframe')){var bar=document.querySelector('.bar');scrollTo(0,view.getBoundingClientRect().top+scrollY-bar.offsetHeight);}
+    else scrollTo(0,0);
+  }
+  document.querySelectorAll('.tb').forEach(function(b){
+    b.addEventListener('click',function(){
+      showTab(b.dataset.v);
+      history.replaceState(null,'',b===document.querySelector('.tb')?location.pathname+location.search:'#'+b.dataset.v);
+      settle(b.dataset.v);
+    });
+  });
+
+  /* ── 全部展开 / 收起（只管当前 tab） ── */
+  document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
+    var open=b.dataset.all==='open';b.closest('.view').querySelectorAll('details.ep,details.faq,details.res').forEach(function(d){d.open=open;});});});
+
+  /* ── 播放器：本地有原片就放本地（data-src），没有就用 B 站播放器。时间码都是原片里的秒；点封面从 data-start 开始放
+   * （CS231n 的卡片只截了一讲里的一段，封面从这段的开头放） ── */
+  function player(ep){
+    if(ep._pl)return ep._pl;
+    var box=ep.querySelector('.pl'), which=ep.querySelector('.plwhich'), tl=[].slice.call(ep.querySelectorAll('.tl button'));
+    var st={mode:null,el:null};
+    function bili(t){
+      var f=document.createElement('iframe');
+      f.allow='autoplay;fullscreen;picture-in-picture';f.setAttribute('allowfullscreen','');
+      f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('scrolling','no');
+      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&p='+ep.dataset.p+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
+      box.innerHTML='';box.appendChild(f);st.mode='bili';st.el=f;
+      which.textContent=ep.dataset.src?'B 站播放器（本地没找到视频文件）':'B 站播放器';
+    }
+    function mark(t){var cur=null;tl.forEach(function(b){if(+b.dataset.t<=t+0.5)cur=b;});
+      tl.forEach(function(b){b.classList.toggle('on',b===cur);});}
+    function local(t){
+      var v=document.createElement('video');v.controls=true;v.preload='auto';v.playsInline=true;
+      v.src=ep.dataset.src;
+      v.addEventListener('error',function(){if(st.mode==='local')bili(st.want);},{once:true});
+      v.addEventListener('loadedmetadata',function(){v.currentTime=st.want||0;v.play().catch(function(){});},{once:true});
+      v.addEventListener('timeupdate',function(){mark(v.currentTime);});
+      box.innerHTML='';box.appendChild(v);st.mode='local';st.el=v;
+      which.textContent='本地视频 '+ep.dataset.src.split('/').pop();
+    }
+    function play(t){
+      st.want=t;
+      if(!st.mode){if(ep.dataset.src)local(t);else bili(t);}
+      else if(st.mode==='local'){if(st.el.readyState>=1){st.el.currentTime=t;st.el.play().catch(function(){});}}
+      else bili(t);
+      if(st.mode==='bili')mark(t);
+    }
+    return ep._pl={play:play};
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.ts,.tl button,.plgo');if(!b)return;
+    var ep=b.closest('.ep');if(!ep)return;
+    e.preventDefault();
+    player(ep).play(+(b.dataset.t||ep.dataset.start||0));
+    var pl=ep.querySelector('.pl'),r=pl.getBoundingClientRect();
+    if(r.bottom<60||r.top>innerHeight-80)pl.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+
+  /* ── 截图大图，左右键切同一张卡片里的图 ── */
+  var lb=document.getElementById('lightbox'),list=[],at=-1;
+  function show(i){at=(i+list.length)%list.length;var im=list[at];lb.querySelector('img').src=im.src;
+    var cap=im.closest('.shot').querySelector('figcaption').cloneNode(true),t=cap.querySelector('.ts');if(t)t.remove();
+    lb.querySelector('figcaption').innerHTML=cap.innerHTML+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
+    lb.querySelectorAll('.lb-nav').forEach(function(n){n.hidden=list.length<2;});}
+  document.addEventListener('click',function(e){
+    var im=e.target.closest('.shot img');
+    if(im){list=[].slice.call(im.closest('.ep').querySelectorAll('.shot img'));lb.classList.add('on');show(list.indexOf(im));return;}
+    if(!lb.classList.contains('on'))return;
+    var n=e.target.closest('.lb-nav');if(n){show(at+(n.classList.contains('lb-next')?1:-1));return;}
+    lb.classList.remove('on');
+  });
+  addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;
+    if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
+
+  /* ── 地址栏：#kl 这类是 tab；其余是页内任意 id（#l13-s4、#kl-gauss、#faq-collapse），切到它所在的 tab、展开外面的折叠块再滚过去 ──
+   * 截图是懒加载的，图片撑开以后位置会变，load 之后和图片加载完各再定位一次 */
+  function openHash(){
+    var id=decodeURIComponent(location.hash.slice(1));if(!id)return;
+    if(document.getElementById('view-'+id)){showTab(id);return;}
+    var el=document.getElementById(id);if(!el)return;
+    var v=el.closest('.view');if(v)showTab(v.id.slice(5));
+    for(var d=el.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true;
+    el.scrollIntoView({block:'start'});
+  }
+  openHash();addEventListener('hashchange',openHash);
+  addEventListener('load',function(){setTimeout(openHash,0);setTimeout(openHash,600);});
+})();
+</script>
+</body></html>
