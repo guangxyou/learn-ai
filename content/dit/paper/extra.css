@@ -1,0 +1,13 @@
+/* 表格按 686px 的正文宽度缩小；表 4 太宽，缩到还能读的程度后横向滚动 */
+[id="S3.T1"] table{zoom:.95}
+[id="S5.T3"] table{zoom:.82}
+[id="A0.T4"] table{zoom:.6}
+figure.ltx_table{overflow-x:auto}
+.ltx_flex_figure{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 10px}
+.ltx_flex_cell{flex:1 1 40%;min-width:0;text-align:center}
+.ltx_flex_size_1{flex:1 1 100%}
+.ltx_flex_break{flex-basis:100%;height:0}
+/* 作者脚注 */
+.anote{margin:14px auto 0;max-width:640px;text-align:center;font-size:12.5px;line-height:1.7;color:var(--text-3)}
+.anote p{margin:0}
+.anote .fzh{margin:2px 0 0;padding:0;border:0;background:none;font-size:12.5px}

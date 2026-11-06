@@ -236,7 +236,8 @@ async function build() {
   const when = (e) => e.published || e.studied;
   entries.sort((a, b) => when(b).localeCompare(when(a)) || a.id.localeCompare(b.id));
   // entry.json 写 "before": "<id>" 的条目排在那一条正上方，上线日期仍照实写（同一专题的几篇要挨着时用）
-  for (const e of entries.filter((x) => x.before)) {
+  // 从旧往新处理：目标自己也可能带 before（DiT → Latent Diffusion → DDPM），要先就位
+  for (const e of entries.filter((x) => x.before).reverse()) {
     entries.splice(entries.indexOf(e), 1);
     const at = entries.findIndex((x) => x.id === e.before);
     if (at < 0) throw new Error(`${e.id} 的 before 指向不存在的条目 ${e.before}`);
