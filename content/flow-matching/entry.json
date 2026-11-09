@@ -1,0 +1,32 @@
+{
+  "id": "flow-matching",
+  "kind": "paper",
+  "title": "Flow Matching 与 Rectified Flow",
+  "subtitle": "在噪声和数据之间回归速度场：两篇同期论文的条件构造、理论保证和 reflow，附两篇原论文逐段中英对照",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2022-09",
+  "studied": "2026-11",
+  "published": "2026-11-09",
+  "before": "latent-diffusion",
+  "summary": "五个 tab：综述（含实际运行的二维 reflow 实验）、两篇原论文中英对照（含附录）、16 个常见问题；资料里有三个入门视频链接、Sander Dieleman《Perspectives on diffusion》中文译文和 NeurIPS 2024 Flow Matching 教程五段笔记。",
+  "source": {
+    "name": "Flow Matching for Generative Modeling · Lipman 等；Flow Straight and Fast · Liu, Gong, Liu",
+    "url": "https://arxiv.org/abs/2210.02747"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>5</b> 个 tab",
+    "<b>2</b> 张实验图",
+    "<b>40</b> 张截图",
+    "<b>16</b> 个常见问题"
+  ],
+  "build": {
+    "note": "输入在 25_FlowMatching/ 下（content/*.mjs 正文、figures/ 实验图、code/toy.py 二维实验、paper/ 论文源和裁图、blog/ 博客图、video/ 教程录像），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，25_FlowMatching/ 在时构建会先重新生成。第二、三个 tab 是两篇原论文 arXiv 官方 HTML 的中英对照（无批注），build.mjs 调 tools/make-paper.mjs --embed 1 --plain 1 生成 assets/fm.html、assets/rf.html，图拆到 assets/fm/、assets/rf/，用 iframe 嵌进来；译文、文献链接和表格样式在 content/flow-matching/paper/。博客公式用 25_FlowMatching/node_modules 里的 temml 转 MathML。",
+    "tool": "25_FlowMatching/build.mjs",
+    "requires": "25_FlowMatching/build.mjs",
+    "args": []
+  }
+}

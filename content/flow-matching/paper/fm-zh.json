@@ -1,0 +1,814 @@
+[
+{
+"en": "We introduce a new paradigm for gene",
+"zh": "我们提出一种基于 Continuous Normalizing Flow (CNF) 的生成建模新范式，使 CNF 能以前所未有的规模训练。具体来说，我们提出 Flow Matching (FM) 的概念：一种无需模拟 (simulation-free) 的 CNF 训练方法，做法是回归固定的条件概率路径对应的向量场。Flow Matching 兼容一大类在噪声与数据样本之间变换的高斯概率路径，现有的扩散路径是其中的特例。我们发现，用 FM 训练扩散路径，是比现有方法更鲁棒、更稳定的扩散模型训练方式。此外，Flow Matching 也让 CNF 可以用其他非扩散的概率路径训练。其中特别值得关注的一例，是用最优传输 (Optimal Transport, OT) 的位移插值 (displacement interpolation) 定义条件概率路径。这类路径比扩散路径更高效，训练和采样都更快，泛化也更好。在 ImageNet 上用 Flow Matching 训练 CNF，似然和样本质量都稳定优于其他基于扩散的方法，并且可以用现成的数值 ODE 求解器快速、可靠地生成样本。"
+},
+{
+"en": "Introduction",
+"zh": "引言"
+},
+{
+"en": "Deep generative models are a class o",
+"zh": "深度生成模型是一类深度学习算法，目标是估计未知的数据分布并从中采样。近来生成建模（例如图像生成 {c1}）取得了一系列惊人的进展，这主要归功于扩散模型训练的可扩展性和相对的稳定性 {c2}。然而，局限于简单的扩散过程，使得可用的采样概率路径空间相当狭窄，导致训练时间很长，高效采样还需要借助专门的方法（例如 {c3}）。"
+},
+{
+"en": "In this work we consider the general",
+"zh": "本文考虑一般性的、确定性的 Continuous Normalizing Flow 框架（CNF；{c1}）。CNF 能够建模任意的概率路径，并且已知它涵盖了扩散过程所建模的概率路径 {c2}。然而，除了可以借助去噪分数匹配 (Denoising Score Matching) {c3} 等方法高效训练的扩散模型，目前还没有可扩展的 CNF 训练算法。最大似然训练（例如 {c4}）需要代价高昂的数值 ODE 模拟，而现有的无需模拟的方法要么涉及难以计算的积分 {c5}，要么梯度有偏 {c6}。"
+},
+{
+"en": "Figure 1: Unconditional ImageNet-128",
+"zh": "<b>图 1：</b>用 Flow Matching 和最优传输概率路径训练的 CNF 生成的无条件 ImageNet-128 样本。"
+},
+{
+"en": "The goal of this work is to propose",
+"zh": "本文的目标是提出 Flow Matching (FM)：一种高效、无需模拟的 CNF 训练方法，允许用一般的概率路径来监督 CNF 训练。FM 打破了扩散之外 CNF 无法规模化训练的障碍，并且绕开了对扩散过程的推理，直接在概率路径上工作。"
+},
+{
+"en": "In particular, we propose the Flow M",
+"zh": "具体来说，我们提出 Flow Matching 目标（第 {r1} 节）：一个简单直观的训练目标，回归到生成所需概率路径的目标向量场。我们先证明，这样的目标向量场可以通过逐样本（即条件）的表述来构造。随后受去噪分数匹配的启发，我们证明逐样本的训练目标，即条件流匹配 (Conditional Flow Matching, CFM)，给出相同的梯度，并且不需要显式知道那个难以计算的目标向量场。此外，我们讨论一大类可用于 Flow Matching 的逐样本概率路径（第 {r2} 节），现有的扩散路径是其中的特例。即使在扩散路径上，FM 的训练也更鲁棒、更稳定，性能优于分数匹配。这一族概率路径还包含一个特别有意思的情形：对应最优传输 (OT) 位移插值 {c1} 的向量场。我们发现条件 OT 路径比扩散路径更简单，形成直线轨迹，而扩散路径得到的是弯曲的轨迹。从实验看，这些性质带来了更快的训练、更快的生成和更好的性能。"
+},
+{
+"en": "We empirically validate Flow Matchin",
+"zh": "我们在 ImageNet 这个规模大、多样性高的图像数据集上实验验证了 Flow Matching 和基于最优传输路径的构造。我们发现，模型很容易训练到在似然估计和样本质量两方面都优于其他基于扩散的方法。此外，与已有方法相比，我们的模型在计算开销和样本质量之间取得了更好的折中。图 {r1} 展示了我们的模型生成的、经过挑选的无条件 ImageNet 128{m1}128 样本。"
+},
+{
+"en": "Preliminaries: Continuous Normalizin",
+"zh": "预备知识：Continuous Normalizing Flow"
+},
+{
+"en": "Let {m1:\\mathbb{R}^{d}} denote the d",
+"zh": "记 {m1} 为数据空间，数据点为 {m2}。本文用到两个重要对象：概率密度路径 {m3}，它是一个随时间变化的{f1}概率密度函数，即 {m4}；以及随时间变化的向量场 {m5}。向量场 {m6} 可以用来构造一个随时间变化的微分同胚映射，称为<i>流</i> (flow) {m7}，它由常微分方程 (ODE) 定义："
+},
+{
+"en": "We use subscript to denote the time",
+"zh": "我们用下标表示时间参数，例如 {m1}。"
+},
+{
+"en": "Previously, {c1:Chen et al. (2018)}",
+"zh": "此前 {c1} 提出用神经网络 {m2} 建模向量场 {m1}，其中 {m3} 是可学习参数，由此得到流 {m4} 的深度参数化模型，称为 Continuous Normalizing Flow (CNF)。CNF 通过推前 (push-forward) 方程，把简单的先验密度 {m5}（例如纯噪声）变换成更复杂的密度 {m6}："
+},
+{
+"en": "where the push-forward (or change of",
+"zh": "其中推前（或变量替换）算子 {m1} 定义为"
+},
+{
+"en": "A vector field {m1:v_{t}} is said to",
+"zh": "如果向量场 {m1} 的流 {m3} 满足式 {r1}，就称它<i>生成</i>概率密度路径 {m2}。检验一个向量场是否生成某条概率路径，一个实用的办法是连续性方程 (Continuity Equation)，它是我们证明中的关键工具，见附录 {r2}。附录 {r3} 进一步回顾了 CNF 的相关内容，特别是如何计算任意一点 {m5} 处的概率 {m4}。"
+},
+{
+"en": "Flow Matching",
+"zh": "Flow Matching"
+},
+{
+"en": "Let {m1:x_{1}} denote a random varia",
+"zh": "记 {m1} 为服从某个未知数据分布 {m2} 的随机变量。我们假设只能拿到 {m3} 的数据样本，拿不到密度函数本身。再令 {m4} 为一条概率路径，使 {m5} 是一个简单分布，例如标准正态分布 {m6}，并使 {m7} 在分布上近似等于 {m8}。如何构造这样的路径稍后讨论。Flow Matching 目标的设计就是去匹配这条目标概率路径，从而让我们能从 {m9} 流到 {m10}。"
+},
+{
+"en": "Given a target probability density p",
+"zh": "给定目标概率密度路径 {m1} 和生成 {m3} 的对应向量场 {m2}，我们定义 Flow Matching (FM) 目标为"
+},
+{
+"en": "where {m1:\\theta} denotes the learna",
+"zh": "其中 {m1} 是 CNF 向量场 {m2}（定义见第 {r1} 节）的可学习参数，{m3}（均匀分布），{m4}。简单地说，FM 损失就是用神经网络 {m6} 回归向量场 {m5}。损失降到零时，学到的 CNF 模型就会生成 {m7}。"
+},
+{
+"en": "Flow Matching is a simple and attrac",
+"zh": "Flow Matching 是一个简单而有吸引力的目标，但单独直接使用时在实践中无法计算，因为我们事先不知道合适的 {m1} 和 {m2} 是什么。满足 {m3} 的概率路径有很多种选择，更重要的是，我们一般拿不到生成所需 {m5} 的 {m4} 的闭式表达。本节证明，可以用<i>只按单个样本定义</i>的概率路径和向量场来同时构造 {m6} 和 {m7}，经过适当的聚合就得到所需的 {m8} 和 {m9}。此外，这种构造让我们得到一个容易计算得多的 Flow Matching 目标。"
+},
+{
+"en": "Constructing pt,ut from conditional",
+"zh": "从条件概率路径和向量场构造 pₜ、uₜ"
+},
+{
+"en": "A simple way to construct a target p",
+"zh": "构造目标概率路径的一个简单办法，是把更简单的概率路径混合起来：给定某个数据样本 {m1}，记 {m2} 为一条<i>条件概率路径</i>，它在时刻 {m4} 满足 {m3}；在 {m6} 时，我们把 {m5} 设计成集中在 {m7} 附近的分布，例如 {m8}，即均值为 {m9}、标准差 {m10} 足够小的正态分布。把条件概率路径对 {m11} 求边际，得到<i>边际概率路径</i>"
+},
+{
+"en": "where in particular at time {m1:t=1}",
+"zh": "特别地，在时刻 {m1}，边际概率 {m2} 是一个与数据分布 {m3} 非常接近的混合分布，"
+},
+{
+"en": "Interestingly, we can also define a",
+"zh": "有意思的是，我们也可以按下面的方式对条件向量场「求边际」，定义一个<i>边际向量场</i>（假设对所有 {m2} 和 {m3} 都有 {m1}）："
+},
+{
+"en": "where {m1:u_{t}(\\cdot|x_{1}):\\mathbb",
+"zh": "其中 {m1} 是生成 {m2} 的条件向量场。这一点不那么显然，但这样聚合条件向量场，得到的确实是建模边际概率路径所需的正确向量场。"
+},
+{
+"en": "Our first key observation is this:",
+"zh": "我们的第一个关键观察是："
+},
+{
+"en": "The marginal vector field (equation",
+"zh": "<i>边际向量场（式 {r1}）生成边际概率路径（式 {r2}）。</i>"
+},
+{
+"en": "This provides a surprising connectio",
+"zh": "这在条件向量场（生成条件概率路径的向量场）和边际向量场（生成边际概率路径的向量场）之间建立了一个出人意料的联系。借助这一联系，可以把未知且难以计算的边际向量场拆成更简单的条件向量场，条件向量场只依赖单个数据样本，定义起来简单得多。下面的定理把这一点形式化。"
+},
+{
+"en": "Theorem 1 . Given vector fields {m1:",
+"zh": "<b>定理 1：</b><i>给定生成条件概率路径 {m2} 的向量场 {m1}，对任意分布 {m3}，式 {r1} 中的边际向量场 {m4} 生成式 {r2} 中的边际概率路径 {m5}，即 {m6} 和 {m7} 满足连续性方程（式 {r3}）。</i>"
+},
+{
+"en": "The full proofs for our theorems are",
+"zh": "所有定理的完整证明见附录 {r1}。定理 {r2} 也可以从 {c1} 的扩散混合表示定理 (Diffusion Mixture Representation Theorem) 推出，该定理给出了扩散 SDE 中边际漂移系数和扩散系数的公式。"
+},
+{
+"en": "Conditional Flow Matching",
+"zh": "条件流匹配 (Conditional Flow Matching)"
+},
+{
+"en": "Unfortunately, due to the intractabl",
+"zh": "遗憾的是，由于边际概率路径和边际向量场的定义（式 {r1} 和式 {r2}）中含有难以计算的积分，{m1} 仍然无法计算，因此也无法直接对原始 Flow Matching 目标做无偏估计。为此，我们提出一个更简单的目标，出人意料的是，它和原始目标有相同的最优解。具体来说，我们考虑条件流匹配 (Conditional Flow Matching, CFM) 目标："
+},
+{
+"en": "where {m1:t\\sim{\\mathcal{U}}[0,1]} ,",
+"zh": "其中 {m1}，{m2}，而现在 {m3}。与 FM 目标不同，只要能高效地从 {m4} 采样并计算 {m5}，CFM 目标就很容易做无偏估计；这两件事都不难，因为它们是逐样本定义的。因此我们的第二个关键观察是："
+},
+{
+"en": "The FM (equation {r1:5} ) and CFM (e",
+"zh": "<i>FM（式 {r1}）和 CFM（式 {r2}）两个目标关于 {m1} 的梯度相同。</i>"
+},
+{
+"en": "That is, optimizing the CFM objectiv",
+"zh": "也就是说，优化 CFM 目标（在期望意义下）等价于优化 FM 目标。因此，我们可以训练 CNF 去生成边际概率路径 {m1}（特别地，它在 {m3} = {m4} 时近似未知的数据分布 {m2}），而完全不需要拿到边际概率路径或边际向量场。我们只需设计合适的条件概率路径和向量场。下面的定理把这一性质形式化。"
+},
+{
+"en": "Theorem 2 . Assuming that {m1:p_{t}(",
+"zh": "<b>定理 2：</b><i>假设对所有 {m2} 和 {m3} 都有 {m1}，那么在相差一个与 {m4} 无关的常数的意义下，{m5} 与 {m6} 相等。因此 {m7}。</i>"
+},
+{
+"en": "Conditional Probability Paths and Ve",
+"zh": "条件概率路径与向量场"
+},
+{
+"en": "The Conditional Flow Matching object",
+"zh": "条件流匹配目标适用于任意选择的条件概率路径和条件向量场。本节针对一大类高斯条件概率路径，讨论 {m1} 和 {m2} 的构造。具体来说，我们考虑如下形式的条件概率路径："
+},
+{
+"en": "where {m1:\\mu:[0,1]\\times\\mathbb{R}^",
+"zh": "其中 {m1} 是高斯分布随时间变化的均值，{m2} 描述随时间变化的标量标准差 (std)。我们令 {m3}、{m4}，使所有条件概率路径在 {m5} 时都收敛到同一个标准高斯噪声分布 {m6}。再令 {m7}、{m8}，后者取得足够小，使 {m9} 是以 {m10} 为中心、高度集中的高斯分布。"
+},
+{
+"en": "There is an infinite number of vecto",
+"zh": "生成某条特定概率路径的向量场有无穷多个（例如在连续性方程中加入一个无散度的分量，见式 {r1}），但其中绝大多数只是多出了让底层分布保持不变的分量（例如分布本身旋转不变时的旋转分量），只会带来不必要的额外计算。我们选择最简单的向量场，它对应高斯分布的典范变换。具体来说，考虑如下的流（以 {m1} 为条件）："
+},
+{
+"en": "When {m1:x} is distributed as a stan",
+"zh": "当 {m1} 服从标准高斯分布时，{m2} 是一个仿射变换，把它映射为均值 {m3}、标准差 {m4} 的正态随机变量。也就是说，根据式 {r1}，{m5} 把噪声分布 {m6} 推前为 {m7}，即"
+},
+{
+"en": "This flow then provides a vector fie",
+"zh": "这个流给出一个生成条件概率路径的向量场："
+},
+{
+"en": "Reparameterizing {m1:p_{t}(x|x_{1})}",
+"zh": "把 {m1} 改写成只用 {m2} 表示的形式，再把式 {r1} 代入 CFM 损失，得到"
+},
+{
+"en": "Since {m1:\\psi_{t}} is a simple (inv",
+"zh": "由于 {m1} 是简单的（可逆）仿射映射，可以用式 {r1} 求出 {m2} 的闭式解。对随时间变化的函数 {m5}，记 {m3} 为它对时间的导数，即 {m4}。"
+},
+{
+"en": "Theorem 3 . Let {m1:p_{t}(x|x_{1})}",
+"zh": "<b>定理 3：</b><i>设 {m1} 是式 {r1} 中的高斯概率路径，{m2} 是式 {r2} 中对应的流映射。那么定义 {m3} 的唯一向量场形如：</i>"
+},
+{
+"en": "Consequently, {m1:u_{t}(x|x_{1})} ge",
+"zh": "<i>因此，{m1} 生成高斯路径 {m2}。</i>"
+},
+{
+"en": "Special instances of Gaussian condit",
+"zh": "高斯条件概率路径的特例"
+},
+{
+"en": "Our formulation is fully general for",
+"zh": "我们的表述对任意函数 {m1} 和 {m2} 都完全成立，可以把它们设成满足所需边界条件的任意可微函数。下面先讨论几个特例，它们恢复了此前使用的扩散过程对应的概率路径。由于我们直接处理概率路径，可以完全不再借助扩散过程来推理。因此在下面第二个例子中，我们直接基于 Wasserstein-2 最优传输的解构造一条概率路径，作为一个有意思的实例。"
+},
+{
+"en": "Example I: Diffusion conditional VFs",
+"zh": "例 I：扩散条件向量场"
+},
+{
+"en": "Diffusion models start with data poi",
+"zh": "扩散模型从数据点出发，逐步加噪，直到近似纯噪声。这些过程可以表述为随机过程，为了在任意时刻 {m1} 得到闭式表示，它们有严格的要求，结果就是均值 {m3} 和标准差 {m4} 取特定形式的高斯条件概率路径 {m2} {c1}。例如，反向（噪声 {m5} 数据）的 Variance Exploding (VE) 路径形如"
+},
+{
+"en": "where {m1:\\sigma_{t}} is an increasi",
+"zh": "其中 {m1} 是递增函数，{m2}，{m3}。于是式 {r1} 给出 {m4} 和 {m5}。把它们代入定理 {r3} 的式 {r2}，得到"
+},
+{
+"en": "The reversed (noise {m1:\\rightarrow}",
+"zh": "反向（噪声 {m1} 数据）的 Variance Preserving (VP) 扩散路径形如"
+},
+{
+"en": "and {m1:\\beta} is the noise scale fu",
+"zh": "其中 {m1} 是噪声尺度函数。式 {r1} 给出 {m2} 和 {m3}。把它们代入定理 {r3} 的式 {r2}，得到"
+},
+{
+"en": "Our construction of the conditional",
+"zh": "限定在这些条件扩散过程上时，我们构造的条件向量场 {m1} 实际上和此前确定性概率流（{c1}，式 13）中使用的向量场一致，详见附录 {r1}。尽管如此，把扩散条件向量场和 Flow Matching 目标结合，给出了现有分数匹配方法之外一种有吸引力的训练方式，我们在实验中发现它更稳定、更鲁棒。"
+},
+{
+"en": "Another important observation is tha",
+"zh": "另一个重要的观察是：这些概率路径原本是作为扩散过程的解推出来的，它们在有限时间内实际上到达不了真正的噪声分布。实践中，采样和似然评估时只是用一个合适的高斯分布来近似 {m1}。相比之下，我们的构造可以完全控制概率路径，可以直接设定 {m2} 和 {m3}，下面就这样做。"
+},
+{
+"en": "Figure 2: Compared to the diffusion",
+"zh": "<b>图 2：</b>与扩散路径的条件分数函数相比，OT 路径的条件向量场方向不随时间变化，可以认为更容易用参数化模型拟合。蓝色表示幅值较大，红色表示幅值较小。"
+},
+{
+"en": "Example II: Optimal Transport condit",
+"zh": "例 II：最优传输条件向量场"
+},
+{
+"en": "An arguably more natural choice for",
+"zh": "条件概率路径一个可以说更自然的选择，是让均值和标准差随时间线性变化，即"
+},
+{
+"en": "According to Theorem {r1:3} this pat",
+"zh": "根据定理 {r1}，这条路径由如下向量场生成："
+},
+{
+"en": "which, in contrast to the diffusion",
+"zh": "与扩散条件向量场（式 {r1}）不同，它对所有 {m1} 都有定义。对应 {m2} 的条件流是"
+},
+{
+"en": "and in this case, the CFM loss (see",
+"zh": "此时 CFM 损失（见式 {r1}、{r2}）的形式为："
+},
+{
+"en": "Allowing the mean and std to change",
+"zh": "让均值和标准差线性变化，不仅得到简单直观的路径，而且在下面的意义上是最优的。条件流 {m1} 实际上是两个高斯分布 {m2} 与 {m3} 之间的最优传输 (OT) <i>位移映射</i> (displacement map)。<i>OT 插值</i>是一条概率路径，定义为（见 {c1} 的定义 1.1）："
+},
+{
+"en": "where {m1:\\psi:\\mathbb{R}^{d}\\righta",
+"zh": "其中 {m1} 是把 {m2} 推前为 {m3} 的 OT 映射，{m4} 表示恒等映射，即 {m5}，{m6} 称为 OT 位移映射。{c1} 的例 1.7 表明，在我们这种两个高斯分布、其中一个为标准高斯的情形下，OT 位移映射的形式就是式 {r1}。"
+},
+{
+"en": "Figure 3: Diffusion and OT trajector",
+"zh": "<b>图 3：</b>扩散轨迹与 OT 轨迹。"
+},
+{
+"en": "Intuitively, particles under the OT",
+"zh": "直观上，在 OT 位移映射下，粒子总是沿直线以恒定速度运动。图 {r1} 画出了扩散条件向量场和 OT 条件向量场的采样路径。有意思的是，扩散路径的采样轨迹可能会「越过」最终样本，造成不必要的折返，而 OT 路径保证是直线。"
+},
+{
+"en": "Figure {r1:2} compares the diffusion",
+"zh": "图 {r1} 比较了扩散的条件分数函数（典型扩散方法的回归目标），即 {m1}，其中 {m2} 按式 {r2} 定义，以及 OT 条件向量场（式 {r3}）。两个例子中起点（{m3}）和终点（{m4}）的高斯分布相同。一个有意思的观察是，OT 向量场的方向不随时间变化，可以认为这使回归任务更简单。这一性质也可以直接从式 {r4} 验证，因为该向量场可以写成 {m5} 的形式。附录的图 {r5} 画出了扩散向量场。最后要指出，条件流是最优的，并不意味着边际向量场是最优传输的解。不过，我们预期边际向量场仍然相对简单。"
+},
+{
+"en": "Related Work",
+"zh": "相关工作"
+},
+{
+"en": "Continuous Normalizing Flows were in",
+"zh": "Continuous Normalizing Flow 由 {c1} 提出，是归一化流 (Normalizing Flow) 的连续时间版本（综述见 {c2}）。CNF 最初用最大似然目标训练，但这需要在前向和反向传播中做代价高昂的 ODE 模拟，而 ODE 模拟本质上是串行的，时间复杂度很高。虽然有工作展示了 CNF 生成模型做图像合成的能力 {c3}，但扩展到维度非常高的图像本身就很困难。一些工作尝试对 ODE 加以正则化使其更容易求解，例如使用增广 {c4}、加入正则项 {c5}，或随机采样积分区间 {c6}。这些工作只是正则化 ODE，没有改变根本的训练算法。"
+},
+{
+"en": "In order to speed up CNF training, s",
+"zh": "为了加速 CNF 训练，一些工作通过显式设计目标概率路径和动力学，发展了无需模拟的 CNF 训练框架。例如，{c1} 考虑先验密度和目标密度之间的线性插值，但涉及在高维中难以估计的积分；{c2} 考虑与本文类似的一般概率路径，但在随机小批量训练下梯度有偏。相比之下，Flow Matching 框架允许梯度无偏的无需模拟训练，并且很容易扩展到非常高的维度。"
+},
+{
+"en": "Another approach to simulation-free",
+"zh": "另一类无需模拟的训练方法依赖构造扩散过程来间接定义目标概率路径 {c1}。{c2} 指出扩散模型是用去噪分数匹配 {c3} 训练的，这是一个条件目标，相对分数匹配目标给出无偏梯度。条件流匹配受这一结果启发，但推广为直接匹配向量场。由于易于扩展，扩散模型受到越来越多的关注，出现了各种改进，例如损失重加权 {c4}、加入分类器引导并改进结构 {c5}，以及学习噪声调度 {c6}。不过，{c7} 和 {c8} 只考虑由单参数简单扩散过程定义的高斯条件路径这一受限情形，尤其不包含我们的条件 OT 路径。另一条工作线 {c9} 借助扩散桥理论提出有限时间的扩散构造，消除了无限时间去噪构造带来的近似误差。已有工作利用了概率路径相同的扩散过程与 Continuous Normalizing Flow 之间的联系 {c10}，而我们的工作可以推广到简单扩散所能建模的概率路径之外。借助本文的方法，可以完全绕开扩散过程的构造，直接在概率路径上推理，同时保持高效的训练和对数似然评估。最后，与我们同期的工作 {c11} 得到了类似的条件目标，用于无需模拟地训练 CNF；{c12} 则在假设 {m1} 是梯度场时推出了一个隐式目标。"
+},
+{
+"en": "Figure 4: ( left ) Trajectories of C",
+"zh": "<b>图 4：</b>（左）在二维棋盘格数据上用不同目标训练的 CNF 的轨迹。OT 路径更早出现棋盘格图案，FM 的训练也更稳定。（右）FM 搭配 OT 的采样更高效，用中点法求解。"
+},
+{
+"en": "Experiments",
+"zh": "实验"
+},
+{
+"en": "We explore the empirical benefits of",
+"zh": "我们在 CIFAR-10 {c1} 和分辨率为 32、64、128 的 ImageNet {c2} 图像数据集上考察 Flow Matching 的实际效果。我们还在 Flow Matching 中对扩散路径的选择做消融，主要比较标准的 Variance Preserving 扩散路径和最优传输路径。我们讨论直接参数化生成向量场、并使用 Flow Matching 目标如何改善样本生成。最后我们展示 Flow Matching 也可以用于条件生成。除非另有说明，我们用 dopri5 {c3}、绝对和相对容差均为 1e-5 来评估模型的似然和样本。生成的样本见附录，全部实现细节见附录 {r1}。"
+},
+{
+"en": "Table 1: Likelihood (BPD), quality o",
+"zh": "<b>表 1：</b>同一模型用不同方法训练时的似然 (BPD)、生成样本质量 (FID) 和评估时间 (NFE)。"
+},
+{
+"en": "Density Modeling and Sample Quality",
+"zh": "ImageNet 上的密度建模与样本质量"
+},
+{
+"en": "We start by comparing the same model",
+"zh": "我们先比较同一模型结构，即 {c1} 的 U-Net 结构（只做了最小改动），在 CIFAR-10 和 ImageNet 32/64 上用几种流行的扩散损失训练的结果：{c2} 的 DDPM、分数匹配 (Score Matching, SM) {c3} 和 Score Flow (SF) {c4}；具体细节见附录 {r1}。表 {r2}（左）汇总了我们的结果和这些基线，报告以每维比特数 (Bits Per Dimension, BPD) 为单位的负对数似然 (NLL)、用 Fréchet Inception Distance（FID；{c5}）衡量的样本质量，以及自适应求解器达到预设数值容差所需的平均函数求值次数 (Number of Function Evaluations, NFE)，在 5 万个样本上取平均。所有模型使用相同的结构、超参数和训练迭代次数，基线还被允许多训练一些迭代以便更好地收敛。注意这些都是无条件模型。在 CIFAR-10 和 ImageNet 上，FM-OT 在所有定量指标上都稳定地取得了最好结果。我们注意到 CIFAR-10 上的 FID 比此前的工作 {c6} 高，可能是因为我们使用的结构没有针对 CIFAR-10 优化。"
+},
+{
+"en": "Secondly, Table {r1:1} (right) compa",
+"zh": "其次，表 {r1}（右）比较了用 Flow Matching 和 OT 路径在 128{m1}128 分辨率的 ImageNet 上训练的模型。我们的 FID 是当前最好的，唯一的例外是 IC-GAN {c1}，它用一个自监督 ResNet50 模型做条件，因此没有列入这张表。附录的图 {r2}、{r3}、{r4} 展示了这些模型未经挑选的样本。"
+},
+{
+"en": "Figure 5: Image quality during train",
+"zh": "<b>图 5：</b>训练过程中的图像质量，ImageNet 64{m1}64。"
+},
+{
+"en": "Faster training. While existing work",
+"zh": "<b>训练更快。</b>已有工作训练扩散模型的迭代次数非常多（例如 Score Flow 和 VDM 分别报告了 130 万次和 1000 万次迭代），而我们发现 Flow Matching 通常收敛快得多。图 {r1} 给出了 Flow Matching 和所有基线在 ImageNet 64{m1}64 上训练过程中的 FID 曲线；FM-OT 的 FID 下降得比其他方法更快、也更低。在 ImageNet-128 上，{c1} 以批量大小 256 训练了 436 万次迭代，而 FM（模型大 25%）以批量大小 1.5k 训练了 50 万次迭代，即图像吞吐量少 33%；具体见表 {r2}。此外，用分数匹配训练时，从模型采样的开销在训练过程中可能剧烈变化，而用 Flow Matching 训练时采样开销保持不变（见附录图 {r3}）。"
+},
+{
+"en": "Sampling Efficiency",
+"zh": "采样效率"
+},
+{
+"en": "Figure 6: Sample paths from the same",
+"zh": "<b>图 6：</b>在 ImageNet 64{m1}64 上训练的模型从同一初始噪声出发的采样路径。OT 路径大致线性地去除噪声，而扩散路径要到路径末尾才明显去掉噪声。还要注意生成图像之间的差异。"
+},
+{
+"en": "For sampling, we first draw a random",
+"zh": "采样时，我们先抽取一个随机噪声样本 {m1}，再用 ODE 求解器，以训练好的向量场 {m3} 在区间 {m4} 上求解式 {r1}，算出 {m2}。扩散模型也可以通过 SDE 表述来采样，但这可能非常低效，许多提出快速采样器的方法（例如 {c1}）都直接利用 ODE 的视角（见附录 {r2}）。部分原因在于 ODE 求解器效率高得多（在相近的计算开销下误差更低 {c2}），而且可用的 ODE 求解格式很多。与消融模型相比，我们发现无论用哪种 ODE 求解器，用 Flow Matching 和 OT 路径训练的模型得到的采样器总是最高效的，下面具体展示。"
+},
+{
+"en": "Sample paths. We first qualitatively",
+"zh": "<b>采样路径。</b>我们先定性地可视化扩散和 OT 在采样路径上的差异。图 {r1} 展示了 ImageNet-64 模型用相同随机种子生成的样本，可以看到 OT 路径模型比扩散路径模型更早开始生成图像，扩散路径模型的图像直到最后时刻都由噪声主导。我们还画出了二维棋盘格图案生成中的概率密度路径（图 {r2} 左），趋势类似。"
+},
+{
+"en": "Low-cost samples. We next switch to",
+"zh": "<b>低开销采样。</b>接下来我们换成定步长求解器，用表 {r1} 中的 ImageNet-32 模型比较低 NFE（{m1} 100）的样本。图 {r2}（左）比较了低 NFE 解相对 1000 NFE 解的逐像素均方误差（用了 256 个随机噪声种子），可以看到 FM 搭配 OT 的模型在相同计算开销下数值误差最小，达到同样的误差阈值只需扩散模型约 60% 的 NFE。其次，图 {r3}（右）给出 FID 随计算开销的变化，FM 搭配 OT 在 NFE 很低时也能得到不错的 FID，与消融模型相比在样本质量和开销之间取得了更好的折中。图 {r4}（右）展示了二维棋盘格实验中的低开销采样效果。"
+},
+{
+"en": "Figure 7: Flow Matching, especially",
+"zh": "<b>图 7：</b>Flow Matching（特别是使用 OT 路径时）可以用更少的求值次数采样，同时保持相近的数值误差（左）和样本质量（右）。结果来自在 ImageNet 32{m1}32 上训练的模型，数值误差针对中点法。"
+},
+{
+"en": "Conditional sampling from low-resolu",
+"zh": "基于低分辨率图像的条件采样"
+},
+{
+"en": "Table 2: Image super-resolution on t",
+"zh": "<b>表 2：</b>ImageNet 验证集上的图像超分辨率。"
+},
+{
+"en": "Lastly, we experimented with Flow Ma",
+"zh": "最后，我们用 Flow Matching 做了条件图像生成实验，具体是把图像从 64{m1}64 上采样到 256{m2}256。我们沿用 {c1} 的评估流程，计算上采样后验证集图像的 FID；基线包括参考值（原始验证集的 FID）和回归方法。结果见表 {r1}。上采样的图像样本见附录图 {r2}、{r3}。FM-OT 的 PSNR 和 SSIM 与 {c2} 相近，FID 和 IS 则有明显改善，而按 {c3} 的论证，后两者更能反映生成质量。"
+},
+{
+"en": "Conclusion",
+"zh": "结论"
+},
+{
+"en": "We introduced Flow Matching, a new s",
+"zh": "我们提出了 Flow Matching，一种训练 Continuous Normalizing Flow 模型的无需模拟的新框架，它依靠条件构造，可以毫不费力地扩展到非常高的维度。此外，FM 框架为扩散模型提供了另一种视角，主张放弃随机过程（扩散）的构造，转而更直接地指定概率路径，从而可以构造采样更快或生成效果更好的路径。实验表明，在 Flow Matching 框架下训练和采样都很容易。未来，我们期望 FM 能打开使用多种概率路径的大门（例如非各向同性高斯，或者更一般的核）。"
+},
+{
+"en": "Social responsibility",
+"zh": "社会责任"
+},
+{
+"en": "Along side its many positive applica",
+"zh": "图像生成有许多积极的应用，也可能被用于有害的目的。使用内容受控的训练集，以及对图像做验证或分类，有助于减少这类用途。此外，训练大型深度学习模型的能耗正在快速增长 {c1}，研究能用更少梯度更新次数和图像吞吐量完成训练的方法，可以显著节省时间和能源。"
+},
+{
+"en": "Theorem Proofs",
+"zh": "定理证明"
+},
+{
+"en": "Theorem 1. Given vector fields {m1:u",
+"zh": "<b>定理 1：</b><i>给定生成条件概率路径 {m2} 的向量场 {m1}，对任意分布 {m3}，式 {r1} 中的边际向量场 {m4} 生成式 {r2} 中的边际概率路径 {m5}，即 {m6} 和 {m7} 满足连续性方程（式 {r3}）。</i>"
+},
+{
+"en": "Proof. To verify this, we check that",
+"zh": "<b>证明：</b>为此，我们验证 {m1} 和 {m2} 满足连续性方程（式 {r1}）："
+},
+{
+"en": "where in the second equality we used",
+"zh": "其中第二个等号用到 {m1} 生成 {m2} 这一事实，最后一个等号用到式 {r1}。此外，第一个和第三个等号成立的依据是假设被积函数满足 Leibniz 法则（交换积分与求导）的正则性条件。∎"
+},
+{
+"en": "Theorem 2. Assuming that {m1:p_{t}(x",
+"zh": "<b>定理 2：</b><i>假设对所有 {m2} 和 {m3} 都有 {m1}，那么在相差一个与 {m4} 无关的常数的意义下，{m5} 与 {m6} 相等。因此 {m7}。</i>"
+},
+{
+"en": "Proof. To ensure existence of all in",
+"zh": "<b>证明：</b>为保证下面所有积分存在、并允许（借助 Fubini 定理）交换积分次序，我们假设 {m1} 和 {m2} 在 {m3} 时以足够快的速度衰减到零，并且 {m4} 有界。"
+},
+{
+"en": "First, using the standard bilinearit",
+"zh": "首先，利用 {m1} 范数的标准双线性，有"
+},
+{
+"en": "Next, remember that {m1:u_{t}} is in",
+"zh": "接着，注意 {m1} 与 {m2} 无关，并注意到"
+},
+{
+"en": "where in the second equality we use",
+"zh": "其中第二个等号用到式 {r1}，第三个等号交换了积分次序。接着，"
+},
+{
+"en": "where in the last equality we change",
+"zh": "其中最后一个等号再次交换了积分次序。∎"
+},
+{
+"en": "Theorem 3. Let {m1:p_{t}(x|x_{1})} b",
+"zh": "<b>定理 3：</b><i>设 {m1} 是式 {r1} 中的高斯概率路径，{m2} 是式 {r2} 中对应的流映射。那么定义 {m3} 的唯一向量场形如：</i>"
+},
+{
+"en": "Consequently, {m1:u_{t}(x|x_{1})} ge",
+"zh": "<i>因此，{m1} 生成高斯路径 {m2}。</i>"
+},
+{
+"en": "Proof. For notational simplicity let",
+"zh": "<b>证明：</b>为记号简洁，令 {m1}。考虑式 {r1}："
+},
+{
+"en": "Since {m1:\\psi_{t}} is invertible (a",
+"zh": "由于 {m1} 可逆（因为 {m2}），令 {m3}，得到"
+},
+{
+"en": "where we used the apostrophe notatio",
+"zh": "这里用撇号表示导数，是为了强调 {m1} 在 {m2} 处取值。接着，对 {m3} 求逆得到"
+},
+{
+"en": "Differentiating {m1:\\psi_{t}} with r",
+"zh": "把 {m1} 对 {m2} 求导，得到"
+},
+{
+"en": "Plugging these last two equations in",
+"zh": "把最后两个式子代入式 {r1}，得到"
+},
+{
+"en": "as required. ∎",
+"zh": "即为所需结论。∎"
+},
+{
+"en": "The continuity equation",
+"zh": "连续性方程"
+},
+{
+"en": "One method of testing if a vector fi",
+"zh": "检验向量场 {m1} 是否生成概率路径 {m2} 的一种方法是连续性方程 {c1}。它是一个偏微分方程 (PDE)，给出向量场 {m3} 生成 {m4} 的充分必要条件："
+},
+{
+"en": "where the divergence operator, {m1:\\",
+"zh": "其中散度算子 {m1} 是关于空间变量 {m2} 定义的，即 {m3}。"
+},
+{
+"en": "Computing probabilities of the CNF m",
+"zh": "计算 CNF 模型的概率"
+},
+{
+"en": "We are given an arbitrary data point",
+"zh": "给定任意数据点 {m1}，需要计算模型在该点的概率，即 {m2}。下面回顾具体做法，内容包括相关的基本 ODE、散度计算的规模化、如何考虑数据变换（例如数据中心化），以及每维比特数 (Bits Per Dimension) 的计算。"
+},
+{
+"en": "ODE for computing p1(x1)",
+"zh": "计算 p₁(x₁) 的 ODE"
+},
+{
+"en": "The continuity equation with equatio",
+"zh": "连续性方程结合式 {r1}，得到瞬时变量替换公式 {c1}："
+},
+{
+"en": "Integrating {m1:t\\in[0,1]} gives:",
+"zh": "对 {m1} 积分得到："
+},
+{
+"en": "Therefore, the log probability can b",
+"zh": "因此，对数概率可以和流的轨迹一起，通过求解下面的 ODE 计算："
+},
+{
+"en": "Given initial conditions",
+"zh": "给定初始条件"
+},
+{
+"en": "the solution {m1:\\left[\\phi_{t}(x),f",
+"zh": "解 {m1} 是唯一确定的（只需向量场 {m2} 满足一些温和的条件）。记 {m3}，根据式 {r1}，"
+},
+{
+"en": "Now, we are given an arbitrary {m1:x",
+"zh": "现在给定任意 {m1}，要计算 {m2}。为此需要反向求解式 {r1}，即"
+},
+{
+"en": "and we solve this equation for {m1:s",
+"zh": "在 {m1} 上求解这个方程，{m2} 处的初始条件为："
+},
+{
+"en": "From uniqueness of ODEs, the solutio",
+"zh": "由 ODE 解的唯一性，这个解与式 {r1} 在式 {r2} 的初始条件下的解相同，其中 {m1}。这可以从式 {r3} 并令 {m2} 看出。因此得到"
+},
+{
+"en": "and consequently",
+"zh": "从而"
+},
+{
+"en": "To summarize, to compute {m1:p_{1}(x",
+"zh": "总结一下，计算 {m1} 时，先在式 {r2} 的初始条件下求解式 {r1} 中的 ODE，再计算式 {r3}。"
+},
+{
+"en": "Unbiased estimator to p1(x1)",
+"zh": "p₁(x₁) 的无偏估计"
+},
+{
+"en": "Solving equation {r1:31} requires co",
+"zh": "求解式 {r1} 需要计算 {m2} 中向量场的 {m1}，代价很高。{c1} 提出用（无偏的）Hutchinson 迹估计代替散度，"
+},
+{
+"en": "where {m1:z\\in\\mathbb{R}^{d}} is a s",
+"zh": "其中 {m1} 是满足 {m2} 的随机变量的一个样本。在式 {r2} 的初始条件下精确求解式 {r1} 中的 ODE（实践中误差小且可控），得到"
+},
+{
+"en": "where in the third equality we switc",
+"zh": "其中第三个等号在假设 Fubini 定理的充分条件成立的前提下交换了积分次序，倒数第二个等号用到式 {r1}。因此随机变量"
+},
+{
+"en": "is an unbiased estimator for {m1:\\lo",
+"zh": "是 {m1} 的无偏估计。总结一下，要可扩展地无偏估计 {m2}，先在式 {r2} 的初始条件下求解式 {r1} 中的 ODE，再输出式 {r3}。"
+},
+{
+"en": "Transformed data",
+"zh": "变换后的数据"
+},
+{
+"en": "Often, before training our generativ",
+"zh": "训练生成模型之前，我们常常先变换数据，例如缩放或平移。记这样的变换为 {m1}，生成模型于是变成复合映射"
+},
+{
+"en": "where {m1:\\phi:\\mathbb{R}^{d}\\righta",
+"zh": "其中 {m1} 是我们训练的模型。给定先验概率 {m2}，该概率在 {m3} 下的推前（式 {r1} 和式 {r2}）形如"
+},
+{
+"en": "and therefore",
+"zh": "因此"
+},
+{
+"en": "For images {m1:d=H\\times W\\times 3}",
+"zh": "对图像有 {m1}，我们考虑一个变换 {m2}，把每个像素值从 {m3} 映射到 {m4}。因此，"
+},
+{
+"en": "and",
+"zh": "以及"
+},
+{
+"en": "For this case we have",
+"zh": "此时有"
+},
+{
+"en": "Bits-Per-Dimension (BPD) computation",
+"zh": "每维比特数 (BPD) 的计算"
+},
+{
+"en": "BPD is defined by",
+"zh": "BPD 的定义为"
+},
+{
+"en": "Following equation {r1:36} we get",
+"zh": "根据式 {r1}，得到"
+},
+{
+"en": "and {m1:\\log\\phi_{*}p_{0}(\\varphi^{-",
+"zh": "其中 {m1} 用式 {r1} 中的无偏估计在变换后的数据 {m2} 上近似。在大规模测试集 {m3} 上对无偏估计取平均，就能很好地近似测试集 BPD。"
+},
+{
+"en": "Diffusion conditional vector fields",
+"zh": "扩散条件向量场"
+},
+{
+"en": "We derive the vector field governing",
+"zh": "我们推导 VE 和 VP 扩散路径（式 {r1}）下支配概率流 ODE（{c1} 中的式 13）的向量场，并指出它与我们用定理 {r2} 推出的条件向量场一致，即式 {r3} 和式 {r4} 定义的向量场。"
+},
+{
+"en": "We start with a short primer on how",
+"zh": "我们先简要介绍如何为 Fokker-Planck 方程描述的概率路径找到条件向量场，再把它具体用到 VE 和 VP 概率路径上。"
+},
+{
+"en": "Since in the diffusion literature th",
+"zh": "扩散文献中，扩散过程在时刻 {m1} 从数据出发，在时刻 {m2} 到达噪声；我们的约定则是 {m3} 对应噪声、{m4} 对应数据。为了把扩散的向量场转换到我们的约定下，需要下面的引理："
+},
+{
+"en": "Lemma 1 . Consider a flow defined by",
+"zh": "<b>引理 1：</b><i>考虑一个由向量场 {m1} 定义的流，它生成概率密度路径 {m2}。那么从 {m5} 出发时，向量场 {m3} 生成路径 {m4}。</i>"
+},
+{
+"en": "Proof. We use the continuity equatio",
+"zh": "<b>证明：</b>使用连续性方程（式 {r1}）："
+},
+{
+"en": "and therefore {m1:\\tilde{u}_{t}(x)=-",
+"zh": "因此 {m1} 生成 {m2}。∎"
+},
+{
+"en": "Conditional VFs for Fokker-Planck pr",
+"zh": "Fokker-Planck 概率路径的条件向量场"
+},
+{
+"en": "Consider a Stochastic Differential E",
+"zh": "考虑标准形式的随机微分方程 (Stochastic Differential Equation, SDE)"
+},
+{
+"en": "with time parameter {m1:t} , drift {",
+"zh": "其中时间参数为 {m1}，漂移为 {m2}，扩散系数为 {m3}，{m4} 是 Wiener 过程。SDE 的解 {m5} 是一个随机过程，即随时间连续变化的随机变量，它的概率密度 {m6} 由 Fokker-Planck 方程刻画："
+},
+{
+"en": "where {m1:\\Delta} represents the Lap",
+"zh": "其中 {m1} 是（关于 {m2} 的）Laplace 算子，即 {m3}，{m4} 是梯度算子（同样关于 {m5}）。这个方程可以如下改写成连续性方程的形式 {c1}："
+},
+{
+"en": "where the vector field",
+"zh": "其中向量场"
+},
+{
+"en": "satisfies the continuity equation wi",
+"zh": "与概率路径 {m1} 一起满足连续性方程，因此生成 {m2}。"
+},
+{
+"en": "Variance Exploding (VE) path",
+"zh": "Variance Exploding (VE) 路径"
+},
+{
+"en": "The SDE for the VE path is",
+"zh": "VE 路径的 SDE 为"
+},
+{
+"en": "where {m1:\\sigma_{0}=0} and increasi",
+"zh": "其中 {m1}，并在 {m2} 时增长到无穷。这个 SDE 在 {m4} 时从数据 {m3} 出发，在 {m6} 时到达噪声 {m5}，概率路径为"
+},
+{
+"en": "The conditional VF according to equa",
+"zh": "按式 {r1}，条件向量场为："
+},
+{
+"en": "Using Lemma {r1:1} we get that the p",
+"zh": "利用引理 {r1}，得到概率路径"
+},
+{
+"en": "is generated by",
+"zh": "由下面的向量场生成"
+},
+{
+"en": "which coincides with equation {r1:17",
+"zh": "与式 {r1} 一致。"
+},
+{
+"en": "Variance Preserving (VP) path",
+"zh": "Variance Preserving (VP) 路径"
+},
+{
+"en": "The SDE for the VP path is",
+"zh": "VP 路径的 SDE 为"
+},
+{
+"en": "where {m1:T(t)=\\int_{0}^{t}\\beta(s)d",
+"zh": "其中 {m1}，{m2}。因此 SDE 的系数为"
+},
+{
+"en": "and",
+"zh": "以及"
+},
+{
+"en": "Plugging these choices in equation {",
+"zh": "把这些代入式 {r1}，得到条件向量场"
+},
+{
+"en": "Using Lemma {r1:1} to reverse the ti",
+"zh": "利用引理 {r1} 反转时间，得到反向概率路径的条件向量场："
+},
+{
+"en": "which coincides with equation {r1:19",
+"zh": "与式 {r1} 一致。"
+},
+{
+"en": "Figure 8: VP Diffusion path’s condit",
+"zh": "<b>图 8：</b>VP 扩散路径的条件向量场，可与图 {r1} 对照。"
+},
+{
+"en": "Figure 9: Trajectories of CNFs train",
+"zh": "<b>图 9：</b>在二维棋盘格数据上用 ScoreFlow {c1} 和 DDPM {c2} 损失训练的 CNF 的轨迹，学习率等超参数与图 {r1} 相同。"
+},
+{
+"en": "Implementation details",
+"zh": "实现细节"
+},
+{
+"en": "For the 2D example we used an MLP wi",
+"zh": "二维例子用的是 5 层、每层 512 个神经元的 MLP，图像用的是 {c1} 的 UNet 结构。对图像，我们先做中心裁剪再缩放到相应尺寸；32{m1}32 和 64{m2}64 分辨率则沿用 {c2} 的预处理。三种方法（FM-OT、FM-Diffusion 和 SM-Diffusion）始终在相同结构、相同超参数下训练相同的轮数。"
+},
+{
+"en": "Diffusion baselines",
+"zh": "扩散基线"
+},
+{
+"en": "Losses.",
+"zh": "损失"
+},
+{
+"en": "We consider three options as diffusi",
+"zh": "我们考虑三种扩散基线，对应最常用的几种扩散损失参数化 {c1}。假设高斯路径取式 {r1} 的一般形式，即"
+},
+{
+"en": "Score Matching loss is",
+"zh": "分数匹配损失为"
+},
+{
+"en": "Taking {m1:\\lambda(t)=\\sigma_{t}^{2}",
+"zh": "取 {m1} 对应 {c1} 原始的分数匹配 (SM) 损失；取 {m2}（{m3} 的定义见下文）对应 Score Flow (SF) 损失，其动机是 NLL 的上界 {c2}；{m4} 是可学习的分数函数。{c3} 的 DDPM（噪声匹配）损失（式 14）为"
+},
+{
+"en": "where {m1:p_{0}(x)={\\mathcal{N}}(x|0",
+"zh": "其中 {m1} 是标准高斯分布，{m2} 是可学习的噪声函数。"
+},
+{
+"en": "Diffusion path.",
+"zh": "扩散路径"
+},
+{
+"en": "For the diffusion path we use the st",
+"zh": "扩散路径使用标准的 VP 扩散（式 {r1}），即"
+},
+{
+"en": "with, as suggested in {c1:Song et al",
+"zh": "按 {c1} 的建议，取 {m1}，从而"
+},
+{
+"en": "where {m1:\\beta_{\\min}=0.1} , {m2:\\b",
+"zh": "其中 {m1}，{m2}，时间在 {m3} 中采样，训练和似然计算时取 {m4}，采样时取 {m5}。"
+},
+{
+"en": "Sampling.",
+"zh": "采样"
+},
+{
+"en": "Score matching samples are produced",
+"zh": "分数匹配的样本由向量场如下的 ODE（式 {r1}）求解得到："
+},
+{
+"en": "DDPM samples are computed with equat",
+"zh": "DDPM 的样本在令 {m1} 后用式 {r1} 计算，其中 {m2}。"
+},
+{
+"en": "Training & evaluation details",
+"zh": "训练与评估细节"
+},
+{
+"en": "Table 3: Hyper-parameters used for t",
+"zh": "<b>表 3：</b>训练各模型使用的超参数。"
+},
+{
+"en": "We report the hyper-parameters used",
+"zh": "所用超参数见表 {r1}。训练 CIFAR10 和 ImageNet-32 时用完整的 32 位精度，训练 ImageNet-64/128/256 时用 16 位混合精度。所有模型都用 Adam 优化器训练，参数为 {m1}、{m2}、权重衰减 0.0、{m3}。我们训练的所有方法（即 FM-OT、FM-Diffusion、SM-Diffusion）都使用相同的结构、相同的参数，训练相同的轮数（见表 {r2}）。学习率调度采用常数或多项式衰减（见表 {r3}）。多项式衰减调度包含一个持续指定训练步数的预热阶段。预热阶段学习率从 {m4} 线性增加到峰值学习率（见表 {r4}）。达到峰值后，学习率线性衰减，直到最后一个训练步降到 {m5}。"
+},
+{
+"en": "When reporting negative log-likeliho",
+"zh": "报告负对数似然时，我们用标准的均匀去量化 (Uniform Dequantization)。我们报告用下式得到的重要性加权估计："
+},
+{
+"en": "with {m1:x} is in {0, …, 255} and so",
+"zh": "其中 {m1} 取值于 {0, …, 255}，用 torchdiffeq {c1} 库中 atol=rtol=1e-5 的自适应步长求解器 dopri5 在 {m2} 处求解。不同 {m3} 取值下的估计见表 {r1}。"
+},
+{
+"en": "When computing FID/Inception scores",
+"zh": "在 CIFAR10、ImageNet-32/64 上计算 FID 和 Inception Score 时，我们用 TensorFlow GAN 库{f1}。为了与 {c1} 可比，ImageNet-128 上我们用他们公开代码仓库中附带的评估脚本{f2}。"
+},
+{
+"en": "{r1:https://github.com/tensorflow/ga",
+"zh": "{r1}"
+},
+{
+"en": "{r1:https://github.com/openai/guided",
+"zh": "{r1}"
+},
+{
+"en": "Additional tables and figures",
+"zh": "补充表格与图"
+},
+{
+"en": "Table 4: Negative log-likelihood (in",
+"zh": "<b>表 4：</b>测试集上的负对数似然（每维比特数），使用均匀去量化，{m1} 取不同值。"
+},
+{
+"en": "Figure 10: Function evaluations for",
+"zh": "<b>图 10：</b>训练过程中采样所需的函数求值次数，模型在 CIFAR-10 上训练，使用容差为 {m1} 的 dopri5 求解器。"
+},
+{
+"en": "Figure 11: Non-curated unconditional",
+"zh": "<b>图 11：</b>用 FM-OT 训练的 CNF 生成的、未经挑选的无条件 ImageNet-32 图像。"
+},
+{
+"en": "Figure 12: Non-curated unconditional",
+"zh": "<b>图 12：</b>用 FM-OT 训练的 CNF 生成的、未经挑选的无条件 ImageNet-64 图像。"
+},
+{
+"en": "Figure 13: Non-curated unconditional",
+"zh": "<b>图 13：</b>用 FM-OT 训练的 CNF 生成的、未经挑选的无条件 ImageNet-128 图像。"
+},
+{
+"en": "Figure 14: Conditional generation 64",
+"zh": "<b>图 14：</b>条件生成 64{m1}64 {m2} 256{m3}256。Flow Matching OT 对验证集图像的上采样结果。"
+},
+{
+"en": "Figure 15: Conditional generation 64",
+"zh": "<b>图 15：</b>条件生成 64{m1}64 {m2} 256{m3}256。Flow Matching OT 对验证集图像的上采样结果。"
+},
+{
+"en": "Figure 16: Generated samples from th",
+"zh": "<b>图 16：</b>从同一初始噪声出发、函数求值次数 (NFE) 不同时生成的样本。使用 OT 路径的 Flow Matching，在 ImageNet-128 上训练。"
+},
+{
+"en": "Figure 17: Generated samples from th",
+"zh": "<b>图 17：</b>从同一初始噪声出发、函数求值次数 (NFE) 不同时生成的样本。使用 OT 路径的 Flow Matching，在 ImageNet 256{m1}256 上训练。"
+}
+]
