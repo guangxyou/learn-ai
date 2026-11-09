@@ -1,0 +1,1086 @@
+[
+{
+"en": "We present rectified flow, a surpris",
+"zh": "我们提出 Rectified Flow：一种出人意料地简单的方法，用来学习在两个经验观测分布 {m1} 和 {m2} 之间传输的（神经）常微分方程 (ODE) 模型，从而为生成建模、域迁移以及其他各种涉及分布传输的任务提供统一的解法。Rectified Flow 的思路是让学到的 ODE 尽量沿着连接 {m3} 与 {m4} 中样本点的直线路径走。这通过求解一个直接的非线性最小二乘优化问题来实现，它很容易扩展到大模型，除了标准监督学习所需的参数之外不引入额外参数。直线路径之所以特殊、之所以更受青睐，是因为它是两点之间的最短路径，而且不需要时间离散化就能被精确模拟，因而得到计算上高效的模型。我们证明，从数据学习 Rectified Flow 的过程（称为 rectification）把 {m5} 与 {m6} 的任意耦合变成一个新的确定性耦合，并且可以证明它的凸传输代价不增。此外，递归地应用 rectification，可以得到一串路径越来越直的流，推理阶段用粗糙的时间离散化就能准确模拟。实验表明，Rectified Flow 在图像生成、图像到图像翻译 (Image-to-Image Translation) 和域适应 (Domain Adaptation) 上表现出色。特别是在图像生成和翻译上，我们的方法得到的流几乎是直的，<i>即使只用一个 Euler 离散化步</i>也能给出高质量的结果。"
+},
+{
+"en": "Introduction",
+"zh": "引言"
+},
+{
+"en": "Compared with supervised learning, t",
+"zh": "与监督学习相比，各种形式的无监督学习有一个共同的难点：缺少成对的输入/输出数据，因而无法直接套用标准的回归或分类任务。大多数无监督方法的要义，是以这样或那样的方式，在两个分布的样本点之间找到有意义的对应关系。例如，生成对抗网络 (GAN) 和变分自编码器 (VAE) 等生成模型 {c1} 试图把数据点映射到服从简单基本分布（高斯分布）的隐编码，借此生成和操控数据。表示学习 (Representation Learning) 基于这样的想法：如果一个足够光滑的函数能把结构化的数据分布映射到一个基本分布，那么它（很可能）可以被赋予某种有语义的解释，并对各种下游学习任务有用。另一方面，域迁移方法寻找映射，在两个都只有经验观测的不同数据分布之间传输样本点，用于图像到图像翻译、风格迁移和域适应 {c2}。所有这些任务都可以统一表述为寻找两个分布之间的传输映射："
+},
+{
+"en": "The Transport Mapping Problem Given",
+"zh": "<b>传输映射问题</b>　给定 {m2} 上两个分布的经验观测 {m1}，求一个传输映射 {m3}（最好在某种意义上良好或最优），使得当 {m5} 时有 {m4}，即 {m6} 是 {m7} 与 {m8} 的一个耦合 (coupling)（又称传输计划 (transport plan)）。"
+},
+{
+"en": "Several lines of techniques have bee",
+"zh": "根据如何表示和训练映射 {m1}，已经发展出几条技术路线。传统生成模型把 {m2} 参数化为神经网络，用 GAN 类的极小极大算法或（近似）最大似然估计 (MLE) 训练。然而，GAN 已知存在数值不稳定和模式坍缩 (Mode Collapse) 问题，并且需要大量工程投入和人工调参，这些调整往往难以迁移到不同的模型结构和数据集上。另一方面，MLE 对复杂模型往往难以计算，因此需要近似的变分推断或 Monte Carlo 推断技术（例如变分自编码器所用的那些），或者归一化流、自回归模型这类特殊的模型结构，才能得到可计算的似然，这使得表达能力和计算开销之间难以权衡。"
+},
+{
+"en": "Recently, advances have been made by",
+"zh": "最近的进展来自把传输计划隐式地表示为一个<i>连续时间过程</i>，例如基于神经常微分方程 (ODE) 的流模型 {c1} 和基于随机微分方程 (SDE) 的扩散模型 {c2}；这些模型训练一个神经网络来表示过程的漂移力，推理时用数值 ODE/SDE 求解器模拟该过程。关键在于，借助 ODE/SDE 的数学结构，连续时间模型可以高效地训练，而不必求助于极小极大优化或传统的近似推断技术。最著名的例子是近来基于分数的生成模型 {c3} 和去噪扩散概率模型 (DDPM) {c4}，我们把它们统称为去噪扩散方法。这些方法让我们可以训练大规模的扩散/SDE 生成模型，在图像生成的质量和多样性上都超过 GAN，并且没有不稳定和模式坍缩的问题 {c5}。学到的 SDE 可以用概率流 ODE (Probability Flow ODE) {c6} 和 DDIM {c7} 的方法转换为确定性的 ODE 模型，以加快推理。"
+},
+{
+"en": "However, compared with the tradition",
+"zh": "然而，与 GAN、VAE 这类传统的一步模型相比，连续时间模型的一个关键缺点是推理时计算开销高：采样一个点（例如一张图像）需要用数值求解器求解 ODE/SDE，而求解器要反复调用代价高昂的神经网络漂移函数。此外，现有的去噪扩散技术需要在复杂的设计空间中做大量超参数搜索，无论在实验上还是理论上都还没有被很好地理解 {c1}。"
+},
+{
+"en": "In existing approaches, generative m",
+"zh": "在现有方法中，生成建模和域迁移通常被分开处理。要解决域迁移问题，往往需要扩展或定制生成学习技术，例如 Cycle GAN {c1} 和基于扩散的图像到图像翻译 {c2}。能自然统一这两类任务的一个框架是最优传输 (Optimal Transport, OT) {c3}，它提供了一套技术，用来寻找使形如 {m1} 的传输代价最小的最优耦合，其中 {m2} 是代价函数，因而可以自然地应用于生成学习和迁移学习。然而，现有的 OT 技术在高维、大数据量的问题上很慢 {c4}。此外，由于传输代价和实际的学习性能并不完全一致，忠实地找到最优传输映射的方法，学习性能未必更好 {c5}。"
+},
+{
+"en": "Figure 1: The trajectories of rectif",
+"zh": "<b>图 1：</b>Rectified Flow 用于图像生成（{m1}：标准高斯噪声，{m2}：猫脸，上两行）和人脸与猫脸之间的图像迁移（{m3}：人脸，{m4}：猫脸，下两行）时的轨迹，用步长 {m5} 的 Euler 法模拟 {m6} 步。由训练数据得到的第一个 Rectified Flow（<i>1-Rectified Flow</i>）在步数很少（例如 {m7}）时就有好的结果；由 1-Rectified Flow 再做一次 reflow 得到的拉直后的流（记为 <i>2-Rectified Flow</i>）轨迹几乎是直线，即使只用一个离散化步也有好的结果。"
+},
+{
+"en": "Contribution",
+"zh": "贡献"
+},
+{
+"en": "We introduce rectified flow , a surp",
+"zh": "我们提出 <i>Rectified Flow</i>，一种出人意料地简单的传输映射问题解法，它统一地解决生成建模和域迁移。Rectified Flow 是一个 ODE 模型，它尽可能沿着直线路径，把分布 {m1} 传输到 {m2}。直线路径在理论上更好，因为它是两个端点之间的最短路径；在计算上也更好，因为它不需要时间离散化就能被精确模拟。因此，路径为直线的流填补了一步模型和连续时间模型之间的差距。"
+},
+{
+"en": "Algorithmically, the rectified flow",
+"zh": "在算法上，Rectified Flow 用一个简单、可扩展的无约束最小二乘优化过程训练，避开了 GAN 的不稳定问题、MLE 方法难以计算的似然，以及去噪扩散模型微妙的超参数决策。从训练数据得到 Rectified Flow 的过程有很好的理论性质：1) 得到的耦合对所有凸代价 {m1} 同时满足传输代价不增；2) 使流的路径越来越直，因而数值求解的误差更低。因此，借助 <i>reflow</i> 过程，即用前一个 Rectified Flow 模拟出的数据迭代地训练新的 Rectified Flow，我们得到几乎是直的流，即使用最粗的时间离散化（一个 Euler 步）也能给出好的结果。我们的方法完全基于 ODE，与 {c1} 基于 SDE 的方法相比，概念上更简单，推理时实际上也更快。"
+},
+{
+"en": "Empirically, rectified flow can yiel",
+"zh": "实验上，Rectified Flow 用很少的 Euler 步模拟时就能生成高质量的图像（见图 {r1} 第一行）。此外，只做一次 reflow，流就变得几乎是直的，因此用单个 Euler 离散化步也能得到好的结果（图 {r2} 第二行）。这比标准的去噪扩散方法有显著改进。在定量上，我们在 CIFAR10 上的一步快速扩散/流模型 {c1} 中取得了当前最好的 FID (4.85) 和召回率 (0.51)。同样的算法在图像到图像翻译（见图 {r3} 下两行）和迁移学习等域迁移任务上也取得了出色的结果。"
+},
+{
+"en": "Method",
+"zh": "方法"
+},
+{
+"en": "We provide a quick overview of the m",
+"zh": "第 {r1} 节简要概述方法，第 {r2} 节给出一些讨论和说明。第 {r3} 节介绍方法的一个非线性扩展，借此说明我们的方法与概率流 ODE {c1} 和 DDIM {c2} 的联系，以及相对它们的优势。"
+},
+{
+"en": "Figure 2: (a) Linear interpolation o",
+"zh": "<b>图 2：</b>(a) 输入数据 {m1} 的线性插值。(b) 由 {m3} 诱导的 Rectified Flow {m2}；轨迹在交叉点处被「重新接线」，以避免交叉。(c) 流 {m5} 的端点 {m4} 的线性插值。(d) 由 {m6} 诱导的 Rectified Flow，它沿直线路径走。"
+},
+{
+"en": "Overview",
+"zh": "概述"
+},
+{
+"en": "Rectified flow",
+"zh": "Rectified Flow"
+},
+{
+"en": "Given empirical observations of {m1:",
+"zh": "给定观测样本 {m1}，由 {m2} 诱导的 Rectified Flow 是时间 {m3} 上的一个常微分模型 (ODE)，"
+},
+{
+"en": "which converts {m1:Z_{0}} from {m2:{",
+"zh": "它把服从 {m2} 的 {m1} 变换为服从 {m4} 的 {m3}。漂移力 {m5} 的设定是让流尽可能沿着从 {m7} 指向 {m8} 的线性路径方向 {m6} 走，通过求解一个简单的最小二乘回归问题实现："
+},
+{
+"en": "where {m1:X_{t}} is the linear inter",
+"zh": "其中 {m1} 是 {m2} 与 {m3} 的线性插值。直接看，{m4} 服从 ODE {m5}，它是非因果的（或者说是预知未来的），因为 {m6} 的更新需要终点 {m7} 的信息。通过用 {m9} 拟合漂移 {m8}，Rectified Flow 把线性插值 {m10} 的路径<i>因果化</i>，得到一个不需要看到未来就能模拟的 ODE 流。"
+},
+{
+"en": "In practice, we parameterize {m1:v}",
+"zh": "实践中，我们用神经网络或其他非线性模型参数化 {m1}，用 {m2} 的经验样本，以任意现成的随机优化器（例如随机梯度下降）求解 ({r1})。见算法 {r2}。得到 {m3} 之后，从 {m4} 出发求解 ODE，就把 {m5} 传输到 {m6}；从 {m7} 出发反向求解，就把 {m8} 传输到 {m9}。具体来说，反向采样只需从 {m11} 出发求解 {m10}，再令 {m12}。训练算法对正向和反向采样一视同仁，因为 ({r3}) 中的目标是时间对称的：交换 {m13} 与 {m14} 并把 {m15} 取反，得到的是等价的问题。"
+},
+{
+"en": "Flows avoid crossing",
+"zh": "流不会交叉"
+},
+{
+"en": "A key to understanding the method is",
+"zh": "理解这个方法的关键是流的不交叉性质：服从一个良定义 ODE {m1}（其解存在且唯一）的不同路径，在任何时刻 {m2} 都不会相互交叉。具体来说，不存在位置 {m3} 和时刻 {m4}，使得两条路径在时刻 {m6} 沿不同方向穿过 {m5}，否则 ODE 的解就不唯一了。另一方面，插值过程 {m7} 的路径可能相互交叉（图 {r1}a），这使它是非因果的。因此，如图 {r2}b 所示，Rectified Flow 对穿过交叉点的各条轨迹重新接线以避免交叉，同时由于 ({r3}) 的优化，它描绘出的密度分布与线性插值路径相同。可以把线性插值 {m8} 看作修建连接 {m9} 和 {m10} 的道路（或隧道），把 Rectified Flow 看作粒子以短视、无记忆、不交叉的方式在这些道路上通行，粒子因此可以忽略 {m11} 与 {m12} 如何配对的全局路径信息，重建出 {m13} 之间更确定的配对。"
+},
+{
+"en": "Rectified flows reduce transport cos",
+"zh": "Rectified Flow 降低传输代价"
+},
+{
+"en": "If ( {r1:1} ) is solved exactly, the",
+"zh": "如果 ({r1}) 被精确求解，那么 Rectified Flow 的端点对 {m1} 保证是 {m2} 的一个合法耦合（定理 {r2}），即当 {m5} 时 {m3} 服从 {m4}。此外，对所有凸代价函数 {m8}，{m6} 的传输代价都保证不大于数据对 {m7} 的传输代价（定理 {r3}）。数据对 {m9} 可以是 {m10} 的任意耦合，由于实际问题中缺少有意义的成对观测，它通常是独立耦合（即 {m11}）。相比之下，rectify 之后的耦合 {m12} 具有确定性的依赖关系，因为它由 ODE 模型构造。记从 {m14} 到 {m15} 的映射为 {m13}。于是 {m16} 把任意耦合转换为凸传输代价更低的确定性耦合。"
+},
+{
+"en": "Straight line flows yield fast simul",
+"zh": "直线流可以快速模拟"
+},
+{
+"en": "Following Algorithm {r1:1} , denote",
+"zh": "按照算法 {r1}，记由 {m2} 诱导的 Rectified Flow 为 {m1}。递归地应用这个算子，得到一串 Rectified Flow {m3}，其中 {m4}，{m5} 是由 {m8} 诱导的第 {m6} 个 Rectified Flow，简称 <i>{m7}-Rectified Flow</i>。"
+},
+{
+"en": "This reflow procedure not only decre",
+"zh": "这个 <i>reflow</i> 过程不仅降低传输代价，还有一个重要作用：<i>拉直</i> Rectified Flow 的路径，即让流的路径更直。这在计算上非常有吸引力，因为路径几乎是直线的流在数值模拟中的时间离散化误差很小。事实上，完全直的路径用单个 Euler 步就能精确模拟，实际上就是一个一步模型。这正好解决了现有连续时间 ODE/SDE 模型推理开销高这一瓶颈。"
+},
+{
+"en": "Algorithm 1 Rectified Flow: Main Alg",
+"zh": "<b>算法 1</b> Rectified Flow：主算法"
+},
+{
+"en": "Main Results and Properties",
+"zh": "主要结果与性质"
+},
+{
+"en": "We provide more in-depth discussions",
+"zh": "本节更深入地讨论 Rectified Flow 的主要性质。为突出直观，本节的讨论不追求严格，完整的理论分析放在第 {r1} 节。"
+},
+{
+"en": "First, for a given input coupling {m",
+"zh": "首先，对给定的输入耦合 {m1}，容易看出 ({r1}) 的精确最小值在下式时取到："
+},
+{
+"en": "which is the expectation of the line",
+"zh": "它是在时刻 {m3} 经过 {m2} 的那些直线的方向 {m1} 的期望。下面讨论 Rectified Flow {m4}（{m5}）的性质，假设该 ODE 有唯一解。"
+},
+{
+"en": "Marginal preserving property",
+"zh": "保持边际分布的性质"
+},
+{
+"en": "[Theorem {r1:3.3} ] The pair {m1:(Z_",
+"zh": "[定理 {r1}] 端点对 {m1} 是 {m2} 与 {m3} 的一个耦合。实际上，在每个时刻 {m6}，{m4} 的边际分布都等于 {m5} 的边际分布，即 {m7}。"
+},
+{
+"en": "Intuitively, this is because, by the",
+"zh": "直观上，这是因为根据 ({r1}) 中 {m1} 的定义，在 {m2} 和 {m3} 两种动力学下，任何位置、任何时刻通过每个无穷小体积的期望质量都相等，从而保证它们描绘出相同的边际分布："
+},
+{
+"en": "On the other hand, the joint distrib",
+"zh": "另一方面，{m1} 与 {m2} 整条轨迹的联合分布一般是不同的。特别地，{m3} 一般是非因果、非 Markov 的过程，{m4} 是一个随机耦合；而 {m5} 把 {m6} <i>因果化</i>、<i>Markov 化</i>并<i>去随机化</i>，同时在所有时刻保持边际分布不变。"
+},
+{
+"en": "Reducing transport costs",
+"zh": "降低传输代价"
+},
+{
+"en": "[Theorem {r1:3.5} ] The coupling {m1",
+"zh": "[定理 {r1}] 对任意凸代价 {m4}，耦合 {m1} 的凸传输代价都不高于输入 {m2}，即 {m3}。"
+},
+{
+"en": "The transport costs measure the expe",
+"zh": "传输代价衡量的是按照耦合指定的分配关系，把一个分布的质量搬运到另一个分布的开销，它是最优传输的核心课题 {c1}。典型的例子是 {m1}，其中 {m2}。因此，{m3} 在所有凸传输代价组成的集合上带来 Pareto 下降，而不针对任何特定的 {m4}。这与典型的最优传输优化方法不同，后者明确地针对给定的 {m5} 做优化。所以，对任何给定的 {m8}，递归应用 {m6} 并不保证达到 {m7} 最优耦合；例外是一维情形，此时 {m9} 的不动点与唯一的单调耦合重合，而单调耦合同时使所有非负凸代价 {m10} 最小；见第 {r1} 节。"
+},
+{
+"en": "Intuitively, the convex transport co",
+"zh": "直观上，凸传输代价保证下降，是因为 Rectified Flow {m1} 的路径是对连接 {m2} 的直线路径的重新接线。举例说明，考虑 {m3} 这一简单情形，此时传输代价 {m4} 和 {m5} 就是连接端点的直线的期望长度。这个不等式可以如下图示地证明："
+},
+{
+"en": "where {m1:\\overset{\\scriptsize(*)}{\\",
+"zh": "其中 {m1} 用到三角不等式，{m2} 成立是因为按照 ({r1}) 中 {m5} 的构造，{m3} 的路径是对 {m4} 直线路径的重新接线。对一般的凸代价 {m6}，第 {r2} 节给出了用 Jensen 不等式的类似证明。"
+},
+{
+"en": "Reflow, straightening, fast simulati",
+"zh": "Reflow、拉直与快速模拟"
+},
+{
+"en": "As shown in Figure {r1:3} , when we",
+"zh": "如图 {r1} 所示，递归地应用 {m1} 时，随着 {m4} 增大，{m2}-Rectified Flow {m3} 的路径越来越直，因而越来越容易数值模拟。这种拉直的趋势可以在理论上得到保证。"
+},
+{
+"en": "Figure 3: (a)-(c) Samples of traject",
+"zh": "<b>图 3：</b>(a)-(c) 在一个简单例子上做 reflow 得到的轨迹样本（{m1}：<i>紫色点</i>，{m2}：<i>红色点</i>；绿线和蓝线是连接 {m3} 不同模式的轨迹）。(d) 直度和相对 L2 传输代价随 reflow 步数的变化；数值缩放到 {m4}，因此 0 对应直线和 {m5} 最优传输；更多信息见第 {r1} 节。我们使用 ({r2}) 中带宽 {m6} 的非参数模型。"
+},
+{
+"en": "Specifically, we say that a flow {m1",
+"zh": "具体来说，如果几乎必然地对 {m3} 有 {m2}，或者等价地，沿每条路径都有 {m4}，就称流 {m1} 是直的。（更准确地说，这里的「直」指的是以恒定速度沿直线运动。）这样的直线流在计算上非常有吸引力，因为它实际上就是一个一步模型：单个 Euler 步更新 {m5} 就能从 {m7} 精确算出 {m6}。注意，按这个定义线性插值 {m8} 是直的，但它不是（因果的）流，因此除非能同时从 {m9} 和 {m10} 获取样本（借助某种「神谕」），否则无法模拟。相比之下，让一个流 {m11} 变直并不简单，因为那样的话 {m12} 必须满足无黏 Burgers 方程 {m13}："
+},
+{
+"en": "More generally, we can measure the s",
+"zh": "更一般地，任何连续可微过程 {m1} 的直度可以用下式衡量："
+},
+{
+"en": "{m1:S({\\boldsymbol{Z}})=0} means exa",
+"zh": "{m1} 意味着完全是直的。{m2} 较小的流路径几乎是直的，因此用离散化步数很少的数值求解器就能准确模拟。第 {r1} 节证明，递归应用 rectification 可以使 {m3} 降向零。"
+},
+{
+"en": "[Theorem {r1:3.7} ] Let {m1:{\\boldsy",
+"zh": "[定理 {r1}] 设 {m1} 是由 {m3} 诱导的第 {m2} 个 Rectified Flow，则"
+},
+{
+"en": "As shown Figure {r1:1} , applying on",
+"zh": "如图 {r1} 所示，只做一次 reflow 就已经能得到几乎是直的流，用单个 Euler 步模拟时性能就很好。不建议做太多次 reflow，因为这可能累积 {m1} 的估计误差。"
+},
+{
+"en": "Distillation",
+"zh": "蒸馏"
+},
+{
+"en": "After obtaining the {m1:k} -th recti",
+"zh": "得到第 {m1} 个 Rectified Flow {m2} 之后，可以把 {m3} 之间的关系蒸馏进一个神经网络 {m4}，直接从 {m6} 预测 {m5}，不必模拟流，从而进一步提高推理速度。由于流已经几乎是直的（因此一步更新就能很好地近似），蒸馏可以高效完成。特别地，如果取 {m7}，那么蒸馏 {m8} 的损失函数就是 {m9}，它正是 ({r1}) 在 {m10} 时的那一项。"
+},
+{
+"en": "We should highlight the difference b",
+"zh": "需要强调蒸馏与 rectification 的区别：蒸馏试图忠实地逼近耦合 {m1}，而 rectification 得到的是另一个耦合 {m2}，它的传输代价更低、流更直。因此，蒸馏应该只用在最后阶段，即需要微调模型以做快速一步推理的时候。"
+},
+{
+"en": "On the velocity field vX",
+"zh": "关于速度场 vˣ"
+},
+{
+"en": "If {m1:X_{0}} yields a conditional d",
+"zh": "如果在 {m3} 的条件下 {m1} 具有条件密度函数 {m2}，那么最优速度场 {m4} 可以表示为"
+},
+{
+"en": "where the expectation {m1:\\mathbb{E}",
+"zh": "其中期望 {m1} 对 {m2} 求取。这一点可以这样看出：在 {m5} 的条件下，{m3} 且 {m4}。因此，如果 {m6} 处处为正且连续，那么 {m7} 在 {m8} 上有良好定义且连续。进一步，如果 {m9} 关于 {m10} 连续可微，可以证明"
+},
+{
+"en": "Note that {m1:\\mathrm{d}Z_{t}=v^{X}(",
+"zh": "注意，如果 {m2} 在 {m3} 上对任意 {m4} 都一致 Lipschitz 连续，那么 {m1} 保证有唯一解。"
+},
+{
+"en": "If {m1:X_{0}|X_{1}=x_{1}} does not y",
+"zh": "如果 {m1} 不具有条件密度函数，{m2} 可能无定义或不连续，使 ODE {m3} 性态不良。一个简单的修补办法是给 {m4} 加上与 {m6} 独立的高斯噪声 {m5}，得到平滑后的变量 {m7}，再用 Rectified Flow 把 {m8} 传输到 {m9}。这实际上给出一个形如 {m10} 的随机映射，把 {m11} 传输到 {m12}。"
+},
+{
+"en": "Smooth function approximation",
+"zh": "光滑函数逼近"
+},
+{
+"en": "Following ( {r1:4} ), we can exactly",
+"zh": "按 ({r1})，如果条件密度函数 {m2} 存在且已知，并且 {m3} 是有限个点的经验测度（其期望可以精确计算），就可以精确算出 {m1}。此时正向运行 Rectified Flow 会精确地还原 {m4} 中的点。然而这在大多数情况下并没有实际用处，因为它完全过拟合了数据。因此，用神经网络或非参数模型这类光滑函数逼近器来拟合 {m5}，得到能产生新样本、有实际用处的平滑分布，既必要又有益。"
+},
+{
+"en": "Deep neural networks are no doubt th",
+"zh": "对大规模问题，深度神经网络无疑是最好的函数逼近器。对低维问题，下面这个简单的 Nadaraya–Watson 式 {m1} 非参数估计，不需要知道条件密度 {m2} 就能很好地逼近精确的 Rectified Flow："
+},
+{
+"en": "where {m1:\\omega_{h}(X_{t},z)=\\frac{",
+"zh": "其中 {m1}，{m2} 是带宽参数为 {m3} 的平滑核，衡量 {m4} 与 {m5} 的相似度。取高斯 RBF 核 {m6}，可以证明当 {m7} 时，在 {m11} 能到达的点 {m10} 上（即条件期望 {m12} 存在的点），{m8} 收敛到 {m9}。在 {m14} 到达不了的点 {m13} 上，{m15} 通过找到靠近 {m17} 的 {m16} 来外推取值。实践中我们用经验平均代替 ({r1}) 中的期望。我们发现 {m18} 在实践中表现很好，因为它是线性函数的混合，而这些线性函数总是指向 {m19} 支撑集中的某个点。"
+},
+{
+"en": "A Nonlinear Extension",
+"zh": "非线性扩展"
+},
+{
+"en": "We present a nonlinear extension of",
+"zh": "下面给出 Rectified Flow 的一个非线性扩展：把线性插值 {m1} 换成连接 {m2} 和 {m3} 的任意关于时间可微的曲线。这种广义的 Rectified Flow 仍然能把 {m4} 传输到 {m5}（定理 {r1}），但不再保证降低凸传输代价，也不再有拉直效果。重要的是，概率流方法 {c1} 和 DDIM {c2} 可以（近似地）看作这个框架的特例，这让我们能说清本文方法和它们的联系以及相对它们的优势。"
+},
+{
+"en": "Let {m1:{{\\boldsymbol{X}}}=\\{X_{t}\\c",
+"zh": "设 {m1} 是连接 {m2} 和 {m3} 的任意关于时间可微的随机过程，{m4} 是 {m5} 的时间导数。由 {m6} 诱导的（非线性）Rectified Flow 定义为"
+},
+{
+"en": "We can estimate {m1:v^{{\\boldsymbol{",
+"zh": "可以通过求解下式估计 {m1}："
+},
+{
+"en": "where {m1:w_{t}\\colon(0,1)\\to(0,+\\in",
+"zh": "其中 {m1} 是正的权重序列（默认 {m2}）。使用线性插值 {m3} 时，有 {m4}，{m5} 时 ({r1}) 退化为 ({r2})。如定理 {r3} 所示，这种方法给出的流 {m6} 仍然保持 {m7} 的边际分布，即 {m8}，{m9}，因此 {m10} 仍然是 {m11} 的一个耦合。然而，如果 {m12} 不是直的，{m13} 就不再保证在凸传输代价上优于 {m14}。更重要的是，reflow 过程不再能拉直 {m15} 的路径。"
+},
+{
+"en": "A simple class of interpolation proc",
+"zh": "一类简单的插值过程是 {m1}，其中 {m2} 和 {m3} 是两个可微序列，满足 {m4} 和 {m5}，以保证过程在起点和终点分别等于 {m6}。此时 ({r1}) 中有 {m7}，其中 {m8} 和 {m9} 是 {m10} 和 {m11} 的时间导数。曲线的形状由 {m12} 与 {m13} 的关系决定。如果对所有 {m15} 取 {m14}，那么 {m16} 的路径是直的，但不以恒定速度运动；把 {m18} 重新参数化为 {m19} 时，它可以看作典范情形 {m17} 的一个时间变换版本。当 {m20} 时，除了某些特殊情形（例如 {m22} 或 {m23}，或者对某个 {m25} 有 {m24}），{m21} 的路径都不是直线。"
+},
+{
+"en": "Probability Flow ODEs and DDIM",
+"zh": "概率流 ODE 与 DDIM"
+},
+{
+"en": "The probability flow ODEs (PF-ODEs)",
+"zh": "概率流 ODE (Probability Flow ODE, PF-ODE) {c1} 和去噪扩散隐式模型 (Denoising Diffusion Implicit Model, DDIM) {c2} 都是从球形高斯初始分布 {m2} 出发、学习 {m1} 的 ODE 生成模型的方法，它们的推导方式是把去噪扩散方法学到的 SDE 转换为边际分布相同的 ODE。{c3} 从作为基于分数的生成模型学到的三类 SDE（variance-exploding (VE) SDE、variance-preserving (VP) SDE 和 sub-VP SDE）推出了三类 PF-ODE，我们分别记为 VE ODE、VP ODE 和 sub-VP ODE。VP ODE 等价于 DDIM 的连续时间极限，而 DDIM 是从去噪扩散概率模型 (DDPM) {c4} 推出的。由于 PF-ODE 和 DDIM 的推导需要随机分析中的高级工具，我们只讨论 {c5} 给出的最终算法流程，汇总在第 {r1} 节。细节请读者参阅 {c6}。"
+},
+{
+"en": "[Proposition {r1:3.11} ] All variant",
+"zh": "[命题 {r1}] 对某些满足 {m3} 的 {m2}，使用 {m1} 时，所有 PF-ODE 变体都可以看作 ({r2}) 的实例，其中 {m4} 是标准高斯随机变量。"
+},
+{
+"en": "Here we need to use introduce {m1:\\x",
+"zh": "这里需要引入 {m1} 来代替 {m2}，因为 {c1} 建议的 {m3} 和 {m4} 不满足 {m7} 处的边界条件 {m5} 和 {m6}，因此 {m8}。在这些方法中，初始分布 {m9} 是隐式地定义为 {m10} 的，并通过令 {m12} 近似为 {m11}。因此在这些方法中 {m13} 取为 {m14}。从我们的框架看，没有理由把 {m15} 限制为 {m16}，也没有理由不直接令 {m17} 来避免这个近似。"
+},
+{
+"en": "Figure 4: Comparing rectified flow w",
+"zh": "<b>图 4：</b>{m1}（紫色点）、{m2} 为低方差高斯混合（红色点）时，Rectified Flow 与 VP ODE、sub-VP ODE 的比较。线性 Rectified Flow 做一次 reflow 后轨迹就几乎是直线，而 VP ODE 和 sub-VP ODE 的轨迹是弯曲的，reflow 也拉不直。"
+},
+{
+"en": "Figure 5: Trajectories of different",
+"zh": "<b>图 5：</b>离散化步数 {m1} 不同时各方法的轨迹（紫色点：{m2}；红色点：{m3}；橙色点：中间步；蓝色曲线：流的轨迹）。Rectified Flow 沿直线运动，并且随时间匀速推进；用单个 Euler 步模拟时它生成 {m4} 的均值，步数稍多就很快覆盖整个分布 {m5}（这里 {m6} 就够了）。相比之下，VP ODE 和 sub-VP ODE 沿曲线以不均匀的速度运动：开始时偏慢，后期加速（大部分更新发生在 {m7} 时）。令 {m8} 可以避免速度不均匀（见最后一列）。"
+},
+{
+"en": "VP ODE and sub-VP ODE",
+"zh": "VP ODE 与 sub-VP ODE"
+},
+{
+"en": "The VP ODE and sub-VP ODE of {c1:[ 7",
+"zh": "{c1} 的 VP ODE 和 sub-VP ODE 共用如下的 {m1}："
+},
+{
+"en": "where the default values of {m1:a,b}",
+"zh": "其中 {m1} 的默认值是为了与 DDIM 和 DDPM 共用的训练流程的连续时间极限相匹配。VP ODE 与 sub-VP ODE 的区别在于 {m2} 的选择，如下："
+},
+{
+"en": "As {m1:\\beta_{0}\\approx 1} in both V",
+"zh": "由于 VP 和 sub-VP ODE 中都有 {m1}，两种情形下的 {m2} 都取为 {m3}。"
+},
+{
+"en": "The choices of {m1:\\alpha_{t},\\beta_",
+"zh": "上面 {m1} 的选择是 {c1} 基于 SDE 推导的结果。然而，考察所诱导的 ODE 的路径性质时，这些选择并没有充分的理由："
+},
+{
+"en": "{m1:\\bullet} Non-straight paths: Due",
+"zh": "{m1} <b>路径不直：</b>由于 ({r1}) 中 {m2} 的选择，VP ODE 和 sub-VP ODE 的轨迹一般是弯曲的，而且无法用 reflow 过程拉直。要得到直线路径，应该取 {m3}。"
+},
+{
+"en": "Figure 6: {m1:t} vs. {m2:\\alpha_{t},",
+"zh": "<b>图 6：</b>各方法的 {m2} 随 {m1} 的变化。"
+},
+{
+"en": "{m1:\\bullet} Non-uniform speed: The",
+"zh": "{m1} <b>速度不均匀：</b>({r1}) 中 {m2} 的指数形式，源于 SDE 模型推导中使用的 Ornstein–Uhlenbeck 过程 {c1}。然而对 ODE 来说，使用 ({r2}) 并没有明显的好处。如图 {r3} 所示，VP 和 sub-VP ODE 的 {m3} 和 {m4} 在前期（{m5}）变化很慢。结果流在开始时也移动得很慢，大部分更新集中在后期。这种不均匀的更新速度，加上路径不直，使 VP ODE 和 sub-VP ODE 在大步长下表现不佳，即使只是在简单的球形高斯分布之间传输也是如此（见图 {r4}）。如图 {r5} 最后一列所示，把 VP ODE 中指数形式的 {m6} 换成线性函数 {m7}，就能在保持连续时间轨迹不变的同时得到均匀的更新速度。"
+},
+{
+"en": "VE ODE",
+"zh": "VE ODE"
+},
+{
+"en": "The VE ODE of {c1:[ 73 ]} uses {m1:\\",
+"zh": "{c1} 的 VE ODE 使用 {m1} 和 {m2}，其中默认 {m3}，{m4} 的取值使 {m5} 与 {m6} 中所有训练数据点对之间的最大欧氏距离一样大（{c2} 的技巧 1）。假设 {m7} 远大于 {m8} 和 {m9} 的方差，那么 {m10}，可以把初始分布设为 {m11}，其方差比 {m12} 大得多。因此 VE ODE 无法用于（也没有画在）图 {r1} 和图 {r2} 的简单例子中。和 (sub-)VP ODE 一样，从我们的框架看，对 {m13} 的限制其实没有必要，对 {m14} 的要求也不自然。另一方面，VE ODE 中 {m15} 的轨迹确实是直线，因为 {m16} 的方向总是和 {m17} 相同。然而，{m18} 的选择导致了与 (sub-)VP ODE 类似的速度不均匀问题。"
+},
+{
+"en": "Following {c1:[ 73 , 23 ]} , a line",
+"zh": "沿着 {c1}，一系列工作提出了改进 {m1} 选择的方法，但仍然受限于 SDE 转 ODE 推导所规定的基本设计空间，例如见 {c2}。"
+},
+{
+"en": "To summarize, the simple nonlinear r",
+"zh": "总结一下，({r1}) 中简单的非线性 Rectified Flow 框架既简化又扩展了现有框架，并带来几点重要认识："
+},
+{
+"en": "{m1:\\bullet} Learning ODEs can be co",
+"zh": "{m1} 学习 ODE 可以直接、独立地考虑，不必借助扩散/SDE 方法；"
+},
+{
+"en": "{m1:\\bullet} The paths of the learne",
+"zh": "{m1} 学到的 ODE 的路径可以由 {m3} 与 {m4} 之间任意光滑的插值曲线 {m2} 指定；"
+},
+{
+"en": "{m1:\\bullet} The initial distributio",
+"zh": "{m1} 初始分布 {m2} 可以任意选择，与插值 {m3} 的选择无关。"
+},
+{
+"en": "{m1:\\bullet} The canonical linear in",
+"zh": "{m1} 推荐把典范的线性插值 {m2} 作为默认选择。"
+},
+{
+"en": "On the other hand, non-linear choice",
+"zh": "另一方面，当需要纳入变量的某种非欧几何结构，或者想对 ODE 的轨迹施加某些约束时，非线性的 {m1} 可能有用。这留待以后的工作。"
+},
+{
+"en": "Theoretical Analysis",
+"zh": "理论分析"
+},
+{
+"en": "We present the theoretical analysis",
+"zh": "下面给出 Rectified Flow 的理论分析，结果汇总如下。"
+},
+{
+"en": "{m1:\\bullet} [Section {r1:3.1} ] All",
+"zh": "{m1} [第 {r1} 节] 使用任意插值 {m2} 的非线性 Rectified Flow 都保持边际分布。"
+},
+{
+"en": "{m1:\\bullet} [Section {r1:3.2} ] The",
+"zh": "{m1} [第 {r1} 节] Rectified Flow（使用典范的线性插值）降低凸传输代价。"
+},
+{
+"en": "{m1:\\bullet} [Section {r1:3.3} ] Ref",
+"zh": "{m1} [第 {r1} 节] Reflow 保证拉直（线性）Rectified Flow。"
+},
+{
+"en": "{m1:\\bullet} [Section {r1:3.4} ] We",
+"zh": "{m1} [第 {r1} 节] 我们说明直线耦合与 {m2} 最优耦合之间的关系。"
+},
+{
+"en": "{m1:\\bullet} [Section {r1:3.5} ] We",
+"zh": "{m1} [第 {r1} 节] 我们证明 PF-ODE 是非线性 Rectified Flow 的实例。"
+},
+{
+"en": "The Marginal Preserving Property",
+"zh": "保持边际分布的性质"
+},
+{
+"en": "The marginal preserving property tha",
+"zh": "对 {m2} 有 {m1}，这一保持边际分布的性质是 ({r1}) 中非线性 Rectified Flow 的普遍性质，与插值 {m3} 是否为直线无关。"
+},
+{
+"en": "Definition 3.1 . For a path-wise con",
+"zh": "<b>定义 3.1：</b>对一个路径逐条连续可微的随机过程 {m1}，它的期望速度 {m2} 定义为"
+},
+{
+"en": "For {m1:x\\not\\in\\mathrm{supp}(X_{t})",
+"zh": "对 {m1}，条件期望没有定义，此时 {m2} 可以任意设定，例如 {m3}。"
+},
+{
+"en": "Definition 3.2 . We call that {m1:{\\",
+"zh": "<b>定义 3.2：</b>如果 {m2} 局部有界，并且下面积分方程的解存在且唯一，就称 {m1} 是<i>可 rectify 的</i> (rectifiable)："
+},
+{
+"en": "In this case, {m1:{\\boldsymbol{Z}}=\\",
+"zh": "此时称 {m1} 为由 {m2} 诱导的 <i>Rectified Flow</i>。"
+},
+{
+"en": "Theorem 3.3 . Assume {m1:{\\boldsymbo",
+"zh": "<b>定理 3.3：</b><i>假设 {m1} 可 rectify，{m2} 是它的 Rectified Flow。那么对 {m4} 有 {m3}。</i>"
+},
+{
+"en": "Proof. For any compactly supported c",
+"zh": "<b>证明：</b>对任意紧支撑的连续可微检验函数 {m1}，有"
+},
+{
+"en": "where we used {m1:v^{{\\boldsymbol{X}",
+"zh": "其中用到 {m1}。按定义，这等价于 {m2} 在分布意义下是以 {m3} 为漂移的连续性方程的解："
+},
+{
+"en": "To see the equivalence of ( {r1:10}",
+"zh": "为说明 ({r1}) 与 ({r2}) 等价，可以把 ({r3}) 乘以 {m1} 再两边积分："
+},
+{
+"en": "where we use integration by parts th",
+"zh": "其中用到分部积分 {m1}。"
+},
+{
+"en": "Because {m1:Z_{t}} is driven by the",
+"zh": "由于 {m1} 由同一个速度场 {m2} 驱动，它的边际分布 {m3} 是同一个方程在相同初始条件（{m4}）下的解。因此，只要 ({r1}) 的解唯一，{m5} 与 {m6} 就相等；而按 {c1} 的推论 1.3（另见 {c2} 的定理 4.1），这等价于 {m7} 的解唯一。∎"
+},
+{
+"en": "Reducing Convex Transport Costs",
+"zh": "降低凸传输代价"
+},
+{
+"en": "The fact that {m1:(Z_{0},Z_{1})} yie",
+"zh": "{m1} 的凸传输代价不大于 {m2}，这是使用特殊的线性插值 {m3}（欧氏空间的测地线）的结果。"
+},
+{
+"en": "Definition 3.4 . A coupling {m1:(X_{",
+"zh": "<b>定义 3.4：</b>如果耦合 {m1} 的线性插值过程 {m2} 可 rectify，就称该耦合可 rectify。此时称 ({r1}) 中的 {m3} 为耦合 {m4} 的 Rectified Flow，记为 {m5}；称 {m6} 为 {m7} 的 rectified 耦合，记为 {m8}"
+},
+{
+"en": "Theorem 3.5 . Assume {m1:(X_{0},X_{1",
+"zh": "<b>定理 3.5：</b><i>假设 {m1} 可 rectify，且 {m2}。那么对任意凸函数 {m3}，有</i>"
+},
+{
+"en": "Proof. The proof is based on element",
+"zh": "<b>证明：</b>证明基于 Jensen 不等式的初等应用。"
+},
+{
+"en": "∎",
+"zh": "∎"
+},
+{
+"en": "If {m1:X_{t}} is straight but with p",
+"zh": "如果 {m1} 是直的但速度为正且不恒定，即 {m2}，其中 {m3} 且 {m4}，那么只要 {m6} 是凸的并且是 {m7} 次齐次的，即对 {m9} 有 {m8}（{m10} 为某个常数），仍然有 {m5}。"
+},
+{
+"en": "The Straightening Effect",
+"zh": "拉直效应"
+},
+{
+"en": "A coupling {m1:(X_{0},X_{1})} is sai",
+"zh": "如果耦合 {m1} 是 {m2} 映射的不动点，就称它是<i>直的</i>（或<i>完全 rectified</i>）。我们希望得到直的耦合，因为它的 Rectified Flow 是直的，数值求解器一步就能精确模拟。本节先刻画直线耦合的基本性质，证明一个耦合是直的，当且仅当它的线性插值路径互不相交。然后证明递归的 rectification 以 {m3} 的速率拉直耦合及相应的流，其中 {m4} 是 rectification 的步数。"
+},
+{
+"en": "Theorem 3.6 . Assume {m1:(X_{0},X_{1",
+"zh": "<b>定理 3.6：</b><i>假设 {m1} 可 rectify。令 {m2}，{m3}。那么 {m4} 是直线耦合，当且仅当下面几个等价的命题成立。</i>"
+},
+{
+"en": "There exists a strictly convex funct",
+"zh": "<i>存在严格凸函数 {m1}，使得 {m2}。</i>"
+},
+{
+"en": "{m1:(X_{0},X_{1})} is a fixed point",
+"zh": "<i>{m1} 是 {m2} 的不动点，即 {m3}。</i>"
+},
+{
+"en": "The rectified flow coincides with th",
+"zh": "<i>Rectified Flow 与线性插值过程重合：{m1}。</i>"
+},
+{
+"en": "The paths of the linear interpolatio",
+"zh": "<i>线性插值 {m1} 的路径互不相交：</i>"
+},
+{
+"en": "where {m1:V((X_{0},X_{1}))=0} indica",
+"zh": "其中 {m1} 表示当 {m3} 时，{m2} 几乎必然成立，也就是说经过每个 {m4} 的直线是唯一的，因此线性插值路径互不相交。"
+},
+{
+"en": "Proof. {m1:3\\to 2\\to 1} : Obvious.",
+"zh": "<b>证明：</b>{m1}：显然。"
+},
+{
+"en": "{m1:1\\to 4} : If {m2:\\mathbb{E}[c(Z_",
+"zh": "{m1}：如果 {m2}，那么定理 {r1} 证明中两次使用的 Jensen 不等式都取等号。由于 {m3} 严格凸，证明中第二个 Jensen 不等式取等号意味着关于 {m5} 和 {m6} 几乎必然有 {m4}，从而 {m7}"
+},
+{
+"en": "{m1:4\\to 3} : If {m2:V({\\boldsymbol{",
+"zh": "{m1}：如果 {m2}，那么对 {m4} 有 {m3}。因此"
+},
+{
+"en": "Because {m1:{\\boldsymbol{Z}}} satisf",
+"zh": "由于 {m1} 满足同一个方程 ({r1})，由解的唯一性得到 {m2}。"
+},
+{
+"en": "∎",
+"zh": "∎"
+},
+{
+"en": "O⁡(1/K) convergence rate",
+"zh": "O(1/K) 收敛速率"
+},
+{
+"en": "We now show that as we apply rectifi",
+"zh": "下面证明，递归地应用 rectification 时，Rectified Flow 越来越直，耦合的线性插值也越来越不相交。"
+},
+{
+"en": "Theorem 3.7 . Let {m1:{\\boldsymbol{Z",
+"zh": "<b>定理 3.7：</b><i>设 {m1} 是 {m3} 的第 {m2} 个 Rectified Flow，即 {m4}，{m5}。假设对 {m7}，每个 {m6} 都可 rectify。</i>"
+},
+{
+"en": "Then",
+"zh": "<i>那么</i>"
+},
+{
+"en": "Hence, {m1:\\mathbb{E}[\\left\\lVert X_",
+"zh": "<i>因此，若 {m1}，则有 {m2}。</i>"
+},
+{
+"en": "Proof. Taking {m1:c(x)=\\left\\lVert x",
+"zh": "<b>证明：</b>在定理 3.5 的证明中取 {m1}，可以得到"
+},
+{
+"en": "Applying it to each rectification st",
+"zh": "把它用于每一步 rectification，得到"
+},
+{
+"en": "A telescoping sum on {m1:k=0,\\ldots,",
+"zh": "对 {m1} 求望远镜和 (telescoping sum)，即得结论。"
+},
+{
+"en": "∎",
+"zh": "∎"
+},
+{
+"en": "Straight vs. Optimal Couplings",
+"zh": "直线耦合与最优耦合"
+},
+{
+"en": "A coupling {m1:(X_{0},X_{1})} is cal",
+"zh": "如果耦合 {m1} 在所有边际相同的耦合中使 {m3} 最小，就称它是 <i>{m2} 最优</i>的。理解和计算最优耦合一直是最优传输的核心问题 {c1}。直线耦合是另一种我们想要的性质。下面证明，对严格凸函数 {m5}，直线性是 {m4} 最优的必要条件而非充分条件；例外是一维情形，此时两个概念重合。因此，找一个直线耦合比找一个 {m6} 最优耦合「更容易」。"
+},
+{
+"en": "Theorem 3.8 . If a rectifiable coupl",
+"zh": "<b>定理 3.8：</b><i>如果一个可 rectify 的耦合 {m1} 对某个严格凸代价函数 {m3} 是 {m2} 最优的，那么 {m4} 是直线耦合。</i>"
+},
+{
+"en": "Proof. Let {m1:(Z_{0},Z_{1})=\\mathtt",
+"zh": "<b>证明：</b>令 {m1}。如果 {m2} 是 {m3} 最优的，必然有 {m4}。这推出定理 {r1} 的命题 1，因此 {m5} 是直的。∎"
+},
+{
+"en": "1D Case",
+"zh": "一维情形"
+},
+{
+"en": "For any {m1:{\\pi}_{0},{\\pi}_{1}} on",
+"zh": "对 {m2} 上的任意 {m1}，存在唯一的耦合 {m3}，它对所有非负凸代价函数 {m4} 同时最优。这个耦合由一个单调性质唯一刻画：对 {m7} 支撑集中的任意 {m5} 和 {m6}，若 {m8}，则 {m9}。此外，如果 {m10} 关于 Lebesgue 测度绝对连续，那么 {m11} 必然是确定性的，即存在映射 {m12} 使 {m13}。见 {c1}。"
+},
+{
+"en": "In the following, we show that strai",
+"zh": "下面证明，{m1} 上的直线耦合与确定性的单调耦合 {m2} 重合，因此当 {m4} 绝对连续时，它是唯一的，并且对所有凸代价 {m3} 同时最优。思路是：在 {m5} 上，一个耦合是单调的，当且仅当它的线性插值路径互不相交，而这正是直线耦合的特征。"
+},
+{
+"en": "Lemma 3.9 . A coupling on {m1:\\mathb",
+"zh": "<b>引理 3.9：</b><i>{m1} 上的耦合是直的，当且仅当它是确定性且单调的。</i>"
+},
+{
+"en": "Theorem 3.10 . For any {m1:{\\pi}_{0}",
+"zh": "<b>定理 3.10：</b><i>对 {m2} 上的任意 {m1}，要么不存在直线耦合，要么存在唯一的直线耦合。此外，若存在，这个唯一的直线耦合是确定性且单调的，并且对所有使 {m4} 的最小值存在且有限的凸代价函数 {m3} 同时最优。</i>"
+},
+{
+"en": "Proof of Lemma {r1:3.9} . If {m1:(X_",
+"zh": "<b>引理 {r1} 的证明：</b>如果 {m2} 上的 {m1} 是直的，那么它与自己的 rectified 耦合 {m3} 重合。而 {m4} 由 Rectified Flow {m5} 诱导，显然是确定性的。由于流的不交叉性质，它也是单调的。具体来说，如果 {m6} 不单调，那么 {m9} 的支撑集中存在 {m7} 和 {m8}，使得 {m10} 且 {m11}。若如此，必然存在 {m12} 使 {m13}。但由解的唯一性，对 {m15} 有 {m14}，这与 {m16} 矛盾。"
+},
+{
+"en": "Assume {m1:(X_{0},X_{1})} is determi",
+"zh": "假设 {m1} 是确定性且单调的。由于单调性，{m4} 的支撑集中不存在 {m2} 和 {m3}，使得 {m5} 且对某个 {m7} 有 {m6}。这说明对 {m9} 有 {m8}，从而 {m10}，这正是 Rectified Flow 的 ODE。此外，{m11} 显然是这个 ODE 的唯一解。因此按定理 {r1} 的命题 3，{m12} 可 rectify 且是直的。"
+},
+{
+"en": "Proof of Theorem {r1:3.10} . This is",
+"zh": "<b>定理 {r1} 的证明：</b>这是引理 {r2} 与下面这个事实结合的结果：按 {c1} 的引理 2.8 和定理 2.9，单调耦合是唯一的，并且对所有存在最优耦合的凸代价 {m1} 同时最优。∎"
+},
+{
+"en": "Multi-dimensional cases",
+"zh": "多维情形"
+},
+{
+"en": "On the other hand, on {m1:\\mathbb{R}",
+"zh": "另一方面，在 {m2} 的 {m1} 上，不同的代价函数 {m3} 一般没有共同的最优耦合，直线耦合也不保证对某个特定的 {m4} 最优；这在意料之中，因为 {m5} 过程不依赖于 {m6} 的具体选择。因此，必须修改 {m7} 过程，使它针对感兴趣的特定 {m8}。"
+},
+{
+"en": "In a recent work {c1:[ 30 ]} , it wa",
+"zh": "最近的工作 {c1} 猜想由 VP ODE（等价地，DDIM）诱导的耦合 {m1} 对二次损失是最优耦合，这个猜想已被 {c2} 证明不成立。这里我们说明，即使是直线耦合也不保证最优，更何况 VP ODE 在设计上就不走直线路径。"
+},
+{
+"en": "We explore this in a separate work {",
+"zh": "我们在另一篇工作 {c1} 中专门研究如何修改 Rectified Flow 来寻找 {m1} 最优耦合；{c2} 中一个容易表述的结果是：如果求解 ({r1}) 时把 {m4} 限制为形如 {m5} 的梯度场，那么对二次代价 {m2} 的最优耦合可以作为 {m3} 的不动点得到。把 {m6} 限制为梯度场，去掉了速度场 {m7} 中造成传输代价次优的旋转分量。"
+},
+{
+"en": "Denoising Diffusion Models and Proba",
+"zh": "去噪扩散模型与概率流 ODE"
+},
+{
+"en": "We prove that the probability flow O",
+"zh": "我们证明 {c1} 的概率流 ODE (PF-ODE) 可以看作 ({r1}) 中取 {m1} 的非线性 Rectified Flow。下面先介绍去噪扩散模型和 PF-ODE 的算法流程，理论推导请读者参阅原始工作 {c2}。"
+},
+{
+"en": "The denoising diffusion methods lear",
+"zh": "去噪扩散方法通过构造一个由标准 Brown 运动 {m1} 驱动的 SDE 模型来学习生成模型："
+},
+{
+"en": "where {m1:\\sigma_{t}\\colon[0,1]\\to[0",
+"zh": "其中 {m1} 是（通常）固定的扩散系数，{m2} 是可训练的神经网络，初始分布 {m3} 被限制为由算法超参数决定的球形高斯分布。思路是先用一个扩散过程（大多是 Ornstein-Uhlenbeck (OU) 过程）把数据坍缩成（近似的）高斯分布，再把生成扩散过程 ({r1}) 估计为这个坍缩过程的时间反转 {c1}。"
+},
+{
+"en": "Without diving into the derivations,",
+"zh": "不展开推导，{c1} 中 VE、VP、sub-VP SDE 关于 {m1} 的训练损失可以概括如下："
+},
+{
+"en": "where {m1:\\xi_{t}} is a diffusion pr",
+"zh": "其中 {m1} 是满足 {m2} 的扩散过程，{m3} 是算法的超参数序列，{m4} 由 {m5} 通过下式确定："
+},
+{
+"en": "The relation in ( {r1:16} ) is deriv",
+"zh": "({r1}) 中的关系是为了让 {m1} 服从 Ornstein-Uhlenbeck (OU) 过程 {m2} 而推出的。"
+},
+{
+"en": "VE SDE, which is equivalent to SMLD",
+"zh": "VE SDE 等价于 {c1} 中的 SMLD，它取 {m1}，因此 {m2}。(sub-)VP SDE 取 {m3} 为 {m4} 的线性函数，得到 ({r1}) 中指数形式的 {m5}。VP SDE（等价于 DDPM {c2}）取 {m6}，于是如 ({r2}) 所示有 {m7}。DDPM 建议写成 {m8}，并把 {m9} 估计为一个从 {m11} 预测 {m10} 的神经网络。"
+},
+{
+"en": "Theoretically, the SDE in ( {r1:14}",
+"zh": "理论上，({r1}) 中的 SDE 在 {m1} 求解 ({r2}) 时，从 {m3} 初始化保证得到 {m2}；当 {m5} 时，初始值可以近似为 {m4}。"
+},
+{
+"en": "By using the properties of Fokker-Pl",
+"zh": "利用 Fokker-Planck 方程的性质，{c1} 观察到，以 ({r2}) 训练出 {m1} 的 ({r1}) 中的 SDE 可以转换为边际分布相同的 ODE："
+},
+{
+"en": "Equivalently, we can regard {m1:\\til",
+"zh": "等价地，可以把 {m1} 看作下式的解："
+},
+{
+"en": "which defers from ( {r1:14} ) only b",
+"zh": "它和 ({r1}) 的区别只在 {m2} 第二项中的因子 {m1}。这个简单的等价关系只在 ({r2}) 和 ({r3}) 使用特殊初始化 {m3} 时成立。"
+},
+{
+"en": "In the following, we are ready to pr",
+"zh": "下面证明 ({r1}) 可以看作 ({r2}) 中使用 {m1}（{m2}）的非线性 Rectified Flow 目标。主要需要利用 ({r3}) 中的关系消去 {m5} 和 {m6}，证明 {m3} 与 {m4} 等价。"
+},
+{
+"en": "Proposition 3.11 . Assume ( {r1:16}",
+"zh": "<b>命题 3.11：</b><i>假设 ({r1}) 成立。那么 ({r2}) 等价于取 {m1} 的 ({r3})。</i>"
+},
+{
+"en": "Proof. First, note that we can take",
+"zh": "<b>证明：</b>首先注意，可以对所有时刻 {m2} 取 {m1}，因为 {m3} 的相关结构不影响结果。因此有 {m4}。要证明 ({r1}) 与 ({r2}) 等价，只需验证 {m5}。"
+},
+{
+"en": "where in {m1:\\overset{(*)}{=}} we us",
+"zh": "其中在 {m1} 处用到 {m2} 和 {m3}，二者都可以从 ({r1}) 推出。∎"
+},
+{
+"en": "Related Works and Discussion",
+"zh": "相关工作与讨论"
+},
+{
+"en": "Learning one-step models",
+"zh": "学习一步模型"
+},
+{
+"en": "GANs {c1:[ 19 , 4 , 43 ]} , VAEs {c2",
+"zh": "GAN {c1}、VAE {c2} 和（离散时间的）归一化流 {c3} 是学习深度生成模型的三种经典方法。GAN 在生成质量上（尤其是图像）最为成功，但由于使用极小极大更新，存在臭名昭著的训练不稳定和模式坍缩问题。VAE 和归一化流都按最大似然估计 (MLE) 原则训练，需要对模型结构施加约束或使用专门的近似技术，以保证似然可以计算：VAE 除了对似然做变分近似，通常还使用条件高斯分布；归一化流需要使用专门设计的可逆结构，并且要处理代价高昂的 Jacobian 矩阵计算。"
+},
+{
+"en": "The reflow+distillation approach in",
+"zh": "本文的 reflow+蒸馏方法为训练一步模型提供了另一条有前景的途径，避开了 GAN 的极小极大问题，也避开了基于似然的方法难以计算的问题。"
+},
+{
+"en": "Learning ODEs: MLE and PF-ODEs",
+"zh": "学习 ODE：MLE 与 PF-ODE"
+},
+{
+"en": "There are two major approaches for l",
+"zh": "学习神经 ODE 主要有两种方法：第 {r1} 节讨论的 PF-ODE/DDIM 方法，以及更经典的、{c1} 基于 MLE 的方法。"
+},
+{
+"en": "{m1:\\bullet} The MLE approach. In {c",
+"zh": "{m1} <b>MLE 方法。</b>{c1} 训练神经 ODE 来学习生成模型，做法是在数据分布 {m4} 下最大化 ODE 在 {m3} 时刻的输出 {m2} 的分布的似然。具体来说，用 {m5} 的观测样本，通过下式估计 ODE {m7} 的神经漂移 {m6}："
+},
+{
+"en": "where {m1:\\mathbb{D}(\\cdot;\\penalty\\",
+"zh": "其中 {m1} 表示 KL 散度（或其他差异度量），{m2} 是从 {m5} 出发按 {m4} 得到的 {m3} 的密度；{m6} 的密度需要已知且容易计算。"
+},
+{
+"en": "By using an instantaneous change of",
+"zh": "{c1} 观察到，借助瞬时变量替换公式，神经 ODE 的似然比离散时间归一化流更容易计算，而且不需要约束模型结构。然而，这种 MLE 方法对大规模模型仍然计算代价高昂，因为每个训练步都需要反复模拟 ODE。此外，由于 MLE 的优化过程需要沿时间反向传播，除非加入合适的正则化，否则很容易出现梯度消失或爆炸问题。"
+},
+{
+"en": "Another fundamental problem is that",
+"zh": "另一个根本问题是，神经 ODE 的 MLE ({r1}) 在理论上是欠定的，因为 MLE 只关心让最终输出 {m1} 的分布与数据分布 {m2} 匹配，而有无穷多个 ODE 能经由不同路径得到相同的 {m3} 输出分布。一些工作通过加入正则项（例如基于传输代价的正则项）来偏向更短的路径，以弥补这一点；见 {c1}。加入正则项后，MLE 学到的 ODE 会由初始化以及求解 ({r2}) 所用优化器的其他超参数隐式地决定。"
+},
+{
+"en": "{m1:\\bullet} Probability Flow ODEs.",
+"zh": "{m1} <b>概率流 ODE。</b>PF-ODE {c1} 和 DDIM {c2} 提供了另一种学习 ODE 的方法，避开了 MLE 方法的主要缺点，包括代价高昂的似然计算、训练时对 ODE 模型的模拟，以及沿时间反向传播的需要。然而，由于 PF-ODE 和 DDIM 是作为学习数学上更复杂的扩散/SDE 模型的副产品推出的，它们的理论和算法形式被弄得不必要地受限和复杂。非线性 Rectified Flow 框架表明，ODE 的学习可以用非常简单的方式直接处理，这让我们找出线性 Rectified Flow 这一典范情形，并为插值曲线 {m2} 和初始分布 {m3} 的灵活、解耦的选择打开了进一步改进的大门。"
+},
+{
+"en": "Viewed through the general non-linea",
+"zh": "从一般的非线性 Rectified Flow 框架看，MLE 在计算和理论上的缺点都可以避免，因为我们可以通过指定插值曲线 {m1}，直接预先确定 ODE 应该走的「道路」，而不是留给算法去隐式地摸索。预先指定任意插值 {m2} 在理论上是合理的，因为作为生成模型，神经 ODE 是高度过参数化的：当 {m3} 是通用逼近器且 {m4} 绝对连续时，给定任意固定的插值曲线 {m6}，{m5} 的分布都能逼近任意分布。Rectified Flow 的思路就是为 {m7} 取最简单的测地线路径。"
+},
+{
+"en": "Learning SDEs with denoising diffusi",
+"zh": "用去噪扩散学习 SDE"
+},
+{
+"en": "Although the scope of this work is l",
+"zh": "虽然本文的范围只限于学习 ODE，但基于分数的生成模型 {c1} 和去噪扩散概率模型 (DDPM) {c2} 作为 PF-ODE 和 DDIM 的基础，与本文高度相关。用这些方法训练的扩散/SDE 模型在图像合成的质量和多样性上都已超过 GAN {c3}。由于基于优化的训练过程稳定且可扩展，扩散模型已成功用于大型文生图模型，效果惊人 {c4}。它迅速推广到其他领域，例如视频 {c5}、音乐 {c6}、音频 {c7} 和文本 {c8}，以及图像编辑 {c9} 等更多任务。越来越多的文献致力于提高去噪扩散模型的推理速度，PF-ODE/DDIM 方法就是一例，它通过把 SDE 变成 ODE 获得加速。下面列举一些近期工作，远不完整。"
+},
+{
+"en": "{m1:\\bullet} Improved training and i",
+"zh": "{m1} <b>改进训练与推理。</b>一系列工作致力于改进去噪扩散模型的推理和采样过程。例如，{c1} 对 DDPM 做了几处简单修改，提高了似然、采样速度和生成质量。{c2} 用实验系统地考察了扩散生成模型的设计空间，找出了一些训练和推理的做法，能用更少的采样步得到更好的生成质量。{c3} 提出扩散指数积分采样器，用于扩散模型的快速采样。{c4} 为 PF-ODE 提供了一个定制的高阶求解器。{c5} 给出了最优扩散系数的解析估计。"
+},
+{
+"en": "{m1:\\bullet} Combination with other",
+"zh": "{m1} <b>与其他方法结合。</b>另一个方向是把扩散模型与 GAN 等生成模型结合来加速。DDPM 蒸馏 {c1} 把扩散模型的轨迹蒸馏进一串条件 GAN，以加快推理。{c2} 的截断扩散概率模型 (Truncated Diffusion Probabilistic Model, TDPM) 训练一个 GAN 模型作为 {m2}，使扩散过程可以截断以提高速度；{c3} 探索了类似的想法，{c4} 分析了最优的截断时间。{c5} 在隐空间中学习去噪扩散模型，并与变分自编码器结合。这些方法有可能用于 Rectified Flow，为学习神经 ODE 带来类似的加速。"
+},
+{
+"en": "{m1:\\bullet} Unpaired Image-to-Image",
+"zh": "{m1} <b>非配对图像到图像翻译。</b>标准的去噪扩散和 PF-ODE 方法关注把高斯噪声 ({m2}) 变换为数据 ({m3}) 的生成任务。一些工作提出把它改造为在任意源域和目标域之间迁移数据。例如，SDEdit {c1} 在输入图像引导下合成逼真的图像，做法是先给输入加噪，再用预训练的 SDE 模型对结果去噪。{c2} 提出一种引导 DDPM 生成过程的方法，基于给定的参考图像生成逼真图像。{c3} 用两个 PF-ODE 做图像翻译，一个把源图像翻译成隐变量，另一个从隐变量构造目标图像。{c4} 提出一种能量引导方法，用在源域和目标域上预训练的能量函数引导预训练 SDE 的推理过程，以改进图像翻译。相比之下，我们的框架表明，只需把 {m4} 设为源域，域迁移就可以用与生成建模基本相同的算法实现。"
+},
+{
+"en": "{m1:\\bullet} Diffusion bridges. Some",
+"zh": "{m1} <b>扩散桥。</b>一些近期工作 {c1} 表明，借助在终止时刻固定于某个数据点的扩散桥 (Diffusion Bridge) 过程，去噪扩散模型的设计空间可以变得非常灵活。这把去噪扩散方法的设计归结为构造合适的桥过程。{c2} 中的桥用时间反转技术构造，如 {c3} 所示，这等价地可以用 Doob {m2} 变换实现，{c4} 讨论了更一般的构造技术。尽管设计空间大大扩展了，一个尚未回答的问题是：应该偏好哪类扩散桥过程？这个问题之所以困难，是因为扩散噪声的存在以及对高级随机分析工具的需要，让人很难直观理解这些方法如何起作用。我们的工作去掉了扩散噪声，清楚地表明应该偏好直线路径。我们期望这一想法可以推广，为学习 SDE 时设计最优桥过程提供指导。"
+},
+{
+"en": "{m1:\\bullet} Schrodinger bridges. An",
+"zh": "{m1} <b>Schrödinger 桥。</b>另一批工作 {c1} 把 Schrödinger 桥 (Schrödinger Bridge, SB) 作为学习扩散生成模型的另一种方法。这些方法在理论上很有吸引力，但求解 Schrödinger 桥问题带来了很大的计算挑战。"
+},
+{
+"en": "Re-thinking the role of diffusion no",
+"zh": "重新思考扩散噪声的作用"
+},
+{
+"en": "The introduction of diffusion noise",
+"zh": "引入扩散噪声曾被认为是必不可少的，因为它在那些成功方法 {c1} 的推导中起着关键作用。然而，既然 Rectified Flow 用纯 ODE 框架就能取得更好或相当的结果，扩散机制的作用就应该重新审视，并与去噪扩散模型的其他优点清楚地区分开。去噪扩散模型的成功，可能主要应归功于简单稳定、基于优化的训练过程，它避开了 GAN 的不稳定问题和逐个案例调参的需要，而不是扩散噪声的存在。"
+},
+{
+"en": "Because our work shows that there is",
+"zh": "既然我们的工作表明，如果目标是学习 ODE，就没有必要动用 SDE 工具，剩下的问题是：对给定的问题，应该学习 ODE 还是 SDE？正如一些工作 {c1} 已经论证的，一般而言 ODE 应该比 SDE 更受青睐。下面是 ODE 与 SDE 的详细比较。"
+},
+{
+"en": "{m1:\\bullet} Conceptual simplicity a",
+"zh": "{m1} <b>概念简单与数值速度。</b>SDE 在数学上更复杂，更难理解。ODE 的数值模拟比 SDE 更简单、更快。"
+},
+{
+"en": "{m1:\\bullet} Time reversibility. It",
+"zh": "{m1} <b>时间可逆性。</b>ODE 正向和反向求解同样容易。相比之下，SDE 的时间反转 {c1} 在理论上更复杂，计算上也未必可行。"
+},
+{
+"en": "{m1:\\bullet} Latent spaces. The coup",
+"zh": "{m1} <b>隐空间。</b>ODE 的耦合 {m2} 是确定性的，在 Rectified Flow 的情形下传输代价也低，因此为表示和操控输出提供了良好的隐空间。引入扩散噪声会使 {m3} 更随机，因而用处更小。实际上，DDPM {c1} 和 {c2} 的 SDE 给出的 {m4}，因而对隐空间表示没有用处。"
+},
+{
+"en": "{m1:\\bullet} Training difficulty. Th",
+"zh": "{m1} <b>训练难度。</b>没有理由认为训练一个 ODE 比训练一个边际分布相同的 SDE 更难，即使不是更容易：两种情形的训练损失共享协变量的分布，只是目标不同。在 {c1} 的设定下，两个损失函数 ({r1}) 和 ({r2}) 在相差一个线性重参数化的意义下等价。"
+},
+{
+"en": "{m1:\\bullet} Expressive power. As ev",
+"zh": "{m1} <b>表达能力。</b>由于用 {c1} 的技术（另见 {c2}），每个 SDE 都可以转换为边际分布相同的 ODE，因此在表示边际分布这件事上 ODE 与 SDE 一样强，而这正是本文所考虑的传输映射问题需要的。另一方面，如果需要刻画更丰富的时间相关结构，SDE 可能更合适。"
+},
+{
+"en": "{m1:\\bullet} Manifold data. When equ",
+"zh": "{m1} <b>流形数据。</b>以神经网络作为漂移时，ODE 的输出往往落在一个光滑的低维流形上，这对图像和文本这类 AI 中的结构化数据是一个关键的归纳偏置。相比之下，用 SDE 建模流形数据时，必须小心地对扩散噪声退火才能得到光滑的结果，这导致计算缓慢和调参负担。SDE 可能更适合金融、经济等领域中噪声很大的数据建模，以及分子模拟这类在物理上本来就涉及扩散过程的领域。"
+},
+{
+"en": "Optimal vs. straight transport",
+"zh": "最优传输与直线传输"
+},
+{
+"en": "Optimal transport has been extensive",
+"zh": "最优传输作为比较概率测度、在概率测度之间迁移的有力工具，在机器学习中已被广泛研究。对本文考虑的传输映射问题，一个自然的方法是对给定的 {m3}，寻找使传输代价 {m2} 最小的最优耦合 {m1}。最常见的 {m4} 是二次代价 {m5}。"
+},
+{
+"en": "However, finding the optimal couplin",
+"zh": "然而，寻找最优耦合（特别是对高维连续测度）在计算上非常困难，至今仍是活跃的研究课题，例如见 {c1}。此外，虽然已知最优耦合有很好的光滑性和其他正则性质，但并没有必要精确地找到最优耦合，因为传输代价与具体问题的学习性能并不完全一致；例如见 {c2}。"
+},
+{
+"en": "In comparison, our reflow procedure",
+"zh": "相比之下，我们的 reflow 过程找到的是直线耦合，它对给定的 {m1} 并不是最优的（见第 {r1} 节）。从快速推理的角度看，所有直线耦合都一样好，因为它们都给出直的 Rectified Flow，因此都能用一个 Euler 步模拟。"
+},
+{
+"en": "Experiments",
+"zh": "实验"
+},
+{
+"en": "We start by studying the impact of r",
+"zh": "我们先在简单例子上研究 reflow 的影响。然后展示经过多次 reflow，Rectified Flow 在 CIFAR-10 上达到当前最好的性能。此外，它在高分辨率图像数据集上也能生成高质量图像。在无条件图像生成之外，我们把方法用于非配对的图像到图像翻译任务，生成视觉质量很高的图像对。"
+},
+{
+"en": "Algorithm",
+"zh": "算法"
+},
+{
+"en": "We follow the procedure in Algorithm",
+"zh": "我们按算法 {r1} 的流程进行。先抽取 {m1}，用它最小化 ({r2})，得到第一个 Rectified Flow {m2}。第二个 Rectified Flow {m3} 用同样的流程得到，只是数据换成从 {m4} 抽取的样本，这些样本通过模拟第一个 Rectified Flow {m5} 得到。这个过程重复 {m6} 次，得到 {m7}-Rectified Flow {m8}。最后，还可以在 {m12} 的样本上拟合，把 {m9}-Rectified Flow {m10} 进一步蒸馏成一步模型 {m11}。"
+},
+{
+"en": "By default, the ODEs are simulated u",
+"zh": "默认情况下，ODE 用普通 Euler 法以恒定步长 {m1} 模拟 {m2} 步，即对 {m4} 有 {m3}。我们也使用 Scipy {c1} 中 5(4) 阶的 Runge-Kutta 法，记为 RK45，它根据用户指定的相对和绝对容差自适应地决定步长和步数 {m5}。实验中我们沿用 {c2} 的参数。"
+},
+{
+"en": "Toy Examples",
+"zh": "简单例子"
+},
+{
+"en": "To accurately illustrate the theoret",
+"zh": "为了准确展示理论性质，图 {r2}、{r3}、{r4}、{r5} 的简单例子使用 ({r1}) 中的非参数估计 {m1}。实践中，我们用最近邻估计近似 ({r6}) 中的期望：给定从 {m3} 抽取的样本 {m2}，用下式估计 {m4}："
+},
+{
+"en": "where {m1:\\mathrm{knn}(z,m)} denotes",
+"zh": "其中 {m1} 表示 {m3} 在 {m4} 中的前 {m2} 个最近邻。我们发现结果对 {m5} 和带宽 {m6} 的选择不敏感（见图 {r1}）。默认使用 {m7} 和 {m8}。流用 Euler 法以恒定步长 {m9} 模拟 {m10} 步。除非另有说明，使用 {m11} 步。"
+},
+{
+"en": "Alternatively, {m1:v^{X}} can be par",
+"zh": "另外，{m1} 也可以参数化为神经网络，用随机梯度下降或 Adam 训练。图 {r1} 给出了一个例子，其中 {m2} 参数化为有 2 个隐藏层、每层 64 个神经元的全连接神经网络。可以看到，神经网络对线性插值轨迹（在这个简单例子中应该是分段线性的）拟合得不那么完美。如图 {r2} 所示，我们发现，除了 rectification 的作用之外，增强神经网络的光滑性（训练时增大 L2 正则系数）也有助于拉直流。"
+},
+{
+"en": "Figure 7: Rectified flows fitted wit",
+"zh": "<b>图 7：</b>用不同 L2 惩罚训练的神经网络（左）和不同带宽 {m1} 的核估计（右）拟合的 Rectified Flow。{m2}：红色点；{m3}：紫色点。"
+},
+{
+"en": "In Figure {r1:3} of Section {r2:2.2}",
+"zh": "第 {r2} 节图 {r1} 中的直度，是基于模拟轨迹对 ({r3}) 做的经验估计。相对传输代价基于模拟流得到的、来自 {m2} 的样本 {m1} 计算，即 {m3}，其中 {m4} 是求解 {m6} 与 {m7} 之间离散 L2 最优传输问题得到的 {m5} 的最优 L2 分配。需要指出，这个指标只在低维时有用，因为在高维情形下，即使把 {m8} 设为随机神经网络，它也往往恒为零。正是这一误导性的现象，使 {c1} 错误地假设 DDIM 给出 L2 最优传输。"
+},
+{
+"en": "Unconditioned Image Generation",
+"zh": "无条件图像生成"
+},
+{
+"en": "We test rectified flow for unconditi",
+"zh": "我们在 CIFAR-10 和若干高分辨率数据集上测试 Rectified Flow 的无条件图像生成。生成图像的质量用 Fréchet Inception Distance (FID) 和 Inception Score (IS) 评估，多样性按 {c1} 用召回率评估。"
+},
+{
+"en": "Experiment settings",
+"zh": "实验设置"
+},
+{
+"en": "For the purpose of generative modeli",
+"zh": "对生成建模，我们令 {m1} 为标准高斯分布，{m2} 为数据分布。我们的 Rectified Flow 实现在 {c1} 的开源代码基础上修改。漂移 {m3} 用 DDPM++ {c2} 的 U-Net 结构表示，表 {r1}(a) 和图 {r2} 报告了我们的方法和 {c3} 的 (sub)-VP ODE 在相同结构下的结果。其他使用不同网络结构的近期结果列在表 {r3}(b) 中供参考。更详细的设置见附录。"
+},
+{
+"en": "Table 1: Results on CIFAR10 uncondit",
+"zh": "<b>表 1：</b>CIFAR10 无条件图像生成的结果。Fréchet Inception Distance (FID) 和 Inception Score (IS) 衡量生成图像的质量，召回率 {c1} 衡量多样性。函数求值次数 (NFE) 表示推理时调用主神经网络的次数，对 ODE 和 SDE 模型它与离散化步数 {m1} 相同。"
+},
+{
+"en": "Figure 8: (a) Results of rectified f",
+"zh": "<b>图 8：</b>(a) Rectified Flow 与 (sub-)VP ODE 在 CIFAR10 上使用不同 Euler 离散化步数 {m1} 的结果。(b) 不同 reflow 步数和训练步数下的 FID 与召回率。(a) 中 {m2}-Distilled 指从 {m3}-Rectified Flow 蒸馏出的一步模型，{m4}。"
+},
+{
+"en": "Results",
+"zh": "结果"
+},
+{
+"en": "{m1:\\bullet} Results of fully solved",
+"zh": "{m1} <b>完全求解 ODE 的结果。</b>如表 {r1}(a) 所示，在 DDPM++ 结构上训练、用 RK45 求解的 1-Rectified Flow，在所有基于 ODE 的方法中 FID 最低（{m2}）、召回率最高（{m3}）。特别是 0.57 的召回率比现有的 ODE 和 GAN 方法有显著提升。使用同样的 RK45 ODE 求解器，Rectified Flow 生成图像所需的步数比 VE、VP、sub-VP ODE 更少。结果与完全模拟的 (sub-)VP SDE 相当，而后者需要很高的模拟开销。"
+},
+{
+"en": "Figure 9: The straightening effect o",
+"zh": "<b>图 9：</b>CIFAR10 上的拉直效应。左：不同 reflow 步数和训练迭代次数下的直度。右：随机抽取的像素沿 1-Rectified Flow 和 2-Rectified Flow 的轨迹。"
+},
+{
+"en": "{m1:\\bullet} Results on few and sing",
+"zh": "{m1} <b>少步和单步生成的结果。</b>如图 {r1} 所示，reflow 过程在小步数区间（例如 {m2}）显著改善了 FID 和召回率，尽管由于 {m3} 估计误差的累积，它在大步数区间使结果变差。图 {r2}(b) 显示每次 reflow 都带来 FID 和召回率的明显改善。对一步生成 {m4}，蒸馏进一步提升了结果（见图 {r3}(a) 中的星号）。总体而言，{m6} 的蒸馏 {m5}-Rectified Flow 得到的一步生成模型胜过此前所有经过蒸馏的 ODE；它们也胜过已报告的、用 GAN 训练的类似 U-Net 结构一步模型（见表 {r4}(b) 中带 U-Net 的 GAN）。"
+},
+{
+"en": "In particular, the distilled 2-recti",
+"zh": "特别地，蒸馏的 2-Rectified Flow 取得了 {m1} 的 FID，胜过此前已知最好的 U-Net 结构一步生成模型的 {m2}（TDPM，表 {r1}(b)）。2-Rectified Flow（{m3}）和 3-Rectified Flow（{m4}）的召回率都超过了 GAN 已知的最好结果（StyleGAN2+ADA 的 {m5}），显示出多样性上的优势。需要指出，GAN 的报告结果用自适应判别器增强 (Adaptive Discriminator Augmentation, ADA) {c1} 等专门技术仔细优化过，而我们的结果基于 Rectified Flow 的原始实现。借助合适的数据增强技术，或者与 GAN 结合（例如 TDPM {c2} 和去噪扩散 GAN {c3} 提出的方法），Rectified Flow 很可能还能进一步改进。"
+},
+{
+"en": "{m1:\\bullet} Reflow straightens the",
+"zh": "{m1} <b>Reflow 拉直流。</b>图 {r1} 显示 reflow 过程提高了 CIFAR10 上流的直度。图 {r2} 可视化了 1-Rectified Flow 和 2-Rectified Flow 在 AFHQ 猫数据集上的轨迹：在每个点 {m2}，用 {m4} 外推 {m3} 时的终值；如果 ODE 的轨迹是直线，沿同一条路径改变 {m6} 时 {m5} 应该不变。我们观察到，对 2-Rectified Flow，{m7} 几乎与 {m8} 无关，说明路径几乎是直的。此外，虽然 1-Rectified Flow 不直，{m9} 随时间变化，但它很早（{m10}）就能给出可辨认的清晰图像。相比之下，sub-VP ODE 的外推要到 {m11} 才能得到清晰图像。"
+},
+{
+"en": "High-resolution image generation",
+"zh": "高分辨率图像生成"
+},
+{
+"en": "Figure {r1:11} shows the result of 1",
+"zh": "图 {r1} 给出 1-Rectified Flow 在高分辨率（{m1}）数据集上的图像生成结果，包括 LSUN Bedroom {c1}、LSUN Church {c2}、CelebA HQ {c3} 和 AFHQ Cat {c4}。可以看到，它在不同数据集上都能生成高质量的结果。图 {r2} 和图 {r3} 显示 1-（2-）Rectified Flow 在一个或几个 Euler 步内就能给出好的结果。"
+},
+{
+"en": "Figure {r1:12} shows a simple exampl",
+"zh": "图 {r1} 给出用 1-Rectified Flow 做图像编辑的一个简单例子：先把两张自然图像的上半部分和下半部分拼接成一张不自然的图像 {m1}，再反向运行 1-Rectified Flow 得到隐编码 {m2}。然后修改 {m3}，提高它在 {m4}（即 {m5}）下的似然，得到拼接图像更自然的变体。"
+},
+{
+"en": "Figure 10: Sample trajectories {m1:z",
+"zh": "<b>图 10：</b>不同流在 AFHQ 猫数据集上的轨迹样本 {m1}，以及从不同 {m3} 出发的外推 {m2}。三种方法使用相同的随机种子。2-Rectified Flow 的 {m4} 几乎与 {m5} 无关，说明它的轨迹几乎是直的。"
+},
+{
+"en": "Figure 11: Examples of {m1:256\\times",
+"zh": "<b>图 11：</b>1-Rectified Flow 生成的 {m1} 图像示例。"
+},
+{
+"en": "Figure 12: An example of image editi",
+"zh": "<b>图 12：</b>用 1-Rectified Flow 做图像编辑的例子。这里把一只白猫和一只黑猫的图像拼成一张不自然的图像（记为 {m1}）。从 {m2} 反向模拟 ODE，得到隐编码 {m3}。由于 {m4} 不是自然图像，{m5} 在 {m6} 下的似然应该很低。因此我们把 {m7} 移向 {m8} 的高概率区域得到 {m9}，再正向求解 ODE，得到看起来更真实的图像 {m10}。修改可以确定性地进行，即通过 {m12}（{m13}）提高 {m11} 下的似然；也可以随机地用 Langevin 动力学进行，得到公式 {m14}，其中 {m15}。"
+},
+{
+"en": "Figure 13: Samples of 1-rectified fl",
+"zh": "<b>图 13：</b>1-Rectified Flow 在不同域之间用 {m1} 个 Euler 步模拟的样本。"
+},
+{
+"en": "Figure 14: Samples of results of 1-",
+"zh": "<b>图 14：</b>1-Rectified Flow 和 2-Rectified Flow 分别用 {m1} 和 {m2} 个 Euler 步模拟的结果样本。"
+},
+{
+"en": "Image-to-Image Translation",
+"zh": "图像到图像翻译"
+},
+{
+"en": "Assume we are given two sets of imag",
+"zh": "假设给定两组风格不同（又称不同域）的图像，分布分别记为 {m1}。我们希望在没有成对样本的情况下，把一个域中图像的风格（或其他关键特征）迁移到另一个域。实现这一点的一个经典方法是循环一致对抗网络（又称 CycleGAN）{c1}，它联合学习正向和反向映射 {m2}，最小化两个域上对抗损失之和，并用循环一致损失加以正则，使对所有图像 {m4} 都有 {m3}。"
+},
+{
+"en": "By constructing the rectified flow o",
+"zh": "通过构造 {m1} 与 {m2} 之间的 Rectified Flow，我们得到一种简单的图像翻译方法，既不需要对抗优化，也不需要循环一致正则：训练 Rectified Flow 只需一个简单的优化过程，而由于 ODE 的可逆性，流模型自动满足循环一致性。"
+},
+{
+"en": "As the main goal here is to obtain g",
+"zh": "由于这里的主要目标是得到好的视觉效果，我们并不追求把 {m1} 忠实地传输成严格服从 {m3} 的 {m2}，而是希望在迁移图像风格的同时保留图像中主体的身份。例如，把人脸图像迁移成猫脸时，我们想得到的是一张不真实的人猫混合脸，它仍然「看起来像」原来的人脸。"
+},
+{
+"en": "To achieve this, let {m1:h(x)} be a",
+"zh": "为此，令 {m1} 为图像 {m2} 的一个特征映射，表示我们想迁移的风格。令 {m3}，则 {m4} 服从 ODE {m5} 因此，为了保证风格被正确迁移，我们提出学习 {m6}，使得 {m7}（其中 {m8}）尽可能逼近 {m9}。由于 {m10}，我们提出最小化下面的损失："
+},
+{
+"en": "In practice, we set {m1:h(x)} to be",
+"zh": "实践中，我们把 {m1} 设为一个分类器的隐表示，该分类器从预训练的 ImageNet {c1} 模型微调而来，用来区分两个域 {m2} 的图像。直观上，{m3} 起到显著性分数的作用，对各坐标重新加权，使 ({r1}) 中的损失着重惩罚那些会显著改变 {m4} 的误差。"
+},
+{
+"en": "Figure 15: (a) Samples of trajectori",
+"zh": "<b>图 15：</b>(a) 1-Rectified Flow 和 2-Rectified Flow 在不同域之间迁移时的轨迹样本 {m1}。"
+},
+{
+"en": "Experiment settings",
+"zh": "实验设置"
+},
+{
+"en": "We set the domains {m1:{\\pi}_{0},{\\p",
+"zh": "我们把 {m1} 设为 AFHQ {c1}、MetFace {c2} 和 CelebA-HQ {c3} 数据集两两组成的域对。对每个数据集，随机选 {m2} 作为训练数据，其余作为测试数据；展示的结果是从测试数据初始化训练好的流得到的。图像缩放到 {m3}。训练和网络配置大体沿用第 {r1} 节的实验设置。详细描述见附录。"
+},
+{
+"en": "Results",
+"zh": "结果"
+},
+{
+"en": "Figure {r1:1} , {r2:13} , {r3:14} ,",
+"zh": "图 {r1}、{r2}、{r3}、{r4} 展示了用 Euler 法、以不同步数 {m1} 模拟 1-Rectified Flow 和 2-Rectified Flow 的结果示例。可以看到，Rectified Flow 能成功迁移风格并生成高质量图像。例如，把猫迁移到野生动物时，可以生成各种动物的脸，如狐狸、狮子、老虎和猎豹。此外，做一次 reflow 后，2-Rectified Flow 用单个 Euler 步（{m2}）就能给出好的结果。更多例子见附录。"
+},
+{
+"en": "Domain Adaptation",
+"zh": "域适应"
+},
+{
+"en": "A key challenge of applying machine",
+"zh": "把机器学习用于实际问题的一个关键挑战是训练集与测试集之间的域偏移 (Domain Shift)：在与训练集不同的新域上测试时，机器学习模型的性能可能显著下降。可以用 Rectified Flow 把新域（{m1}）传输到训练域（{m2}），减轻域偏移的影响。"
+},
+{
+"en": "Experiment settings",
+"zh": "实验设置"
+},
+{
+"en": "We test the rectified flow for domai",
+"zh": "我们在若干数据集上测试 Rectified Flow 做域适应的效果。DomainNet {c1} 是取自 DomainBed {c2} 的常见物体数据集，包含六个不同的域。DomainNet 的所有域都包含 345 个物体类别，如手镯、飞机、鸟和大提琴。Office-Home {c3} 是域适应的基准数据集，包含 4 个域，每个域有 65 个类别。应用我们的方法时，先把训练数据和测试数据都映射为预训练模型最后一个隐藏层的隐表示，在隐表示上构造 Rectified Flow。训练使用同样的 DDPM++ 模型结构。推理时，流模型使用均匀离散化，步数设为 {m1}。方法的评估指标是迁移后的测试数据在用训练数据训练的分类模型上的预测准确率。"
+},
+{
+"en": "Results",
+"zh": "结果"
+},
+{
+"en": "As demonstrated in Table {r1:2} , th",
+"zh": "如表 {r1} 所示，1-Rectified Flow 在 DomainNet 和 OfficeHome 上都达到了当前最好的性能。它优于或持平此前最好的方法（Deep CORAL {c1}），并且大幅超过其他所有方法。"
+},
+{
+"en": "Table 2: The accuracy of the transfe",
+"zh": "<b>表 2：</b>不同方法下迁移后测试数据的准确率，数据集为 OfficeHome 和 DomainNet。准确率越高表示性能越好。"
+},
+{
+"en": "Algorithm 2 Train(Data)",
+"zh": "<b>算法 2</b> Train(Data)"
+},
+{
+"en": "Algorithm 3 Sample(Model, Data)",
+"zh": "<b>算法 3</b> Sample(Model, Data)"
+},
+{
+"en": "Algorithm 4 Reflow(Data)",
+"zh": "<b>算法 4</b> Reflow(Data)"
+},
+{
+"en": "Figure 16: Few-step generation with",
+"zh": "<b>图 16：</b>不同 ODE 的少步生成。与 VE、VP、sub-VP ODE 相比，1-Rectified Flow 只用 1、2、3 步就能生成模糊的图像。做一次 rectification 后，2-Rectified Flow 用 1、2、3 步就能生成清晰的图像。"
+},
+{
+"en": "Additional Experiment Details",
+"zh": "补充实验细节"
+},
+{
+"en": "Experiment Configuration on CIFAR10",
+"zh": "CIFAR10 实验配置"
+},
+{
+"en": "We conduct unconditional image gener",
+"zh": "我们在 CIFAR-10 数据集 {c1} 上做无条件图像生成，图像分辨率为 {m1}。Rectified Flow 采用与 {c2} 中 DDPM++ 相同的网络结构。网络训练按 {c3} 的做法用指数滑动平均平滑，系数为 {m2}。我们使用 Adam {c4} 优化器，学习率 {m3}，dropout 率 {m4}。"
+},
+{
+"en": "For reflow, we first generate 4 mill",
+"zh": "做 reflow 时，先生成 400 万对 {m1}，得到新数据集 {m2}，再把 {m3}-Rectified Flow 模型微调 {m4} 步，得到 {m5}-Rectified Flow 模型。我们进一步把这些 Rectified Flow 模型蒸馏用于少步生成。要从 {m7}-Rectified Flow 得到 {m6} 步的图像生成器，微调时随机采样 {m8}，而不是随机采样 {m9}。特别地，对 {m10}，我们把 L2 损失函数换成 LPIPS 相似度 {c1}，因为实验上它带来更好的性能。"
+},
+{
+"en": "Expreiment Configuration on Image-to",
+"zh": "图像到图像翻译实验配置"
+},
+{
+"en": "In this experiment, we also adopt th",
+"zh": "这个实验同样采用 DDPM++ {c1} 的 U-Net 结构表示漂移 {m1}，并按算法 {r1} 的流程进行。为了生成建模，我们令 {m2} 为一个域的数据集，{m3} 为另一个域的数据集。优化使用 AdamW {c2} 优化器，{m4} 为 {m5}，权重衰减 {m6}，dropout 率 {m7}。批量大小为 {m8}，训练 {m9} 轮。我们还使用系数为 {m10} 的指数滑动平均 (EMA)。学习率在 {m11} 中做网格搜索，选训练损失最低的模型。"
+},
+{
+"en": "We use the AFHQ {c1:[ 9 ]} , MetFace",
+"zh": "我们使用 AFHQ {c1}、MetFace {c2} 和 CelebA-HQ {c3} 数据集。Animal Faces HQ (AFHQ) 是一个动物脸数据集，包含 15,000 张 {m1} 分辨率的高质量图像，分为猫、狗和野生动物三个域，每个域 5000 张。MetFace 包含 1,336 张 {m2} 分辨率的高质量 PNG 人脸图像，取自艺术作品。CelebA-HQ 是一个人脸数据集，包含 30,000 张 {m3} 分辨率的图像。我们随机选 {m4} 作为训练数据，其余作为测试数据，并把图像缩放到 {m5}。"
+},
+{
+"en": "Experiment Configuration on Domain A",
+"zh": "域适应实验配置"
+},
+{
+"en": "For training the model, we apply Ada",
+"zh": "训练模型时使用 AdamW {c1} 优化器，批量大小 {m1}，迭代 {m2}k 次，学习率 {m3}，权重衰减 {m4}，学习率调度用 OneCycle {c2}。"
+},
+{
+"en": "Figure 17: To visualize the latent s",
+"zh": "<b>图 17：</b>为了可视化隐空间，我们从 {m3} 随机采样 {m1} 和 {m2}，展示对 {m5} 由 {m4} 生成的图像。"
+},
+{
+"en": "Figure 18: (a) We compare the latent",
+"zh": "<b>图 18：</b>(a) 用相同的随机种子、不同的采样策略比较 Rectified Flow (0) 和 (1) 的隐空间。我们观察到：(i) 1-Rectified Flow 和 2-Rectified Flow 都能给出平滑的隐空间插值，二者的隐空间看起来相似；(ii) 用一步采样（{m1}）时，2-Rectified Flow 仍能给出视觉上可辨认的插值，1-Rectified Flow 则不能；(iii) 蒸馏的一步模型也能在图像之间连续插值，它们的隐空间与原始的流差别很小。(b) 把黑猫的边界替换成白猫，合成两张图像的隐编码，再可视化沿轨迹的变化。黑猫先变成灰猫，再变成毛色混杂的猫，最后变成白猫。(c) 随机采样 {m2}，再用 {m3} 生成图像，考察 {m4} 对生成图像的影响。我们发现 {m5} 导致图像过于平滑，而 {m6} 导致图像有噪声。"
+},
+{
+"en": "Figure 19: Sample trajectories {m1:z",
+"zh": "<b>图 19：</b>不同流在 CIFAR10 数据集上的轨迹样本 {m1}，以及从不同 {m3} 出发的外推 {m2}。三种方法使用相同的随机种子。2-Rectified Flow 的 {m4} 几乎与 {m5} 无关，说明它的轨迹几乎是直的。"
+},
+{
+"en": "Figure 20: We perform latent space e",
+"zh": "<b>图 20：</b>这里做隐空间嵌入和图像重建。给定图像 {m1}，用反向 ODE 求解器得到隐编码 {m2}，再用正向 ODE 求解器得到图像的重建 {m3}。图中的列是反向 ODE 求解器（正向 ODE 求解器）。(i) 得益于「拉直」效应，2-Rectified Flow 只用一步反向求解就能得到有意义的隐编码，用一步正向求解也能生成可辨认的图像。(ii) 借助蒸馏模型，一步嵌入和重建的效果显著改善。"
+},
+{
+"en": "Figure 21: More results for image-to",
+"zh": "<b>图 21：</b>不同域之间图像到图像翻译的更多结果。每行图像是从 1-Rectified Flow 的轨迹上按时间均匀取出的，轨迹以恒定步长求解 {m1} 个 Euler 步。"
+}
+]

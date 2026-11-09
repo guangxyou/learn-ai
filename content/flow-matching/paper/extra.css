@@ -1,0 +1,6 @@
+/* 宽表格缩到正文宽度，放不下就横向滚动 */
+figure.ltx_table{overflow-x:auto}
+/* 作者脚注 */
+.anote{margin:14px auto 0;max-width:640px;text-align:center;font-size:12.5px;line-height:1.7;color:var(--text-3)}
+.anote p{margin:0}
+.anote .fzh{margin:2px 0 0;padding:0;border:0;background:none;font-size:12.5px}
