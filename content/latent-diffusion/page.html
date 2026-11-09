@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Latent Diffusion · 隐空间扩散模型 (Latent Diffusion Model) 的来历、方法和后续发展，Stable Diffusion 的基础，附原论文逐段中英对照</title>
-<meta name="description" content="四个 tab：综述、原论文中英对照、15 个常见问题，NeurIPS 2023 教程的两份笔记默认折叠在资料里。">
+<title>LDM · 隐空间扩散模型 (Latent Diffusion Model) 的来历、方法和后续发展，Stable Diffusion 的基础，附原论文逐段中英对照</title>
+<meta name="description" content="四个 tab：综述、原论文中英对照、15 个常见问题；资料里默认折叠三份视频笔记：NeurIPS 2023 教程两段，和跟李沐学AI 的 DALL·E 2 论文精读（讲者说得不准的十来处在注里改了）。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -292,7 +292,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
 <div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
 <div class="wrap"><header class="ep-head">
   <div class="ep-kicker"><span class="topic">专题</span><span>Rombach、Blattmann、Lorenz、Esser、Ommer，arXiv 2021-12-20，CVPR 2022</span></div>
-  <h1>Latent Diffusion</h1>
+  <h1>LDM</h1>
   <p class="ep-sub">隐空间扩散模型 (Latent Diffusion Model)，Stable Diffusion 的基础</p>
 </header></div>
 <nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
@@ -306,7 +306,7 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
 <div class="aiwrap">
   <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#o-oneline">概述</a></li><li><a href="#o-history">来历</a></li><li><a href="#o-problem">要解决的问题</a></li><li><a href="#o-frame">整体结构</a></li><li><a href="#o-ae">第一阶段：自编码器</a></li><li><a href="#o-scale">隐空间的尺度</a></li><li><a href="#o-f">压缩倍数</a></li><li><a href="#o-ldm">第二阶段：扩散模型</a></li><li><a href="#o-unet">去噪网络</a></li><li><a href="#o-cross">交叉注意力</a></li><li><a href="#o-concat">拼接</a></li><li><a href="#o-cfg">引导</a></li><li><a href="#o-sample">采样</a></li><li><a href="#o-conv">卷积采样</a></li><li><a href="#o-results">实验结果</a></li><li><a href="#o-limits">局限</a></li><li><a href="#o-sd">Stable Diffusion</a></li><li><a href="#o-after">后续发展</a></li><li><a href="#o-relation">相关模型</a></li></ol></nav>
   <article class="aidoc">
-    <h2 class="aih">Latent Diffusion 综述：来历、方法与后续发展</h2>
+    <h2 class="aih">LDM 综述：来历、方法与后续发展</h2>
     <p class="lede">这一页按计算顺序讲 Latent Diffusion。前四节说明它是什么、从哪里来、要解决什么问题、由哪几部分组成；中间九节依次讲第一阶段的自编码器、隐空间的尺度、压缩倍数的选择、第二阶段的扩散模型、去噪网络、两种条件机制、引导和采样；后面六节讲卷积采样、实验结果、局限、Stable Diffusion、后续发展和相关模型。</p><p class="lede">论文逐段中英对照在「论文」tab，常见问题在「常见问题」tab，NeurIPS 2023 教程的笔记收在「资料」tab，默认折叠。前向过程、逆向过程和预测噪声的推导不在这里重复，见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题</a>；KL 散度和证据下界见 <a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">VAE 专题</a>。</p>
     <section class="aisec" id="o-oneline">
     <h2><span class="n">1</span><span>概述：先压缩，再在压缩后的空间里扩散</span></h2>
@@ -823,8 +823,8 @@ image = vae.decode(z / 0.18215).sample        # 解码器只运行这一次</cod
 </div>
 <div class="view" id="view-res">
 <div class="resdoc">
-  <p class="lede">NeurIPS 2023 教程《Latent Diffusion Models: Is the Generative AI Revolution Happening in Latent Space?》的笔记收在这里，共两段视频。两份笔记默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
-  <div class="eptools"><span>2 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
+  <p class="lede">这里收三份视频笔记：NeurIPS 2023 教程《Latent Diffusion Models: Is the Generative AI Revolution Happening in Latent Space?》的两段，和跟李沐学AI 的 DALL·E 2 论文精读。笔记默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
+  <div class="eptools"><span>3 份资料</span><button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <details class="res" id="res-p1">
   <summary><span class="rt"><b>NeurIPS 2023 教程第一部分：入门</b><em>43 分钟，Karsten Kreis 讲扩散模型回顾、LDM 框架、判别器、率失真和正则化</em></span></summary>
   <div class="resb">
@@ -1019,6 +1019,316 @@ image = vae.decode(z / 0.18215).sample        # 解码器只运行这一次</cod
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/p2-2390.jpg')"><span class="tri"></span></button></div>
       <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1wFNCehED7/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="82"><b>1:22</b><span>Vahdat：端到端训练</span></button></li><li><button type="button" data-t="439"><b>7:19</b><span>加速采样和蒸馏</span></button></li><li><button type="button" data-t="1089"><b>18:09</b><span>逆问题</span></button></li><li><button type="button" data-t="1416"><b>23:36</b><span>控制和编辑</span></button></li><li><button type="button" data-t="2044"><b>34:04</b><span>现场提问</span></button></li><li><button type="button" data-t="2241"><b>37:21</b><span>Gao：视频</span></button></li><li><button type="button" data-t="2902"><b>48:22</b><span>三维</span></button></li><li><button type="button" data-t="3760"><b>62:40</b><span>文本、分子和感知任务</span></button></li><li><button type="button" data-t="4380"><b>73:00</b><span>圆桌讨论</span></button></li><li><button type="button" data-t="4561"><b>76:01</b><span>圆桌：为什么成功</span></button></li><li><button type="button" data-t="4798"><b>79:58</b><span>圆桌：隐空间和像素空间</span></button></li><li><button type="button" data-t="4937"><b>82:17</b><span>圆桌：端到端还是两阶段</span></button></li><li><button type="button" data-t="5222"><b>87:02</b><span>圆桌：图像之外</span></button></li><li><button type="button" data-t="5462"><b>91:02</b><span>圆桌：和其他生成模型的关系</span></button></li><li><button type="button" data-t="5764"><b>96:04</b><span>圆桌：控制和组合性</span></button></li><li><button type="button" data-t="5933"><b>98:53</b><span>圆桌：给研究者的建议</span></button></li><li><button type="button" data-t="6313"><b>105:13</b><span>圆桌：开放权重的影响</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+  </div>
+</details>
+  <details class="res" id="res-m">
+  <summary><span class="rt"><b>跟李沐学AI：DALL·E 2 论文精读</b><em>1 小时 28 分，其中 35 分钟串讲生成对抗网络、变分自编码器、VQ-VAE、DALL·E、DDPM、两种引导和 GLIDE，再回到 DALL·E 2 的方法和结果</em></span></summary>
+  <div class="resb">
+<div class="intro"><p>这一期名义上讲 DALL·E 2，真正讲论文的时间不到一半。DALL·E 2 正文的方法部分只有两页，几乎全是「和 GLIDE 相比改了什么」，不知道前面那串工作就看不懂。</p><p>所以讲者在 27 分钟到 62 分钟之间插了一段 35 分钟的串讲：生成对抗网络、自编码器、变分自编码器、VQ-VAE、DALL·E、DDPM、Improved DDPM、Diffusion Models Beat GANs、两种引导、GLIDE，一路讲到 DALL·E 2 为什么长这样。</p><p>串讲是白板手绘，每个模型一张框图，不推公式，胜在把十年的工作排成一条线。</p><p>代价是有几处说得太快或说错了：变分自编码器里把编码器学出的分布叫成了先验，DDPM 预测的噪声说成了相邻两步之间的那一份，无分类器引导的额外开销放错了阶段，DALL·E 2 的图像变体流程多画了一个 prior。这些在对应小节的「注」里改了。</p><p>笔记按视频顺序分节转述。前 27 分钟是 DALL·E 2 的宣传效果、后续工作时间线、标题摘要引言；中间是串讲；62 分钟以后回到论文，讲方法、应用、数值结果和局限。</p></div>
+<details class="ep" id="m" data-bv="BV17r4y1u77B" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">读</span>
+    <span class="tt"><b>DALL·E 2（内含扩散模型介绍）论文精读</b><em>跟李沐学AI · B 站 · 2022-07-08 发布 · 论文精读系列</em><span class="hook">87 分钟，其中 35 分钟是一段生成模型串讲：生成对抗网络、自编码器、变分自编码器、VQ-VAE、DALL·E、DDPM、两种引导、GLIDE，每个模型一张白板框图，最后拼出 DALL·E 2 = CLIP + prior + GLIDE 式解码器 + 两级上采样。</span></span>
+    <span class="side"><span class="chip">跟李沐学AI</span><span class="len">87:55</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">整期的主线一句话：DALL·E 2 先用冻住的 CLIP 把文本变成文本特征，再用一个 prior 把文本特征变成 CLIP 图像特征，最后用一个扩散模型解码器把图像特征画成 64×64 的图，再两次上采样到 1024×1024。论文自己管这个框架叫 unCLIP，因为它把 CLIP「从图到特征」的过程反了过来。</p>
+      <p class="lede">串讲那一段反复回到同一组取舍：保真度和多样性。生成对抗网络逼真但单一，变分自编码器和扩散模型多样但一开始不够逼真，引导 (Guidance) 是拿一部分多样性去换保真度的旋钮。讲者的判断是：扩散模型 2022 年的状态相当于 2017、2018 年的生成对抗网络，还有两三年可挖。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV17r4y1u77B/" target="_blank" rel="noreferrer">B 站原视频 ↗</a><a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noreferrer">DALL·E 2 原论文 ↗</a><a href="https://github.com/mli/paper-reading" target="_blank" rel="noreferrer">论文精读系列目录 ↗</a><a href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题（本站） ↗</a><a href="https://xslaoxu.cn/learn-ai/ddpm/" target="_blank" rel="noreferrer">DDPM 专题（本站） ↗</a></p>
+      <section class="sec" id="m-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>OpenAI 怎么宣传 DALL·E 2</span></h4>
+      <p>DALL·E 2 是 OpenAI 文本生成图像系列的第三篇：2021 年 1 月的 DALL·E，2021 年 12 月的 GLIDE，2022 年 4 月的 DALL·E 2。发布那几天社交网络上全是它生成的图。</p>
+      <p>OpenAI 博客强调的第一点是「原创」：生成的是训练集里没出现过的图，模型学到了文本里的概念、属性和风格，可以任意组合。例子是三行可替换的描述，比如「宇航员 / 骑马 / 写实风格」换成「一碗汤 / 通往另一个次元的传送门 / 数字绘画」。</p>
+      <p>第二点是用文本编辑已有图像：在指定位置加一只火烈鸟、一张沙发，阴影、倒影、材质都会考虑进去。同一个位置能给出很多种结果，因为底层是扩散模型，每次采样都不一样。讲者特别提到一个细节：把火烈鸟加到室内泳池的水面上，模型画出来的是火烈鸟形状的游泳圈，这个结果比真的火烈鸟更合理。</p>
+      <p>第三点是没有文本也能用：给一张图（比如名画），生成一批风格和内容一致、细节不同的变体。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-280.jpg" alt="博客里的图像变体：左边原图，右边是 DALL·E 2 给的变体，人物朝向、头巾样式都变了，风格没变。" loading="lazy"><figcaption><button class="ts" type="button" data-t="280">4:40</button>博客里的图像变体：左边原图，右边是 DALL·E 2 给的变体，人物朝向、头巾样式都变了，风格没变。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s1">
+      <h4><button class="ts" type="button" data-t="339">5:39</button><span>和 DALL·E 比，安全考虑，等候名单</span></h4>
+      <p>同一句描述，DALL·E 2 的分辨率是 DALL·E 的四倍。OpenAI 还做了人工评测：评测者对比两代模型各 1000 张图，约七成认为 DALL·E 2 的图和文本更贴切，近九成认为它更真实。</p>
+      <p>老规矩，发布时谈安全：模型不开源，API 也只开放给一小批内测用户，担心的是暴力、成人、政治类图像，以及网络图文对里带的偏见。讲者吐槽等候名单排了一个半月没消息，优先给了有影响力的账号。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s2">
+      <h4><button class="ts" type="button" data-t="459">7:39</button><span>没排上队：试玩 DALL·E Mini</span></h4>
+      <p>没拿到资格的话，GitHub 上有开源的 DALL·E Mini（当时约 9000 星），Hugging Face Spaces 上有在线版。模型和数据都小，效果粗糙但能玩。</p>
+      <p>讲者试了四句：月球上奔跑的狗（意思对，画质差）；猫狗打架（构图对，但有一张是一个狗头接两个身子）；拉面配寿司（两个常见物体，效果最好）；在亚马逊云 (AWS) 上种西红柿（模型不懂 AWS，只画了西红柿）。最后一例和 DALL·E 2 论文里写的局限一致：描述太复杂时，模型会退到它能画的最简单的那个场景。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s3">
+      <h4><button class="ts" type="button" data-t="620">10:20</button><span>2021–2022 文本生成图像时间线</span></h4>
+      <p>DALL·E 之后一年半，跟进工作一个接一个，讲者在论文首页上方写了一行时间线：</p>
+      <div class="tbl"><table><thead><tr><th>时间</th><th>工作</th><th>机构</th><th>备注</th></tr></thead><tbody><tr><td>2021-01-05</td><td>DALL·E</td><td>OpenAI</td><td>120 亿参数，离散变分自编码器加自回归 Transformer</td></tr><tr><td>2021-05-26</td><td>CogView</td><td>清华等</td><td>支持中文</td></tr><tr><td>2021-11-24</td><td>NÜWA（女娲）</td><td>微软亚洲研究院、北大</td><td>还能生成短视频</td></tr><tr><td>2021-12-20</td><td>GLIDE</td><td>OpenAI</td><td>DALL·E 2 的底子</td></tr><tr><td>2021-12-31</td><td>ERNIE-ViLG</td><td>百度</td><td>支持中文，100 亿参数</td></tr><tr><td>2022-04-13</td><td>DALL·E 2</td><td>OpenAI</td><td>论文上 arXiv 的日期，博客是 4 月 6 日</td></tr><tr><td>2022-04-28</td><td>CogView2</td><td>清华等</td><td></td></tr><tr><td>2022-05-23</td><td>Imagen</td><td>Google</td><td>结构更简单，效果不输 DALL·E 2</td></tr><tr><td>2022-05-29</td><td>CogVideo</td><td>清华等</td><td>文本生成视频</td></tr></tbody></table><p class="tnote">日期是各论文第一版上 arXiv 的日子（DALL·E 是博客日期）。讲者口头顺序里 CogVideo 在 Imagen 前面，按日期 Imagen 早六天。</p></div>
+      <p>这几个里 DALL·E 2 和 Imagen 底层都是扩散模型。讲者的判断：生成对抗网络已经被挖了五六年，扩散模型现在的状态像 2017、2018 年的生成对抗网络，至少还有两三年可做，未来几年会取代它的位置。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-625.jpg" alt="论文首页上方手写的时间线：DALL·E、CogView、NÜWA、GLIDE、ERNIE-ViLG、DALL·E 2、CogView2、CogVideo、Imagen。" loading="lazy"><figcaption><button class="ts" type="button" data-t="625">10:25</button>论文首页上方手写的时间线：DALL·E、CogView、NÜWA、GLIDE、ERNIE-ViLG、DALL·E 2、CogView2、CogVideo、Imagen。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s4">
+      <h4><button class="ts" type="button" data-t="723">12:03</button><span>标题和作者</span></h4>
+      <p>标题《Hierarchical Text-Conditional Image Generation with CLIP Latents》拆开读：「层级式」指先生成 64×64，再上采样到 256×256，再到 1024×1024。</p>
+      <p>「以文本为条件」指任务是文本生成图像；「CLIP 隐变量」指整个模型依赖 CLIP 的特征：先训练好 CLIP，给定文本，用 CLIP 文本编码器得到文本特征，训练一个 prior 把文本特征变成图像特征，再交给解码器出图。</p>
+      <p>五位作者都来自 OpenAI。一作 Aditya Ramesh 参与过 CLIP 和 DALL·E；Mark Chen 也是 DALL·E 的作者；Prafulla Dhariwal 和 Alex Nichol 是扩散模型方面的人，刚写过 Improved DDPM。</p>
+      <p>讲者的概括：DALL·E 2 就是 CLIP 加 GLIDE，作者也正好是 CLIP 的人加 GLIDE 的人。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>讲者说二作三作「做过 iGPT」，iGPT 的作者里有 Dhariwal，没有 Nichol。不影响主线。</p></div>
+    </section>
+<section class="sec" id="m-s5">
+      <h4><button class="ts" type="button" data-t="842">14:02</button><span>论文结构</span></h4>
+      <p>全文 27 页，去掉可视化和参考文献只有十几页。摘要、引言（贴了 9 张 1024×1024 大图），方法只有两页，而且没讲 CLIP，默认读者已经知道；然后四五页讲能做什么，四五页和别的方法比，最后是相关工作和局限。讲者推荐细看最后的局限部分，看完会发现 DALL·E 2 远没有宣传图那么完美。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s6">
+      <h4><button class="ts" type="button" data-t="933">15:33</button><span>摘要：prior 加解码器</span></h4>
+      <p>摘要的逻辑：CLIP 这类对比学习模型学到的特征既有语义又有风格，只拿来做分类可惜了，所以提出一个两阶段模型。<b>prior</b> 根据文本生成一个类似 CLIP 图像特征的东西，<b>解码器 (Decoder)</b> 根据图像特征生成图像。</p>
+      <p>完整流程：文本先过冻住的 CLIP 文本编码器得到文本特征（这一步固定）；prior 把文本特征变成图像特征（训练时用 CLIP 图像编码器对配对图片算出的特征当标准答案）；解码器把图像特征画成图。</p>
+      <p>摘要里的几个卖点：显式地生成一个图像特征，能明显提高多样性，逼真程度和文图匹配度几乎不掉；同一个图像特征可以解码出语义和风格接近、细节不同的多张图；借 CLIP 的联合特征空间，可以零样本地用文本编辑图像；prior 试了自回归和扩散两种，扩散的又快又好。讲者觉得最后这句被放在压轴位置，是在号召大家都用扩散模型。</p>
+      <p>讲者在这里顺带讲了为什么 DALL·E 2 和 Imagen 都选扩散模型：生成对抗网络的目标就是以假乱真，图很逼真，但多样性差、缺原创性；扩散模型从分布里采样，多样性好。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s7">
+      <h4><button class="ts" type="button" data-t="1157">19:17</button><span>引言：CLIP 和扩散模型</span></h4>
+      <p>引言第一段说视觉领域最近的进展靠更大的模型和更大的图文对数据集，代表是 CLIP：用最简单的对比学习得到很好的特征，零样本分类能识别远多于 ImageNet 1000 类的类别，对分布偏移也稳健。讲者补了一句 CLIP 论文里自己承认的短板：真遇到分布外的数据，连手写数字都认不好。</p>
+      <p>第二段转到扩散模型。它 2015 年甚至更早就有了，是概率分布模型，从分布里采样，多样性好，但保真度比不过生成对抗网络，Inception Score、FID 这些数值上一直被压着打。</p>
+      <p>从 2020 年起，DDPM、Improved DDPM、Diffusion Models Beat GANs、GLIDE、DALL·E 2 一路改进，其中最有名的技巧是<b>引导 (Guidance)</b>：牺牲一部分多样性换保真度，扩散模型在数值上终于追平生成对抗网络，大家这才敢跟进。</p>
+      <p>第二页的九宫格挑几张看：戴贝雷帽穿黑色高领毛衣的柴犬（背景虚化像近景照片）、正在混合冒泡化学品的疯狂熊猫科学家、土星外穿宇航服的海豚、时代广场上踩滑板的泰迪熊。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s8">
+      <h4><button class="ts" type="button" data-t="1394">23:14</button><span>图 2：上半是 CLIP，下半是 unCLIP</span></h4>
+      <p>引言后两段直接看图 2。虚线上方是 CLIP 的训练：文本过文本编码器、图像过图像编码器，配对的两个特征是正样本，和其他图像的组合是负样本，对比学习得到一个图文合一的特征空间。DALL·E 2 训练和使用时 CLIP 始终冻住，不训练也不微调。</p>
+      <p>虚线下方是 DALL·E 2 本身。最粗暴的做法是中间放一个大模型，从文本直接生成图像；论文的发现是中间显式地多一步「先生成图像特征」效果更好，所以分成两阶段。训练 prior 时文本和文本特征一一对应（CLIP 冻住），目标是配对图片的 CLIP 图像特征；推理时只有文本，prior 给出一个「像 CLIP 算出来的」图像特征，再交给扩散解码器。</p>
+      <p>论文里从头到尾没把自己叫 DALL·E 2，而是叫 <b>unCLIP</b>：CLIP 是从输入到特征，这里是从特征还原到图像，正好反过来。别人说 unCLIP 时指的就是这篇。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1600.jpg" alt="图 2：虚线上方 CLIP 训练，下方是 prior（文本特征到图像特征）和解码器（图像特征到图）。讲者在左上角写了 unCLIP。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1600">26:40</button>图 2：虚线上方 CLIP 训练，下方是 prior（文本特征到图像特征）和解码器（图像特征到图）。讲者在左上角写了 unCLIP。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s9">
+      <h4><button class="ts" type="button" data-t="1642">27:22</button><span>为什么要先补背景</span></h4>
+      <p>方法部分只有两段：一段讲解码器，基本是「升级版 GLIDE 和原版的区别」；一段讲 prior，也全是实现细节。光看这篇，回答不了模型整体长什么样、输入输出是什么、目标函数是什么。所以讲者先把图像生成之前的工作过一遍：生成对抗网络，自编码器到变分自编码器这一系，再到扩散模型和它的后续工作。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s10">
+      <h4><button class="ts" type="button" data-t="1708">28:28</button><span>生成对抗网络</span></h4>
+      <p><b>生成对抗网络 (Generative Adversarial Network)</b> 是左右手互搏：生成器从随机噪声 z 生成图 x′，判别器拿到真图 x 和假图 x′，做一个真假二分类。两边互相较劲，一起变强，最后生成器能画出以假乱真的图。</p>
+      <p>优点：目标函数就是以假乱真，所以保真度很高，深度伪造 (Deepfake) 就是这么火起来的；改造了这么多年，现在也不太吃数据，用起来顺手。缺点有三：同时训练两个网络要找平衡，容易训练坍塌；多样性只来自开头那个随机噪声，创造性不够；它不是显式的概率模型，生成过程藏在网络里，不知道它服从什么分布，数学上不如变分自编码器和扩散模型漂亮。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1780.jpg" alt="生成对抗网络：z 进生成器 G 得到 x′，判别器 D 区分 x′ 和真图 x，输出 0/1。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1780">29:40</button>生成对抗网络：z 进生成器 G 得到 x′，判别器 D 区分 x′ 和真图 x，输出 0/1。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>「不是概率模型」更准确的说法是：生成对抗网络定义了一个分布（z 的分布经生成器推过去），能采样，但写不出密度 p(x)，算不了似然，所以叫隐式生成模型。</p></div>
+    </section>
+<section class="sec" id="m-s11">
+      <h4><button class="ts" type="button" data-t="1827">30:27</button><span>自编码器和去噪自编码器</span></h4>
+      <p><b>自编码器 (Autoencoder)</b>：输入 x 过编码器得到一个维度小得多的特征 z，叫瓶颈 (Bottleneck)，再过解码器得到 x′，训练目标是让 x′ 尽量重建 x。自己重建自己，所以叫自编码器。</p>
+      <p><b>去噪自编码器 (Denoising Autoencoder)</b>：先把 x 打乱成 <span class="m"><i>x</i><sub><i>c</i></sub></span>（corrupted），把打乱后的输入交给编码器，但目标仍然是重建原始的 x。</p>
+      <p>这一改很有用，尤其对图像：模型更稳健，不容易过拟合。原因是像素冗余太高，污染一部分模型照样抓得住本质。何恺明的掩码自编码器 (Masked Autoencoder) 能遮掉 75% 的图块还重建得出来，也说明了这一点。</p>
+      <p>但这几种的目的都是学中间那个瓶颈特征，拿去做分类、检测、分割，不是用来生成的。原因是它们学到的不是一个概率分布，z 只是专门为重建准备的特征，没法从里面采样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-1945.jpg" alt="自编码器：x 经编码器 E 压成瓶颈 z，解码器 D 还原成 x′；橙色是去噪自编码器多出来的一步，先把 x 污染成 x_c 再输入。" loading="lazy"><figcaption><button class="ts" type="button" data-t="1945">32:25</button>自编码器：x 经编码器 E 压成瓶颈 z，解码器 D 还原成 x′；橙色是去噪自编码器多出来的一步，先把 x 污染成 <span class="m"><i>x</i><sub><i>c</i></sub></span> 再输入。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s12">
+      <h4><button class="ts" type="button" data-t="1976">32:56</button><span>变分自编码器</span></h4>
+      <p><b>变分自编码器 (Variational Autoencoder)</b> 框架看着一样，关键区别是中间不再学一个固定的特征，而是学一个分布。假设它是高斯分布，用均值和方差描述：编码器的特征后面接几层全连接，预测 μ 和 σ，再按 <span class="m"><i>z</i> = <i>μ</i> + <i>σ</i>·<i>ε</i></span>，<span class="m"><i>ε</i> ∼ <i>N</i>(0, 1)</span> 采样一个 z，交给解码器重建。</p>
+      <p>训练好以后可以把编码器扔掉，直接从高斯噪声里抽一个 z 给解码器，就生成了一张新图。因为是从分布里采样，多样性比生成对抗网络好很多，后面的 VQ-VAE、VQ-VAE-2、第一版 DALL·E 都是沿着这条线做的。</p>
+      <p>讲者从贝叶斯的角度给框图上的三个量贴了标签：给定 x 求 z 是后验 <span class="m"><i>q</i>(<i>z</i>|<i>x</i>)</span>，z 那里标了 prior，给定 z 生成 x 是似然 <span class="m"><i>p</i>(<i>x</i>|<i>z</i>)</span>，整个训练是在最大化似然。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2080.jpg" alt="变分自编码器：编码器输出 μ、σ，按 z = μ + σ·ε 采样；上方标了 q(z|x) 和 prior，解码器旁边标了 p(x|z)。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2080">34:40</button>变分自编码器：编码器输出 μ、σ，按 z = μ + σ·ε 采样；上方标了 q(z|x) 和 prior，解码器旁边标了 p(x|z)。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>口述里有一句「学出来的这个分布其实就是一个先验分布」，这句说反了。编码器学出来的 <span class="m"><i>q</i>(<i>z</i>|<i>x</i>)</span> 是<b>近似后验</b>；<b>先验</b> <span class="m"><i>p</i>(<i>z</i>)</span> 是人定的 <span class="m"><i>N</i>(0, <i>I</i>)</span>，不用学；<span class="m"><i>p</i>(<i>x</i>|<i>z</i>)</span> 是<b>似然</b>，由解码器给出。</p><p>「最大似然」要最大化的是 <span class="m">log <i>p</i>(<i>x</i>)</span>，实际优化的是它的下界：重建项 <span class="m"><i>E</i><sub><i>q</i></sub>[log <i>p</i>(<i>x</i>|<i>z</i>)]</span> 减去 <span class="m">KL(<i>q</i>(<i>z</i>|<i>x</i>) ‖ <i>p</i>(<i>z</i>))</span>。板书上 z 旁边写 prior，意思是生成时 z 从先验里抽；训练时进解码器的 z 是从 <span class="m"><i>q</i>(<i>z</i>|<i>x</i>)</span> 里抽的。</p><p>这四个量的关系在本站<a class="ilink" href="https://xslaoxu.cn/learn-ai/vae/" target="_blank" rel="noreferrer">变分自编码器专题</a>里有完整推导。</p></div>
+    </section>
+<section class="sec" id="m-s13">
+      <h4><button class="ts" type="button" data-t="2099">34:59</button><span>VQ-VAE 和码本</span></h4>
+      <p>VQ 是向量量化 (Vector Quantized)。为什么要量化：现实信号是连续的，但真正处理时都离散化了，图像变成像素，语音被采样，效果好的模型也大多是分类模型。照变分自编码器那样直接预测连续分布，不好把模型和图像尺寸做大，分布也不好学。</p>
+      <p>所以 VQ-VAE 不预测分布，换成一个<b>码本 (Codebook)</b>，大小 K×D，可以理解成 K 个聚类中心，每个是 D 维向量。</p>
+      <p>图片过编码器得到一张 H×W 的特征图 f，每个位置的向量去码本里找最近的那个中心，把它的编号写进矩阵 z（里面是 1、100 这样的整数）；再按编号把对应向量取出来拼成量化后的特征图 <span class="m"><i>f</i><sub><i>q</i></sub></span>，交给解码器重建 x′。<span class="m"><i>f</i><sub><i>q</i></sub></span> 永远来自码本，不是随机的东西，所以好优化。</p>
+      <p>VQ-VAE 后来还用到了自监督学习：BEiT 拿 DALL·E 训好的码本把图片量化成编号图当标准答案，训练视觉 Transformer；之后的 VL-BEiT 思路一样，扩展到图文多模态。</p>
+      <p>但学到的是一个固定码本，又没法像变分自编码器那样随机采样了，它更像一个自编码器。要拿来生成，得另外训练一个 prior 网络，在编号图上建模：VQ-VAE 论文用的是 PixelCNN。VQ-VAE-2 做成了层级式（局部加全局），加了注意力，prior 也重新学，生成效果很好。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2265.jpg" alt="VQ-VAE：编码器特征 f 在 K×D 的码本里找最近的向量，编号存进 z，再取回向量组成 f_q 交给解码器。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2265">37:45</button>VQ-VAE：编码器特征 f 在 K×D 的码本里找最近的向量，编号存进 z，再取回向量组成 <span class="m"><i>f</i><sub><i>q</i></sub></span> 交给解码器。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者说 K「一般是 8192」，这是 DALL·E 那个离散变分自编码器的码本大小。VQ-VAE 原论文在 ImageNet 上用的 K 是 512。</p><p>量化这一步取最近邻、不可导，训练时梯度直接从 <span class="m"><i>f</i><sub><i>q</i></sub></span> 抄给 f（直通估计，Straight-Through Estimator），另外加两项损失把码本向量和编码器输出互相拉近。视频没讲。</p></div>
+    </section>
+<section class="sec" id="m-s14">
+      <h4><button class="ts" type="button" data-t="2381">39:41</button><span>DALL·E：文本 token 接图像 token</span></h4>
+      <p>VQ-VAE 是「训练一个码本，再用 PixelCNN 做生成」，PixelCNN 是自回归模型。OpenAI 的看家本领 GPT 也是自回归模型，那把 PixelCNN 换成 GPT，再用文本引导，就是 <b>DALL·E</b>。</p>
+      <p>流程：文本用 BPE 编码；256×256 的图过一个训好的离散码本，变成 32×32 = 1024 个图像 token；文本 token 和图像 token 拼成一个 1280 长的序列，交给一个 120 亿参数的 GPT 式模型做自回归预测。</p>
+      <p>推理时只给文本，自回归地把图像 token 一个个生成出来，再解码成图。生成很多张以后，用 CLIP 给它们和文本的匹配度打分，挑最贴切的。</p>
+      <p>论文将近一半篇幅在讲怎么把 120 亿参数训起来、怎么收集足够大的数据集，典型的 OpenAI 风格：大力出奇迹。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2465.jpg" alt="DALL·E：文本经 BPE 编码，图像经码本变成 32×32 = 1024 个 token，拼成 1280 长的序列交给 120 亿参数的 GPT。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2465">41:05</button>DALL·E：文本经 BPE 编码，图像经码本变成 32×32 = 1024 个 token，拼成 1280 长的序列交给 120 亿参数的 GPT。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>板书上 BPE 那里写的 256 是文本 token 的最大个数（词表大小 16384），不是 256 维特征。DALL·E 用的码本是离散变分自编码器 (dVAE)，K = 8192，训练时用 Gumbel-Softmax 松弛，不是 VQ-VAE 那套最近邻加直通估计；两者作用一样，都是把图压成离散编号。</p></div>
+    </section>
+<section class="sec" id="m-s15">
+      <h4><button class="ts" type="button" data-t="2491">41:31</button><span>扩散模型：前向加噪，逆向去噪</span></h4>
+      <p>讲了 40 多分钟才到主角。扩散模型的概念很简单：一张正常的图 <span class="m"><i>x</i><sub>0</sub></span>，每一步加一点很小的正态噪声得到 <span class="m"><i>x</i><sub>1</sub></span>，继续加，加 T 次。T 足够大时，最后的 <span class="m"><i>x</i><sub><i>T</i></sub></span> 就成了各向同性的正态分布。这个过程叫<b>前向扩散 (Forward Diffusion)</b>。</p>
+      <p>名字来自热力学：高密度的物质会向低密度扩散，比如香水慢慢散满整个房间，最后达到平衡。这里的平衡就是那个各向同性的高斯噪声。</p>
+      <p>和生成的关系：反过来想，如果输入是一个随机噪声（就是生成对抗网络里的 z），能训练一个网络一点点把它恢复成图，不就能生成了吗。这就是<b>逆向扩散 (Reverse Diffusion)</b>：从 <span class="m"><i>x</i><sub><i>T</i></sub></span> 到 <span class="m"><i>x</i><sub><i>T</i>−1</sub></span>，再用同一个模型到 <span class="m"><i>x</i><sub><i>T</i>−2</sub></span>，一路退回来，所有步共享一个模型。</p>
+      <p>代价是慢。生成对抗网络一次前向就出图；最原始的扩散模型 T 取 1000，生成一张图要做 1000 次前向，训练也比别的模型贵。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s16">
+      <h4><button class="ts" type="button" data-t="2669">44:29</button><span>U-Net 和步数编码</span></h4>
+      <p>扩散模型每一步的输入输出都是同样大小的图，所以用了很常见的 <b>U-Net</b>：一个卷积网络，编码器一路把图压小，解码器一路放大回同样尺寸，中间有跳跃连接把前面的信息直接送过去，帮助恢复细节。后来的改进在 U-Net 里加了注意力。原则上不一定非用 U-Net，但大部分扩散模型都用它。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2690.jpg" alt="上方：前向扩散 x_0 到 x_T 每步加噪声 ε，终点是 N(0, I)；下方：逆向一步用 U-Net 从 x_t 得到 x_{t−1}。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2690">44:50</button>上方：前向扩散 <span class="m"><i>x</i><sub>0</sub></span> 到 <span class="m"><i>x</i><sub><i>T</i></sub></span> 每步加噪声 ε，终点是 N(0, I)；下方：逆向一步用 U-Net 从 <span class="m"><i>x</i><sub><i>t</i></sub></span> 得到 <span class="m"><i>x</i><sub><i>t</i>−1</sub></span>。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s17">
+      <h4><button class="ts" type="button" data-t="2762">46:02</button><span>DDPM 的两个改动</span></h4>
+      <p>扩散模型 2015 年就提出了，但当时只是想法，像二十年前的深度学习一样缺了很多必要条件。2020 年 6 月的 <b>DDPM</b> 让它第一次做出了好图，有两处关键改动。</p>
+      <p>第一处：之前大家用 <span class="m"><i>x</i><sub><i>t</i></sub></span> 去预测 <span class="m"><i>x</i><sub><i>t</i>−1</sub></span>，是图到图的转换，不好优化。DDPM 改成预测噪声。讲者类比残差网络：直接预测 y 难，就把 y 写成 x 加残差，只预测残差。</p>
+      <p>U-Net 的输入除了 <span class="m"><i>x</i><sub><i>t</i></sub></span>，还有一个<b>步数编码 (Time Embedding)</b>，形式和 Transformer 的正弦位置编码一样，加进网络的方式有直接相加、拼接等多种。</p>
+      <p>为什么要步数编码：所有步共享同一个 U-Net，但希望它在逆向过程的前段先生成粗糙的轮廓，到后段再补高频细节（边边角角、小特征）。步数编码告诉模型现在走到哪一步、该粗一点还是细一点。</p>
+      <p>损失是真实噪声和预测噪声的差：真实噪声是前向过程里自己加的，已知；预测的那个是 <span class="m"><i>f</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>)</span>，f 就是 U-Net。</p>
+      <p>第二处：预测一个正态分布本来要学均值和方差，DDPM 发现方差固定成常数就行，只学均值，再降一次优化难度。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-2990.jpg" alt="左上是损失（板书写成 p(x_{t−1}|x_t) = ‖ε − f_θ(x_t, t)‖，记号是简写）；左下 U-Net 多了一个步数编码 t 的输入；右边是后面要讲的演进线：DDPM、Improved DDPM、Diffusion Beats GAN、GLIDE、DALL·E 2，以及无分类器引导。" loading="lazy"><figcaption><button class="ts" type="button" data-t="2990">49:50</button>左上是损失（板书写成 p(x<sub>t−1</sub>|x<sub>t</sub>) = ‖ε − f<sub>θ</sub>(x<sub>t</sub>, t)‖，记号是简写）；左下 U-Net 多了一个步数编码 t 的输入；右边是后面要讲的演进线：DDPM、Improved DDPM、Diffusion Beats GAN、GLIDE、DALL·E 2，以及无分类器引导。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>网络预测的 ε 是从 <span class="m"><i>x</i><sub>0</sub></span> 一步加到 <span class="m"><i>x</i><sub><i>t</i></sub></span> 的那份总噪声：<span class="m"><i>x</i><sub><i>t</i></sub> = √<i class="aov">α</i><sub><i>t</i></sub> <i>x</i><sub>0</sub> + √(1 − <i class="aov">α</i><sub><i>t</i></sub>) <i>ε</i></span>，不是 <span class="m"><i>x</i><sub><i>t</i>−1</sub></span> 到 <span class="m"><i>x</i><sub><i>t</i></sub></span> 那一步的噪声。口述里「预测从 <span class="m"><i>x</i><sub><i>t</i>−1</sub></span> 到 <span class="m"><i>x</i><sub><i>t</i></sub></span> 噪声是怎么加的」说得不准。DDPM 专题的综述 tab 第 5 节把这一步推了一遍。</p><p>板书左上那个式子是损失函数，左边写成 <span class="m"><i>p</i>(<i>x</i><sub><i>t</i>−1</sub>|<i>x</i><sub><i>t</i></sub>)</span> 是简写，不是等式。</p></div>
+    </section>
+<section class="sec" id="m-s18">
+      <h4><button class="ts" type="button" data-t="3029">50:29</button><span>扩散模型和变分自编码器比一比</span></h4>
+      <p>DDPM 也可以看成编码器加解码器的结构，和变分自编码器有三处不同：</p>
+      <ul><li>扩散模型的「编码器」是一步步加噪，固定不学；变分自编码器的编码器是学出来的。</li><li>扩散模型每一步的中间结果都和输入一样大；自编码器、变分自编码器的瓶颈特征比输入小很多。</li><li>扩散模型有步数的概念，从噪声开始走很多步才出图，所以有步数编码，而且所有步共享一个 U-Net；变分自编码器没有这些。</li></ul>
+      <p>扩散模型一做通，大家的兴趣就上来了：正向逆向都是高斯，数学上简洁，能推出很多性质。之前担心它在真实大数据集、大模型上不行，现在有人做通了。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s19">
+      <h4><button class="ts" type="button" data-t="3124">52:04</button><span>Improved DDPM 和 Diffusion Models Beat GANs</span></h4>
+      <p>后来 DALL·E 2 的二作、三作马上钻研 DDPM，提出 <b>Improved DDPM</b>，改了三处：方差也学（DDPM 说用常数就行，他们发现学了更好，采样效果提升）；加噪方案从线性改成余弦，类比学习率调度从线性到余弦；试了更大的模型，发现扩散模型随规模涨得很好。</p>
+      <p>最后一点对 OpenAI 是好消息，几个月后就有了 <b>Diffusion Models Beat GANs</b>：模型加大加宽，增加注意力头数，单尺度注意力换成多尺度注意力。</p>
+      <p>提出自适应组归一化 (Adaptive Group Normalization)，按步数做自适应归一化；用<b>分类器引导 (Classifier Guidance)</b> 指导采样，图更逼真，论文里只要 25 次前向就能生成很好的图。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>讲者说 Improved DDPM 是「20 年底放到 arXiv」，实际是 2021-02-18；Diffusion Models Beat GANs 是 2021-05-11。</p></div>
+    </section>
+<section class="sec" id="m-s20">
+      <h4><button class="ts" type="button" data-t="3241">54:01</button><span>分类器引导</span></h4>
+      <p>在 Beat GANs 之前，扩散模型的图看着已经不错了，但 Inception Score、FID 比不过生成对抗网络。光给人看图，别人会怀疑是挑过的；分数上不去也不好发论文。再加上采样太慢，大家就想找点额外的指导。</p>
+      <p><b>分类器引导</b>：训练扩散模型的同时，另外训练一个图像分类器。它通常在 ImageNet 上训，但图片都加了噪声，因为扩散模型每一步的输入都是带噪的图，和干净的 ImageNet 很不一样，所以得从头训。逆向的每一步把 <span class="m"><i>x</i><sub><i>t</i></sub></span> 交给分类器，算交叉熵，得到一个梯度，用这个梯度去引导下一步采样。</p>
+      <p>梯度里暗含「图里有没有某个物体、这个物体真不真」。引导等于告诉 U-Net：生成的图要更像某一类物体，形状、颜色、纹理都要对上，不是意思到了就行。加了引导以后，IS 和 FID 大幅提升，扩散模型第一次在这些分数上超过当时最好的 BigGAN。论文说这是牺牲一部分多样性换写实性，但讲者认为这个取舍划算：多样性仍然比生成对抗网络好，逼真程度也超过了。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-3320.jpg" alt="分类器引导：逆向链 x_t 到 x_{t−1} 到 … 到 x_0，每一步把当前的图交给分类器，求梯度 ∇g 去引导下一步。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3320">55:20</button>分类器引导：逆向链 <span class="m"><i>x</i><sub><i>t</i></sub></span> 到 <span class="m"><i>x</i><sub><i>t</i>−1</sub></span> 到 … 到 <span class="m"><i>x</i><sub>0</sub></span>，每一步把当前的图交给分类器，求梯度 ∇g 去引导下一步。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>准确的形式是把逆向一步的均值往 <span class="m">∇<sub><i>x</i><sub><i>t</i></sub></sub> log <i>p</i><sub><i>φ</i></sub>(<i>y</i>|<i>x</i><sub><i>t</i></sub>)</span> 的方向挪一点，乘一个引导强度 s；s 越大，越像那一类，多样性越低。</p></div>
+    </section>
+<section class="sec" id="m-s21">
+      <h4><button class="ts" type="button" data-t="3466">57:46</button><span>换成 CLIP 和别的条件</span></h4>
+      <p>引导这么有效，大家开始找别的指导信号。首先想到把分类器换成 CLIP，文本和图像就联系起来了，不仅能用梯度引导，还能用文本控制生成。图像这边可以用像素级重建、特征层面、风格（用 Gram 矩阵）来引导；文本这边可以用训练好的大语言模型来引导。</p>
+      <p>这些引导在目标函数里都是那个额外的条件 y：模型的输入不光是 <span class="m"><i>x</i><sub><i>t</i></sub></span> 和 t，还有一个条件，条件是什么看应用。板书上 y 下面列了四种：分类器、CLIP、图像、文本。</p>
+      <p>共同的缺陷：都要再用一个模型，要么拿现成的预训练模型，要么自己再训一个，成本高，训练过程也不好控制。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-3500.jpg" alt="损失里多了条件 y，可以来自分类器、CLIP、图像或文本。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3500">58:20</button>损失里多了条件 y，可以来自分类器、CLIP、图像或文本。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s22">
+      <h4><button class="ts" type="button" data-t="3557">59:17</button><span>无分类器引导</span></h4>
+      <p>后续工作提出<b>无分类器引导 (Classifier-Free Guidance)</b>：不要分类器，也能找到指导信号。做法是训练时让模型生成两个输出，一个有条件，一个没条件。比如用图文对训练、拿文本当引导信号，就用文本 y 生成一个输出，再随机把条件去掉，换成空序列生成另一个输出。</p>
+      <p>在特征空间里，无条件的输出 <span class="m"><i>x</i></span> 和有条件的输出 <span class="m"><i>x</i><sub><i>y</i></sub></span> 之间有一个方向。训练让模型知道这两者大概差多少；生成时，有了无条件的输出，就能沿这个方向推到有条件的输出，摆脱了分类器。</p>
+      <p>讲者说这个方法训练时很贵，因为本来就贵的扩散模型还要多生成一个输出。但它好用，GLIDE、DALL·E 2、Imagen 都用了，而且都说是很重要的技巧。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-3610.jpg" alt="右上是无分类器引导：从无条件输出 f_θ(x_t, t, ∅) 指向有条件输出 f_θ(x_t, t, y) 的方向，生成时沿这个方向再推远一点。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3610">60:10</button>右上是无分类器引导：从无条件输出 <span class="m"><i>f</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>, ∅)</span> 指向有条件输出 <span class="m"><i>f</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>t</i>, <i>y</i>)</span> 的方向，生成时沿这个方向再推远一点。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>开销放错了阶段。训练时是同一个网络，每个样本随机以一定概率（比如 10%）把条件换成空，一次前向一个输出，成本基本不变；贵的是<b>采样</b>：每一步要算有条件、无条件两次前向，再按 <span class="m"><i class="atl">ε</i> = <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅) + <i>w</i>·(<i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, <i>y</i>) − <i>ε</i><sub><i>θ</i></sub>(<i>x</i><sub><i>t</i></sub>, ∅))</span> 组合，w &gt; 1 时就是沿着那个方向多推一段。</p><p>这个方法的论文 2021 年 12 月先以 NeurIPS 研讨会短文发表，arXiv 版是 2022-07-26，比 GLIDE 的 arXiv 晚，所以讲者口中「后续工作」的顺序按的是研讨会版本。</p></div>
+    </section>
+<section class="sec" id="m-s23">
+      <h4><button class="ts" type="button" data-t="3688">61:28</button><span>GLIDE，然后是 DALL·E 2</span></h4>
+      <p>把这些技巧融到一起，<b>GLIDE</b> 终于让扩散模型做好了文本生成图像：只有 35 亿参数，效果直逼 120 亿参数的 DALL·E，分数和观感都更好。</p>
+      <p>OpenAI 一看方向靠谱，就不再沿 DALL·E 那套码本加自回归走了，改用扩散模型，在 GLIDE 基础上前面加一个 prior，后面做层级式生成（64 到 256 到 1024），再叠上一堆新技巧，成了 DALL·E 2。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-3680.jpg" alt="板书上的演进线：DDPM、Improved DDPM、Diffusion Beats GAN 加无分类器引导，汇到 GLIDE，再到 DALL·E 2。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3680">61:20</button>板书上的演进线：DDPM、Improved DDPM、Diffusion Beats GAN 加无分类器引导，汇到 GLIDE，再到 DALL·E 2。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s24">
+      <h4><button class="ts" type="button" data-t="3741">62:21</button><span>方法：两阶段为什么成立</span></h4>
+      <p>训练数据是图文对 (x, y)。<span class="m"><i>z</i><sub><i>i</i></sub></span> 是 CLIP 图像特征，<span class="m"><i>z</i><sub><i>t</i></sub></span> 是 CLIP 文本特征。模型两部分：prior <span class="m"><i>P</i>(<i>z</i><sub><i>i</i></sub>|<i>y</i>)</span> 根据文本生成图像特征；解码器 <span class="m"><i>P</i>(<i>x</i>|<i>z</i><sub><i>i</i></sub>, <i>y</i>)</span> 根据图像特征（可选再加上文本）生成图像。</p>
+      <p>论文用一行公式说明两阶段有依据：<span class="m"><i>P</i>(<i>x</i>|<i>y</i>) = <i>P</i>(<i>x</i>, <i>z</i><sub><i>i</i></sub>|<i>y</i>) = <i>P</i>(<i>x</i>|<i>z</i><sub><i>i</i></sub>, <i>y</i>) <i>P</i>(<i>z</i><sub><i>i</i></sub>|<i>y</i>)</span>。第一个等号成立，是因为 CLIP 冻住了，<span class="m"><i>z</i><sub><i>i</i></sub></span> 是 x 的确定性函数，给定图就有唯一的 <span class="m"><i>z</i><sub><i>i</i></sub></span>，两者等价。</p>
+      <p>第二个等号是链式法则。所以先用 prior 采 <span class="m"><i>z</i><sub><i>i</i></sub></span>，再用解码器采 x，就是从真正的条件分布 <span class="m"><i>P</i>(<i>x</i>|<i>y</i>)</span> 里采样。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-3880.jpg" alt="论文第 2 节：prior P(z_i|y)、解码器 P(x|z_i, y)，以及 P(x|y) = P(x|z_i, y)P(z_i|y)。" loading="lazy"><figcaption><button class="ts" type="button" data-t="3880">64:40</button>论文第 2 节：prior P(z<sub>i</sub>|y)、解码器 P(x|z<sub>i</sub>, y)，以及 P(x|y) = P(x|z<sub>i</sub>, y)P(z<sub>i</sub>|y)。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s25">
+      <h4><button class="ts" type="button" data-t="3918">65:18</button><span>解码器</span></h4>
+      <p>解码器是 GLIDE 的变体，改动不大。讲者概括为两件事：用了 CLIP 的引导，以及无分类器引导。后者具体是训练时 10% 的时间把 CLIP 特征置零，50% 的时间丢掉文本。讲者的评价：能用的都用上了，无分类器引导很贵，但 OpenAI 向来不怕贵，效果好就行。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>论文里解码器用 CLIP 的方式是<b>条件输入</b>，没有像 CLIP 引导那样求梯度：把 CLIP 图像特征投影后加到步数编码上，再投影成 4 个额外的 token 拼到 GLIDE 文本编码器的输出序列后面。</p><p>GLIDE 原有的文本通路保留着，作者希望它补上 CLIP 不擅长的属性绑定，结果帮助不大（第 7 节）。解码器是 35 亿参数的 GLIDE 结构，采样 250 步。</p></div>
+    </section>
+<section class="sec" id="m-s26">
+      <h4><button class="ts" type="button" data-t="3989">66:29</button><span>两级上采样</span></h4>
+      <p>为了出 1024 的大图吸引眼球，先从 64×64 到 256×256 训一个模型，再从 256×256 到 1024×1024 训一个。为了训练稳定，训练时加了很多噪声。</p>
+      <p>还有一点：听起来大模型应该是 Transformer，但扩散模型多数时候是 U-Net 这种卷积结构。作者强调上采样模型只用空间卷积，没有注意力层，所以推理时可以直接用在任意尺寸上，不用担心序列长度对不上，训出来就能生成更大的图。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>「加了很多噪声」具体是给作为条件的低分辨率图做退化：第一级用高斯模糊，第二级用更多样的 BSR 退化。另外训练时只用目标尺寸四分之一大小的随机裁块，推理时直接在整图上跑。两个上采样模型分别是 7 亿和 3 亿参数，用 DDIM 采样，分别 27 步和 15 步，不加文本条件，也不用引导。</p></div>
+    </section>
+<section class="sec" id="m-s27">
+      <h4><button class="ts" type="button" data-t="4043">67:23</button><span>prior：自回归还是扩散</span></h4>
+      <p>prior 要做的是根据文本生成图像特征 <span class="m"><i>z</i><sub><i>i</i></sub></span>。试了两种：<b>自回归 prior</b>，和 DALL·E、GPT 一样，输入文本特征，把 CLIP 图像特征遮住，自回归地预测；但 OpenAI 从 CLIP 那篇起就说过这类预测式模型训练效率太低，为了加速用了 PCA 降维等技巧，结果也没多讲。</p>
+      <p><b>扩散 prior</b> 是重点。两种都用了无分类器引导，讲者说做生成的都可以试试这个技巧。</p>
+      <p>扩散 prior 的输入输出都是特征向量，U-Net 不合适，直接用 Transformer 解码器处理一个序列：编码后的文本、CLIP 文本特征、步数编码、加了噪声的 CLIP 图像特征，最后再加一个 token（类似 CLS），它的输出用来预测没加噪声的 CLIP 图像特征。</p>
+      <p>有意思的一点：DDPM 以后大家都预测噪声，又快又好；但作者发现对他们这个任务，直接预测干净的 <span class="m"><i>z</i><sub><i>i</i></sub></span> 比预测噪声好。所以 prior 的损失是 <span class="m">‖<i>f</i><sub><i>θ</i></sub>(<i>z</i><sub><i>i</i></sub><sup>(<i>t</i>)</sup>, <i>t</i>, <i>y</i>) − <i>z</i><sub><i>i</i></sub>‖<sup>2</sup></span>，目标就是 CLIP 出来的 <span class="m"><i>z</i><sub><i>i</i></sub></span>。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4130.jpg" alt="扩散 prior：Transformer 解码器的输入依次是文本、CLIP 文本特征、步数、加噪的 CLIP 图像特征和一个输出 token，损失直接对干净的 z_i 算均方误差。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4130">68:50</button>扩散 prior：Transformer 解码器的输入依次是文本、CLIP 文本特征、步数、加噪的 CLIP 图像特征和一个输出 token，损失直接对干净的 <span class="m"><i>z</i><sub><i>i</i></sub></span> 算均方误差。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>自回归 prior 的细节：CLIP 图像特征 1024 维，PCA 保留 319 维（重建误差不到 1%），每维量化成 1024 档，token 数降到原来的三分之一。</p><p>它还在前缀里放一个「图文点积」token，采样时取点积分布的上半部分，相当于要求生成的特征和文本更匹配。扩散 prior 不加这个，改成每次采两个 <span class="m"><i>z</i><sub><i>i</i></sub></span>，留和 <span class="m"><i>z</i><sub><i>t</i></sub></span> 点积大的那个。两种 prior 都是 10 亿参数。</p></div>
+    </section>
+<section class="sec" id="m-s28">
+      <h4><button class="ts" type="button" data-t="4238">70:38</button><span>技巧时灵时不灵，规模最要紧</span></h4>
+      <p>方法讲完，讲者的感慨：图像生成这边技巧太多，经常连一张总览图都画不出来，不看代码很难把握全貌。</p>
+      <p>而且这些技巧时灵时不灵：DDPM 说预测噪声好，DALL·E 2 的 prior 又改回预测 <span class="m"><i>z</i><sub><i>i</i></sub></span>；DALL·E 2 做两阶段，Imagen 直接一个 U-Net（加上采样）就解决了，更简单效果也好。</p>
+      <p>CLIP 和 DALL·E 2 都说自回归太贵太低效，录视频这两天 Google 又出了 Parti，用自回归做文本生成图像，效果超过 DALL·E 2 和 Imagen。</p>
+      <p>结论：规模最要紧 (scale matters)，模型和训练技巧都好商量。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>Parti（2022-06-22）的 MS-COCO 零样本 FID 是 7.23，Imagen（2022-05-23）是 7.27，两者几乎持平，都比 DALL·E 2 的 10.39 好。</p></div>
+    </section>
+<section class="sec" id="m-s29">
+      <h4><button class="ts" type="button" data-t="4279">71:19</button><span>应用：图像变体</span></h4>
+      <p>图 3：给一张图，生成很多张风格和物体都一致的图。达利那幅画里的钟表、沙漠、树这些语义信息不变，布局、钟表样式、天上的云每张都不一样；OpenAI 的标志也能变出一批，背景都是五彩的色块，前景都是交织的白线，交织方式各不相同。</p>
+      <p>讲者觉得这对设计师很方便：先把大概的想法画出来交给模型，从返回的一批里挑一张喜欢的再交回去，反复几次，只用挑图不用想。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4290.jpg" alt="图 3：达利的画和 OpenAI 标志各生成一批变体，语义和风格保留，非关键细节变化。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4290">71:30</button>图 3：达利的画和 OpenAI 标志各生成一批变体，语义和风格保留，非关键细节变化。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>讲者对原理的解释是「图像特征先变成文本特征，再交给 prior 生成另一个图像特征」，不对。论文第 3.1 节的做法是：用 CLIP 图像编码器得到 <span class="m"><i>z</i><sub><i>i</i></sub></span>，直接交给解码器，不经过 prior；随机性来自解码器的 DDIM 采样（η &gt; 0），η 越大变体离原图越远。</p></div>
+    </section>
+<section class="sec" id="m-s30">
+      <h4><button class="ts" type="button" data-t="4401">73:21</button><span>应用：图像插值和文本插值</span></h4>
+      <p>图 4 是两张图之间插值：各取 CLIP 图像特征，在两者之间按比例插值再解码。偏向左图时，风格和物体像梵高的星空；越往右，主要物体变成右图的狗和房子，月亮星星和梵高画风都没了。另一组是橙色的器皿到黑白的几何体，颜色和形状逐渐过渡。</p>
+      <p>图 5 是在图和文本之间插值：描述从「一张猫的照片」变成「一只超级赛亚猫的动画画」，猫的毛慢慢炸起来；维多利亚风的房子变成现代房子；成年狮子变成幼狮；冬景变成秋景。讲者觉得做细以后就像用文字修图，不用学 Photoshop 了。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4420.jpg" alt="图 4：在两张图的 CLIP 图像特征之间插值，每行固定解码器的随机种子。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4420">73:40</button>图 4：在两张图的 CLIP 图像特征之间插值，每行固定解码器的随机种子。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-4470.jpg" alt="图 5：沿「新描述减旧描述」的文本特征差方向移动图像特征。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4470">74:30</button>图 5：沿「新描述减旧描述」的文本特征差方向移动图像特征。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>图 5 不是在两个文本特征之间插值。做法是算文本差向量 <span class="m"><i>z</i><sub><i>d</i></sub> = <i>n</i><i>o</i><i>r</i><i>m</i>(<i>z</i><sub><i>t</i></sub> − <i>z</i><sub><i>t</i>0</sub>)</span>（新描述减旧描述），再把原图的 <span class="m"><i>z</i><sub><i>i</i></sub></span> 用球面插值往 <span class="m"><i>z</i><sub><i>d</i></sub></span> 方向转，转得越多变化越大。</p></div>
+    </section>
+<section class="sec" id="m-s31">
+      <h4><button class="ts" type="button" data-t="4533">75:33</button><span>MS-COCO 零样本 FID</span></h4>
+      <p>图像生成一般在 MS-COCO 上比 FID，看表的下半部分零样本那一栏：DALL·E 约 28，GLIDE 降到 12.24，说明扩散模型好用；unCLIP 用自回归 prior 是 10.63，用扩散 prior 是 10.39，两者差不多，扩散的稍好、训练也稍容易，所以全文基本围绕扩散 prior 做。</p>
+      <p>分数之外还是要看图。和 DALL·E、GLIDE 比：「绿色火车沿铁轨开来」，DALL·E 的火车像动漫，GLIDE 的火车太大、没有开来的感觉，DALL·E 2 两张都好；「一群大象在泥水里玩」大象身上有反光；滑雪场景左上角的阳光像相机拍的。当然只有五个例子，可能是挑过的。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4525.jpg" alt="表 2：MS-COCO 256×256 FID，零样本一栏 DALL·E 约 28，GLIDE 12.24，unCLIP 10.63（自回归 prior）和 10.39（扩散 prior）。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4525">75:25</button>表 2：MS-COCO 256×256 FID，零样本一栏 DALL·E 约 28，GLIDE 12.24，unCLIP 10.63（自回归 prior）和 10.39（扩散 prior）。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s32">
+      <h4><button class="ts" type="button" data-t="4648">77:28</button><span>局限：属性绑定</span></h4>
+      <p>第 7 节讲局限，讲者推荐细读，知道局限才知道接下来改什么。第一条：物体和属性绑不上。提示「蓝色方块上面放一个红色方块」，GLIDE 大多做对了，DALL·E 2 错得一塌糊涂。</p>
+      <p>原因可能就在 CLIP：它让图文联系更紧，但训练时只看相似度，红方块、蓝方块出现了，相似度就高。它不懂「在上面」、上下左右、是与不是，从头到尾找的是物体层面的相似，用它的特征做下游生成就分不清物体和属性。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4640.jpg" alt="图 14：「a red cube on top of a blue cube」，左边 unCLIP 颜色和上下关系经常错，右边 GLIDE 大多正确。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4640">77:20</button>图 14：「a red cube on top of a blue cube」，左边 unCLIP 颜色和上下关系经常错，右边 GLIDE 大多正确。</figcaption></figure></div>
+      
+    </section>
+<section class="sec" id="m-s33">
+      <h4><button class="ts" type="button" data-t="4769">79:29</button><span>局限：写不对字，画不细复杂场景</span></h4>
+      <p>第二条：图里的文字顺序全不对。提示「一块写着 deep learning 的牌子」，牌子画得像，上面的字是 Deep、Deinp Lerpt 之类，learning 基本没有。可能因为文本用 BPE 编码，按词根词缀切，模型看不到完整拼写；应该还有别的原因。</p>
+      <p>第三条：复杂场景的细节画不出来。「狗在湖边草地上玩」的图像网上复制来的近景照，狗占了大半画面，看不出湖和玩；「时代广场的高清照片」乍看很像，放大以后广告牌全是没有语义的色块。讲者觉得不能全怪模型，提示太短，写长一点、写清楚广告牌上是哪家公司，应该能画出一部分。</p>
+      <div class="shots"><figure class="shot"><img src="__ASSETS__/shots/m-4770.jpg" alt="图 16：「A sign that says deep learning」，牌子上的字拼不对。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4770">79:30</button>图 16：「A sign that says deep learning」，牌子上的字拼不对。</figcaption></figure><figure class="shot"><img src="__ASSETS__/shots/m-4830.jpg" alt="图 17：狗在湖边草地和时代广场，放大后细节缺失。" loading="lazy"><figcaption><button class="ts" type="button" data-t="4830">80:30</button>图 17：狗在湖边草地和时代广场，放大后细节缺失。</figcaption></figure></div>
+      <div class="note"><p><span class="lbl">注</span>论文对第三条的解释是解码器先生成 64×64 再上采样，低分辨率那一级装不下这么多细节；在更高的基础分辨率上训练解码器能缓解，代价是更多训练和推理计算。</p></div>
+    </section>
+<section class="sec" id="m-s34">
+      <h4><button class="ts" type="button" data-t="4905">81:45</button><span>风险，以及之后两个月</span></h4>
+      <p>论文没有结论部分，局限之后最后一段讲风险：生成的图越来越真，FID 从 GLIDE 的 12 降到 10，也越来越找不到 AI 生成的痕迹，被拿去生成政治、歧视类图像视频的风险更高，呼吁更多安全方面的研究。</p>
+      <p>DALL·E 和 DALL·E 2 加快了这个方向的节奏：以前半年出一篇有影响力的，现在 4 月 DALL·E 2，5 月 Imagen 把 FID 降到 7 点几，6 月 Parti 也在 7 左右，用的是 200 亿参数的自回归模型。</p>
+      <p>还有人脑洞：先写几个词，让 GPT-3 扩写成一段话，交给 DALL·E 2 生成图，就得到无穷无尽的图文对，再拿来训练 CLIP 和 DALL·E 2。讲者说这有点左脚踩右脚，推特上不少人调侃，也有人猜大公司已经在这么做了。</p>
+      
+      
+    </section>
+<section class="sec" id="m-s35">
+      <h4><button class="ts" type="button" data-t="5086">84:46</button><span>「秘密语言」</span></h4>
+      <p>推特上一个很火的帖子说 DALL·E 2 有自己的一套语言：让它生成「两个农民在讨论蔬菜，带字幕」，图上的乱码字幕拿回去当提示，一句生成的是一盘盘菜，另一句生成的是鸟；「两只鲸鱼讨论食物，带字幕」生成的乱码拿回去，生成的是海鲜。作者把发现整理成了论文。</p>
+      <p>这也暴露了两个问题：属性对不上（人在讨论蔬菜，字幕却是鸟），以及安全。现有的过滤系统按政策法规过滤文字，这种谁也看不懂的「垃圾提示词 (Gibberish)」可能绕过过滤器，带来安全和可解释性的问题。</p>
+      <p>讲者最后说，DALL·E 2 才出来两个月就成了「爷爷辈」的工作，下个月说不定又有新的，说不定还开源。事后看确实如此：2022-08-22 Stable Diffusion 开源发布。</p>
+      
+      <div class="note"><p><span class="lbl">注</span>那篇论文是 Giannis Daras、Alexandros Dimakis 的《Discovering the Hidden Vocabulary of DALLE-2》，arXiv 2022-06-01。这个说法当时就有人反驳：换个上下文，这些乱码词常常就不灵了，更像是 BPE 切出的碎片碰巧落在某些概念附近。</p></div>
+    </section>
+      <section class="sec keys"><h4>这个视频记住这几条</h4><ul><li>DALL·E 2（论文里叫 unCLIP）= 冻住的 CLIP + 扩散 prior（文本特征到 CLIP 图像特征）+ GLIDE 式扩散解码器（图像特征到 64×64）+ 两级卷积上采样到 1024×1024。</li><li>自编码器学的是一个特征，不能采样；变分自编码器学一个分布，生成时扔掉编码器从先验采样；VQ-VAE 学离散码本，要另训 prior（PixelCNN、GPT）才能生成；DALL·E 就是码本加 GPT。</li><li>扩散模型把「从噪声到图」拆成很多小步，DDPM 改成预测噪声、方差固定，第一次做出好图；之后靠加大模型和引导在分数上超过生成对抗网络。</li><li>分类器引导要另训一个带噪分类器，用梯度推采样；无分类器引导只用一个随机丢条件的模型，采样时把有条件和无条件两个预测的差放大。贵在采样，不在训练。</li><li>讲者自己的结论：具体技巧时灵时不灵（预测噪声还是预测干净信号、一阶段还是两阶段、自回归还是扩散），规模最要紧。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/m-20.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV17r4y1u77B/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>OpenAI 怎么宣传 DALL·E 2</span></button></li><li><button type="button" data-t="339"><b>5:39</b><span>和 DALL·E 比，安全考虑，等候名单</span></button></li><li><button type="button" data-t="459"><b>7:39</b><span>没排上队：试玩 DALL·E Mini</span></button></li><li><button type="button" data-t="620"><b>10:20</b><span>2021–2022 文本生成图像时间线</span></button></li><li><button type="button" data-t="723"><b>12:03</b><span>标题和作者</span></button></li><li><button type="button" data-t="842"><b>14:02</b><span>论文结构</span></button></li><li><button type="button" data-t="933"><b>15:33</b><span>摘要：prior 加解码器</span></button></li><li><button type="button" data-t="1157"><b>19:17</b><span>引言：CLIP 和扩散模型</span></button></li><li><button type="button" data-t="1394"><b>23:14</b><span>图 2：上半是 CLIP，下半是 unCLIP</span></button></li><li><button type="button" data-t="1642"><b>27:22</b><span>为什么要先补背景</span></button></li><li><button type="button" data-t="1708"><b>28:28</b><span>生成对抗网络</span></button></li><li><button type="button" data-t="1827"><b>30:27</b><span>自编码器和去噪自编码器</span></button></li><li><button type="button" data-t="1976"><b>32:56</b><span>变分自编码器</span></button></li><li><button type="button" data-t="2099"><b>34:59</b><span>VQ-VAE 和码本</span></button></li><li><button type="button" data-t="2381"><b>39:41</b><span>DALL·E：文本 token 接图像 token</span></button></li><li><button type="button" data-t="2491"><b>41:31</b><span>扩散模型：前向加噪，逆向去噪</span></button></li><li><button type="button" data-t="2669"><b>44:29</b><span>U-Net 和步数编码</span></button></li><li><button type="button" data-t="2762"><b>46:02</b><span>DDPM 的两个改动</span></button></li><li><button type="button" data-t="3029"><b>50:29</b><span>扩散模型和变分自编码器比一比</span></button></li><li><button type="button" data-t="3124"><b>52:04</b><span>Improved DDPM 和 Diffusion Models Beat GANs</span></button></li><li><button type="button" data-t="3241"><b>54:01</b><span>分类器引导</span></button></li><li><button type="button" data-t="3466"><b>57:46</b><span>换成 CLIP 和别的条件</span></button></li><li><button type="button" data-t="3557"><b>59:17</b><span>无分类器引导</span></button></li><li><button type="button" data-t="3688"><b>61:28</b><span>GLIDE，然后是 DALL·E 2</span></button></li><li><button type="button" data-t="3741"><b>62:21</b><span>方法：两阶段为什么成立</span></button></li><li><button type="button" data-t="3918"><b>65:18</b><span>解码器</span></button></li><li><button type="button" data-t="3989"><b>66:29</b><span>两级上采样</span></button></li><li><button type="button" data-t="4043"><b>67:23</b><span>prior：自回归还是扩散</span></button></li><li><button type="button" data-t="4238"><b>70:38</b><span>技巧时灵时不灵，规模最要紧</span></button></li><li><button type="button" data-t="4279"><b>71:19</b><span>应用：图像变体</span></button></li><li><button type="button" data-t="4401"><b>73:21</b><span>应用：图像插值和文本插值</span></button></li><li><button type="button" data-t="4533"><b>75:33</b><span>MS-COCO 零样本 FID</span></button></li><li><button type="button" data-t="4648"><b>77:28</b><span>局限：属性绑定</span></button></li><li><button type="button" data-t="4769"><b>79:29</b><span>局限：写不对字，画不细复杂场景</span></button></li><li><button type="button" data-t="4905"><b>81:45</b><span>风险，以及之后两个月</span></button></li><li><button type="button" data-t="5086"><b>84:46</b><span>「秘密语言」</span></button></li></ol>
     </aside>
   </div>
 </details>

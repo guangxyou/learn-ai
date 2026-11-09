@@ -2,7 +2,7 @@
   "id": "generative-models",
   "kind": "paper",
   "title": "生成模型二十年：技术是怎么一代代换过来的",
-  "subtitle": "从受限玻尔兹曼机到对话里出图，自回归、变分自编码器、对抗网络、流模型、扩散、流匹配六类做法各自解决了什么、卡在哪里，后来又怎么合到一起",
+  "subtitle": "只讲图像和视频：从受限玻尔兹曼机到对话里出图，自回归、变分自编码器、对抗网络、流模型、扩散、流匹配六类做法各自解决了什么、卡在哪里，后来又怎么合到一起",
   "topics": [
     "生成模型",
     "综述"
@@ -10,16 +10,16 @@
   "date": "2006-07",
   "studied": "2026-11",
   "published": "2026-11-09",
-  "summary": "一篇综述，17 节：前史、变分自编码器、对抗网络、自回归、流模型、离散 token、扩散、引导、文本生成图像、语言模型、少步采样、Transformer 骨干、视频和音频、合流、评价，最后是贯穿的几条线和还没解决的问题。论文日期取 arXiv 第一版，引用的数字只取论文摘要里写明的。",
+  "summary": "一篇综述，16 节：前史、变分自编码器、对抗网络、自回归、流模型、离散 token、扩散、引导、文本生成图像、少步采样、Transformer 骨干、视频、合流、评价，最后是贯穿的几条线和还没解决的问题。论文日期取 arXiv 第一版，引用的数字只取论文摘要里写明的；公式用 KaTeX 渲染成 MathML。",
   "page": "page.html",
   "outputs": [
-    "<b>17</b> 节",
-    "<b>0.8</b> 万字",
-    "<b>12</b> 张图",
+    "<b>16</b> 节",
+    "<b>0.75</b> 万字",
+    "<b>11</b> 张图",
     "<b>10</b> 个公式"
   ],
   "build": {
-    "note": "输入在 26_GenModels/ 下（content/article.mjs 正文、figures/gen.mjs 全部配图、research/arxiv.txt 日期记录），那个目录不进仓库。page.html 是提交进仓库的成品，26_GenModels/ 在时构建会先重新生成。",
+    "note": "输入在 26_GenModels/ 下（content/article.mjs 正文、figures/gen.mjs 全部配图、research/arxiv.txt 日期记录，package.json 里的 katex 用来把 LaTeX 渲染成 MathML），那个目录不进仓库。page.html 是提交进仓库的成品，26_GenModels/ 在时构建会先重新生成。",
     "tool": "26_GenModels/build.mjs",
     "requires": "26_GenModels/build.mjs",
     "args": []
