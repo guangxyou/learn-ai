@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History of Diffusion · 扩散模型访谈史：Jascha Sohl-Dickstein、宋飏、Sander Dieleman 三期访谈的分节笔记，配中英字幕的 B 站转载版</title>
+<meta name="description" content="Bain Capital Ventures 的 Slater Stich 主持的三期访谈。第 1 期 Jascha Sohl-Dickstein 讲扩散模型怎样从非平衡统计力学、Jarzynski 等式和退火重要性采样里来，为什么沉寂了五年；第 2 期宋飏讲分数匹配、逆时间 SDE 与概率流 ODE 的两个意外、一致性模型；第 3 期 Sander Dieleman 讲条件期望、频域自回归、无分类器引导与对抗样本、最优输运和把扩散看作循环网络。52 节，每节可点时间码跳到 B 站播放器，论文日期和讲者说得不准的地方在注里核对过。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+.epmain .lede+.lede{margin-top:10px}
+.atl,.aov{position:relative;display:inline-block}
+.atl::after{content:'~';position:absolute;left:50%;top:-.36em;transform:translateX(-30%);font:normal .8em/1 system-ui,sans-serif}
+.aov::after{content:'';position:absolute;left:24%;right:2%;top:.2em;border-top:1px solid currentColor}
+.tl button b{width:6ch}
+.sec{scroll-margin-top:calc(var(--bar-h) + 12px)}
+.intro{max-width:860px;margin:0 0 18px}
+.intro p{margin:0 0 10px;font-size:15px;line-height:1.8;color:var(--text)}
+.deriv{margin:14px 0 16px;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df,.deriv .df *{white-space:nowrap}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.ep-sub{margin:6px 0 0;font-size:15px;color:var(--text-3)}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">访谈</span><span>Bain Capital Ventures · Slater Stich 主持 · 三期，共 1 小时 56 分钟</span></div>
+  <h1>History of Diffusion</h1>
+  <p class="ep-sub">扩散模型访谈史：Jascha Sohl-Dickstein、宋飏、Sander Dieleman 讲扩散模型的来历和理解方式</p>
+</header>
+<div class="intro">
+  <p>Bain Capital Ventures 出品、合伙人 Slater Stich 主持的三期访谈，嘉宾是扩散模型发展中的三位关键人物：2015 年提出扩散模型的 Jascha Sohl-Dickstein，把分数匹配、SDE 和一致性模型做出来的宋飏，以及以博客解读扩散模型著称的 Sander Dieleman。视频 2025-02-10 到 2025-05-14 陆续发布在 YouTube，访谈里的职务和判断都是当时的。</p>
+  <p>笔记按主持人的提问分节转述，小节标题旁和右侧时间轴的时间码可以点，播放器跳到对应位置。播放的是 B 站上带中英字幕的转载版，英文据原声转写，中文由 Claude Opus 5.5 翻译校订。说法不准确或需要补充出处的地方写在每节的“注”里。</p>
+</div></div>
+<nav class="bar"><div class="wrap"><div class="tabs" role="tablist">
+  <button class="tb on" type="button" role="tab" data-v="ep1" aria-selected="true">第 1 期 · Jascha Sohl-Dickstein</button>
+  <button class="tb" type="button" role="tab" data-v="ep2" aria-selected="false">第 2 期 · 宋飏</button>
+  <button class="tb" type="button" role="tab" data-v="ep3" aria-selected="false">第 3 期 · Sander Dieleman</button>
+</div></div></nav>
+<main class="wrap">
+<div class="view on" id="view-ep1">
+<details class="ep" id="e1" data-bv="BV16LWt6uE8T" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">一</span>
+    <span class="tt"><b>Jascha Sohl-Dickstein：扩散模型的物理起源</b><em>History of Diffusion 第 1 期 · YouTube 2025-02-10</em><span class="hook">2015 年第一篇扩散模型论文的作者讲这个想法怎么从非平衡统计力学里来，为什么之后沉寂了五年，以及他现在觉得值得做的冷门方向。</span></span>
+    <span class="side"><span class="chip">Jascha Sohl-Dickstein</span><span class="len">32:22</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">Jascha Sohl-Dickstein 是 2015-03-12 发布的《Deep Unsupervised Learning using Nonequilibrium Thermodynamics》第一作者，这篇论文提出了扩散模型。</p>
+      <p class="lede">这一期的重点是来历。扩散模型出自两件事的交汇：神经科学里“大脑在给输入建概率模型”的假说，以及物理学里非平衡过程的一组等式。图像生成是后来才找到的用途。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV16LWt6uE8T/" target="_blank" rel="noreferrer">B 站（中英字幕） ↗</a><a href="https://www.youtube.com/watch?v=VpYNlHIHT7o" target="_blank" rel="noreferrer">YouTube 原视频 ↗</a><a href="https://arxiv.org/abs/1503.03585" target="_blank" rel="noreferrer">2015 年原论文 ↗</a></p>
+      <section class="sec" id="e1-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>开场</span></h4>
+      <p>片头剪的是访谈后段的一句话：非平衡统计力学研究的很多问题，是怎样在局部逆转熵增，比如把快的气体分子分到右边、慢的分到左边。Jascha 说，这类研究让他相信可以把熵从系统里排出去。</p>
+      
+    </section>
+<section class="sec" id="e1-s1">
+      <h4><button class="ts" type="button" data-t="29">0:29</button><span>嘉宾介绍</span></h4>
+      <p>Slater Stich 是 Bain Capital Ventures 的合伙人。他介绍 Jascha 时列了一串基于扩散模型的产品：Midjourney、Ideogram、DALL·E、Stable Diffusion、Black Forest Labs 的模型、Google 的 Imagen。</p>
+      <p>这一期谈三件事：2015 年的原始论文，Jascha 对之后扩散研究的看法，以及启发了扩散模型的理论物理。</p>
+      
+    </section>
+<section class="sec" id="e1-s2">
+      <h4><button class="ts" type="button" data-t="76">1:16</button><span>2015 年的那篇论文与当时的深度学习</span></h4>
+      <p>论文写于 AlexNet 之后两三年。图像分类刚接近人类水平，生成问题几乎无人能做好，所以 Jascha 说当时研究生成模型“非常早”。</p>
+      
+    </section>
+<section class="sec" id="e1-s3">
+      <h4><button class="ts" type="button" data-t="103">1:43</button><span>研究动机：计算神经科学与世界模型</span></h4>
+      <p>Jascha 的博士方向是计算神经科学。神经科学里有一类假说：大脑在为它的输入建立概率模型，看到一张图像，就尽量准确地估计这张图像在世界上出现的概率。</p>
+      <p>如果能完整描述现实中所见事物的分布，就等于学会了是什么让一件事更可能或更不可能发生。Slater 把这概括成世界模型 (World Model)，Jascha 同意：他读博时一直在训练这类模型，再看模型内部学到的表征能不能在大脑记录里找到对应。他说答案常常难以判断，但也常能找到对得上的地方。</p>
+      
+    </section>
+<section class="sec" id="e1-s4">
+      <h4><button class="ts" type="button" data-t="233">3:53</button><span>非平衡统计力学与机器学习的联系</span></h4>
+      <p>Jascha 本科学物理，博士在伯克利读生物物理方向，那里有一群人专门研究非平衡统计力学 (Non-Equilibrium Statistical Mechanics)。</p>
+      <p>平衡统计力学研究没有输入输出、放置足够久之后的系统，比如粒子起初都在盒子一侧，最终充满盒子，得到平衡分布。非平衡统计力学研究还没稳定下来的系统：要么一直有输入输出，要么观察的是较早的时刻。</p>
+      <p>平衡统计力学和机器学习之间早有对应：能量模型 (Energy-Based Model) 直接对应统计力学里基于能量的概率模型，而且任何概率模型都能写成能量模型。非平衡统计力学和机器学习之间当时没有这样的联系。Jascha 把这个空缺和自己对表征学习 (Representation Learning) 的兴趣放在一起，最后写成了第一篇扩散模型论文。</p>
+      
+    </section>
+<section class="sec" id="e1-s5">
+      <h4><button class="ts" type="button" data-t="399">6:39</button><span>Jarzynski 与 Radford Neal 的两篇论文</span></h4>
+      <p>2015 年的论文引用了两篇启发它的工作：物理学家 Christopher Jarzynski 的论文和统计学家 Radford Neal 的论文。两篇都不涉及图像，讨论的是怎样把一个分布变换成另一个，尤其是其中一个难以计算的时候。</p>
+      <p>热力学第二定律是一个不等式：自由能的变化不超过对系统做的功。Jarzynski 证明它可以写成等式，即 <span class="m"><i>e</i><sup>−Δ<i>F</i>/<i>k</i><i>T</i></sup> = ⟨<i>e</i><sup>−<i>W</i>/<i>k</i><i>T</i></sup>⟩</span>，右边是对所有实现过程取平均。Jascha 觉得这件事很惊人：所用的数学只是高中到大学低年级的水平，这个等式却几十年没人发现。</p>
+      <p>Neal 的论文是退火重要性采样 (Annealed Importance Sampling)：在两个分布之间采样轨迹，用来估计归一化常数。它和 Jarzynski 等式是同一个关系，只是用机器学习的语言表述。Jascha 说，读 Neal 的论文几乎能看出作者是在哪一段意识到物理学家已经发现过这一点。</p>
+      <div class="note"><p><span class="lbl">注</span>Jascha 先说 Jarzynski 的论文在 1994 年左右，随即改口 1997 年。这篇《Nonequilibrium Equality for Free Energy Differences》1997-04-07 发表在 Physical Review Letters；Neal 的论文 1998-03-08 发到 arXiv，2001 年正式发表。由 Jensen 不等式，Jarzynski 等式可以推回第二定律 <span class="m">Δ<i>F</i> ≤ ⟨<i>W</i>⟩</span>。</p></div>
+    </section>
+<section class="sec" id="e1-s6">
+      <h4><button class="ts" type="button" data-t="646">10:46</button><span>为什么能用于图像：逐步加噪与逆向生成</span></h4>
+      <p>扩散模型的做法是从数据分布出发，逐步给干净图像加噪声，让它经历一个扩散过程，越来越像从高斯分布中采样得到的样本。生成时不必一步把噪声映射回图像，而是拆成很多小步，每一步只预测噪声少一点的图像。</p>
+      <p>Jascha 认为，能走很多很多步，是问题变得容易的原因。Slater 的疑问是：在很短的时间尺度上，正向和逆向看起来差不多，这可以理解；令人惊讶的是靠这些小步居然能一路倒回去，好比让打碎的玻璃复原。</p>
+      <p>Jascha 说，项目早期跟人讨论时，对方常常难以置信，因为混合好的布丁不可能再分开。关键在于这里训练了一个模型来降低熵，把样本推向一个已知的分布，而不是把过程倒放、期望它碰巧回到起点。</p>
+      <p>他也提到一个细节：加噪之后信息被移除，此时预测原图，得到的分布必然比原来那个数据点更分散，所以逆推时会出现模糊的图像。</p>
+      <div class="note"><p><span class="lbl">注</span>“模糊的预测”在第 3 期有更完整的解释：网络学到的是所有可能原图的条件期望，见第 3 期的“Perspectives on Diffusion”一节。</p></div>
+    </section>
+<section class="sec" id="e1-s7">
+      <h4><button class="ts" type="button" data-t="887">14:47</button><span>最初的 CIFAR 实验与物理直觉</span></h4>
+      <p>Slater 问，从统计力学的通用方法跳到图像生成，跨度很大，直觉从哪里来。Jascha 回到非平衡统计力学：那里很多工作研究的就是局部逆转熵增的轨迹，比如麦克斯韦妖 (Maxwell's Demon) 把快分子放右边、慢分子放左边，得到一冷一热两侧。</p>
+      <p>分拣本身需要处理和存储信息，这个代价抵消了分拣带来的收益。这一类“用信息交换熵”的思想，让他更容易想到可以把熵从系统里排出，恢复一个非常复杂的分布。对于第一批 CIFAR 样本，他的评价是：放在论文发表的那一年，效果算是不错。</p>
+      
+    </section>
+<section class="sec" id="e1-s8">
+      <h4><button class="ts" type="button" data-t="1014">16:54</button><span>GAN 时代：扩散模型的沉寂期</span></h4>
+      <p>GAN 比第一篇扩散论文早九个月（arXiv 2014-06-10），Alec Radford 等人的 DCGAN 在 2015-11-19 发布。此后约五年，图像生成的重心都在 GAN 上，Slater 称之为扩散模型的“小冰河期”。</p>
+      <p>Jascha 说扩散模型那几年基本被遗忘了。GAN、变分自编码器 (Variational Autoencoder)、基于流的模型和扩散模型出现的时间很接近，大家多半在并行地发展这些想法。扩散模型只有少数后续论文，他自己也转去做别的问题。</p>
+      <p>他总结了扩散模型当时的优劣。优势是容易引导，能很好地控制生成内容，而且可组合，做图像修复、和分类器结合都方便。劣势是计算量大：当时用尽算力才生成出不好看的 CIFAR 图像，要让大家多花一千倍算力，说服力不够。原因是逆向过程需要很多步。</p>
+      
+    </section>
+<section class="sec" id="e1-s9">
+      <h4><button class="ts" type="button" data-t="1191">19:51</button><span>扩散模型是否注定胜出</span></h4>
+      <p>Slater 问，在那段时间里，Jascha 是否相信扩散模型终将胜出。毕竟大约从 2021 年起，最好的商业图像生成产品几乎都基于扩散。Jascha 的回答是没有，现在也没有这种看法。</p>
+      <p>他列出决定模型质量的几个因素：训练数据的质量和数量，网络架构，目标函数和训练框架（GAN、扩散或其他），以及优化器。对多数图像、视频、音频任务，扩散模型目前是最好的选择，但差距不大。自回归模型同样能做这些任务，代价是更多算力和更麻烦的引导方式。各类模型的差异主要是边际上的取舍。</p>
+      
+    </section>
+<section class="sec" id="e1-s10">
+      <h4><button class="ts" type="button" data-t="1298">21:38</button><span>DDPM 与宋飏的分数方法</span></h4>
+      <p>Jonathan Ho 写 DDPM（2020-06-19）时把草稿发给了 Jascha，他很高兴有人找到了那篇论文并在上面继续做，也感谢 Ho 在论文里充分肯定了原始工作。不过读稿时他没有预料到 DDPM 的影响会这么大，以为扩散模型只是达到了和其他方法相近的水平。</p>
+      <p>他认为扩散模型后来流行，主要靠的是损失指标以外的优势，也就是可引导和可组合。</p>
+      <p>同一时期，斯坦福的宋飏在做基于分数的方法：一边做朗之万 (Langevin) 采样，一边逐渐降低温度（噪声水平）。Jascha 认为这是向扩散模型的趋同演化，宋飏起初并不知道扩散模型的工作；即使没有 DDPM，宋飏大概一两年内也会得到相似结果，可能还有另外几家实验室在做同样的事。</p>
+      <div class="note"><p><span class="lbl">注</span>宋飏的第一篇分数模型论文 NCSN 是 2019-07-12 发布的，比 DDPM 早将近一年，第 2 期有他本人的讲述。</p></div>
+    </section>
+<section class="sec" id="e1-s11">
+      <h4><button class="ts" type="button" data-t="1411">23:31</button><span>多种解释：趋同演化还是不同路线</span></h4>
+      <p>Slater 提到 Sander Dieleman 的博客文章，里面列了理解扩散模型的多种视角，可以从中认出 DDPM、早期分数方法和朗之万动力学、Flow Matching 各自对应的那一种。他问：这些是同一想法的变体，还是有些路线本质不同，沿技术树继续走会通往别处。</p>
+      <p>Jascha 的回答是两者都有。能从这么多起点讲出同一类模型的故事，说明存在某种趋同演化；但不同视角会带来不同的能力和取舍。例如从概率图模型的视角，可以得到加速采样的技术；一致性模型 (Consistency Model) 则来自基于流的视角，不从这个角度思考就不容易想到。</p>
+      <div class="note"><p><span class="lbl">注</span>Sander 的那篇是 2023-07-20 发布的《Perspectives on diffusion》。主持人这里说“二十种”，第 3 期又说“十一二种”，以原文为准。</p></div>
+    </section>
+<section class="sec" id="e1-s12">
+      <h4><button class="ts" type="button" data-t="1525">25:25</button><span>值得尝试的冷门方向</span></h4>
+      <p>Slater 问，2015 年的扩散模型是一个很奇怪的方向，今天有没有同样奇怪、还没被充分开发的东西。Jascha 说扩散模型已经长成一片密林，论文多到读不完，邻近的空间被探索得很密；如果今天要做既有影响又奇怪的研究，他不会选图像建模。他先声明，现在的研究生会有比他更新鲜的想法，然后举了几个例子。</p>
+      <p>第一类是非图灵式计算。我们在图灵机上建起了整棵技术树，但如今大部分算力用于另一种计算：接收输入，以非线性方式产生输出，有许多可调的旋钮，不需要 if-else 或循环。用逻辑门实现这种系统，只是因为已有的技术积累。可以考虑模拟计算，或者直接利用某种物理介质。</p>
+      <p>第二类是只用前向传播训练模型。目前训练的很多复杂性来自反向传播的实现，如果能只靠前向传播训练，可以省掉大量配套的机制、硬件和时间。</p>
+      <p>第三类是当年因为算力和数据不够而失败的想法。神经网络在 20 世纪 60 年代和 80 年代都试过，80 年代的架构已经和今天很接近。Jascha 说 Andrej Karpathy 提过的进化计算就属于这一类：进化本身显然有效，进化计算的历史尝试大多失败，很可能只是规模不够。元学习 (Meta-Learning) 也类似：给足算力和数据，学出来的函数总会胜过手工设计的，但我们仍在手工设计优化器、损失函数和架构。</p>
+      
+    </section>
+<section class="sec" id="e1-s13">
+      <h4><button class="ts" type="button" data-t="1861">31:01</button><span>回顾十年：最意外的进展</span></h4>
+      <p>最后一个问题是十年里最让他意外的事。Jascha 说，2015 年他们连 32 × 32 的小图像块都建模得不好，当时绝对想不到不到十年就能生成几乎与现实无法区分的视频和音频。这些模型本身的能力，是他最没有预料到的。</p>
+      
+    </section>
+      <section class="sec keys"><h4>这一期记住这几条</h4><ul><li>扩散模型的数学来自非平衡统计力学：Jarzynski 等式和 Neal 的退火重要性采样，都是在两个分布之间沿轨迹采样。</li><li>核心做法是把“从噪声一步生成图像”拆成很多小步，并训练一个模型在每一步降低熵，而不是指望过程自己倒回去。</li><li>2015 到 2020 年的沉寂主要因为计算代价；后来的流行靠的是可引导、可组合，而不只是损失更低。</li><li>DDPM 和宋飏的分数方法是独立走到一起的，Jascha 不认为扩散模型注定胜出，质量取决于数据、架构、目标函数、优化器的整体组合。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/e1-300.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV16LWt6uE8T/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场</span></button></li><li><button type="button" data-t="29"><b>0:29</b><span>嘉宾介绍</span></button></li><li><button type="button" data-t="76"><b>1:16</b><span>2015 年的那篇论文与当时的深度学习</span></button></li><li><button type="button" data-t="103"><b>1:43</b><span>研究动机：计算神经科学与世界模型</span></button></li><li><button type="button" data-t="233"><b>3:53</b><span>非平衡统计力学与机器学习的联系</span></button></li><li><button type="button" data-t="399"><b>6:39</b><span>Jarzynski 与 Radford Neal 的两篇论文</span></button></li><li><button type="button" data-t="646"><b>10:46</b><span>为什么能用于图像：逐步加噪与逆向生成</span></button></li><li><button type="button" data-t="887"><b>14:47</b><span>最初的 CIFAR 实验与物理直觉</span></button></li><li><button type="button" data-t="1014"><b>16:54</b><span>GAN 时代：扩散模型的沉寂期</span></button></li><li><button type="button" data-t="1191"><b>19:51</b><span>扩散模型是否注定胜出</span></button></li><li><button type="button" data-t="1298"><b>21:38</b><span>DDPM 与宋飏的分数方法</span></button></li><li><button type="button" data-t="1411"><b>23:31</b><span>多种解释：趋同演化还是不同路线</span></button></li><li><button type="button" data-t="1525"><b>25:25</b><span>值得尝试的冷门方向</span></button></li><li><button type="button" data-t="1861"><b>31:01</b><span>回顾十年：最意外的进展</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+<div class="view" id="view-ep2">
+<details class="ep" id="e2" data-bv="BV1aaWt6tEqD" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">二</span>
+    <span class="tt"><b>宋飏：分数匹配、SDE 与一致性模型</b><em>History of Diffusion 第 2 期 · YouTube 2025-04-14</em><span class="hook">分数匹配怎样从能量模型的训练难题里来，SDE 和概率流 ODE 的两个意外，一致性模型为什么能一步生成，以及他对自回归与扩散统一的判断。</span></span>
+    <span class="side"><span class="chip">宋飏 · Yang Song</span><span class="len">38:19</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">宋飏是 NCSN（2019-07-12）、Score SDE（2020-11-26）和一致性模型（2023-03-02）的第一作者。访谈录制时他在 OpenAI 领导 Strategic Explorations 团队，并已拿到加州理工学院的教职邀请。</p>
+      <p class="lede">这一期按他的三条研究线展开。主持人反复问同一个问题：某个关键结论是事先预料到的，还是做出来之后的意外。宋飏的回答多半是后者。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1aaWt6tEqD/" target="_blank" rel="noreferrer">B 站（中英字幕） ↗</a><a href="https://www.youtube.com/watch?v=ud6z5SkjoZI" target="_blank" rel="noreferrer">YouTube 原视频 ↗</a><a href="https://arxiv.org/abs/1907.05600" target="_blank" rel="noreferrer">NCSN 论文 ↗</a><a href="https://arxiv.org/abs/2011.13456" target="_blank" rel="noreferrer">Score SDE 论文 ↗</a><a href="https://arxiv.org/abs/2303.01469" target="_blank" rel="noreferrer">一致性模型论文 ↗</a></p>
+      <section class="sec" id="e2-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>开场</span></h4>
+      <p>片头取自访谈后段：生成建模的历史上反复出现同一种情况。DCGAN 之前 GAN 的效果并不好；最新一代扩散模型论文之前，最早的扩散模型数学表述几乎已经完整，只是效果不好。缺的是把模型训练好、扩大规模的具体配方。他说刚发布的那篇论文，对一致性模型做的就是这件事。</p>
+      
+    </section>
+<section class="sec" id="e2-s1">
+      <h4><button class="ts" type="button" data-t="38">0:38</button><span>嘉宾介绍</span></h4>
+      <p>Slater 把宋飏的工作分成三块：分数匹配在扩散模型中的应用和这个想法的历史；扩散模型的 SDE 与 ODE 解释，它统一了此前的很多研究；一致性模型。</p>
+      <p>他认为这些工作的特点是两头都有收获：实践上带来了更快的推理和更多控制生成的方法，理论上通过和物理学、早期能量模型研究的类比，让人更清楚扩散模型在做什么。</p>
+      
+    </section>
+<section class="sec" id="e2-s2">
+      <h4><button class="ts" type="button" data-t="93">1:33</button><span>2019 年：为什么研究分数匹配</span></h4>
+      <p>当时图像生成有几条路线。GAN 很难训练，要靠很多技巧才能工作；变分自编码器容易训练，但样本质量不如 GAN。宋飏想找一种既容易训练、样本又好的方法。</p>
+      <p>他那时在研究能量模型 (Energy-Based Model)。能量模型和 GAN 一样，可以用很灵活的神经网络架构来参数化，潜力很大，问题是难训练。分数匹配 (Score Matching) 可以训练能量模型而不需要大量额外计算，但它是个老概念，得先让它真正工作起来。</p>
+      <p>他说当时他们并不知道扩散模型，尽管 2015 年的论文早已发表；是后来更多论文出现，才意识到两者之间的联系。</p>
+      
+    </section>
+<section class="sec" id="e2-s3">
+      <h4><button class="ts" type="button" data-t="217">3:37</button><span>MCMC 训练的代价</span></h4>
+      <p>能量模型的经典训练方法要用 MCMC（马尔可夫链蒙特卡洛，Markov Chain Monte Carlo）从模型中采样，对比散度 (Contrastive Divergence) 之类的技巧是为了加快这一步。宋飏说问题在于 MCMC 采样本身很贵，而每次训练迭代都要做一次，累积起来成本极高。</p>
+      <p>他相信有更好的办法，因为当时已经有核化 Stein 差异 (Kernelized Stein Discrepancy) 和更早的分数匹配，这些方法完全不需要从能量模型中采样。只是没人展示过它们训练能量模型的能力，要用到深度神经网络上，还需要一些额外的创新和工程技巧。</p>
+      
+    </section>
+<section class="sec" id="e2-s4">
+      <h4><button class="ts" type="button" data-t="299">4:59</button><span>分数匹配的来历与 Hinton 的致谢</span></h4>
+      <p>分数匹配是宋飏从文献里读到的，它和对比散度关系很近。分数匹配的提出者 Aapo Hyvärinen 和 Geoff Hinton 合作过，写过一篇讨论分数匹配与对比散度联系的论文，所以知道那篇论文的人沿分数匹配方向走是很自然的。</p>
+      <p>他讲了一个细节：Hyvärinen 在那篇论文的致谢里说，Hinton 深度参与了项目，但拒绝署名，原因是论文里的数学公式太多。</p>
+      <div class="note"><p><span class="lbl">注</span>主持人中途插问的 Brian Anderson，是下文逆时间 SDE 那篇 1982 年论文的作者，和分数匹配无关，宋飏随即更正为 Aapo。</p></div>
+    </section>
+<section class="sec" id="e2-s5">
+      <h4><button class="ts" type="button" data-t="381">6:21</button><span>朴素分数匹配的难题与 Jascha 的劝告</span></h4>
+      <p>NCSN 论文开头先解释了为什么直接使用分数匹配行不通。Slater 列了三个问题：在数据分布很稀疏的低密度区域，训练效果很差；数据流形的维度低于所在空间的维度；反向传播要计算分数函数完整的雅可比矩阵，规模很大。</p>
+      <p>宋飏说，也许因为自己当时是个无所畏惧的研究生，对这些困难了解不多；如果已经做了五年分数匹配，可能会更悲观。2018 年他在 ICLR 上和 Jascha 聊过，Jascha 早年研究过分数匹配，还把它推广成最小概率流 (Minimum Probability Flow) 等形式。Jascha 基本上是在劝他放弃，认为分数匹配有根本性的障碍，无法让大规模神经网络训练奏效。</p>
+      <p>Jascha 的担心是，分数匹配只关注分布的局部结构。用 MCMC 采样是为了估计归一化常数，而归一化常数是全局性质，只看局部却绕开了这个难题，不可能是免费的午餐。宋飏认为这个批评有道理，但用高斯噪声扰动数据之后再做分数匹配，其中很多问题就消失了。他觉得分数匹配的数学太漂亮，做不成实在可惜，于是坚持了下来。</p>
+      <div class="note"><p><span class="lbl">注</span>雅可比矩阵的问题，宋飏 2019-05-17 的 Sliced Score Matching 给过一种解法；NCSN 用的是去噪分数匹配 (Denoising Score Matching)，目标里不出现雅可比矩阵的迹。第 3 期 Sander 也说，多噪声尺度是让分数匹配奏效的关键。</p></div>
+    </section>
+<section class="sec" id="e2-s6">
+      <h4><button class="ts" type="button" data-t="606">10:06</button><span>为什么转向连续时间的 SDE</span></h4>
+      <p>离散的采样器已经工作得不错，为什么还要做连续时间？宋飏说部分原因是 DDPM。他们写完两篇基于分数的模型论文后，Jonathan Ho 发表了 DDPM，两类方法之间显然有很强的联系，应该能统一起来。</p>
+      <p>DDPM 的表述没法直接用于分数模型里的朗之万动力学 (Langevin Dynamics) 采样步骤，所以要统一两者，就得把一切推广到连续时间。他说是 Jascha 先提出用 SDE 表述：时间步数趋于无穷时，它就是离散时间扩散模型的数学推广。他自己找到了逆时间 SDE 和 ODE 的表述，合在一起得到一个同时涵盖 DDPM 采样和分数模型采样的统一采样器。</p>
+      
+    </section>
+<section class="sec" id="e2-s7">
+      <h4><button class="ts" type="button" data-t="704">11:44</button><span>逆时间 SDE 与分数函数</span></h4>
+      <p>Slater 说这篇论文里第一个让他吃惊的地方是：写出正向 SDE 很自然，直觉上逆时间方程应该很复杂，大概没有闭式解；结果它不仅有简洁的闭式，而且唯一未知的量恰好是数据分布对数密度的梯度，也就是分数匹配训练的那个量。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>d</i><i>x</i> = <i>f</i>(<i>x</i>, <i>t</i>) <i>d</i><i>t</i> + <i>g</i>(<i>t</i>) <i>d</i><i>w</i></span></span><span class="dc">正向 SDE</span></div><div><span class="df"><span class="m"><i>d</i><i>x</i> = [<i>f</i>(<i>x</i>, <i>t</i>) − <i>g</i>(<i>t</i>)<sup>2</sup> ∇<sub><i>x</i></sub> log <i>p</i><sub><i>t</i></sub>(<i>x</i>)] <i>d</i><i>t</i> + <i>g</i>(<i>t</i>) <i>d</i><i class="aov">w</i></span></span><span class="dc">逆时间 SDE，未知的只有分数 <span class="m">∇<sub><i>x</i></sub> log <i>p</i><sub><i>t</i></sub>(<i>x</i>)</span></span></div></div>
+      <p>宋飏说他事先也没想到。他和 Jascha 都有物理背景，知道扩散过程的逆过程也是扩散过程，但逆过程的闭式在机器学习界并不为人所知。既然逆过程也应该是一个 SDE，就一定有闭式解或相关公式，他去查文献，找到一篇澳大利亚学者写的论文，里面明确给出了逆时间 SDE。从那个公式直接推导，得到了含分数函数的简单形式。看到分数函数出现，他就知道这是统一分数模型和扩散模型的正确路线。</p>
+      <div class="note"><p><span class="lbl">注</span>宋飏说那篇论文是“上世纪七十年代”的。Score SDE 引用的是 Brian D. O. Anderson 的《Reverse-time diffusion equation models》，1982 年 5 月发表在 Stochastic Processes and their Applications。</p></div>
+    </section>
+<section class="sec" id="e2-s8">
+      <h4><button class="ts" type="button" data-t="838">13:58</button><span>概率流 ODE</span></h4>
+      <p>第二个意外：就算接受逆时间方程有闭式这件事，有了好的 SDE 采样器本来也够了；论文又指出可以写出一个确定性的 ODE，它在每个时刻的边缘分布和随机过程完全相同。这样多年积累的 ODE 方法都能用于逆时间采样。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>d</i><i>x</i> = [<i>f</i>(<i>x</i>, <i>t</i>) − ½ <i>g</i>(<i>t</i>)<sup>2</sup> ∇<sub><i>x</i></sub> log <i>p</i><sub><i>t</i></sub>(<i>x</i>)] <i>d</i><i>t</i></span></span><span class="dc">概率流 ODE：没有噪声项，边缘分布 p<sub>t</sub> 与上面的 SDE 相同</span></div></div>
+      <p>宋飏说这同样是个惊喜。统一了朗之万采样和 DDPM 采样之后，自然要问能否进一步推广采样方法。这个问题本质上是怎样从 SDE 的边缘分布采样，SDE 文献里早有研究，他在此前一篇论文里找到了 ODE 表述，考虑 SDE 对应的 Fokker-Planck 方程，推导相当直接。</p>
+      <p>那篇论文没有意识到的是，用这个 ODE 可以计算精确的似然。它还把归一化流 (Normalizing Flow)、神经 ODE (Neural ODE) 和扩散模型联系了起来。</p>
+      
+    </section>
+<section class="sec" id="e2-s9">
+      <h4><button class="ts" type="button" data-t="971">16:11</button><span>几何直觉：引导、条件生成与逆问题</span></h4>
+      <p>Slater 喜欢分数方法的几何直觉：写出贝叶斯公式，取对数，再取梯度，就会发现想朝某个类别标签或条件信息的方向生成，只需加上相应的梯度，使逆向过程朝那个方向偏移。</p>
+      <div class="deriv"><div><span class="df"><span class="m">∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i> | <i>y</i>) = ∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i>) + ∇<sub><i>x</i></sub> log <i>p</i>(<i>y</i> | <i>x</i>)</span></span><span class="dc">条件分数 = 无条件分数 + 分类器的梯度</span></div></div>
+      <p>宋飏说这本来就是分数模型的优势，SDE 之前就知道可以用它做贝叶斯推断；得克萨斯大学奥斯汀分校已有研究用分数模型求解逆问题，逆问题求解基本上就是贝叶斯推断，也是一种引导。SDE 表述里再次出现分数函数，意味着适用于分数函数的技巧都可以直接搬过来：逆问题、引导、类别条件采样、文生图。</p>
+      <p>他记得截稿前大约一周，Jascha 提议：既然条件生成和逆问题已经有了很好的表述，可以找一个从图像生成文本的模型，把它反过来，就能根据文本生成图像。那是 2020 年。</p>
+      
+    </section>
+<section class="sec" id="e2-s10">
+      <h4><button class="ts" type="button" data-t="1126">18:46</button><span>ODE 求解器与采样速度</span></h4>
+      <p>走 ODE 这条路的一大好处，是有大量高度优化的 ODE 求解器，理论上能显著提高采样效率。宋飏说这并不是最初的动机，当时他想要的是精确计算似然。推导出 ODE、用它生成样本之后，他们统计了求解器的函数求值次数，发现比扩散模型通常的采样步数少得多，这也是意外收获。</p>
+      
+    </section>
+<section class="sec" id="e2-s11">
+      <h4><button class="ts" type="button" data-t="1194">19:54</button><span>一致性模型：一步生成</span></h4>
+      <p>此前多数扩散模型要做几十步迭代采样，一致性模型 (Consistency Model) 则说不必这样，可以一步从噪声回到原始数据分布。宋飏说直觉来自 ODE 解释：一致性模型可以看作一个学出来的 ODE 求解器，一步解完 ODE。有了 ODE，一步求解在理论上就可行，剩下的只是怎样学出这个求解器。</p>
+      <p>论文有两个主要想法。一是一致性蒸馏 (Consistency Distillation)：给定预训练的扩散模型，把它微调成一致性模型，省下大量算力，效果通常也更好。他说这是论文里比较直接的部分，因为写出 ODE 之后可以用任意求解器去解，学出来的一致性模型只是选项之一。</p>
+      <p>二是一致性训练 (Consistency Training)：从零训练，完全不依赖扩散模型，这让一致性模型成为一个独立的生成模型家族。宋飏对这一点更自豪。长期以来人们想要一种能一步采样、又不需要对抗训练的生成模型，此前的选择只有 GAN，而 GAN 难训练、训练动态复杂。他认为一致性模型是唯一具备这种性质、样本质量又能和 GAN 相比的模型家族。</p>
+      <div class="note"><p><span class="lbl">注</span>第 3 期 Slater 把宋飏的这个回答转述给 Sander，Sander 的看法是：一致性模型学的是同一个映射的另一种刻画，但到目前为止，先训练扩散模型仍是找到这个映射最实用的办法。</p></div>
+    </section>
+<section class="sec" id="e2-s12">
+      <h4><button class="ts" type="button" data-t="1401">23:21</button><span>架构：U-Net 与 Transformer</span></h4>
+      <p>扩散模型似乎比较不依赖具体架构：最早的分数匹配论文和 DDPM 都用 U-Net，后来转向交叉注意力，再到更接近 Transformer 的系统。宋飏说不依赖架构正是开发分数模型和扩散模型时明确追求的目标之一：对架构的约束少，可探索的空间就大，找到好架构的可能性也更高。</p>
+      <p>最初选 U-Net 有理论和实验两方面的原因。分数模型最初是能量模型的替代，分数是能量的梯度；如果能量模型是卷积网络，它的梯度的结构就和 U-Net 很像。实验上，他试过计算机视觉文献里的大量架构，包括空洞卷积和各种分割网络，U-Net 明显最好。</p>
+      <p>现在大家转向 Transformer，它在规模大时表现好。他认为比较收敛速度，U-Net 仍然更快，只是训练足够久之后 Transformer 可能更占优势，所以 U-Net 在不少应用里仍有优势。</p>
+      <p>Stable Diffusion 没让他太意外，因为同一组作者此前有 Taming Transformers（2020-12-17），两篇思路很近，区别是把隐空间里的 Transformer 换成了隐空间里的扩散模型，而且他记得 Stable Diffusion 在隐空间里用的仍是 U-Net。DiT（2022-12-19）是最早系统研究用 Transformer 做扩散的论文之一，他也不意外，自己做过类似实验。他高兴的是现在可以用 Transformer 统一各种架构，也更容易和基于 Transformer 的语言模型整合。</p>
+      
+    </section>
+<section class="sec" id="e2-s13">
+      <h4><button class="ts" type="button" data-t="1700">28:20</button><span>改进一致性模型的训练</span></h4>
+      <p>录制时宋飏刚发布了改进一致性模型训练的新论文。他说最主要的结论是：一致性模型现在只用两步采样，样本质量就能非常接近最好的扩散模型，很多应用已经可以实时生成；而且它至少和扩散模型一样能扩大规模。</p>
+      <p>和最初的论文相比，数学表述两年来没怎么变，变化在于仔细做了各种消融实验，找到了一套能在大规模上训练一致性模型的通用方法。他说找到让方法真正奏效的配方往往更重要，生成建模的历史上反复如此：DCGAN 之于 GAN，新一代扩散论文之于最早的扩散模型。</p>
+      <div class="note"><p><span class="lbl">注</span>访谈里没说论文名。按“两步采样”“大规模训练”的描述，最接近 2024-10-14 发布的 sCM（Simplifying, Stabilizing and Scaling Continuous-Time Consistency Models，Cheng Lu、宋飏）。</p></div>
+    </section>
+<section class="sec" id="e2-s14">
+      <h4><button class="ts" type="button" data-t="1824">30:24</button><span>自回归与扩散能否统一</span></h4>
+      <p>Slater 引用 Sander Dieleman 的说法：如今有两种生成范式，语言建模里是离散 token 的自回归范式，图像、视频、音频这类更连续的内容用扩散范式。会一直分开，还是有机会统一？</p>
+      <p>宋飏认为一定会统一。两者看起来不同，本质是同一种方法：自回归模型可以看作扩散模型的特例，某种程度上扩散模型也可以看作在隐空间里做自回归。把两者放进同一个框架并不难，未来的大规模多模态生成模型一定会这样做。</p>
+      <p>但这不是生成建模的终点。两类方法都有局限，最明显的是采样速度：语言模型的自回归生成偏慢，扩散模型生成图像和视频也很慢。应该存在更好的生成模型表述，能大幅加快采样，一致性模型是一种可能的路线，这也是他研究它的原因。</p>
+      
+    </section>
+<section class="sec" id="e2-s15">
+      <h4><button class="ts" type="button" data-t="1947">32:27</button><span>从低频到高频：图像与语言的差别</span></h4>
+      <p>Slater 的直觉是：扩散模型先确定低频，逆时间推进时逐步加入更高频的信息；自回归的下一 token 预测里看不出这样的顺序，每个 token 携带的信息量似乎差不多。</p>
+      <p>宋飏同意这个直觉，并给出解释：语言是人类发展出来的，信息密度远高于图像像素；人类大致按自回归的方式处理语言，语言某种意义上就是为这种处理方式而形成的，所以用自回归生成语言很自然。对图像来说，从低频到高频几乎可以看作一种描述图像的语言：先说整体颜色、整体结构，再逐步转到细节。扩散过程隐式地做了这件事。</p>
+      <div class="note"><p><span class="lbl">注</span>第 3 期 Sander 用“频域自回归”专门讨论了这个视角，并解释了为什么这个顺序在图像上近似成立。</p></div>
+    </section>
+<section class="sec" id="e2-s16">
+      <h4><button class="ts" type="button" data-t="2066">34:26</button><span>给年轻研究者的建议</span></h4>
+      <p>最后一个问题是学术界和产业界的年轻研究者该怎样选项目。宋飏说，无论在哪里，最重要的都是研究最重要的问题，其余限制都是次要的。</p>
+      <p>对学术界的人，他建议不要过于围绕发表论文，而是把一个项目真正推到终点，也可以参与大规模开源项目，利用学术界的资源产生更大影响。GPU 不够、软件工程师不够这些困难，都有办法绕开。</p>
+      <p>Slater 提到 Richard Hamming 的做法：问别人所在领域最重要的问题是什么，再问对方是不是在研究它。宋飏完全同意，并说如果有人认为最重要的问题必须靠大量 GPU 才能解决，那就应该离开学术界去产业界，人可以选择环境，不必被所在的位置限制。Slater 的总结是先决定更高一层的问题，也就是该研究什么，再由它决定合适的环境。</p>
+      <div class="note"><p><span class="lbl">注</span>Hamming 的说法出自他 1986-03-07 在 Bellcore 的演讲《You and Your Research》。</p></div>
+    </section>
+      <section class="sec keys"><h4>这一期记住这几条</h4><ul><li>分数匹配最初是为了训练能量模型而不做 MCMC；让它在高维数据上奏效的关键，是用多个噪声尺度的高斯扰动数据。</li><li>逆时间 SDE 的未知量正好是分数，这把分数模型和 DDPM 统一到同一个框架里；概率流 ODE 进一步带来精确似然和更少的函数求值次数。</li><li>一致性模型可以理解为学出来的一步 ODE 求解器，宋飏更看重的是能从零训练、不需要对抗训练的那一半。</li><li>他认为自回归与扩散一定会统一，但两者的采样速度都不够快，生成建模还没到终点。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/e2-1500.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1aaWt6tEqD/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场</span></button></li><li><button type="button" data-t="38"><b>0:38</b><span>嘉宾介绍</span></button></li><li><button type="button" data-t="93"><b>1:33</b><span>2019 年：为什么研究分数匹配</span></button></li><li><button type="button" data-t="217"><b>3:37</b><span>MCMC 训练的代价</span></button></li><li><button type="button" data-t="299"><b>4:59</b><span>分数匹配的来历与 Hinton 的致谢</span></button></li><li><button type="button" data-t="381"><b>6:21</b><span>朴素分数匹配的难题与 Jascha 的劝告</span></button></li><li><button type="button" data-t="606"><b>10:06</b><span>为什么转向连续时间的 SDE</span></button></li><li><button type="button" data-t="704"><b>11:44</b><span>逆时间 SDE 与分数函数</span></button></li><li><button type="button" data-t="838"><b>13:58</b><span>概率流 ODE</span></button></li><li><button type="button" data-t="971"><b>16:11</b><span>几何直觉：引导、条件生成与逆问题</span></button></li><li><button type="button" data-t="1126"><b>18:46</b><span>ODE 求解器与采样速度</span></button></li><li><button type="button" data-t="1194"><b>19:54</b><span>一致性模型：一步生成</span></button></li><li><button type="button" data-t="1401"><b>23:21</b><span>架构：U-Net 与 Transformer</span></button></li><li><button type="button" data-t="1700"><b>28:20</b><span>改进一致性模型的训练</span></button></li><li><button type="button" data-t="1824"><b>30:24</b><span>自回归与扩散能否统一</span></button></li><li><button type="button" data-t="1947"><b>32:27</b><span>从低频到高频：图像与语言的差别</span></button></li><li><button type="button" data-t="2066"><b>34:26</b><span>给年轻研究者的建议</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+<div class="view" id="view-ep3">
+<details class="ep" id="e3" data-bv="BV1QaWt6tE92" data-p="1" data-start="0" open>
+  <summary>
+    <span class="no">三</span>
+    <span class="tt"><b>Sander Dieleman：理解扩散的多种视角</b><em>History of Diffusion 第 3 期 · YouTube 2025-05-14</em><span class="hook">条件期望、频域自回归、最优输运、循环网络，Sander 用这几个视角解释扩散模型为什么有效，也谈语言扩散、引导和少步生成的极限。</span></span>
+    <span class="side"><span class="chip">Sander Dieleman</span><span class="len">45:05</span></span>
+  </summary>
+  <div class="epb">
+    <div class="epmain">
+      <p class="lede">Sander Dieleman 是 Google DeepMind 的研究科学家，做图像、视频、音频和音乐的生成模型。他的博客 sander.ai 是很多人学扩散模型的入口，主持人也说，他问过的研究者几乎都推荐了这个博客。</p>
+      <p class="lede">前两期讲的多是论文的来历，这一期主要谈怎样理解扩散模型。访谈录于 2025 年，里面关于语言扩散模型规模的说法是当时的情况。</p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1QaWt6tE92/" target="_blank" rel="noreferrer">B 站（中英字幕） ↗</a><a href="https://www.youtube.com/watch?v=ktPGNhe11cQ" target="_blank" rel="noreferrer">YouTube 原视频 ↗</a><a href="https://sander.ai/2023/07/20/perspectives.html" target="_blank" rel="noreferrer">Perspectives on diffusion ↗</a><a href="https://sander.ai/2024/09/02/spectral-autoregression.html" target="_blank" rel="noreferrer">Diffusion is spectral autoregression ↗</a></p>
+      <section class="sec" id="e3-s0">
+      <h4><button class="ts" type="button" data-t="0">0:00</button><span>开场</span></h4>
+      <p>片头取自访谈中段：现在一种范式最适合语言，另一种范式几乎最适合其他一切。Sander 不认为这种局面能长久，从长远看，我们不会一直容忍这种复杂性。</p>
+      
+    </section>
+<section class="sec" id="e3-s1">
+      <h4><button class="ts" type="button" data-t="24">0:24</button><span>嘉宾介绍</span></h4>
+      <p>Slater 说，他刚开始对扩散模型感兴趣时问过很多研究者该读什么，大家都指向 Sander 的博客：它对扩散的关键思想有深入而直观的解释，也写前沿话题。这一期既谈 Sander 的工作，也谈他怎样看扩散模型发展史上的关键事件。</p>
+      
+    </section>
+<section class="sec" id="e3-s2">
+      <h4><button class="ts" type="button" data-t="79">1:19</button><span>Perspectives on Diffusion：最常用的理解方式</span></h4>
+      <p>Slater 最早读到的是 2023-07-20 的《Perspectives on diffusion》，文中列出十几种理解扩散模型的方式。他联想到菲尔兹奖得主 William Thurston 的一篇文章，讲同一个数学概念可以有很多种理解，各有各的用处。他问 Sander 最常回到哪一种。</p>
+      <p>Sander 选的是“扩散模型在估计期望”，他承认这不是最炫的一个。训练时我们监督模型去预测某一张具体的图像，但真正希望它估计的，是所有可能产生这张带噪图像的原图的期望。借助均方误差，模型最终学到的正是这个条件期望。</p>
+      <div class="deriv"><div><span class="df"><span class="m"><i>D</i>(<i>x</i><sub><i>t</i></sub>, <i>t</i>) ≈ <i>E</i>[<i>x</i><sub>0</sub> | <i>x</i><sub><i>t</i></sub>]</span></span><span class="dc">用均方误差训练的去噪器，最优解是给定带噪输入时原图的条件期望</span></div></div>
+      <p>这对理解采样尤其重要。Slater 说自己起初也奇怪，为什么模型在中途给出的预测是模糊的图像；答案就是它在对所有可能的原图求平均。Sander 在另一篇博客里把这件事画在二维输入空间里：扩散模型在空间每一点给出的，是该把输入往哪个方向移动，才能让它在目标分布下更可能出现。</p>
+      <div class="note"><p><span class="lbl">注</span>Thurston 的文章是 1994-04-01 发到 arXiv 的《On proof and progress in mathematics》，原文列举的是理解导数的多种方式。</p></div>
+    </section>
+<section class="sec" id="e3-s3">
+      <h4><button class="ts" type="button" data-t="259">4:19</button><span>一致性模型与最优映射</span></h4>
+      <p>Slater 问，一致性模型这类一步生成的方法直接到达数据分布里的一个具体样本，而不是平均后的模糊结果，这和期望视角怎么对上。Sander 说正因为扩散模型在估计期望，才能看清一致性模型的不同：它不估计期望，而是学习噪声分布中的样本与数据分布中的样本之间的一个映射，这个映射在某种意义上是最优的。</p>
+      <p>扩散模型学的其实是同一个映射，训练扩散模型是目前找出它最容易的办法；找到之后，可以把它蒸馏进一致性模型，理想情况下一次前向传播就完成映射。有意思的是，直接学这个映射要难得多，至少目前看，先训练扩散模型像是一个必要的中间步骤。</p>
+      <p>Slater 转述了宋飏在第 2 期的看法：他最看重的是从零训练一致性模型，几乎把它当作一种新的生成模型。Sander 部分同意：这是对同一个输运映射的另一种刻画，如果能奏效，它更有用，因为一步就得到映射，不必模拟整个过程；但从零学习这个映射实际上更难，到目前为止，先做扩散或 Flow Matching 训练，仍是最实用、最能扩展的路线。</p>
+      
+    </section>
+<section class="sec" id="e3-s4">
+      <h4><button class="ts" type="button" data-t="391">6:31</button><span>频域自回归视角</span></h4>
+      <p>哪个视角被低估了？Sander 说是频域自回归 (Spectral Autoregression)：扩散模型实际上在做一种近似的自回归，只不过发生在频率空间，而不是像素空间。他 2024-09-02 专门写了《Diffusion is spectral autoregression》，让这个想法得到了更多关注，但这不是他首先提出的。</p>
+      <p>他最早是在 Severi Rissanen 等人的论文里读到这个想法。那篇论文讨论的是用模糊而不是高斯噪声作为破坏数据的过程，同时指出扩散模型隐式地在做类似的事：噪声越多，被遮蔽的高频信息越多，最后只剩低频内容可见。</p>
+      <div class="note"><p><span class="lbl">注</span>Rissanen 等人的论文是 2022-06-21 发布的《Generative Modelling With Inverse Heat Dissipation》。</p></div>
+    </section>
+<section class="sec" id="e3-s5">
+      <h4><button class="ts" type="button" data-t="469">7:49</button><span>频谱曲线：理论与实测</span></h4>
+      <p>Slater 回忆，最初的文章只是从基本原理勾勒论证：自然图像的功率谱大致服从幂律，高斯噪声在所有频率上一样，频谱是一条水平线；两者相加后的曲线会在某处弯折。后来的文章对具体图像真的画出了这些曲线，结果几乎一模一样。</p>
+      <p>Sander 说他也没想到理论与实测会这么接近，不过回头看并不意外。图像是二维的，频谱也是二维的，他对所有方向取平均，得到径向平均功率谱密度 (Radially Averaged Power Spectral Density)，这一步平滑掉了大量随机波动。博客里他好像用了 128 张图，即使只用 16 张，曲线也已经很像理论曲线。</p>
+      <p>音频就不一样了。音频是一维信号，频谱也是一维的，没有这种跨方向的平均，曲线要嘈杂得多。</p>
+      
+    </section>
+<section class="sec" id="e3-s6">
+      <h4><button class="ts" type="button" data-t="594">9:54</button><span>生成顺序：频率与 token</span></h4>
+      <p>Slater 的疑问是：图像扩散有一个自然顺序，先低频、再中频、最后高频；离散的下一 token 预测似乎没有这种结构，先生成的 token 和后生成的携带的信息差不多。</p>
+      <p>Sander 先从语言说起。自回归模型把序列的联合分布分解成依次相接的条件分布，按概率论，这可以按任意顺序做。语言建模里序列本身的顺序最自然，有实验发现随意打乱顺序会让学习更难，说明模型的归纳偏置和原始顺序是配合的。</p>
+      <p>用语言建模的范式做图像，先要把图像编码成离散 token 序列，这时就要决定顺序，因为二维对象变成一维序列没有预定的最佳顺序。常见做法是最简单的光栅扫描，但可能存在更有层次的排法，比如从低频到高频。JPEG 在每个 8 × 8 像素块内部就大致按从低频到高频的顺序存储信息。</p>
+      <p>从这个角度看，扩散模型做的是一种软性的版本：不像离散自回归那样严格，但明显是先对低频建模，再以已经确定的低频为条件对高频建模。</p>
+      
+    </section>
+<section class="sec" id="e3-s7">
+      <h4><button class="ts" type="button" data-t="796">13:16</button><span>两种生成范式能否统一</span></h4>
+      <p>Slater 认为 Sander 是最努力连接两种生成方式的人之一，问他长期怎么看。Sander 说他在博客里写过扩散为什么特别适合自然图像，其中有些理由也适用于语言，有些不适用。</p>
+      <p>他不认为现状能持续。回想读博时出现的论文，今天还在用的是 ReLU、残差连接这类几乎一段话就能解释的简单想法，当时更复杂的东西大多被遗忘。多模态模型会带来统一的压力：现在要让语言模型理解并生成图像，往往得把两种范式拼接起来，方式未必优雅，从长期看这种复杂性不值得。</p>
+      <p>他给了两种可能。一是规模扩大后，扩散模型在训练和采样上的成本优势变得不那么重要，最简单的做法是把一切都变成离散 token，用大家熟悉的自回归 Transformer 生成所有内容，哪怕图像质量略有损失，容易整合这一点也会更重要。二是终于找到高效做语言扩散的方法，能和自回归竞争，大家转而训练多模态扩散模型。他不知道会是哪一种。</p>
+      
+    </section>
+<section class="sec" id="e3-s8">
+      <h4><button class="ts" type="button" data-t="993">16:33</button><span>语言扩散模型的进展</span></h4>
+      <p>Sander 在 2023-01-09 写过一篇语言扩散模型的博客，结论是有很多有意思的想法，但还不能和自回归方法竞争。之后他结束了这方面的项目，转去做 DeepMind 的旗舰文生图、文生视频和文生音乐模型，但一直关注这个方向。</p>
+      <p>他说进展让人高兴，很多人没有放弃，但还没到能与自回归模型竞争的程度。已经有 Llama 70B 这样的自回归模型，却还没有公开的、甚至论文里描述过的 70B 语言扩散模型。这类偏探索的研究在大规模上更难争取资源，可能只是缺一个有勇气去做的人，技术障碍也许已经不存在。</p>
+      <p>他尤其觉得离散掩码扩散 (Masked Diffusion) 重新成为语言建模的一种范式很有意思。他当年的看法是扩散在连续空间里效果好，所以应该把一切嵌入连续空间；掩码扩散恰好相反，它几乎就是自回归，只是允许任意生成顺序，并可以同时生成多个 token，处在两种范式之间。有好几篇论文在同一时期重新带起了这个方向。</p>
+      <div class="note"><p><span class="lbl">注</span>同一时期的几篇，例如 SEDD（2023-10-25）、MD4（2024-06-06）、MDLM（2024-06-11）。“还没有 70B 语言扩散模型”是 2025 年录制时的说法。</p></div>
+    </section>
+<section class="sec" id="e3-s9">
+      <h4><button class="ts" type="button" data-t="1145">19:05</button><span>掩码扩散与叠加状态</span></h4>
+      <p>Slater 认为掩码语言扩散模型放弃了一样东西：逆向过程的每一步都必须表示成一组实际的 token，不能在几个可能的状态之间保留叠加，比如“这个 token 还没定，先停在两个候选之间”。</p>
+      <p>Sander 说他当初也这么想，并且很确信中间步骤需要表示可能结果的叠加，因为和连续分布相比，文本里 token 的分布非常尖锐。在连续空间里，中间的嵌入向量可以是多个候选嵌入的线性组合，以此表示最终落到哪个嵌入上的不确定性。但目前的结果在证明他错了：扩散过程中做确定的选择，仍能得到很好的结果。</p>
+      
+    </section>
+<section class="sec" id="e3-s10">
+      <h4><button class="ts" type="button" data-t="1246">20:46</button><span>2020 年前后：扩散为何兴起</span></h4>
+      <p>Slater 提到 Sander 那篇从去噪自编码器角度解释扩散的博客（2022-01-31），里面回顾过历史：Jascha 2015 年就有那篇论文，Hyvärinen 的分数匹配更早，但直到 2019、2020 年，有了 DDPM 和宋飏与 Stefano Ermon 的论文，扩散才真正流行。</p>
+      <p>Sander 说他从 2016 年刚加入 DeepMind 不久就在做视听媒体的生成建模，当时这并不热门。他认为早期“把去噪用于生成建模”的思路缺少的关键是退火：从很高的噪声水平出发，随生成过程逐渐降低。宋飏的论文和 DDPM 都有这个想法，它是让模型在当时所谓的大规模任务（比如 ImageNet）上工作的必要条件。</p>
+      
+    </section>
+<section class="sec" id="e3-s11">
+      <h4><button class="ts" type="button" data-t="1371">22:51</button><span>引导的作用</span></h4>
+      <p>另一个重要发现是引导：先是分类器引导，后来是无分类器引导 (Classifier-Free Guidance)，大幅增强了模型能力，较小的模型也突然能生成相当高质量的图像。Sander 说效果之好让他意外。</p>
+      <p>他给别人解释时，常常要翻回 OpenAI 的 GLIDE 这类早期论文，用里面的对比展示引导的作用。因为从那以后大家一直开着引导，再也不关，反而看不到关掉引导时模型有多差。很多大型扩散模型没有引导时效果真的不怎么样。</p>
+      <div class="note"><p><span class="lbl">注</span>分类器引导出自 Dhariwal 与 Nichol 的《Diffusion Models Beat GANs on Image Synthesis》（2021-05-11），无分类器引导的论文 2022-07-26 发到 arXiv，GLIDE 是 2021-12-20。</p></div>
+    </section>
+<section class="sec" id="e3-s12">
+      <h4><button class="ts" type="button" data-t="1425">23:45</button><span>分数匹配为何可行：多噪声尺度</span></h4>
+      <p>Slater 转述宋飏的话：当初人们不相信分数匹配能奏效，因为它似乎丢掉了很多全局信息，信号也很难传播，也就是论文里的低密度区域问题；真正让它工作的，是对所有数据点加扰动、在多个噪声水平上做扩散。Sander 说这也是他 2019 年读那篇论文时得到的认识。</p>
+      <p>他早就知道分数匹配。读博时他花了很多时间研究受限玻尔兹曼机 (Restricted Boltzmann Machine)，这种模型在 2010 年代初很流行，因为当时还不能端到端训练深层网络，要逐层预训练。有人提出可以用分数匹配训练 RBM，那是他第一次接触分数匹配：借助梯度，难以计算的配分函数直接消掉了。他觉得很漂亮，可惜效果不如期望。后来网络不再需要逐层预训练，RBM 也用不上了，所以大约五年前看到分数匹配复兴，他很兴奋。</p>
+      
+    </section>
+<section class="sec" id="e3-s13">
+      <h4><button class="ts" type="button" data-t="1563">26:03</button><span>局部信息与全局结构</span></h4>
+      <p>Slater 的问题是：分数匹配的优势是消掉了难以估计的归一化常数，但这似乎也丢掉了分布的全局信息，只关注局部；为什么只学局部信息，实际上就能生成很好的样本？</p>
+      <p>Sander 认为并没有真正放弃全局信息，而是把它分解了：在不同噪声水平上分别学习局部信息，每个噪声水平对应一个不同的尺度。对图像来说，这个对应很直接，噪声水平大致对应不同的空间频率。Slater 的理解是：单看任何一个噪声水平，确实放弃了一些全局信息，但有了噪声调度，沿时间反向推进，就能慢慢恢复全局图景。</p>
+      
+    </section>
+<section class="sec" id="e3-s14">
+      <h4><button class="ts" type="button" data-t="1636">27:16</button><span>误差累积与随机采样</span></h4>
+      <p>Sander 觉得扩散模型真正令人惊讶的是：连续做大约一百次预测，最后居然还能落在数据分布上，或者至少偏离不远。通常只训练递归过程中的单独一步、再反复应用，最后会偏离到输入对模型已经没有意义的地方；自回归模型也有这个问题，生成一个很不可能的 token 后，后续就可能失控。加入高斯噪声再去除它的这种设置，似乎对多次预测中的误差累积格外稳健。</p>
+      <p>Slater 问，DDPM 逆向步骤里加入少量噪声，是不是为了避免沿某条奇怪的路径偏下去。Sander 说严格来说不确定这是不是原因，但他是这样理解的：大家常发现，每一步既去噪又注入噪声的随机采样算法，在很多情况下比不加新噪声的确定性算法略好；把噪声加回去，相当于把预测错误稍微掩盖起来，可以继续递归而不太担心误差累积。</p>
+      
+    </section>
+<section class="sec" id="e3-s15">
+      <h4><button class="ts" type="button" data-t="1732">28:52</button><span>无分类器引导与对抗样本</span></h4>
+      <p>Slater 提到 Sander 讲扩散引导几何直觉的博客（2023-08-28），问为什么无分类器引导在实际中比分类器引导好那么多。Sander 说这和对抗样本 (Adversarial Example) 有关。</p>
+      <p>对分类器这样的判别模型，给输入加一个人几乎察觉不到的扰动，就能彻底改变输出；对抗样本通常就是对网络反向传播到输入、在保持接近原图的同时提高某个错误类别的得分找到的。分类器引导做的事几乎一样：对网络相对输入反向传播，找让图像更符合某个类别的梯度方向，这等于在主动寻找对抗样本。</p>
+      <p>原因在于分类器只被训练来从输入中提取信息，从未被训练来生成输入。图像里有大量与类别标签无关、却与感知密切相关的信息，分类器不会学这些，通过它反向传播时就会对这些信息做各种奇怪的改动。无分类器引导复用生成模型本身来构造所需的分类器，本质上是一个贝叶斯分类器，它对数据理解得多得多，给出的梯度方向也更有意义。</p>
+      <div class="deriv"><div><span class="df"><span class="m">∇<sub><i>x</i></sub> log <i>p</i>(<i>y</i> | <i>x</i>) = ∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i> | <i>y</i>) − ∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i>)</span></span><span class="dc">用同一个生成模型的条件分数和无条件分数，隐式得到分类器的梯度</span></div><div><span class="df"><span class="m">∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i>) + <i>γ</i> [∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i> | <i>y</i>) − ∇<sub><i>x</i></sub> log <i>p</i>(<i>x</i>)]</span></span><span class="dc">无分类器引导：引导强度 γ &gt; 1</span></div></div>
+      <p>Slater 追问，是不是因为生成模型要学的东西比分类器多得多，不只是一个有限的类别列表，还有纹理之类。Sander 说基本就是这个原因。以前就有人发现给分类器加生成式损失可以起正则化作用，关键的新洞见是可以直接用已有的生成模型构造分类器，不再需要单独的分类器。</p>
+      
+    </section>
+<section class="sec" id="e3-s16">
+      <h4><button class="ts" type="button" data-t="1935">32:15</button><span>里程碑论文：EDM 等</span></h4>
+      <p>2020 年以后哪几篇最重要？Sander 首先说的是 Tero Karras 等人在 NVIDIA 芬兰团队写的《Elucidating the Design Space of Diffusion-Based Generative Models》（EDM，2022-06-01）。他至今仍经常回看，因为它努力抓住本质：在采样和训练两方面，什么有效、什么无效、为什么。Slater 称之为“扩散模型圣经”，Sander 说他也喜欢这样叫。</p>
+      <p>他还提到自己 2024-06-14 写的噪声调度文章，讨论什么因素决定扩散模型关注数据的哪些方面，本质上是关注哪些噪声水平，对图像来说就是哪些空间频率。在这个问题上，Diederik Kingma 和 Ruiqi Gao 的论文（2023-03-01）深入分析了影响各噪声水平相对权重的因素和它们对结果的影响。第三篇是前面提到的 Rissanen 等人的逆热耗散论文，它第一次在这个问题上引入了频谱分析。</p>
+      <div class="note"><p><span class="lbl">注</span>Kingma 与 Gao 的论文是《Understanding Diffusion Objectives as the ELBO with Simple Data Augmentation》。</p></div>
+    </section>
+<section class="sec" id="e3-s17">
+      <h4><button class="ts" type="button" data-t="2055">34:15</button><span>最优输运与少步蒸馏</span></h4>
+      <p>Sander 发过一串推文，把扩散模型理解为在解最优输运 (Optimal Transport) 问题。Slater 的理解是，从分数匹配、SDE、ODE 到一步求解器，这些研究都在设法摆脱逐步逆时间迭代，直接一步完成。</p>
+      <p>Sander 说扩散模型显然学到了某种潜在的映射。有人发现，在一个数据集上训练扩散模型，稍微修改数据集再训练一个，两个模型学到的映射仍然很相似，这暗示它在某种意义上是最优的。有了这个映射，就可以训练一致性模型、做各种蒸馏，利用它从噪声分布一步跳到数据分布。</p>
+      <p>但在大规模上，把强大的扩散模型蒸馏成一步生成效果往往不好：和原模型同样大小的网络只运行一步，可能不足以捕捉映射的所有细节。四步、八步已经能得到相当不错的结果；再往下减少步数，就得有所妥协，比如接受多样性下降，同一个提示词总得到同一个样本，只要它看起来足够好。</p>
+      <p>他认为一定计算量所能实现的能力存在上限，而扩散模型强大的原因之一，就是它提供了一种在生成时投入大量计算、而训练时不必同样花大量算力的高效方法。</p>
+      <div class="note"><p><span class="lbl">注</span>“某种意义上最优”是 Sander 的措辞。概率流 ODE 给出的映射一般并不是严格意义上的最优输运映射。</p></div>
+    </section>
+<section class="sec" id="e3-s18">
+      <h4><button class="ts" type="button" data-t="2228">37:08</button><span>把扩散看作循环网络</span></h4>
+      <p>还有一个前面没谈的视角：把扩散模型看作循环神经网络。扩散网络是一个计算单元，被递归地应用很多次，不断更新同一张画布；把整个计算图展开，它就是同一个网络的更深版本。</p>
+      <p>为什么不直接端到端训练这个深网络？因为太贵。如果扩散网络有 20 层，采样 100 步，就相当于要对一个 2,000 层的网络做反向传播，而反向传播是串行的，必须按顺序先向前再向后。从这个角度看，扩散模型是我们找到的一种训练极深计算图的便宜办法。</p>
+      <p>按这个逻辑推下去，扩散模型最终也许不再必要，因为总有一天能高效地端到端训练这样深的网络。Sander 说，大约十五年前他开始读博时，训练的网络只有两层，勉强四层；如今几百层很常见。再过十年，也许能训练一万层、十万层的网络，强到一次就能生成复杂分布，不再需要迭代细化；也可能把这样的深网络和扩散、自回归等方法结合，得到更强的生成过程。</p>
+      
+    </section>
+<section class="sec" id="e3-s19">
+      <h4><button class="ts" type="button" data-t="2356">39:16</button><span>音乐与视频：序列还是扩散</span></h4>
+      <p>Slater 说音乐和视频像是处在两种范式之间：图像扩散和语言建模的做法都已比较统一，音乐这类内容有时间维度，任一时间片又像扩散问题，大家在用不同方式组合。长远看会更像沿时间依次生成片段的序列问题，还是在越来越长的时间范围上一次扩散出来？</p>
+      <p>Sander 说取决于目标。这些模态既有序列的特点，也有网格这样的拓扑结构，任何范式都能用于任何拓扑，但有些组合更合适。扩散隐含从粗到细的生成过程，往往擅长捕捉各种尺度的结构；自回归的学习问题是先学局部结构，再在模型容量允许的范围内学习有助于预测局部的大尺度结构，容量总会用完，比如一百个 token 以前的内容怎样影响当前 token，就学不到了。</p>
+      <p>另一方面，音频和视频有些应用需要实时生成，比如逐帧生成并立刻展示给用户，这时只能自回归，因为无法预先生成未来的内容。所以取舍是：想尽量提高一致性和全局结构，就在所有维度上做扩散；想实时生成视频，就沿时间自回归、在空间里做扩散。</p>
+      
+    </section>
+<section class="sec" id="e3-s20">
+      <h4><button class="ts" type="button" data-t="2544">42:24</button><span>值得探索的新方向</span></h4>
+      <p>最后，Slater 问有哪些现在看起来奇怪、前沿实验室的主流项目还没覆盖、适合特别有勇气的博士生去做的方向，就像十年前的扩散模型。Sander 说他不是合适的回答者：五年前、十年前他确实对这类东西感兴趣，后来它们成了主流，兴趣有了回报，现在他处在“探索与利用”里的利用阶段。</p>
+      <p>每天都在做扩散模型，读到的研究也大多在这个领域，这会让人视野变窄，他承认自己可能有盲区，说不出哪个方向五年后一定会重要。Slater 的总结是，Sander 相当于在扩散模型的种子轮就入场了，现在开始收获回报。</p>
+      
+    </section>
+      <section class="sec keys"><h4>这一期记住这几条</h4><ul><li>Sander 最常用的视角是条件期望：去噪器预测的是所有可能原图的平均，这解释了采样中途的模糊预测，也解释了一致性模型和扩散模型的区别。</li><li>加噪会先遮蔽高频，所以扩散模型近似地在做从低频到高频的自回归；多噪声尺度把全局结构分解成不同尺度上的局部学习。</li><li>无分类器引导优于分类器引导，是因为分类器的输入梯度接近对抗扰动，而生成模型构造的贝叶斯分类器理解数据。</li><li>少步蒸馏到四到八步效果不错，再少就要牺牲多样性；把扩散看作展开的深网络，它是用便宜的训练换来大量推理计算的办法。</li></ul></section>
+    </div>
+    <aside class="epside">
+      <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/shots/e3-1150.jpg')"><span class="tri"></span></button></div>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1QaWt6tE92/" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场</span></button></li><li><button type="button" data-t="24"><b>0:24</b><span>嘉宾介绍</span></button></li><li><button type="button" data-t="79"><b>1:19</b><span>Perspectives on Diffusion：最常用的理解方式</span></button></li><li><button type="button" data-t="259"><b>4:19</b><span>一致性模型与最优映射</span></button></li><li><button type="button" data-t="391"><b>6:31</b><span>频域自回归视角</span></button></li><li><button type="button" data-t="469"><b>7:49</b><span>频谱曲线：理论与实测</span></button></li><li><button type="button" data-t="594"><b>9:54</b><span>生成顺序：频率与 token</span></button></li><li><button type="button" data-t="796"><b>13:16</b><span>两种生成范式能否统一</span></button></li><li><button type="button" data-t="993"><b>16:33</b><span>语言扩散模型的进展</span></button></li><li><button type="button" data-t="1145"><b>19:05</b><span>掩码扩散与叠加状态</span></button></li><li><button type="button" data-t="1246"><b>20:46</b><span>2020 年前后：扩散为何兴起</span></button></li><li><button type="button" data-t="1371"><b>22:51</b><span>引导的作用</span></button></li><li><button type="button" data-t="1425"><b>23:45</b><span>分数匹配为何可行：多噪声尺度</span></button></li><li><button type="button" data-t="1563"><b>26:03</b><span>局部信息与全局结构</span></button></li><li><button type="button" data-t="1636"><b>27:16</b><span>误差累积与随机采样</span></button></li><li><button type="button" data-t="1732"><b>28:52</b><span>无分类器引导与对抗样本</span></button></li><li><button type="button" data-t="1935"><b>32:15</b><span>里程碑论文：EDM 等</span></button></li><li><button type="button" data-t="2055"><b>34:15</b><span>最优输运与少步蒸馏</span></button></li><li><button type="button" data-t="2228"><b>37:08</b><span>把扩散看作循环网络</span></button></li><li><button type="button" data-t="2356"><b>39:16</b><span>音乐与视频：序列还是扩散</span></button></li><li><button type="button" data-t="2544"><b>42:24</b><span>值得探索的新方向</span></button></li></ol>
+    </aside>
+  </div>
+</details>
+</div>
+</main>
+<div class="lb" id="lightbox"><button class="lb-nav lb-prev" type="button" aria-label="上一张">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="下一张">›</button></div>
+<script>(function(){
+  /* ── tab ── */
+  function showTab(v){
+    document.querySelectorAll('.tb').forEach(function(x){var on=x.dataset.v===v;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='view-'+v);});
+    var cur=document.querySelector('.tb.on'),row=cur&&cur.parentNode;if(row&&row.scrollWidth>row.clientWidth)row.scrollLeft=Math.max(0,cur.offsetLeft-row.offsetLeft-16);
+    // 原论文对照是 iframe，第一次切过来才加载（10 MB 的页不该拖慢首屏）
+    var f=document.querySelector('#view-'+v+' iframe[data-src]');if(f&&!f.src)f.src=f.dataset.src;
+  }
+  // iframe 那个 tab 要让它贴着 tab 栏铺满一屏，不然底下一截在屏幕外，得先滚外层
+  function settle(v){
+    var view=document.getElementById('view-'+v);
+    if(view&&view.querySelector('iframe')){var bar=document.querySelector('.bar');scrollTo(0,view.getBoundingClientRect().top+scrollY-bar.offsetHeight);}
+    else scrollTo(0,0);
+  }
+  document.querySelectorAll('.tb').forEach(function(b){
+    b.addEventListener('click',function(){
+      showTab(b.dataset.v);
+      history.replaceState(null,'',b===document.querySelector('.tb')?location.pathname+location.search:'#'+b.dataset.v);
+      settle(b.dataset.v);
+    });
+  });
+
+  /* ── 全部展开 / 收起（只管当前 tab） ── */
+  document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
+    var open=b.dataset.all==='open';b.closest('.view').querySelectorAll('details.ep,details.faq,details.res').forEach(function(d){d.open=open;});});});
+
+  /* ── 播放器：本地有原片就放本地（data-src），没有就用 B 站播放器。时间码都是原片里的秒；点封面从 data-start 开始放
+   * （CS231n 的卡片只截了一讲里的一段，封面从这段的开头放） ── */
+  function player(ep){
+    if(ep._pl)return ep._pl;
+    var box=ep.querySelector('.pl'), which=ep.querySelector('.plwhich'), tl=[].slice.call(ep.querySelectorAll('.tl button'));
+    var st={mode:null,el:null};
+    function bili(t){
+      var f=document.createElement('iframe');
+      f.allow='autoplay;fullscreen;picture-in-picture';f.setAttribute('allowfullscreen','');
+      f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('scrolling','no');
+      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&p='+ep.dataset.p+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
+      box.innerHTML='';box.appendChild(f);st.mode='bili';st.el=f;
+      which.textContent=ep.dataset.src?'B 站播放器（本地没找到视频文件）':'B 站播放器';
+    }
+    function mark(t){var cur=null;tl.forEach(function(b){if(+b.dataset.t<=t+0.5)cur=b;});
+      tl.forEach(function(b){b.classList.toggle('on',b===cur);});}
+    function local(t){
+      var v=document.createElement('video');v.controls=true;v.preload='auto';v.playsInline=true;
+      v.src=ep.dataset.src;
+      v.addEventListener('error',function(){if(st.mode==='local')bili(st.want);},{once:true});
+      v.addEventListener('loadedmetadata',function(){v.currentTime=st.want||0;v.play().catch(function(){});},{once:true});
+      v.addEventListener('timeupdate',function(){mark(v.currentTime);});
+      box.innerHTML='';box.appendChild(v);st.mode='local';st.el=v;
+      which.textContent='本地视频 '+ep.dataset.src.split('/').pop();
+    }
+    function play(t){
+      st.want=t;
+      if(!st.mode){if(ep.dataset.src)local(t);else bili(t);}
+      else if(st.mode==='local'){if(st.el.readyState>=1){st.el.currentTime=t;st.el.play().catch(function(){});}}
+      else bili(t);
+      if(st.mode==='bili')mark(t);
+    }
+    return ep._pl={play:play};
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.ts,.tl button,.plgo');if(!b)return;
+    var ep=b.closest('.ep');if(!ep)return;
+    e.preventDefault();
+    player(ep).play(+(b.dataset.t||ep.dataset.start||0));
+    var pl=ep.querySelector('.pl'),r=pl.getBoundingClientRect();
+    if(r.bottom<60||r.top>innerHeight-80)pl.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+
+  /* ── 截图大图，左右键切同一张卡片里的图 ── */
+  var lb=document.getElementById('lightbox'),list=[],at=-1;
+  function show(i){at=(i+list.length)%list.length;var im=list[at];lb.querySelector('img').src=im.src;
+    var cap=im.closest('.shot').querySelector('figcaption').cloneNode(true),t=cap.querySelector('.ts');if(t)t.remove();
+    lb.querySelector('figcaption').innerHTML=cap.innerHTML+(list.length>1?'　·　'+(at+1)+' / '+list.length:'');
+    lb.querySelectorAll('.lb-nav').forEach(function(n){n.hidden=list.length<2;});}
+  document.addEventListener('click',function(e){
+    var im=e.target.closest('.shot img');
+    if(im){list=[].slice.call(im.closest('.ep').querySelectorAll('.shot img'));lb.classList.add('on');show(list.indexOf(im));return;}
+    if(!lb.classList.contains('on'))return;
+    var n=e.target.closest('.lb-nav');if(n){show(at+(n.classList.contains('lb-next')?1:-1));return;}
+    lb.classList.remove('on');
+  });
+  addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;
+    if(e.key==='Escape')lb.classList.remove('on');else if(e.key==='ArrowRight')show(at+1);else if(e.key==='ArrowLeft')show(at-1);});
+
+  /* ── 地址栏：#kl 这类是 tab；其余是页内任意 id（#l13-s4、#kl-gauss、#faq-collapse），切到它所在的 tab、展开外面的折叠块再滚过去 ──
+   * 截图是懒加载的，图片撑开以后位置会变，load 之后和图片加载完各再定位一次 */
+  function openHash(){
+    var id=decodeURIComponent(location.hash.slice(1));if(!id)return;
+    if(document.getElementById('view-'+id)){showTab(id);return;}
+    var el=document.getElementById(id);if(!el)return;
+    var v=el.closest('.view');if(v)showTab(v.id.slice(5));
+    for(var d=el.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true;
+    el.scrollIntoView({block:'start'});
+  }
+  openHash();addEventListener('hashchange',openHash);
+  addEventListener('load',function(){setTimeout(openHash,0);setTimeout(openHash,600);});
+})();
+</script>
+</body></html>
