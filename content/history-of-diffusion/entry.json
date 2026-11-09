@@ -1,0 +1,30 @@
+{
+  "id": "history-of-diffusion",
+  "kind": "paper",
+  "title": "History of Diffusion",
+  "subtitle": "扩散模型访谈史：Jascha Sohl-Dickstein、宋飏、Sander Dieleman 三期访谈的分节笔记，配中英字幕的 B 站转载版",
+  "topics": [
+    "生成模型",
+    "视频笔记"
+  ],
+  "date": "2025-02",
+  "studied": "2026-11",
+  "published": "2026-11-09",
+  "summary": "Bain Capital Ventures 的 Slater Stich 主持的三期访谈。第 1 期 Jascha Sohl-Dickstein 讲扩散模型怎样从非平衡统计力学、Jarzynski 等式和退火重要性采样里来，为什么沉寂了五年；第 2 期宋飏讲分数匹配、逆时间 SDE 与概率流 ODE 的两个意外、一致性模型；第 3 期 Sander Dieleman 讲条件期望、频域自回归、无分类器引导与对抗样本、最优输运和把扩散看作循环网络。52 节，每节可点时间码跳到 B 站播放器，论文日期和讲者说得不准的地方在注里核对过。",
+  "source": {
+    "name": "History of Diffusion · Bain Capital Ventures",
+    "url": "https://www.youtube.com/watch?v=VpYNlHIHT7o"
+  },
+  "page": "page.html",
+  "outputs": [
+    "<b>3</b> 期访谈",
+    "<b>52</b> 节笔记",
+    "<b>1360</b> 条中英字幕"
+  ],
+  "build": {
+    "note": "输入在 24_HistoryOfDiffusion/ 下（content/ep*.mjs 正文、subtitles/ 字幕、publish/ 烧录成品和 bilibili.json），那个目录不进仓库。page.html 和 assets/ 是提交进仓库的成品，24_HistoryOfDiffusion/ 在时构建会先重新生成。站点只嵌入 B 站播放器，不放字幕全文。",
+    "tool": "24_HistoryOfDiffusion/build.mjs",
+    "requires": "24_HistoryOfDiffusion/build.mjs",
+    "args": []
+  }
+}
