@@ -1,7 +1,6 @@
 {
   "id": "zero-to-hero",
   "kind": "paper",
-  "draft": true,
   "title": "Karpathy《Zero to Hero》",
   "subtitle": "从手写反向传播到复现 GPT-2，播放列表全部 10 集的分节笔记，时间码点了跳到录像那一秒",
   "topics": [
@@ -10,8 +9,8 @@
     "视频笔记"
   ],
   "date": "2022-08",
-  "studied": "2026-10",
-  "published": "2026-10-10",
+  "studied": "2026-11",
+  "published": "2026-11-10",
   "summary": "Andrej Karpathy 的系列课 Neural Networks: Zero to Hero，按官方播放列表收全 10 集、约 19 小时：用一百行 Python 写出自动求导引擎 micrograd；makemore 五集从 bigram 计数模型做到多层感知机，讲激活值和梯度的诊断、Batch Normalization、手推张量级反向传播、WaveNet 式的层级结构；然后在 tiny Shakespeare 上从零写一个 GPT；Microsoft Build 2023 演讲 State of GPT 讲助手模型怎么训练和使用；手写 GPT-4 式的 BPE 分词器并解释分词引起的各种怪现象；最后 4 小时复现 GPT-2 124M，把训练提速 11 倍、照 GPT-3 设超参数、8 卡分布式训练，在 FineWeb-Edu 上超过 GPT-2。194 个小节、约 8.7 万字，配 113 张截图、32 段代码和作者留的练习题。",
   "source": {
     "name": "Neural Networks: Zero to Hero · Andrej Karpathy",
