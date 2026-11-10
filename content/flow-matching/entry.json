@@ -10,7 +10,7 @@
   "date": "2022-09",
   "studied": "2026-11",
   "published": "2026-11-09",
-  "before": "latent-diffusion",
+  "before": "dit",
   "summary": "五个 tab：综述（含实际运行的二维 reflow 实验）、两篇原论文中英对照（含附录）、16 个常见问题；资料里有三个入门视频链接、Sander Dieleman《Perspectives on diffusion》中文译文和 NeurIPS 2024 Flow Matching 教程五段笔记。",
   "source": {
     "name": "Flow Matching for Generative Modeling · Lipman 等；Flow Straight and Fast · Liu, Gong, Liu",
