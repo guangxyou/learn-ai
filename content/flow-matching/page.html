@@ -2,7 +2,7 @@
 <html lang="zh-Hans"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Flow Matching 与 Rectified Flow · 在噪声和数据之间回归速度场：两篇同期论文的条件构造、理论保证和 reflow，附两篇原论文逐段中英对照</title>
-<meta name="description" content="五个 tab：综述（含实际运行的二维 reflow 实验）、两篇原论文中英对照（含附录）、16 个常见问题；资料里有三个入门视频链接、Sander Dieleman《Perspectives on diffusion》中文译文和 NeurIPS 2024 Flow Matching 教程五段笔记。">
+<meta name="description" content="五个 tab：综述（含实际运行的二维 reflow 实验）、两篇原论文中英对照（含附录）、16 个常见问题；资料里有三个入门视频和李沐讲 Movie Gen 等视频生成模型的两期链接、Sander Dieleman《Perspectives on diffusion》中文译文和 NeurIPS 2024 Flow Matching 教程五段笔记。">
 <link rel="canonical" href="__CANONICAL__">
 <style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
 --bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
@@ -640,8 +640,9 @@ pre.code code{background:none;padding:0;color:inherit;font:inherit}
 </div>
 <div class="view" id="view-res">
 <div class="resdoc">
-  <p class="lede">三个入门视频只放链接；Sander Dieleman 的博客《Perspectives on diffusion》有完整中文译文；NeurIPS 2024 的 Flow Matching 教程分五段做了笔记。后两份默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
+  <p class="lede">三个入门视频和李沐讲视频生成（含 Movie Gen）的两期只放链接；Sander Dieleman 的博客《Perspectives on diffusion》有完整中文译文；NeurIPS 2024 的 Flow Matching 教程分五段做了笔记。后两份默认折叠，点标题展开；从综述和常见问题里的链接进入时，对应的块会自动展开。</p>
   <section class="vsec"><h2>入门视频</h2><ul class="vlinks"><li><a href="https://www.bilibili.com/video/BV1zurDBCEoS/" target="_blank" rel="noreferrer"><b>扩散模型（Diffusion Model）入门级别介绍</b> ↗</a><span>AVCLab · 2026-01-17 · 2 个分 P，共 65:12 · 实验室内部的科研训练视频，第 1 期讲 U-Net 结构的扩散模型，第 2 期讲 DiT 结构的</span></li><li><a href="https://www.bilibili.com/video/BV1Titt68EsZ/" target="_blank" rel="noreferrer"><b>【科研入门】扩散模型基础｜LDM、Score Matching、Classifier Guidance、Classifier-Free Guidance</b> ↗</a><span>AVCLab · 2026-08-31 · 25:06 · DDPM、DDIM、LDM、分数匹配和两种引导</span></li><li><a href="https://www.bilibili.com/video/BV1G6ti6fExr/" target="_blank" rel="noreferrer"><b>【科研入门】Flow Matching 在学什么？从 ODE、条件流匹配到 Rectified Flow</b> ↗</a><span>AVCLab · 2026-09-04 · 23:11 · ODE、连续性方程、向量场，到 Flow Matching、条件流匹配与 Rectified Flow</span></li></ul></section>
+  <section class="vsec"><h2>应用：Movie Gen 与视频生成</h2><ul class="vlinks"><li><a href="https://www.bilibili.com/video/BV1VdcxesEAt/" target="_blank" rel="noreferrer"><b>视频生成·上【论文精读·55】</b> ↗</a><span>跟李沐学AI · 2025-01-11 · 64:18 · 从 OpenAI Sora 讲起，包含 Movie Gen 和 HunyuanVideo</span></li><li><a href="https://www.bilibili.com/video/BV1U65SzuE4p/" target="_blank" rel="noreferrer"><b>视频生成·下：模型和训练【论文精读·55】</b> ↗</a><span>跟李沐学AI · 2025-04-22 · 62:50 · 接上集，讲视频生成的模型结构和训练</span></li></ul></section>
   <details class="res" id="res-dl">
   <summary><span class="rt"><b>看待扩散模型的几种视角</b><em>Sander Dieleman，&lt;i&gt;Perspectives on diffusion&lt;/i&gt;（2023-07-20）中文译文：自编码器、隐变量模型、分数函数、反向 SDE、流模型、RNN、自回归、期望，以及离散与连续、其他表述、一致性和不守约定</em></span></summary>
   <div class="resb">
