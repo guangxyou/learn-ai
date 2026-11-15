@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT-4 之后：LLM 重要概念地图 · 从 CoT 到 mHC</title>
+<meta name="description" content="从 CoT 到 mHC，按推理、架构、训练、工具、多模态、安全六条线，整理 2023 到 2026 年真正进入主流的概念。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+/* 时间列要放得下 1:04:27 这种七位时间码；按 ch 算宽，换字体也不会压到右边文字 */
+.tl button b{flex:none;width:7ch;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+:root{--bar-h:0px}
+.ep-head h1+p{margin:8px 0 0;color:var(--text-3);font-size:14.5px;line-height:1.6}
+main.wrap{padding-top:18px;padding-bottom:60px}
+.aidoc .lede+.lede{margin-top:10px}
+math{font-family:'STIX Two Math','Cambria Math','Latin Modern Math',math,serif;font-size:1.06em}
+.deriv math{font-size:1.1em}
+.aisec{scroll-margin-top:12px}
+.deriv{margin:14px 0 16px;padding:10px 14px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto}
+.deriv>div{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;align-items:baseline;padding:3px 0}
+.deriv .df{white-space:nowrap}.deriv .dc{font-size:12.5px;color:var(--text-3)}
+@media(max-width:640px){.deriv>div{grid-template-columns:1fr;gap:0}.deriv>div+div{margin-top:6px}}
+.aidoc .tbl{margin:14px 0}
+.aidoc td:first-child{white-space:nowrap}
+.aidoc .tnote{font-size:12px;color:var(--text-3);margin:4px 0 0}
+.fig svg{display:block;max-width:100%;height:auto;margin:0 auto}
+.aidoc h3{font-size:15.5px;margin:24px 0 4px;color:var(--text)}
+.aidoc .fig{margin:18px 0 14px}
+.aidoc ul{margin:8px 0 12px;padding-left:1.3em}
+.aidoc li{margin:4px 0}
+.refs a{display:block;line-height:1.5;padding:3px 0}
+.refs .rn{color:var(--text-3);font-size:12px}
+@media(max-width:640px){.fig{overflow-x:auto;overscroll-behavior-x:contain}.fig svg{min-width:760px}}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">综述</span><span>2022 到 2025 · 16 节 · 8 张图 · 约 1.1 万字</span></div>
+  <h1>GPT-4 之后：LLM 重要概念地图</h1>
+  <p>从 CoT 到 mHC，按推理、架构、训练、工具、多模态、安全六条线，整理 2023 到 2026 年真正进入主流的概念</p>
+</header></div>
+<main class="wrap">
+<div class="aiwrap">
+  <nav class="aitoc" aria-label="目录"><p>目录</p><ol><li><a href="#map">地图</a></li><li><a href="#reasoning">推理</a></li><li><a href="#reasoning-limits">推理的边界</a></li><li><a href="#moe">MoE</a></li><li><a href="#attention">注意力</a></li><li><a href="#serving">推理系统</a></li><li><a href="#mhc">残差流</a></li><li><a href="#training">训练</a></li><li><a href="#posttrain">后训练</a></li><li><a href="#agents">工具与 agent</a></li><li><a href="#multimodal">多模态</a></li><li><a href="#longcontext">长上下文</a></li><li><a href="#safety">安全</a></li><li><a href="#evals">评测</a></li><li><a href="#index">概念索引</a></li><li><a href="#reading">读法</a></li></ol></nav>
+  <article class="aidoc">
+    <p class="lede">GPT-4 在 2023 年 3 月 14 日发布。它是一条分界线：在此之前，LLM 的进展主要用「更大的模型、更多的数据」解释；在此之后，进展分成了六条线，每条线解决一个具体问题。推理线解决「测试时怎么多花计算」，架构线解决「同样的显存和带宽怎么放更多参数、跑更长上下文」，训练线解决「更大的模型怎么稳定训出来」，工具线解决「模型怎么调用外部世界」，多模态线解决「图像、音频、视频怎么进同一个模型」，安全与评测线解决「怎么知道模型能做什么、不能做什么」。</p><p class="lede">这篇文章按这六条线整理。选材有三个标准：进了主流模型的架构或训练流程；有明确的原始论文或技术报告；在 2023-03 之后成为默认做法，或者明显改变了后续研究的方向。只在小圈子里流行、没有被后续工作采用的技巧，不收录。RoPE、RMSNorm、SwiGLU 这些 GPT-4 之前就成熟的基础，本站《基础概念》里有条目，这里只在它们被重新使用时提一句。</p><p class="lede">概念很多，不可能每个都展开公式。每节用一张表把这一类的概念、时间、一句话定义列清楚，挑一两个影响最大的展开；文末有一张九十多个概念的总表，方便查。论文日期取 arXiv 第一版，产品取发布日，数字只取论文里写明的；MLA 的 93.3% 和 5.76 倍是对比 DeepSeek 67B 的部署结果，不是单靠公式算出来的，文中会分开写。</p>
+    <section class="aisec" id="map">
+    <h2><span class="n">1</span><span>地图：GPT-4 之后的六条线</span></h2>
+    <p>2023 年 3 月 14 日，OpenAI 发布 GPT-4。技术报告没有层数、没有注意力结构、没有参数规模，主要是评测、能力和安全讨论，外加一份系统卡。报告里能确认的是它仍然是一个基于 Transformer 的自回归模型，用下一个 token 的交叉熵预训练，再用人类偏好数据做对齐。这套做法在 GPT-4 上走到了一个高点，也把六个更具体的问题留给了后面。</p>
+    <p>推理深度：Transformer 一次前向的层数固定，多步算术、逻辑推演、代码调试需要的串行步骤数随问题变长，固定深度放不下。上下文显存：自回归生成要把每个 token 的 Key 和 Value 留在显存里，序列越长，cache 越大。训练稳定性：模型越大、残差流越宽，信号在层间传播时越容易漂移。工具调用：模型只有权重里的知识，碰不到实时数据、文件、浏览器和代码仓库。多模态：文字之外的信息要进同一个模型，接口和训练目标都要改。安全与评测：能力越强，越需要知道它在哪里会犯错、会不会被诱导。</p>
+    <p>六条线不是按时间排的，也不互相替代。CoT 的论文比 GPT-4 早一年多，但它是后来推理模型的主要起点；MLA 和 mHC 都来自 DeepSeek，前者进了 V2 和 V3，后者是 2025 年底的架构论文。一个模型可以同时用上几条线的成果，比如 V3 用 MLA、DeepSeekMoE、MTP 和 FP8，R1 在 V3 的基础上用 RLVR 做推理。</p>
+    <div class="tbl"><table><thead><tr><th>时间</th><th>事件</th><th>为什么放在地图上</th></tr></thead><tbody><tr><td>2023-03</td><td>GPT-4</td><td>分界线；技术报告不公开架构</td></tr><tr><td>2023-05</td><td>DPO</td><td>把 RLHF 简化成偏好对上的分类损失</td></tr><tr><td>2023-05</td><td>过程监督</td><td>把奖励从最终答案挪到推理步骤</td></tr><tr><td>2023-10</td><td>Mistral 7B</td><td>Sliding Window Attention 进入开源模型</td></tr><tr><td>2023-12</td><td>Mamba、Mixtral</td><td>线性注意力 / SSM 与稀疏 MoE 两条路</td></tr><tr><td>2024-01</td><td>DeepSeekMoE</td><td>细粒度专家加共享专家</td></tr><tr><td>2024-05</td><td>GPT-4o、DeepSeek-V2</td><td>原生多模态；MLA 把 KV cache 压成潜向量</td></tr><tr><td>2024-09</td><td>o1、Hyper-Connections</td><td>RL 训练长 CoT；残差流加宽</td></tr><tr><td>2024-12</td><td>DeepSeek-V3</td><td>MLA、MoE、MTP、FP8 合到一个 671B 模型</td></tr><tr><td>2025-01</td><td>DeepSeek-R1、s1</td><td>纯 RL 推理；test-time scaling</td></tr><tr><td>2025-02</td><td>NSA</td><td>原生稀疏注意力</td></tr><tr><td>2025-05</td><td>Qwen3</td><td>开源模型把推理模式做成可切换的选项</td></tr><tr><td>2025-07</td><td>Kimi K2</td><td>Muon 优化器用到万亿参数规模</td></tr><tr><td>2025-12</td><td>DeepSeek-V3.2、mHC</td><td>DSA 稀疏注意力；双随机残差流</td></tr></tbody></table></div>
+    <figure class="fig" id="fig-map"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 484" width="832" height="484" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="484" fill="#fff"/>
+
+<text x="0" y="24" class="h1">GPT-4 之后的六条线</text>
+<text x="0" y="46" class="xs">每条线解决一个具体问题；一个模型可以同时用上几条线的成果。时间是代表工作的公开时间，不是这条线的起点。</text>
+
+<rect x="0" y="70" width="250" height="160" rx="9" class="card"/>
+<rect x="0" y="70" width="4" height="160" rx="2" fill="#0F766E"/>
+<text x="14" y="96" class="ph">推理</text>
+<text x="14" y="114" class="xs">把计算从权重搬到 token</text>
+<text x="14" y="140" class="xi">Chain-of-Thought</text><text x="236" y="140" class="xs" text-anchor="end">2022-01</text><text x="14" y="160" class="xi">Self-Consistency</text><text x="236" y="160" class="xs" text-anchor="end">2022-03</text><text x="14" y="180" class="xi">o1</text><text x="236" y="180" class="xs" text-anchor="end">2024-09</text><text x="14" y="200" class="xi">DeepSeek-R1</text><text x="236" y="200" class="xs" text-anchor="end">2025-01</text>
+
+<rect x="270" y="70" width="250" height="160" rx="9" class="card"/>
+<rect x="270" y="70" width="4" height="160" rx="2" fill="#B45309"/>
+<text x="284" y="96" class="ph">架构</text>
+<text x="284" y="114" class="xs">同样的显存和带宽，放更多参数</text>
+<text x="284" y="140" class="xi">Mixture-of-Experts</text><text x="506" y="140" class="xs" text-anchor="end">2017-01</text><text x="284" y="160" class="xi">Multi-head Latent Attention</text><text x="506" y="160" class="xs" text-anchor="end">2024-05</text><text x="284" y="180" class="xi">Native Sparse Attention</text><text x="506" y="180" class="xs" text-anchor="end">2025-02</text><text x="284" y="200" class="xi">mHC</text><text x="506" y="200" class="xs" text-anchor="end">2025-12</text>
+
+<rect x="540" y="70" width="250" height="160" rx="9" class="card"/>
+<rect x="540" y="70" width="4" height="160" rx="2" fill="#14161A"/>
+<text x="554" y="96" class="ph">训练</text>
+<text x="554" y="114" class="xs">把更大的模型稳定训出来</text>
+<text x="554" y="140" class="xi">DPO</text><text x="776" y="140" class="xs" text-anchor="end">2023-05</text><text x="554" y="160" class="xi">DeepSeek-V3</text><text x="776" y="160" class="xs" text-anchor="end">2024-12</text><text x="554" y="180" class="xi">Muon</text><text x="776" y="180" class="xs" text-anchor="end">2024-12</text><text x="554" y="200" class="xi">FP8 训练</text><text x="776" y="200" class="xs" text-anchor="end">2024-12</text>
+
+<rect x="0" y="250" width="250" height="160" rx="9" class="card"/>
+<rect x="0" y="250" width="4" height="160" rx="2" fill="#0F766E"/>
+<text x="14" y="276" class="ph">工具</text>
+<text x="14" y="294" class="xs">让模型调用外部世界</text>
+<text x="14" y="320" class="xi">ReAct</text><text x="236" y="320" class="xs" text-anchor="end">2022-10</text><text x="14" y="340" class="xi">Function calling</text><text x="236" y="340" class="xs" text-anchor="end">2023-06</text><text x="14" y="360" class="xi">Model Context Protocol</text><text x="236" y="360" class="xs" text-anchor="end">2024-11</text><text x="14" y="380" class="xi">Computer use</text><text x="236" y="380" class="xs" text-anchor="end">2024-10</text>
+
+<rect x="270" y="250" width="250" height="160" rx="9" class="card"/>
+<rect x="270" y="250" width="4" height="160" rx="2" fill="#B45309"/>
+<text x="284" y="276" class="ph">多模态</text>
+<text x="284" y="294" class="xs">图像、音频、视频进同一个模型</text>
+<text x="284" y="320" class="xi">LLaVA</text><text x="506" y="320" class="xs" text-anchor="end">2023-04</text><text x="284" y="340" class="xi">GPT-4o</text><text x="506" y="340" class="xs" text-anchor="end">2024-05</text><text x="284" y="360" class="xi">Chameleon</text><text x="506" y="360" class="xs" text-anchor="end">2024-05</text><text x="284" y="380" class="xi">Sora</text><text x="506" y="380" class="xs" text-anchor="end">2024-02</text>
+
+<rect x="540" y="250" width="250" height="160" rx="9" class="card"/>
+<rect x="540" y="250" width="4" height="160" rx="2" fill="#14161A"/>
+<text x="554" y="276" class="ph">安全与评测</text>
+<text x="554" y="294" class="xs">知道模型能做什么、不能做什么</text>
+<text x="554" y="320" class="xi">Sparse Autoencoder</text><text x="776" y="320" class="xs" text-anchor="end">2023-09</text><text x="554" y="340" class="xi">GCG</text><text x="776" y="340" class="xs" text-anchor="end">2023-07</text><text x="554" y="360" class="xi">Alignment faking</text><text x="776" y="360" class="xs" text-anchor="end">2024-12</text><text x="554" y="380" class="xi">Humanity's Last Exam</text><text x="776" y="380" class="xs" text-anchor="end">2025-01</text>
+<text x="0" y="440" class="xs">六条线不是按时间排的，也不互相替代。表格里的日期取 arXiv 第一版或产品发布日。</text>
+</svg>
+<figcaption>六条线的时间位置。每条线只标几个代表工作，不追求完整；同一年的工作放在一起，不表示先后。</figcaption></figure>
+  </section>
+<section class="aisec" id="reasoning">
+    <h2><span class="n">2</span><span>推理：把计算从权重搬到 token</span></h2>
+    <p>推理这条线的核心问题是：模型的层数固定，一次前向能做的串行计算有限。CoT 的答案是让模型把中间步骤写成 token，用更长的输出换更多的计算。这个答案在 2022 年提出，在 2024 年之后变成训练目标。</p>
+    <p>2022 年 1 月 28 日，Jason Wei 等九人上传 Chain-of-Thought Prompting。做法很简单：在 few-shot 提示里，每个 exemplar 不只给问题和答案，还给出从问题走到答案的中间步骤。论文把这种中间步骤叫 chain of thought，定义是「a series of intermediate natural language reasoning steps that lead to the final output」。</p>
+    <p>论文里那道网球题：Roger 有 5 个网球，又买了 2 罐，每罐 3 个，现在有几个。标准提示直接给 11；CoT 提示先写 2 罐是 6 个，再写 5 + 6 = 11。两边的最终答案一样，区别在中间多了一串 token。</p>
+    <p>实验用 8 个带步骤的 exemplar，不微调，同一个提示用于五个算术基准。PaLM 540B 在 GSM8K 上从 17.9% 提到 56.9%，GPT-3 175B 从 15.6% 提到 46.9%。小模型反而变差：GPT-3 350M 从 2.2% 掉到 0.5%，LaMDA 420M 从 2.6% 掉到 0.4%。论文把这称为随模型规模涌现的能力，增益大约在 100B 参数以上才出现。</p>
+    <div class="tbl"><table><thead><tr><th>设置</th><th>GSM8K</th><th>说明</th></tr></thead><tbody><tr><td>PaLM 540B · standard</td><td>17.9</td><td>直接给答案</td></tr><tr><td>PaLM 540B · CoT</td><td>56.9</td><td>8 个带步骤的 exemplar</td></tr><tr><td>GPT-3 175B · standard</td><td>15.6</td><td></td></tr><tr><td>GPT-3 175B · CoT</td><td>46.9</td><td></td></tr><tr><td>GPT-3 350M · standard</td><td>2.2</td><td></td></tr><tr><td>GPT-3 350M · CoT</td><td>0.5</td><td>小模型加了步骤反而更差</td></tr></tbody></table><p class="tnote">数据来自 Wei 等 2022 的 Table 2，单位是准确率。</p></div>
+    <figure class="fig" id="fig-cot"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 484" width="832" height="484" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="484" fill="#fff"/>
+
+<text x="0" y="24" class="h1">CoT：把答案拆成可以生成的步骤</text>
+<text x="0" y="46" class="xs">同一个问题，标准提示直接给答案，CoT 提示先写中间步骤。下面一排是生成过程：每多一个 token，多一次固定深度的前向计算。</text>
+
+<rect x="0" y="70" width="380" height="240" rx="9" class="panel"/>
+<text x="16" y="96" class="ph">标准提示</text>
+<text x="16" y="114" class="xs">few-shot，8 个 exemplar</text>
+<rect x="16" y="128" width="348" height="72" rx="7" class="soft"/>
+<text x="30" y="152" class="xi">Roger 有 5 个网球。他又买了 2 罐，每罐 3 个。</text>
+<text x="30" y="172" class="xi">现在有几个？</text>
+<path d="M190 204 V224" class="ink" marker-end="url(#a)"/>
+<rect x="120" y="228" width="140" height="40" rx="7" class="warm"/>
+<text x="190" y="255" class="pb" text-anchor="middle" font-size="18">11</text>
+<text x="190" y="288" class="xs" text-anchor="middle">直接输出答案</text>
+
+<rect x="420" y="70" width="380" height="240" rx="9" class="panel"/>
+<text x="436" y="96" class="ph">Chain-of-Thought 提示</text>
+<text x="436" y="114" class="xs">8 个 exemplar，每个都带步骤</text>
+<rect x="436" y="128" width="348" height="56" rx="7" class="soft"/>
+<text x="450" y="150" class="xi">Roger 有 5 个网球。他又买了 2 罐，每罐 3 个。</text>
+<text x="450" y="170" class="xi">现在有几个？</text>
+<path d="M436 190 V284" class="thin"/>
+<rect x="448" y="190" width="336" height="28" rx="5" class="acc"/>
+<text x="462" y="209" class="xi">2 罐 × 3 个 = 6 个</text>
+<rect x="448" y="224" width="336" height="28" rx="5" class="acc"/>
+<text x="462" y="243" class="xi">5 + 6 = 11</text>
+<rect x="448" y="258" width="336" height="28" rx="5" class="warm"/>
+<text x="462" y="277" class="xi">答案是 11</text>
+<text x="436" y="300" class="xs">中间步骤也是 token，要一个一个生成</text>
+
+<rect x="0" y="326" width="800" height="82" rx="9" class="card"/>
+<text x="16" y="350" class="pb">生成过程</text>
+<text x="16" y="368" class="xs">同样是 11，CoT 要多生成 6 个 token</text>
+<rect x="100" y="336" width="44" height="28" rx="4" class="acc2"/><text x="122" y="355" class="pb" text-anchor="middle">5</text>
+<path d="M146 350 H156" class="ink" marker-end="url(#a)"/>
+<rect x="158" y="336" width="44" height="28" rx="4" class="soft"/><text x="180" y="355" class="pb" text-anchor="middle">+</text>
+<path d="M204 350 H214" class="ink" marker-end="url(#a)"/>
+<rect x="216" y="336" width="44" height="28" rx="4" class="acc2"/><text x="238" y="355" class="pb" text-anchor="middle">2</text>
+<path d="M262 350 H272" class="ink" marker-end="url(#a)"/>
+<rect x="274" y="336" width="44" height="28" rx="4" class="soft"/><text x="296" y="355" class="pb" text-anchor="middle">×</text>
+<path d="M320 350 H330" class="ink" marker-end="url(#a)"/>
+<rect x="332" y="336" width="44" height="28" rx="4" class="acc2"/><text x="354" y="355" class="pb" text-anchor="middle">3</text>
+<path d="M378 350 H388" class="ink" marker-end="url(#a)"/>
+<rect x="390" y="336" width="44" height="28" rx="4" class="soft"/><text x="412" y="355" class="pb" text-anchor="middle">=</text>
+<path d="M436 350 H446" class="ink" marker-end="url(#a)"/>
+<rect x="448" y="336" width="44" height="28" rx="4" class="warm"/><text x="470" y="355" class="pb" text-anchor="middle">11</text>
+<path d="M100 378 H492" class="thin"/>
+<text x="100" y="396" class="xs">7 个 token，7 次串行前向</text>
+<text x="500" y="355" class="xi">每多一个 token，</text>
+<text x="500" y="371" class="xi">模型多一次完整前向</text>
+<text x="0" y="438" class="xs">题目来自 Wei 等 2022 的 Figure 1；token 切分为示意，非实测。</text>
+</svg>
+<figcaption>标准提示和 CoT 提示的区别。下面一排是同一个答案的生成过程：每多一个 token，就多一次固定深度的前向计算。题目来自论文 Figure 1，数字为示意，非实测。</figcaption></figure>
+    <p>为什么多写几步会有效？一个解释是串行计算。常数深度、有限精度的 Transformer 在没有 CoT 时，能解决的问题类别受限于电路复杂度里的 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">C</mi></mrow><mn>0</mn></msup></mrow><annotation encoding="application/x-tex">\mathsf{TC}^0</annotation></semantics></math></span>；CoT 把每一步的输出接回输入，等于让模型用生成的 token 换取了更多串行步骤。2024 年 Li 等人的论文把这个直觉写成了表达力定理。这个解释只讲计算能力，不涉及模型写出来的文字是否等于内部推理过程。</p>
+    <p>CoT 之后出现了两个直接变体。Zero-shot CoT 只加一句「Let's think step by step」，在 text-davinci-002 上把 GSM8K 从 10.4% 提到 40.7%，MultiArith 从 17.7% 提到 78.7%。Self-Consistency 采样多条推理路径，对最终答案做多数投票，在 PaLM 540B 上把 GSM8K 从 56.5% 提到 74.4%，提高 17.9 个百分点。前者省掉了 exemplar，后者用采样次数换准确率，代价都是更多的 token 和更长的延迟。</p>
+    <p>只看最终答案有一个漏洞：中间步骤错了，模型也可能碰对。2023 年 5 月的 Let's Verify Step by Step 训练一个 process reward model (PRM)，给每一步打分，不只给最后答案打分。论文在一个有代表性的 MATH 子集上把 solve rate 做到 78%，并且显示过程监督比结果监督更好。代价是步骤级标注，比只标最终答案贵得多。</p>
+    <p>Tree of Thoughts 把推理做成搜索。每个节点是一个中间想法，模型可以生成多个分支、评估、回溯。在 Game of 24 上，ToT 明显高于 CoT；代价是多次调用模型，延迟和成本随分支数增长。Self-Refine 和 Reflexion 走的是另一条路：让模型生成、批评、修改，或者把失败经验写进记忆下一轮再用。两者都不更新权重，靠额外的调用换质量。</p>
+    <p>2024 年 9 月 12 日，OpenAI 发布 o1。它用强化学习训练，回答前生成一段很长的内部 chain of thought；OpenAI 没有公开 RL 的细节、数据和奖励设计。产品形态很清楚：思考 token 成了推理成本的一部分，模型在测试时可以选择想多久。</p>
+    <p>2025 年 1 月 22 日，DeepSeek 发布 R1。R1-Zero 从 V3-Base 出发，完全用强化学习，不做监督微调。算法是 Group Relative Policy Optimization (GRPO)：对每个问题采样一组输出，用组内奖励的均值和标准差算优势，不需要单独的 critic 网络。奖励是规则给的，数学题看答案对不对，代码题看测试过不过，再加一个格式奖励。</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>A</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>r</mi><mi>i</mi></msub><mo>−</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">n</mi></mrow><mo stretchy="false">(</mo><mo stretchy="false">{</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>r</mi><mi>G</mi></msub><mo stretchy="false">}</mo><mo stretchy="false">)</mo></mrow><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">d</mi></mrow><mo stretchy="false">(</mo><mo stretchy="false">{</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>r</mi><mi>G</mi></msub><mo stretchy="false">}</mo><mo stretchy="false">)</mo></mrow></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle A_i = \frac{r_i - \mathrm{mean}(\{r_1,\dots,r_G\})}{\mathrm{std}(\{r_1,\dots,r_G\})}</annotation></semantics></math></span></span><span class="dc">组内归一化的优势，省掉 critic</span></div></div>
+    <p>结果很直接。R1-Zero 在 AIME 2024 上的 pass@1 从 15.6% 升到 77.9%，平均回答长度在 RL 过程中自然增长；加 self-consistency 到 86.7%。R1 在 R1-Zero 的基础上加了 cold-start SFT、拒绝采样和第二阶段 RL，AIME 2024 79.8%，MATH-500 97.3%，Codeforces 百分位 96.3。</p>
+    <p>这类训练叫 RLVR (Reinforcement Learning with Verifiable Rewards)：奖励来自可以程序化验证的结果，数学题对答案，代码跑测试。它和 RLHF 的区别在奖励来源：RLHF 用人偏好模型，RLVR 用规则。规则的好处是便宜、可扩展，坏处是只能覆盖有明确对错的任务。</p>
+    <p>2024 年 8 月的 Scaling LLM Test-Time Compute 把推理算力当成一个可以调的变量：在固定算力预算下，怎么在模型参数和测试时计算之间分配。结论是取决于问题难度，简单题多采样没用，难题多采样有效。2025 年 1 月 31 日的 s1 把这件事做得更小：1,000 条精选数据，加一个 budget forcing 技巧，模型想结束思考时追加「Wait」，强制它继续生成；或者反过来，在预算用完时强行截断。</p>
+    <p>还有一条更远的路：Coconut 把推理放在连续隐状态里，不生成自然语言 token。它在需要搜索的任务上有优势，但可解释性更差。目前主流模型仍然用显式 CoT，隐式推理还是研究阶段。</p>
+    <div class="tbl"><table><thead><tr><th>方法</th><th>时间</th><th>做什么</th><th>代价</th></tr></thead><tbody><tr><td>CoT</td><td>2022-01</td><td>在提示里给中间步骤</td><td>更多 token</td></tr><tr><td>Self-Consistency</td><td>2022-03</td><td>采样多条路径，多数投票</td><td>采样倍数</td></tr><tr><td>Zero-shot CoT</td><td>2022-05</td><td>一句 Let's think step by step</td><td>仍然多 token</td></tr><tr><td>Self-Refine / Reflexion</td><td>2023-03</td><td>自我批评、重试、记忆</td><td>多轮调用，可能空转</td></tr><tr><td>Process supervision</td><td>2023-05</td><td>奖励每个推理步骤</td><td>步骤级标注贵</td></tr><tr><td>Tree of Thoughts</td><td>2023-05</td><td>搜索多条推理分支</td><td>多次调用</td></tr><tr><td>Test-time compute scaling</td><td>2024-08</td><td>把推理算力当变量分配</td><td>收益递减</td></tr><tr><td>o1</td><td>2024-09</td><td>RL 训练长 CoT</td><td>闭源，推理成本高</td></tr><tr><td>R1 / GRPO / RLVR</td><td>2025-01</td><td>用可验证奖励做 RL</td><td>需要可验证任务</td></tr><tr><td>s1 / budget forcing</td><td>2025-01</td><td>小数据加推理预算控制</td><td>依赖强底座</td></tr><tr><td>Coconut</td><td>2024-12</td><td>在连续隐状态里推理</td><td>可解释性差</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="reasoning-limits">
+    <h2><span class="n">3</span><span>推理的边界：忠实性、过度思考、奖励漏洞</span></h2>
+    <p>CoT 读起来像推理，但不保证是模型内部真实的计算。2023 年 Lanham 等人的实验给 CoT 加入错误、改写或者无关内容，看模型答案怎么变。结论是模型对 CoT 的依赖程度因任务而异，模型越大，在多数任务上写出来的推理越不忠实。Turpin 等人的实验更直接：在提示里加入偏置特征，模型会写出支持偏置答案的理由，而不承认自己受了影响。CoT 是一个有用的接口，不能当成模型内部计算的证据。</p>
+    <p>围绕「涌现」也有争论。2023 年 Schaeffer 等人的论文指出，一些涌现曲线是评价指标的非线性造成的假象。CoT 的规模依赖在论文自己的数据里是真实的，小模型加了步骤会更差；至于阈值为什么在那里、是不是一个尖锐的相变，还没有定论。</p>
+    <p>长 CoT 也不是越长越好。简单题上，模型可能生成大量重复检查，准确率不升，延迟上升。R1 之后的推理模型普遍带一个「思考预算」参数，产品上要在准确率和响应时间之间取平衡。</p>
+    <p>RLVR 的奖励是规则，规则有洞。单元测试覆盖不全，模型可能写出只过测试的代码；答案格式奖励可以被刷；数学题的答案抽取也可能被利用。R1 的论文专门讨论了 reward hacking，并把语言一致性奖励拿掉，避免模型为了奖励切换语言。</p>
+    <p>评测还有污染问题。AIME、MATH、SWE-bench 的题目可能出现在预训练数据里，模型可能记住了答案而不是学会了方法。评测要用 held-out、私有或者新收集的题，至少要做 n-gram 重叠检查。</p>
+  </section>
+<section class="aisec" id="moe">
+    <h2><span class="n">4</span><span>稀疏化：Mixture-of-Experts</span></h2>
+    <p>MoE 的思路是让每个 token 只走一部分参数。稠密模型每个 token 都要过所有 FFN 权重，MoE 把 FFN 拆成若干个专家，用一个路由器给每个 token 选 top-k 个专家，只算这几个。总参数量可以很大，每个 token 的激活参数量仍然可控。</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>y</mi><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>∈</mo><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">K</mi></mrow></mrow></munder><msub><mi>g</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mi>E</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>g</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">K</mi></mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mi mathvariant="normal">⊤</mi></msup><msub><mi>W</mi><mi>g</mi></msub><mo stretchy="false">)</mo><msub><mo stretchy="false">)</mo><mi>i</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle y = \sum_{i \in \mathrm{TopK}} g_i(x) E_i(x), \qquad g_i(x) = \mathrm{softmax}(\mathrm{TopK}(x^\top W_g))_i</annotation></semantics></math></span></span><span class="dc">路由器选专家，输出按门控值加权</span></div></div>
+    <p>总参数和激活参数要分开看。DeepSeek-V3 是 671B total / 37B active，DeepSeek-V2 是 236B / 21B，Mixtral 8x7B 是 47B / 13B（论文口径）。训练和推理的显存按总参数算，计算量按激活参数算。</p>
+    <p>DeepSeekMoE 做了两个改动。专家切得更细：同样激活参数量下，用更多、更小的专家，让每个专家学更窄的知识。再留出几个共享专家，所有 token 都走，负责公共知识，减少路由专家的冗余。V2 的配置是 2 个共享专家加 160 个路由专家，每个 token 激活 6 个路由专家。</p>
+    <p>MoE 的麻烦在路由。负载不均会让少数专家过载、多数专家训练不足，叫 routing collapse。V2 用三个辅助损失控制专家级、设备级和通信级的平衡；V3 改成 auxiliary-loss-free 的偏置调整，把平衡从损失函数里拿出来，减少对模型性能的干扰。</p>
+    <p>系统层面，MoE 要求所有专家常驻显存，专家并行会把专家分散到不同设备，每个 token 的激活专家可能跨设备，产生 all-to-all 通信。设备受限路由（device-limited routing）把每个 token 的目标专家限制在最多 M 台设备上，控制通信量。</p>
+    <figure class="fig" id="fig-moe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 422" width="832" height="422" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="422" fill="#fff"/>
+
+<text x="0" y="24" class="h1">MoE：每个 token 只走少数专家</text>
+<text x="0" y="46" class="xs">路由器给每个 token 选 top-k 个专家，输出按门控值加权。总参数可以很大，每个 token 的激活参数仍然可控。</text>
+
+<rect x="10" y="150" width="70" height="40" rx="6" class="soft"/>
+<text x="45" y="175" class="pb" text-anchor="middle">token</text>
+<path d="M80 170 H110" class="ink" marker-end="url(#a)"/>
+<rect x="110" y="145" width="70" height="50" rx="6" class="acc"/>
+<text x="145" y="168" class="pb" text-anchor="middle">Router</text>
+<text x="145" y="184" class="xs" text-anchor="middle">top-k</text>
+<path d="M180 170 H205" class="ink"/>
+
+<rect x="230" y="60" width="130" height="32" rx="5" class="soft"/><text x="244" y="81" class="sm">Expert 1</text>
+<rect x="230" y="110" width="130" height="32" rx="5" class="acc"/><text x="244" y="131" class="pb">Expert 2</text>
+<rect x="230" y="160" width="130" height="32" rx="5" class="soft"/><text x="244" y="181" class="sm">Expert 3</text>
+<rect x="230" y="210" width="130" height="32" rx="5" class="acc"/><text x="244" y="231" class="pb">Expert 4</text>
+<rect x="230" y="260" width="130" height="32" rx="5" class="soft"/><text x="244" y="281" class="sm">Expert 5</text>
+<path d="M205 76 V276" class="thin"/>
+<path d="M205 76 H230" class="dash" marker-end="url(#ag)"/><path d="M205 126 H230" class="ink" marker-end="url(#a)"/><path d="M205 176 H230" class="dash" marker-end="url(#ag)"/><path d="M205 226 H230" class="ink" marker-end="url(#a)"/><path d="M205 276 H230" class="dash" marker-end="url(#ag)"/>
+
+<rect x="230" y="318" width="130" height="30" rx="5" class="acc2"/>
+<text x="244" y="338" class="pb">Shared Expert</text>
+<path d="M45 190 V333 H230" class="tdash" marker-end="url(#at)"/>
+<text x="92" y="326" class="xs">所有 token 都走</text>
+
+<path d="M360 126 L410 160" class="ink" marker-end="url(#a)"/>
+<path d="M360 226 L410 180" class="ink" marker-end="url(#a)"/>
+<rect x="412" y="145" width="120" height="50" rx="6" class="soft"/>
+<text x="472" y="176" class="pb" text-anchor="middle">Σ gᵢ Eᵢ(x)</text>
+<path d="M532 170 H560" class="ink" marker-end="url(#a)"/>
+<rect x="562" y="150" width="70" height="40" rx="6" class="acc"/>
+<text x="597" y="175" class="pb" text-anchor="middle">y</text>
+<text x="412" y="220" class="xs">只把激活专家的输出加起来</text>
+
+<text x="0" y="378" class="xs">示意：5 个路由专家里激活 2 个；实际模型可能有 256 个路由专家、激活 8 个（DeepSeek-V3 是 671B total / 37B active）。</text>
+</svg>
+<figcaption>MoE 的单层结构。路由器给每个 token 选 top-k 个专家，输出按门控值加权求和；共享专家对所有 token 都生效。</figcaption></figure>
+    <div class="tbl"><table><thead><tr><th>模型</th><th>时间</th><th>总参数 / 激活参数</th><th>专家配置</th></tr></thead><tbody><tr><td>Mixtral 8x7B</td><td>2023-12</td><td>47B / 13B</td><td>8 个专家，每 token 选 2 个</td></tr><tr><td>DeepSeek-V2</td><td>2024-05</td><td>236B / 21B</td><td>2 共享 + 160 路由，激活 6 个</td></tr><tr><td>DeepSeek-V3</td><td>2024-12</td><td>671B / 37B</td><td>1 共享 + 256 路由，激活 8 个</td></tr></tbody></table><p class="tnote">V3 的专家配置来自技术报告 §4.2（架构见 §2.1.2）；Mixtral 的 2023-12 是博客发布日，arXiv 是 2024-01。</p></div>
+  </section>
+<section class="aisec" id="attention">
+    <h2><span class="n">5</span><span>注意力：从 GQA 到 MLA，再到稀疏与线性</span></h2>
+    <p>注意力这条线解决的是推理时的显存和计算。标准 MHA 要为每个头、每个 token 存一份 Key 和 Value，cache 随头数、每头维度、层数线性增长。上下文到 128K 时，cache 能到几百 GB。</p>
+    <p>共享 K/V 是最直接的一类做法。Multi-Query Attention (MQA) 让所有头共享一组 K/V，cache 降到 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mrow><annotation encoding="application/x-tex">2 d_h l</annotation></semantics></math></span>；Grouped-Query Attention (GQA) 让每组头共享一组，cache 是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>n</mi><mi>g</mi></msub><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mrow><annotation encoding="application/x-tex">2 n_g d_h l</annotation></semantics></math></span>。共享得越多，cache 越小，但 Key/Value 空间的秩也越低，效果通常不如 MHA。Llama 2 70B 和 Llama 3 用了 GQA。</p>
+    <p>压缩走的是另一条路。MLA 把 K/V 联合压到一个低维潜向量，cache 里只存潜向量加一小段解耦的位置 key。这是 DeepSeek-V2 的核心改动，后面单独展开。</p>
+    <p>限制注意力范围是第三种思路。Sliding Window Attention 让每个 token 只看最近的固定窗口，cache 可以用滚动缓冲区，Mistral 7B 用的就是 4096 窗口。深层网络里，信息可以通过多层传播覆盖更远的距离，但单层看不到全局。</p>
+    <p>稀疏化是第四种思路。Native Sparse Attention (NSA) 用压缩、选择和滑动三条分支组合；DeepSeek Sparse Attention (DSA) 用一个轻量的 lightning indexer 给每个 query 选 top-k 个 KV 条目，只对选中的做注意力。两者都把长上下文的计算量从 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span> 降到接近 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo>⋅</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n \cdot k)</annotation></semantics></math></span>。</p>
+    <p>还有一类做法是换掉注意力。Mamba 用状态空间模型 (State Space Model)，每个 token 只维护一个固定大小的 recurrent state，计算量随序列长度线性增长；Mamba-2 把结构进一步简化。纯 SSM 在精确检索和长距离复制上弱于注意力，Jamba 这类混合模型把注意力层和 SSM 层交替堆叠，取两边的好处。</p>
+    <div class="tbl"><table><thead><tr><th>机制</th><th>每 token cache</th><th>计算量</th><th>代表工作</th><th>主要取舍</th></tr></thead><tbody><tr><td>MHA</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>n</mi><mi>h</mi></msub><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mrow><annotation encoding="application/x-tex">2 n_h d_h l</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span></td><td>Transformer</td><td>质量强，cache 最大</td></tr><tr><td>GQA</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>n</mi><mi>g</mi></msub><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mrow><annotation encoding="application/x-tex">2 n_g d_h l</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span></td><td>Llama 2/3</td><td>cache 小，质量略降</td></tr><tr><td>MQA</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mrow><annotation encoding="application/x-tex">2 d_h l</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span></td><td>PaLM、Falcon</td><td>cache 最小，质量降得多</td></tr><tr><td>MLA</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>d</mi><mi>c</mi></msub><mo>+</mo><msubsup><mi>d</mi><mi>h</mi><mi>R</mi></msubsup><mo stretchy="false">)</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">(d_c + d_h^R)l</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span></td><td>DeepSeek-V2/V3</td><td>cache 接近 MQA，质量强于 MHA</td></tr><tr><td>Sliding window</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(w)</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo>⋅</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n \cdot w)</annotation></semantics></math></span></td><td>Mistral 7B</td><td>只看局部，长程靠层数传播</td></tr><tr><td>Sparse attention</td><td>按选择的 KV 算</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo>⋅</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n \cdot k)</annotation></semantics></math></span></td><td>NSA、DSA</td><td>选择器有额外开销，可能漏信息</td></tr><tr><td>Linear / SSM</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span> 状态</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span></td><td>Mamba、Jamba</td><td>长程检索弱，常与注意力混合</td></tr></tbody></table><p class="tnote"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span> 是序列长度，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span> 是窗口大小，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span> 是每个 query 选中的 KV 数。</p></div>
+    <p>FlashAttention 不属于上面任何一类。它不改变注意力的数学，只改变计算顺序：标准注意力要把 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math></span> 的分数矩阵写回 HBM，再读出来做 softmax；FlashAttention 把 Q、K、V 分块，在 SRAM 里算完一块的 softmax 再写回，减少 HBM 读写。它是长上下文和训练的基础设施，没有它，很多注意力变体连显存都放不下。</p>
+    <p>MLA 值得单独展开。它把 K/V 联合压到一个低维潜向量，保持每个头独立的升维矩阵，在需要的时候把潜向量升维回每个头。cache 里只存这个潜向量，加上一小段解耦的位置 key。</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mtext>MHA cache per token</mtext><mo>=</mo><mn>2</mn><msub><mi>n</mi><mi>h</mi></msub><msub><mi>d</mi><mi>h</mi></msub><mi>l</mi></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle \text{MHA cache per token} = 2 n_h d_h l</annotation></semantics></math></span></span><span class="dc">系数 2 是 K 和 V 各一份</span></div></div>
+    <p>以 DeepSeek-V2 的形状为例：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>h</mi></msub><mo>=</mo><mn>128</mn></mrow><annotation encoding="application/x-tex">n_h = 128</annotation></semantics></math></span>，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>h</mi></msub><mo>=</mo><mn>128</mn></mrow><annotation encoding="application/x-tex">d_h = 128</annotation></semantics></math></span>，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mo>=</mo><mn>60</mn></mrow><annotation encoding="application/x-tex">l = 60</annotation></semantics></math></span>。每个 token 的 MHA cache 是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>128</mn><mo>×</mo><mn>128</mn><mo>×</mo><mn>60</mn><mo>=</mo><mn>1</mn><mo separator="true" lspace="0em" rspace="0em">,</mo><mn>966</mn><mo separator="true" lspace="0em" rspace="0em">,</mo><mn>080</mn></mrow><annotation encoding="application/x-tex">2 \times 128 \times 128 \times 60 = 1{,}966{,}080</annotation></semantics></math></span> 个元素。按 BF16 算，一个 token 约 3.75 MiB；128K 上下文就是 480 GiB。这还没算 batch 和中间激活。</p>
+    <p>V2 的配置是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><mn>512</mn></mrow><annotation encoding="application/x-tex">d_c = 512</annotation></semantics></math></span>，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>h</mi><mi>R</mi></msubsup><mo>=</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">d_h^R = 64</annotation></semantics></math></span>。每个 token 每层的 cache 是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>512</mn><mo>+</mo><mn>64</mn><mo>=</mo><mn>576</mn></mrow><annotation encoding="application/x-tex">512 + 64 = 576</annotation></semantics></math></span> 个元素，60 层共 34,560 个，是 MHA 的 1/56.9。论文的 Table 1 给了一个更好记的等价：MLA 的 cache 等于 GQA 只有 2.25 组时的 cache，但效果比 MHA 强。</p>
+    <p>论文摘要里的 93.3% 和 5.76 倍，是对比 DeepSeek 67B 的实际部署结果。两个模型的层数、头数、cache 精度都不同，V2 还对 cache 做了平均 6 bit 的量化。93.3% 不能直接当成 MLA 和 MHA 的公式比值；公式比值以上面那个 1/56.9 和 2.25 组为准。</p>
+    <figure class="fig" id="fig-mla-cache"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 384" width="832" height="384" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="384" fill="#fff"/>
+
+<text x="0" y="24" class="h1">MLA：KV cache 压成一个潜向量</text>
+<text x="0" y="46" class="xs">同一个 V2 形状下，每 token 每层的 cache 元素数。横轴是对数刻度，否则小的几项会贴在一起看不见。</text>
+
+<path d="M180 80 V260" class="thin"/>
+<path d="M180 80 V260" class="thin" stroke-dasharray="3 4"/><text x="180" y="282" class="xs" text-anchor="middle">10⁴</text><path d="M421.6666666666667 80 V260" class="thin" stroke-dasharray="3 4"/><text x="421.6666666666667" y="282" class="xs" text-anchor="middle">10⁵</text><path d="M663.3333333333334 80 V260" class="thin" stroke-dasharray="3 4"/><text x="663.3333333333334" y="282" class="xs" text-anchor="middle">10⁶</text>
+<text x="170" y="107" class="xi" text-anchor="end">MHA</text>
+<rect x="180" y="92" width="554.2869531246458" height="20" rx="3" class="warm"/>
+<text x="742.2869531246458" y="107" class="xs">1,966,080</text>
+<text x="170" y="147" class="xi" text-anchor="end">GQA（8 组）</text>
+<rect x="180" y="132" width="263.29129064946386" height="20" rx="3" class="soft"/>
+<text x="451.29129064946386" y="147" class="xs">122,880</text>
+<text x="170" y="187" class="xi" text-anchor="end">MLA</text>
+<rect x="180" y="172" width="130.15531900332348" height="20" rx="3" class="acc"/>
+<text x="318.1553190033235" y="187" class="xs">34,560</text>
+<text x="170" y="227" class="xi" text-anchor="end">MQA</text>
+<rect x="180" y="212" width="45.04454379307748" height="20" rx="3" class="soft"/>
+<text x="233.04454379307748" y="227" class="xs">15,360</text>
+
+<path d="M310.1553190033235 80 V260" class="tdash"/>
+<text x="302.1553190033235" y="76" class="xs" text-anchor="end">MLA 与 GQA 2.25 组同宽</text>
+<text x="180" y="318" class="xi">MLA 的 576 = 512（K/V 共用潜向量）+ 64（解耦位置 key）</text>
+<text x="180" y="338" class="xs">V2：n<tspan baseline-shift="-20%" font-size="8">h</tspan> = 128，d<tspan baseline-shift="-20%" font-size="8">h</tspan> = 128，l = 60，d<tspan baseline-shift="-20%" font-size="8">c</tspan> = 512，d<tspan baseline-shift="-20%" font-size="8">h</tspan><tspan baseline-shift="45%" font-size="8">R</tspan> = 64。数值按元素计，不含精度。</text>
+</svg>
+<figcaption>同一个 V2 形状下，每 token 每层的 cache 元素数。MLA 的 576 个元素里，512 个是 K/V 共用的潜向量，64 个是解耦的位置 key。</figcaption></figure>
+    <p>MLA 的计算分几步。先把输入 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span> 压成一个 K/V 共用的潜向量：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>c</mi><mi>t</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup><mo>=</mo><msup><mi>W</mi><mrow><mi>D</mi><mi>K</mi><mi>V</mi></mrow></msup><msub><mi>h</mi><mi>t</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle c_t^{KV} = W^{DKV} h_t</annotation></semantics></math></span></span><span class="dc">d<sub>c</sub> = 512，远小于 d<sub>h</sub> n<sub>h</sub> = 16384</span></div></div>
+    <p>再从潜向量升维出每个头的 Key 和 Value。Query 也做一次低秩压缩，目的是降低训练时的激活显存：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>k</mi><mi>t</mi><mi>C</mi></msubsup><mo>=</mo><msup><mi>W</mi><mrow><mi>U</mi><mi>K</mi></mrow></msup><msubsup><mi>c</mi><mi>t</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup><mo separator="true">,</mo><mspace width="2em"/><msubsup><mi>v</mi><mi>t</mi><mi>C</mi></msubsup><mo>=</mo><msup><mi>W</mi><mrow><mi>U</mi><mi>V</mi></mrow></msup><msubsup><mi>c</mi><mi>t</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle k_t^C = W^{UK} c_t^{KV}, \qquad v_t^C = W^{UV} c_t^{KV}</annotation></semantics></math></span></span><span class="dc">升维矩阵按头切分</span></div></div>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>c</mi><mi>t</mi><mi>Q</mi></msubsup><mo>=</mo><msup><mi>W</mi><mrow><mi>D</mi><mi>Q</mi></mrow></msup><msub><mi>h</mi><mi>t</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msubsup><mi>q</mi><mi>t</mi><mi>C</mi></msubsup><mo>=</mo><msup><mi>W</mi><mrow><mi>U</mi><mi>Q</mi></mrow></msup><msubsup><mi>c</mi><mi>t</mi><mi>Q</mi></msubsup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle c_t^Q = W^{DQ} h_t, \qquad q_t^C = W^{UQ} c_t^Q</annotation></semantics></math></span></span><span class="dc">d<sub>c</sub><sup>\prime</sup> = 1536</span></div></div>
+    <p>位置信息不能直接加在压缩后的 Key 上。RoPE 是位置相关的旋转，如果对 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>k</mi><mi>t</mi><mi>C</mi></msubsup></mrow><annotation encoding="application/x-tex">k_t^C</annotation></semantics></math></span> 做 RoPE，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>W</mi><mrow><mi>U</mi><mi>K</mi></mrow></msup></mrow><annotation encoding="application/x-tex">W^{UK}</annotation></semantics></math></span> 就会和一个随位置变化的旋转矩阵绑在一起，推理时没法再吸收进 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>W</mi><mi>Q</mi></msup></mrow><annotation encoding="application/x-tex">W^Q</annotation></semantics></math></span>，每个新 token 都要把前面所有 token 的 Key 重算一遍，cache 省下来的收益又被抵消。</p>
+    <p>MLA 的做法是解耦：单独用一小段维度承载 RoPE。Query 侧每个头生成 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>q</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>R</mi></msubsup></mrow><annotation encoding="application/x-tex">q_{t,i}^R</annotation></semantics></math></span>，Key 侧只生成一个所有头共享的 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>k</mi><mi>t</mi><mi>R</mi></msubsup></mrow><annotation encoding="application/x-tex">k_t^R</annotation></semantics></math></span>，维度 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>h</mi><mi>R</mi></msubsup><mo>=</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">d_h^R = 64</annotation></semantics></math></span>。每个头的 Query 和 Key 是两段拼接：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>q</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>=</mo><mo stretchy="false">[</mo><msubsup><mi>q</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>C</mi></msubsup><mo separator="true">;</mo><msubsup><mi>q</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>R</mi></msubsup><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>k</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>=</mo><mo stretchy="false">[</mo><msubsup><mi>k</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>C</mi></msubsup><mo separator="true">;</mo><msubsup><mi>k</mi><mi>t</mi><mi>R</mi></msubsup><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle q_{t,i} = [q_{t,i}^C; q_{t,i}^R], \qquad k_{t,i} = [k_{t,i}^C; k_t^R]</annotation></semantics></math></span></span><span class="dc">内容段 + 位置段</span></div></div>
+    <p>注意力分母也跟着变成 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mrow><msub><mi>d</mi><mi>h</mi></msub><mo>+</mo><msubsup><mi>d</mi><mi>h</mi><mi>R</mi></msubsup></mrow></msqrt><mo>=</mo><msqrt><mn>192</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{d_h + d_h^R} = \sqrt{192}</annotation></semantics></math></span>。Value 仍然只用内容段 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>v</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>C</mi></msubsup></mrow><annotation encoding="application/x-tex">v_{t,i}^C</annotation></semantics></math></span>。</p>
+    <p>矩阵吸收是 MLA 在推理时真正省算力的地方。内容段的注意力分数可以写成：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>q</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>i</mi></mrow><mrow><mi>C</mi><mi mathvariant="normal">⊤</mi></mrow></msubsup><msubsup><mi>k</mi><mrow><mi>j</mi><mo separator="true">,</mo><mi>i</mi></mrow><mi>C</mi></msubsup><mo>=</mo><msubsup><mi>c</mi><mi>t</mi><mrow><mi>Q</mi><mi mathvariant="normal">⊤</mi></mrow></msubsup><mo stretchy="false">(</mo><msubsup><mi>W</mi><mi>i</mi><mrow><mi>U</mi><mi>Q</mi></mrow></msubsup><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><msubsup><mi>W</mi><mi>i</mi><mrow><mi>U</mi><mi>K</mi></mrow></msubsup><msubsup><mi>c</mi><mi>j</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle q_{t,i}^{C\top} k_{j,i}^C = c_t^{Q\top} (W_i^{UQ})^\top W_i^{UK} c_j^{KV}</annotation></semantics></math></span></span><span class="dc">把两个升维矩阵先乘起来</span></div></div>
+    <p>右边只和潜向量有关，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>W</mi><mi>i</mi><mrow><mi>U</mi><mi>K</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">W_i^{UK}</annotation></semantics></math></span> 可以折进 Query 侧的矩阵，推理时不需要把 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>k</mi><mi>t</mi><mi>C</mi></msubsup></mrow><annotation encoding="application/x-tex">k_t^C</annotation></semantics></math></span> 真正算出来。Value 侧同理，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>W</mi><mrow><mi>U</mi><mi>V</mi></mrow></msup></mrow><annotation encoding="application/x-tex">W^{UV}</annotation></semantics></math></span> 可以折进输出投影 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>W</mi><mi>O</mi></msup></mrow><annotation encoding="application/x-tex">W^O</annotation></semantics></math></span>。于是每层每 token 在显存里只保留 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>c</mi><mi>t</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">c_t^{KV}</annotation></semantics></math></span> 和 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>k</mi><mi>t</mi><mi>R</mi></msubsup></mrow><annotation encoding="application/x-tex">k_t^R</annotation></semantics></math></span>，每个头的 K/V 在需要时由矩阵乘法直接给出。</p>
+    <p>这个吸收是精确的，因为潜向量到 K/V 之间没有非线性。RoPE 会破坏这个条件，所以位置段必须单独保留。低秩压缩、解耦 RoPE、矩阵吸收三件事是绑在一起的，少一个，MLA 的推理路径就不成立。</p>
+    <p>MLA 的主要收益在推理，不在训练。训练仍然要为所有 token 算 K/V，低秩压缩反而多了两次投影。它解决的是推理时的 cache 容量和访存带宽，训练成本的下降来自 MoE 的稀疏计算，不要把两件事混在一起。</p>
+    <figure class="fig" id="fig-mla"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 504" width="832" height="504" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="504" fill="#fff"/>
+
+<text x="0" y="24" class="h1">MLA 的单层计算</text>
+<text x="0" y="46" class="xs">K/V 先压成潜向量，再升维回每个头；位置信息走单独的解耦 key。绿色是 cache 里保留的两样东西。</text>
+
+<rect x="10" y="240" width="56" height="40" rx="5" class="soft"/><text x="38" y="265" class="v" text-anchor="middle">h<tspan class="vrs" baseline-shift="-20%">t</tspan></text>
+<path d="M66 260 H80" class="ink"/>
+<path d="M80 110 V390" class="thin"/>
+<path d="M80 110 H100" class="ink" marker-end="url(#a)"/>
+<path d="M80 250 H100" class="ink" marker-end="url(#a)"/>
+<path d="M80 390 H100" class="ink" marker-end="url(#a)"/>
+
+<rect x="100" y="92" width="70" height="36" rx="5" class="soft"/><text x="135" y="115" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">DKV</tspan></text>
+<path d="M170 110 H200" class="ink" marker-end="url(#a)"/>
+<rect x="200" y="92" width="100" height="36" rx="5" class="acc"/><text x="250" y="115" class="v" text-anchor="middle">c<tspan class="vrs" baseline-shift="45%">KV</tspan></text>
+<text x="250" y="82" class="xs" text-anchor="middle">cache</text>
+
+<path d="M300 102 H315 V86 H330" class="ink" marker-end="url(#a)"/>
+<path d="M300 118 H315 V138 H330" class="ink" marker-end="url(#a)"/>
+<rect x="330" y="70" width="70" height="32" rx="5" class="soft"/><text x="365" y="91" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">UK</tspan></text>
+<rect x="330" y="122" width="70" height="32" rx="5" class="soft"/><text x="365" y="143" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">UV</tspan></text>
+<path d="M400 86 H430" class="ink" marker-end="url(#a)"/>
+<path d="M400 138 H430" class="ink" marker-end="url(#a)"/>
+<rect x="430" y="70" width="70" height="32" rx="5" class="acc2"/><text x="465" y="91" class="v" text-anchor="middle">k<tspan class="vrs" baseline-shift="45%">C</tspan></text>
+<rect x="430" y="122" width="70" height="32" rx="5" class="acc2"/><text x="465" y="143" class="v" text-anchor="middle">v<tspan class="vrs" baseline-shift="45%">C</tspan></text>
+
+<rect x="100" y="232" width="70" height="36" rx="5" class="soft"/><text x="135" y="255" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">DQ</tspan></text>
+<path d="M170 250 H200" class="ink" marker-end="url(#a)"/>
+<rect x="200" y="232" width="100" height="36" rx="5" class="soft"/><text x="250" y="255" class="v" text-anchor="middle">c<tspan class="vrs" baseline-shift="45%">Q</tspan></text>
+
+<path d="M300 242 H315 V226 H330" class="ink" marker-end="url(#a)"/>
+<path d="M300 258 H315 V278 H330" class="ink" marker-end="url(#a)"/>
+<rect x="330" y="210" width="70" height="32" rx="5" class="soft"/><text x="365" y="231" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">UQ</tspan></text>
+<rect x="330" y="262" width="70" height="32" rx="5" class="soft"/><text x="365" y="283" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">QR</tspan></text>
+<path d="M400 226 H430" class="ink" marker-end="url(#a)"/>
+<path d="M400 278 H430" class="ink" marker-end="url(#a)"/>
+<rect x="430" y="210" width="70" height="32" rx="5" class="acc2"/><text x="465" y="231" class="v" text-anchor="middle">q<tspan class="vrs" baseline-shift="45%">C</tspan></text>
+<rect x="430" y="262" width="70" height="32" rx="5" class="acc2"/><text x="465" y="283" class="v" text-anchor="middle">q<tspan class="vrs" baseline-shift="45%">R</tspan></text>
+
+<rect x="100" y="372" width="70" height="36" rx="5" class="soft"/><text x="135" y="395" class="v" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">KR</tspan></text>
+<path d="M170 390 H200" class="ink" marker-end="url(#a)"/>
+<rect x="200" y="372" width="100" height="36" rx="5" class="acc"/><text x="250" y="395" class="v" text-anchor="middle">k<tspan class="vrs" baseline-shift="45%">R</tspan></text>
+<text x="250" y="362" class="xs" text-anchor="middle">cache</text>
+
+<path d="M500 86 H520 V192 H540" class="ink" marker-end="url(#a)"/>
+<path d="M500 138 H520 V214 H540" class="ink" marker-end="url(#a)"/>
+<path d="M500 226 H520 V236 H540" class="ink" marker-end="url(#a)"/>
+<path d="M500 278 H520 V258 H540" class="ink" marker-end="url(#a)"/>
+<path d="M300 390 H520 V280 H540" class="ink" marker-end="url(#a)"/>
+
+<rect x="540" y="150" width="240" height="190" rx="8" class="panel"/>
+<text x="660" y="176" class="ph" text-anchor="middle">Attention</text>
+<text x="660" y="204" class="v" text-anchor="middle">q = [q<tspan class="vrs" baseline-shift="45%">C</tspan>; q<tspan class="vrs" baseline-shift="45%">R</tspan>]</text>
+<text x="660" y="228" class="v" text-anchor="middle">k = [k<tspan class="vrs" baseline-shift="45%">C</tspan>; k<tspan class="vrs" baseline-shift="45%">R</tspan>]</text>
+<text x="660" y="252" class="v" text-anchor="middle">softmax(q<tspan class="vrs" baseline-shift="45%">T</tspan>k / √192)</text>
+<text x="660" y="276" class="v" text-anchor="middle">v = v<tspan class="vrs" baseline-shift="45%">C</tspan></text>
+<text x="660" y="316" class="xs" text-anchor="middle">推理时只读 cache 里的 c<tspan class="vrs" baseline-shift="45%">KV</tspan> 和 k<tspan class="vrs" baseline-shift="45%">R</tspan></text>
+<path d="M660 340 V360" class="ink" marker-end="url(#a)"/>
+<rect x="590" y="362" width="140" height="34" rx="5" class="soft"/>
+<text x="660" y="384" class="pb" text-anchor="middle">W<tspan class="vrs" baseline-shift="45%">O</tspan> → output</text>
+
+<text x="0" y="438" class="xi">d<tspan baseline-shift="-20%" font-size="8">c</tspan> = 512，d<tspan baseline-shift="-20%" font-size="8">c</tspan>′ = 1536，d<tspan baseline-shift="-20%" font-size="8">h</tspan> = 128，d<tspan baseline-shift="-20%" font-size="8">h</tspan><tspan baseline-shift="45%" font-size="8">R</tspan> = 64</text>
+<text x="0" y="458" class="xs">W<tspan baseline-shift="45%" font-size="8">UK</tspan> 在推理时折进 Query 侧，W<tspan baseline-shift="45%" font-size="8">UV</tspan> 折进 W<tspan baseline-shift="45%" font-size="8">O</tspan>；这两条折线不画，避免穿过 Query 通路。</text>
+</svg>
+<figcaption>MLA 的单层结构。绿色是会被写进 cache 的两样东西：潜向量 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>c</mi><mi>t</mi><mrow><mi>K</mi><mi>V</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">c_t^{KV}</annotation></semantics></math></span> 和解耦位置 key <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>k</mi><mi>t</mi><mi>R</mi></msubsup></mrow><annotation encoding="application/x-tex">k_t^R</annotation></semantics></math></span>。虚线表示推理时可以提前吸收进相邻矩阵的权重。</figcaption></figure>
+  </section>
+<section class="aisec" id="serving">
+    <h2><span class="n">6</span><span>KV cache 与推理系统</span></h2>
+    <p>注意力决定 cache 的理论大小，推理系统决定实际能塞下多少。同样一个模型，cache 怎么分配、请求怎么排队、前缀怎么复用，吞吐能差几倍。</p>
+    <p>PagedAttention 把 KV cache 切成固定大小的 block，不要求连续存放，像操作系统的虚拟内存一样按需映射。这样不同请求的 cache 可以混在一起，碎片少了，batch 也能随到随加。vLLM 就是围绕这个设计做的，continuous batching 让新请求不用等整批结束。</p>
+    <p>Prefix caching 复用相同前缀的 KV。系统提示、few-shot 示例、长文档在多轮请求里经常重复，把这些前缀的 cache 留下来，下一次直接跳过预填充。SGLang 的 RadixAttention 用前缀树管理这些缓存，结构化生成（JSON、正则约束）也走同一套调度。</p>
+    <p>Cache 装不下时的办法是驱逐。StreamingLLM 保留最前面的几个 attention sink 和最近的窗口，中间的 token 扔掉；H2O 按注意力权重选 heavy hitters。两者都是有损的，适合流式对话，不适合需要精确回溯的长文档任务。</p>
+    <p>Speculative decoding 用小模型先草拟几个 token，大模型并行验证。验证通过的 token 直接接受，不通过的从第一个分歧处重采样。输出分布和只用大模型时一样，加速比取决于草稿的接受率。DeepSeek-V3 的 Multi-Token Prediction (MTP) 在训练时让模型多预测几个未来 token，推理时可以把这些 MTP 模块拿来做 speculative decoding。</p>
+    <p>量化是另一条路。FP8、INT8、INT4 把权重和激活压到更低精度，KV cache 也可以单独量化。DeepSeek-V2 在生产环境把 cache 量化到平均 6 bit。量化的风险在长尾：平均指标看不出问题，少数敏感层或长上下文检索会先坏。</p>
+    <div class="tbl"><table><thead><tr><th>技术</th><th>解决的问题</th><th>机制</th><th>代价</th></tr></thead><tbody><tr><td>PagedAttention</td><td>cache 碎片、batch 利用率</td><td>固定大小 block，按需映射</td><td>实现复杂，block 大小要调</td></tr><tr><td>Prefix caching</td><td>重复前缀的预填充</td><td>缓存前缀 KV，命中即复用</td><td>内存占用，淘汰策略</td></tr><tr><td>StreamingLLM / H2O</td><td>cache 装不下</td><td>保留 sink 和最近窗口，或选 heavy hitters</td><td>有损，长程信息丢失</td></tr><tr><td>Speculative decoding</td><td>逐 token 生成慢</td><td>小模型草拟，大模型并行验证</td><td>草稿模型显存，接受率低时无收益</td></tr><tr><td>MTP</td><td>训练信号稀、推理慢</td><td>多预测几个 token，可复用为草稿</td><td>训练开销，推理分支管理</td></tr><tr><td>量化</td><td>显存和带宽</td><td>FP8/INT8/INT4，KV cache 量化</td><td>长尾质量下降</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="mhc">
+    <h2><span class="n">7</span><span>残差流：从 Hyper-Connections 到 mHC</span></h2>
+    <p>ResNet 的残差连接是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>x</mi><mi>l</mi></msub><mo>+</mo><mi>F</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x_{l+1} = x_l + F(x_l)</annotation></semantics></math></span>。展开到第 L 层，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>=</mo><msub><mi>x</mi><mi>l</mi></msub><mo>+</mo><msub><mo>∑</mo><mi>i</mi></msub><mi>F</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x_L = x_l + \sum_i F(x_i)</annotation></semantics></math></span>，前面层的信号可以沿着那条加法路径直接到后面，不需要经过一串权重矩阵的连乘。深度网络能训练，靠的就是这条路径。</p>
+    <p>Hyper-Connections (HC) 把这条单车道扩成 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span> 条。输入 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>l</mi></msub><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mi>n</mi><mo>×</mo><mi>C</mi></mrow></msup></mrow><annotation encoding="application/x-tex">x_l \in \mathbb{R}^{n \times C}</annotation></semantics></math></span>，每一层用三个矩阵控制残差流怎么读写：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>H</mi><mi>l</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msubsup><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H_l^{res} \in \mathbb{R}^{n \times n}</annotation></semantics></math></span> 在流之间混合，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>H</mi><mi>l</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi></mrow></msubsup><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mn>1</mn><mo>×</mo><mi>n</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H_l^{pre} \in \mathbb{R}^{1 \times n}</annotation></semantics></math></span> 把 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span> 条流聚合成一层输入，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>H</mi><mi>l</mi><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi></mrow></msubsup><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mn>1</mn><mo>×</mo><mi>n</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H_l^{post} \in \mathbb{R}^{1 \times n}</annotation></semantics></math></span> 把层输出写回流。</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>x</mi><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msubsup><mi>H</mi><mi>l</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msubsup><msub><mi>x</mi><mi>l</mi></msub><mo>+</mo><msubsup><mi>H</mi><mi>l</mi><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></mrow></msubsup><mi>F</mi><mo stretchy="false">(</mo><msubsup><mi>H</mi><mi>l</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi></mrow></msubsup><msub><mi>x</mi><mi>l</mi></msub><mo separator="true">,</mo><msub><mi>W</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle x_{l+1} = H_l^{res} x_l + H_l^{post\top} F(H_l^{pre} x_l, W_l)</annotation></semantics></math></span></span><span class="dc">n 条残差流，FLOPs 不变</span></div></div>
+    <p>HC 的动机是残差连接里梯度消失和表示坍塌之间的跷跷板。加宽残差流、让不同层之间动态交换信息，可以在两者之间找一个新的点。HC 的实验里，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">n = 4</annotation></semantics></math></span> 就能带来明显的 loss 改善。</p>
+    <p>问题出在多层的复合。把上式递归展开：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>x</mi><mi>L</mi></msub><mo>=</mo><mrow><mo fence="true">(</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>L</mi><mo>−</mo><mi>l</mi></mrow></munderover><msubsup><mi>H</mi><mrow><mi>L</mi><mo>−</mo><mi>i</mi></mrow><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msubsup><mo fence="true">)</mo></mrow><msub><mi>x</mi><mi>l</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mi>l</mi></mrow><mrow><mi>L</mi><mo>−</mo><mn>1</mn></mrow></munderover><mrow><mo fence="true">(</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>L</mi><mo>−</mo><mn>1</mn><mo>−</mo><mi>i</mi></mrow></munderover><msubsup><mi>H</mi><mrow><mi>L</mi><mo>−</mo><mi>j</mi></mrow><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msubsup><mo fence="true">)</mo></mrow><msubsup><mi>H</mi><mi>i</mi><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></mrow></msubsup><mi>F</mi><mo stretchy="false">(</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle x_L = \left(\prod_{i=1}^{L-l} H_{L-i}^{res}\right) x_l + \sum_{i=l}^{L-1} \left(\prod_{j=1}^{L-1-i} H_{L-j}^{res}\right) H_i^{post\top} F(\dots)</annotation></semantics></math></span></span><span class="dc">复合映射是连乘</span></div></div>
+    <p>如果 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{res}</annotation></semantics></math></span> 不受约束，这个连乘的增益会随层数漂移。mHC 的论文在 27B 模型上观察到 HC 在 12k step 附近 loss 突然抬高，梯度范数同时尖峰；用最大绝对行和（前向）和最大绝对列和（反向）衡量复合映射的增益，峰值接近 3000。</p>
+    <p>mHC 的办法是限制 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{res}</annotation></semantics></math></span> 的取值空间：把它投影到双随机矩阵的集合上。双随机矩阵的每一行、每一列都非负且和为 1：</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>H</mi><msub><mn mathvariant="bold">1</mn><mi>n</mi></msub><mo>=</mo><msub><mn mathvariant="bold">1</mn><mi>n</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msubsup><mn mathvariant="bold">1</mn><mi>n</mi><mi mathvariant="normal">⊤</mi></msubsup><mi>H</mi><mo>=</mo><msubsup><mn mathvariant="bold">1</mn><mi>n</mi><mi mathvariant="normal">⊤</mi></msubsup><mo separator="true">,</mo><mspace width="2em"/><mi>H</mi><mo>≥</mo><mn>0</mn></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle H \mathbf{1}_n = \mathbf{1}_n, \qquad \mathbf{1}_n^\top H = \mathbf{1}_n^\top, \qquad H \ge 0</annotation></semantics></math></span></span><span class="dc">Birkhoff 多胞形</span></div></div>
+    <p>这个约束带来三个性质。第一，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">H x</annotation></semantics></math></span> 的每个分量是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span> 条流的凸组合，列和为 1 又保证所有流的均值不变。第二，双随机矩阵的谱范数不超过 1，映射是非扩张的，前向信号和反向梯度都不会被放大。第三，双随机矩阵对乘法封闭，任意多层复合以后仍然是双随机矩阵，增益仍然有界。</p>
+    <p>注意它恢复的是恒等映射的守恒性质，并没有把 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi></mrow><annotation encoding="application/x-tex">H</annotation></semantics></math></span> 强行设成单位矩阵。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo>=</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">H = I</annotation></semantics></math></span> 时流之间不交换信息，HC 的好处也没了；mHC 要的是「可以混合，但混合不改变总量」。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n = 1</annotation></semantics></math></span> 时双随机矩阵退化成标量 1，正好回到原始残差。</p>
+    <p>具体实现用 Sinkhorn-Knopp 算法。先对 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mover accent="true"><mi>H</mi><mo>~</mo></mover><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\tilde{H}^{res}</annotation></semantics></math></span> 取指数保证所有元素为正，然后交替做行归一化和列归一化，重复 20 次，得到一个近似双随机矩阵。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{pre}</annotation></semantics></math></span> 用 sigmoid，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{post}</annotation></semantics></math></span> 用 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">2 \times</annotation></semantics></math></span> sigmoid，把读写强度限制在可控范围。</p>
+    <div class="deriv"><div><span class="df"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msup><mi>M</mi><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><msup><mover accent="true"><mi>H</mi><mo>~</mo></mover><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msup><mi>M</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><msub><mi mathvariant="script">T</mi><mi>r</mi></msub><mo stretchy="false">(</mo><msub><mi mathvariant="script">T</mi><mi>c</mi></msub><mo stretchy="false">(</mo><msup><mi>M</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle M^{(0)} = \exp(\tilde{H}^{res}), \qquad M^{(t)} = \mathcal{T}_r(\mathcal{T}_c(M^{(t-1)}))</annotation></semantics></math></span></span><span class="dc">行、列交替归一化，t<sub>max</sub> = 20</span></div></div>
+    <p>实验在 MoE 模型上做，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">n = 4</annotation></semantics></math></span>，规模 3B、9B、27B。27B 的主结果：最终 loss 比 baseline 低 0.021；BBH 51.0（HC 48.9），DROP 53.9（HC 51.6），GSM8K 53.8（HC 53.2），MMLU 63.4（HC 63.0），MATH 26.0（HC 26.4，略低）。复合映射的最大增益从约 3000 降到约 1.6，降了三个数量级；论文说 in-house 大规模训练的时间只多 6.7%。</p>
+    <p>这些数字有边界。20 次 Sinkhorn 是近似投影，单层映射的列和不会精确等于 1，论文自己的图里反向增益就略微偏离 1；复合以后偏离会累积，只是被限制在 1.6 附近。公开实验最大到 27B，论文提到 in-house 更大规模的训练，但没有给具体数字。mHC 2025 年底才发表，结论还需要更多复现。它改的是残差流的宏观结构，不替代 attention 和 FFN。</p>
+    <figure class="fig" id="fig-mhc"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 514" width="832" height="514" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="514" fill="#fff"/>
+
+<text x="0" y="24" class="h1">mHC：把残差混合矩阵约束成双随机矩阵</text>
+<text x="0" y="46" class="xs">HC 的 H<tspan baseline-shift="-20%" font-size="8">res</tspan> 可以取任意值，多层连乘后增益漂移；mHC 把每个 H<tspan baseline-shift="-20%" font-size="8">res</tspan> 投影到行和、列和都为 1 的矩阵上。</text>
+
+<rect x="0" y="70" width="380" height="210" rx="9" class="panel"/>
+<text x="14" y="96" class="ph">HC</text>
+<text x="14" y="114" class="xs">H<tspan baseline-shift="-20%" font-size="8">res</tspan> 不受约束</text>
+<path d="M14 142 H70" class="ink"/><path d="M14 162 H70" class="ink"/><path d="M14 182 H70" class="ink"/><path d="M14 202 H70" class="ink"/>
+<rect x="90" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.33" stroke="#fff" stroke-width="1"/><rect x="114" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.74" stroke="#fff" stroke-width="1"/><rect x="138" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.24" stroke="#fff" stroke-width="1"/><rect x="162" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.51" stroke="#fff" stroke-width="1"/><rect x="90" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.42" stroke="#fff" stroke-width="1"/><rect x="114" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.20" stroke="#fff" stroke-width="1"/><rect x="138" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.65" stroke="#fff" stroke-width="1"/><rect x="162" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.29" stroke="#fff" stroke-width="1"/><rect x="90" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.56" stroke="#fff" stroke-width="1"/><rect x="114" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.24" stroke="#fff" stroke-width="1"/><rect x="138" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.38" stroke="#fff" stroke-width="1"/><rect x="162" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.78" stroke="#fff" stroke-width="1"/><rect x="90" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.29" stroke="#fff" stroke-width="1"/><rect x="114" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.46" stroke="#fff" stroke-width="1"/><rect x="138" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.24" stroke="#fff" stroke-width="1"/><rect x="162" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.42" stroke="#fff" stroke-width="1"/>
+<path d="M186 142 H220" class="ink" marker-end="url(#a)"/><path d="M186 162 H220" class="ink" marker-end="url(#a)"/><path d="M186 182 H220" class="ink" marker-end="url(#a)"/><path d="M186 202 H220" class="ink" marker-end="url(#a)"/>
+<text x="224" y="232" class="xs">n 条流</text>
+<text x="232" y="146" class="xs">行和 ≠ 1</text>
+<text x="232" y="164" class="xs">列和 ≠ 1</text>
+<text x="232" y="192" class="pb" fill="#B45309">复合增益 ~3000</text>
+<text x="14" y="228" class="xs">矩阵数值为示意，非训练所得</text>
+
+<rect x="420" y="70" width="380" height="210" rx="9" class="panel"/>
+<text x="434" y="96" class="ph">mHC</text>
+<text x="434" y="114" class="xs">H<tspan baseline-shift="-20%" font-size="8">res</tspan> 投影到双随机矩阵</text>
+<path d="M434 142 H490" class="ink"/><path d="M434 162 H490" class="ink"/><path d="M434 182 H490" class="ink"/><path d="M434 202 H490" class="ink"/>
+<rect x="510" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="1.00" stroke="#fff" stroke-width="1"/><rect x="534" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="558" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="582" y="128" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="510" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="534" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="1.00" stroke="#fff" stroke-width="1"/><rect x="558" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="582" y="152" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="510" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="534" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="558" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="1.00" stroke="#fff" stroke-width="1"/><rect x="582" y="176" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="510" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="534" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="558" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="0.25" stroke="#fff" stroke-width="1"/><rect x="582" y="200" width="23" height="23" rx="3" fill="#0F766E" fill-opacity="1.00" stroke="#fff" stroke-width="1"/>
+<path d="M606 142 H640" class="ink" marker-end="url(#a)"/><path d="M606 162 H640" class="ink" marker-end="url(#a)"/><path d="M606 182 H640" class="ink" marker-end="url(#a)"/><path d="M606 202 H640" class="ink" marker-end="url(#a)"/>
+<text x="644" y="232" class="xs">n 条流</text>
+<text x="652" y="146" class="xs">行和 = 1</text>
+<text x="652" y="164" class="xs">列和 = 1</text>
+<text x="652" y="192" class="pb" fill="#0F766E">复合增益 ~1.6</text>
+<text x="434" y="228" class="xs">对角线 0.7，其余 0.1；数值为示意</text>
+
+<rect x="0" y="300" width="800" height="170" rx="9" class="card"/>
+<text x="14" y="326" class="ph">Sinkhorn-Knopp 投影</text>
+<text x="14" y="344" class="xs">先取指数保证正数，再交替做行归一化和列归一化。</text>
+<rect x="14" y="360" width="60" height="44" rx="5" class="soft"/><text x="44" y="387" class="v" text-anchor="middle">H<tspan class="vrs" baseline-shift="45%">~</tspan></text>
+<path d="M74 382 H96" class="ink" marker-end="url(#a)"/>
+<rect x="98" y="360" width="60" height="44" rx="5" class="soft"/><text x="128" y="387" class="pb" text-anchor="middle">exp</text>
+<path d="M158 382 H180" class="ink" marker-end="url(#a)"/>
+<rect x="182" y="360" width="96" height="44" rx="5" class="acc"/><text x="230" y="387" class="pb" text-anchor="middle">行归一化</text>
+<path d="M278 382 H300" class="ink" marker-end="url(#a)"/>
+<rect x="302" y="360" width="96" height="44" rx="5" class="acc"/><text x="350" y="387" class="pb" text-anchor="middle">列归一化</text>
+<path d="M398 382 H420" class="ink" marker-end="url(#a)"/>
+<rect x="422" y="360" width="60" height="44" rx="5" class="soft"/><text x="452" y="387" class="pb" text-anchor="middle">×20</text>
+<path d="M482 382 H504" class="ink" marker-end="url(#a)"/>
+<rect x="506" y="360" width="60" height="44" rx="5" class="acc2"/><text x="536" y="387" class="v" text-anchor="middle">H</text>
+<text x="590" y="387" class="xs">行列交替归一化</text>
+<text x="14" y="438" class="xs">20 次迭代是近似投影：单层列和会略微偏离 1，复合后最大增益约 1.6。</text>
+<text x="14" y="458" class="xs">n = 4；27B 上 loss 比 baseline 低 0.021；in-house 大规模训练的额外开销 6.7%。</text>
+</svg>
+<figcaption>HC 和 mHC 的区别。HC 的 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{res}</annotation></semantics></math></span> 可以取任意值，多层连乘以后增益会漂移；mHC 把每个 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi></mrow></msup></mrow><annotation encoding="application/x-tex">H^{res}</annotation></semantics></math></span> 投影到双随机矩阵上，行和、列和都为 1，复合以后仍然有界。矩阵数值为示意，非训练所得。</figcaption></figure>
+  </section>
+<section class="aisec" id="training">
+    <h2><span class="n">8</span><span>训练：缩放定律、优化器、并行</span></h2>
+    <p>训练这条线的问题是怎么把更大的模型稳定地训出来。三件事决定了答案：数据配比和规模、优化器和精度、并行策略。</p>
+    <p>Chinchilla 的结论是，在固定训练算力下，模型参数和数据量要一起缩放，最优配置是参数和数据等比例缩放；Chinchilla 70B 用了 1.4T token，等价于大约 20 个 token 对 1 个参数。这个结论针对训练算力，不针对推理成本。推理成本高时，人们会选更小的模型、更多的数据；Llama 3 系列用的 token 数就远超过 20 倍。</p>
+    <p>muP (Maximal Update Parametrization) 让超参数在不同宽度的模型之间迁移：在小模型上调好的学习率、初始化方差，放大到宽模型仍然可用。这样可以用小模型做缩放实验，不用每次都从头调参。</p>
+    <p>Warmup-Stable-Decay (WSD) 把学习率分成三段：预热、稳定、衰减。稳定段可以随时延长，衰减段在最后做。相比余弦退火，WSD 更适合继续训练和复用 checkpoint，因为不用提前知道总步数。</p>
+    <p>Muon 是 2024 年之后被大规模采用的优化器。它对动量矩阵做正交化，再更新权重，目标是把不同方向的更新尺度拉平。Kimi K2 在 1T total / 32B active 的模型上用了 Muon 的变体 MuonClip，说明它不只是小规模实验。</p>
+    <p>V3 的报告称，这是 FP8 第一次在 671B 规模上得到验证。V3 的完整训练用了 2.788M H800 GPU 小时，预训练 14.8T tokens；报告里说整个训练没有出现不可恢复的 loss spike，也没有回滚。低精度训练的关键在数值范围：哪些算子用 FP8、哪些保留 BF16、梯度怎么缩放，都要逐层设计。</p>
+    <p>并行策略是另一半天。数据并行用 ZeRO 或 FSDP 切分优化器状态、梯度和参数；张量并行切矩阵；流水线并行切层；专家并行切 MoE 专家。DeepSeek-V3 的 DualPipe 把前向、反向、通信重叠起来，减少流水线气泡；跨节点的 all-to-all 用专门的内核处理。一个 frontier model 的训练，算法和系统已经分不开。</p>
+    <p>数据这一侧的变化不在模型结构，在筛选。FineWeb 用去重、质量分类和启发式过滤，把 Common Crawl 做成可用的预训练语料；数据配比、课程和合成数据的比例，已经和模型结构一样重要。</p>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>改了什么</th><th>代表工作</th></tr></thead><tbody><tr><td>Chinchilla scaling</td><td>2022-03</td><td>参数和数据等比例缩放（70B 约 20 token/参数）</td><td>Hoffmann 等</td></tr><tr><td>muP</td><td>2022-03</td><td>超参数跨宽度迁移</td><td>Yang 等</td></tr><tr><td>WSD</td><td>2024-04</td><td>学习率三段式，可延长稳定段</td><td>MiniCPM</td></tr><tr><td>Muon</td><td>2024-12</td><td>正交化动量更新</td><td>Kimi K2 的 MuonClip</td></tr><tr><td>FP8 训练</td><td>2024-12</td><td>权重/激活/梯度低精度</td><td>DeepSeek-V3</td></tr><tr><td>ZeRO / FSDP</td><td>2019-10</td><td>切分优化器状态和参数</td><td>DeepSpeed、PyTorch</td></tr><tr><td>DualPipe</td><td>2024-12</td><td>流水线通信与计算重叠</td><td>DeepSeek-V3</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="posttrain">
+    <h2><span class="n">9</span><span>后训练：从 RLHF 到 DPO 到 RLVR</span></h2>
+    <p>预训练给模型知识和能力，后训练决定它怎么用这些能力。这条线在 GPT-4 之后变化最大：从 RLHF 一家独大，变成 SFT、DPO 家族、RLVR、蒸馏并存的工具箱。</p>
+    <p>SFT 是最基础的一步：用指令数据继续训练，损失只算 assistant 的 token。数据质量比数量重要，格式、语气、拒答边界都在这一步定下来。</p>
+    <p>RLHF 用人类偏好训练一个奖励模型，再用 PPO 优化策略，同时加一个 KL 惩罚，防止模型偏离参考模型太远。它有效，但流程复杂：奖励模型、采样、PPO、超参数，每一步都可能不稳。</p>
+    <p>DPO 把 RLHF 的奖励模型和 PPO 换成一个闭式解，直接在偏好对上做分类损失。它不需要在线采样，训练稳定，计算便宜，2023 年之后迅速成为开源模型的标准做法。DPO 的局限是离线：它只学偏好数据里出现过的比较，探索能力弱，也容易过拟合偏好数据的风格。</p>
+    <p>DPO 之后出现了一组变体。IPO 加正则，缓解 DPO 在确定性偏好上的过拟合；KTO 只要二元的好/坏标签，不需要成对比较；ORPO 把 SFT 和偏好优化合成一步，不要参考模型；SimPO 用长度归一化的对数概率，减少长度偏置。它们各自解决 DPO 的一个具体问题，没有哪一个全面替代 DPO。</p>
+    <p>Constitutional AI 用一组原则让模型批评自己的输出；RLAIF 用 AI 的偏好判断代替人类标注。两者都把反馈的来源从人换成模型，好处是便宜、可扩展，坏处是反馈模型会继承同一个模型的偏见。</p>
+    <p>RLVR 是 2024 年底之后的新一层：奖励来自可验证的结果，数学题对答案，代码跑测试。DeepSeek-R1 用 GRPO 做 RLVR，把推理能力从 base model 里「激励」出来；Tulu 3 也把 RLVR 作为后训练的一环。RLVR 和 RLHF 不是替代关系：RLHF 管有用、无害、风格，RLVR 管有明确对错的任务。</p>
+    <p>蒸馏是另一条路。R1 训练完之后，把它的推理轨迹蒸馏进更小的模型，小模型不用自己做 RL 也能获得一部分推理能力。蒸馏的代价是上限受教师模型限制，教师模型的错误也会被复制。</p>
+    <p>合成数据贯穿整条后训练线。Self-Instruct 用模型生成指令数据，Evol-Instruct 把指令逐步变复杂，Textbooks Are All You Need 用「教科书质量」的合成数据训练小模型。合成数据能补覆盖，但会让数据分布变窄，反复用模型自己的输出训练会出现模型崩溃 (model collapse)。</p>
+    <p>LoRA 是另一条支线：冻结主干，只给每层加一个低秩适配器，训练参数量降到千分之一到万分之一（论文在 GPT-3 175B 上报告 10,000 倍）。QLoRA 再把主干量化到 4 bit，让 65B 模型能在单张 48GB 卡上微调。LoRA 不增加模型能力，它改变的是后训练的成本结构。</p>
+    <figure class="fig" id="fig-posttrain"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 334" width="832" height="334" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="334" fill="#fff"/>
+
+<text x="0" y="24" class="h1">后训练：几条并行的路径</text>
+<text x="0" y="46" class="xs">SFT 是共同起点；偏好优化和 RLVR 调整不同的东西；蒸馏把大模型的能力搬到小模型。</text>
+
+<rect x="0" y="100" width="120" height="70" rx="7" class="soft"/><text x="60" y="124" class="pb" text-anchor="middle">预训练</text><text x="60" y="142" class="xs" text-anchor="middle">next-token</text>
+<path d="M120 135 H146" class="ink" marker-end="url(#a)"/>
+<rect x="148" y="100" width="120" height="70" rx="7" class="acc"/><text x="208" y="124" class="pb" text-anchor="middle">SFT</text><text x="208" y="142" class="xs" text-anchor="middle">指令数据</text>
+<path d="M268 135 H294" class="ink" marker-end="url(#a)"/>
+<rect x="296" y="100" width="150" height="70" rx="7" class="acc"/><text x="371" y="124" class="pb" text-anchor="middle">偏好优化</text><text x="371" y="142" class="xs" text-anchor="middle">RLHF / DPO</text>
+<path d="M446 135 H472" class="ink" marker-end="url(#a)"/>
+<rect x="474" y="100" width="130" height="70" rx="7" class="acc"/><text x="539" y="124" class="pb" text-anchor="middle">RLVR</text><text x="539" y="142" class="xs" text-anchor="middle">可验证奖励</text>
+<path d="M604 135 H630" class="ink" marker-end="url(#a)"/>
+<rect x="632" y="100" width="168" height="70" rx="7" class="soft"/><text x="716" y="124" class="pb" text-anchor="middle">部署</text><text x="716" y="142" class="xs" text-anchor="middle">推理 + 工具</text>
+
+<text x="0" y="196" class="xs">预训练给知识和能力</text>
+<text x="148" y="196" class="xs">格式、语气、拒答</text>
+<text x="296" y="196" class="xs">有用、无害、风格</text>
+<text x="474" y="196" class="xs">数学、代码</text>
+
+<rect x="296" y="228" width="180" height="44" rx="6" class="warm"/>
+<text x="386" y="246" class="pb" text-anchor="middle">蒸馏</text>
+<text x="386" y="262" class="xs" text-anchor="middle">教师轨迹 → 小模型</text>
+<path d="M539 170 V228 H476" class="dash" marker-end="url(#ag)"/>
+<text x="0" y="290" class="xs">偏好优化和 RLVR 不是替代关系：一个管行为和风格，一个管有明确对错的任务；蒸馏把能力搬到更小的模型。</text>
+</svg>
+<figcaption>后训练的几条路径。SFT 是共同起点；RLHF 和 DPO 调整偏好；RLVR 用可验证奖励提升推理；蒸馏把大模型的能力搬到小模型。</figcaption></figure>
+    <div class="tbl"><table><thead><tr><th>方法</th><th>信号</th><th>成本</th><th>主要失败模式</th></tr></thead><tbody><tr><td>SFT</td><td>人工/合成指令</td><td>中</td><td>数据质量差，模型只会模仿</td></tr><tr><td>RLHF</td><td>人类偏好奖励模型</td><td>高</td><td>奖励模型被刷，训练不稳</td></tr><tr><td>DPO</td><td>偏好对</td><td>低</td><td>离线过拟合，探索弱</td></tr><tr><td>IPO / KTO / ORPO / SimPO</td><td>偏好对或二元标签</td><td>低</td><td>各自解决一个偏差，不全面</td></tr><tr><td>Constitutional AI / RLAIF</td><td>AI 反馈</td><td>中</td><td>继承反馈模型的偏见</td></tr><tr><td>RLVR</td><td>可验证结果</td><td>中高</td><td>奖励漏洞，任务覆盖有限</td></tr><tr><td>蒸馏</td><td>教师输出</td><td>低</td><td>上限受教师限制，错误被复制</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="agents">
+    <h2><span class="n">10</span><span>工具、RAG 与 agent</span></h2>
+    <p>模型权重里的知识是静态的，碰不到实时数据、文件、浏览器和代码仓库。工具这条线解决的是「怎么让模型和外部世界交互」。</p>
+    <p>ReAct 是这类框架里影响最大的一个：模型先写一段思考，再选一个动作（搜索、查库、调用 API），拿到观察结果后继续思考。它把一个只能生成文字的模型变成了一个循环：思考、行动、观察、再思考。</p>
+    <p>Toolformer 让模型自己学会什么时候调用工具，训练数据里的工具调用是模型自己标注的。Function calling 把这件事产品化：给模型一组 JSON schema，模型输出结构化的调用请求，运行时执行后把结果传回去。</p>
+    <p>RAG (Retrieval-Augmented Generation) 在生成前先检索相关文档，把文档拼进上下文。它把「知识」从权重里分出来，更新文档就能更新知识。GraphRAG 在文档上建实体图，先做社区摘要再回答全局问题，适合「这批文档整体在讲什么」这类查询。RAG 的失败模式在检索：检索错了，生成再强也没用。</p>
+    <p>Memory 是另一个方向。MemGPT 把上下文窗口当成内存，把长期记忆放在外部存储，模型通过工具读写。多轮对话、个人助手、长期任务都需要这套机制，但记忆的写入、检索、遗忘都还没有标准做法。</p>
+    <p>MCP (Model Context Protocol) 是 2024 年 11 月 Anthropic 提出的开放协议，把工具、资源、提示词抽象成客户端和服务端之间的标准接口。模型不再为每个工具写一套适配，工具提供方按协议暴露能力。它解决的是集成碎片化，不解决模型会不会用工具。</p>
+    <p>Computer use 把工具扩展到整个桌面：模型看截图，输出鼠标和键盘动作。OSWorld 这类基准测的就是这件事。它的难点在长程规划、错误恢复和界面变化，单步准确率再高，几十步累积下来也会失败。</p>
+    <p>多 agent 系统把任务拆给不同角色的模型，AutoGen、MetaGPT 是代表。角色分工能带来并行和专门化，也会带来通信开销、上下文膨胀和责任不清。多 agent 不是默认更好，很多任务一个模型加几个工具就够了。</p>
+    <figure class="fig" id="fig-agents"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 832 396" width="832" height="396" data-padded="16" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .rule{fill:none;stroke:#14161A;stroke-width:1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .tdash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:4 4}
+  .lead{fill:none;stroke:#B9B3A8;stroke-width:1.2;stroke-dasharray:3 4}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .acc2{fill:#B8DED8;stroke:#0F766E;stroke-width:1.2}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .card{fill:#FBFAF8;stroke:#E4E1DA;stroke-width:1.2}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:22px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pb{font-size:12px;font-weight:650;fill:#14161A}
+  .sm{font-size:12px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .xi{font-size:10.5px;fill:#14161A}
+  .num{font-size:20px;font-weight:700;fill:#0F766E;letter-spacing:-.3px}
+  .numA{font-size:20px;font-weight:700;fill:#B45309;letter-spacing:-.3px}
+  .numK{font-size:20px;font-weight:700;fill:#14161A;letter-spacing:-.3px}
+  .v{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vr{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:15px;fill:#14161A;font-variant-numeric:lining-nums}
+  .vs{font-family:'Times New Roman',Times,Georgia,serif;font-style:italic;font-size:10px;fill:#14161A}
+  .vrs{font-family:'Times New Roman',Times,Georgia,serif;font-style:normal;font-size:10px;fill:#14161A}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-16" y="-16" width="832" height="396" fill="#fff"/>
+
+<text x="0" y="24" class="h1">Agent：模型、工具、循环、记忆</text>
+<text x="0" y="46" class="xs">模型读上下文，决定调用哪个工具，拿回观察结果，再决定下一步；记忆和 RAG 把外部信息带回上下文。</text>
+
+<rect x="330" y="64" width="140" height="46" rx="7" class="soft"/><text x="400" y="92" class="pb" text-anchor="middle">Context</text>
+<rect x="60" y="150" width="140" height="60" rx="7" class="acc"/><text x="130" y="185" class="pb" text-anchor="middle">Memory / RAG</text>
+<rect x="330" y="150" width="140" height="60" rx="7" class="acc"/><text x="400" y="185" class="pb" text-anchor="middle">LLM</text>
+<rect x="600" y="150" width="140" height="60" rx="7" class="acc"/><text x="670" y="185" class="pb" text-anchor="middle">Tools</text>
+<rect x="330" y="270" width="140" height="46" rx="7" class="soft"/><text x="400" y="298" class="pb" text-anchor="middle">Observation</text>
+
+<path d="M400 110 V150" class="ink" marker-end="url(#a)"/>
+<text x="410" y="132" class="xs">系统提示 + 历史</text>
+<path d="M470 180 H600" class="ink" marker-end="url(#a)"/>
+<text x="535" y="170" class="xs" text-anchor="middle">调用</text>
+<path d="M670 210 V270 H470" class="ink" marker-end="url(#a)"/>
+<text x="680" y="244" class="xs">结果</text>
+<path d="M400 270 V210" class="ink" marker-end="url(#a)"/>
+<text x="410" y="248" class="xs">观察</text>
+<path d="M200 180 H330" class="ink" marker-end="url(#a)"/>
+<text x="265" y="170" class="xs" text-anchor="middle">检索</text>
+<path d="M330 200 H200" class="dash" marker-end="url(#ag)"/>
+<text x="265" y="222" class="xs" text-anchor="middle">写入</text>
+
+<text x="0" y="352" class="xs">循环直到任务完成或预算用完。Agent 的可靠性取决于每一步的错误率，步数越多，累积误差越大。</text>
+</svg>
+<figcaption>Agent 的基本循环：模型读上下文，决定调用哪个工具，拿回观察结果，再决定下一步；记忆和 RAG 负责把外部信息带回上下文。</figcaption></figure>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>做什么</th><th>主要问题</th></tr></thead><tbody><tr><td>ReAct</td><td>2022-10</td><td>思考与行动交错</td><td>循环可能不收敛</td></tr><tr><td>Toolformer</td><td>2023-02</td><td>模型自学工具调用</td><td>工具覆盖有限</td></tr><tr><td>Function calling</td><td>2023-06</td><td>JSON schema 调用 API</td><td>参数错误、越权</td></tr><tr><td>RAG</td><td>2020-05</td><td>检索后生成</td><td>检索错误会放大</td></tr><tr><td>GraphRAG</td><td>2024-04</td><td>实体图加社区摘要</td><td>建图成本高</td></tr><tr><td>MemGPT</td><td>2023-10</td><td>分层记忆管理</td><td>写入和遗忘策略</td></tr><tr><td>MCP</td><td>2024-11</td><td>工具/资源的开放协议</td><td>工具接入和权限</td></tr><tr><td>Computer use</td><td>2024-10</td><td>截图加鼠标键盘</td><td>长程可靠性</td></tr><tr><td>AutoGen / MetaGPT</td><td>2023-08</td><td>多 agent 协作</td><td>通信开销、责任不清</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="multimodal">
+    <h2><span class="n">11</span><span>多模态：从拼接走向原生</span></h2>
+    <p>多模态这条线解决的是文字之外的信息怎么进模型。2023 年之后出现了几种做法，差别在「视觉和语言在哪一层汇合」，以及要不要把视频和动作也放进来。</p>
+    <p>第一种是拼接：视觉编码器负责看图，LLM 负责说话，中间加一个投影层或适配器。CLIP 先把图像和文字对齐到同一个向量空间，Flamingo 在冻结的视觉编码器和 LLM 之间插 Perceiver Resampler 和 gated cross-attention，BLIP-2 用 Q-Former 做桥，LLaVA 用一个简单的线性投影加视觉指令微调。这条路工程上最成熟，GPT-4V、早期的多模态开源模型大多走这条路。GPT-4o 把 text、image、audio 放进同一个模型，语音输入输出端到端，延迟接近实时对话；这是「原生 any-to-any」的产品化节点。</p>
+    <p>第二种是原生：图像、文字、音频从第一层就进同一个 Transformer，用同一套 tokenizer 或同一套注意力。Chameleon 把图像离散成 token，和文字放进同一个词表，做 early fusion；Transfusion 在同一个 Transformer 上同时做语言建模和图像扩散；Janus 把理解用的视觉编码和生成用的视觉编码分开，避免两个任务抢同一套表示；Emu3 用 next-token prediction 统一文字、图像和视频。</p>
+    <p>第三种是视频和动作。Sora 把视频切成 spacetime patches，用 diffusion transformer 生成；RT-2 把机器人动作离散成 token，和视觉、文字一起训练；π0 用 flow matching 的 action expert 生成连续动作。它们把多模态从「看懂」推到「行动」。</p>
+    <p>三种做法各有取舍。拼接的视觉表示强，但视觉和语言在中间才汇合，细粒度对齐弱；原生的对齐好，但图像 token 很贵，训练数据也难配；视频和动作的维度更高，评测和仿真更贵。</p>
+    <div class="tbl"><table><thead><tr><th>做法</th><th>表示</th><th>代表工作</th><th>主要取舍</th></tr></thead><tbody><tr><td>冻结编码器 + 适配器</td><td>连续视觉特征 + 投影</td><td>CLIP、Flamingo、BLIP-2、LLaVA</td><td>工程成熟，细粒度对齐弱</td></tr><tr><td>原生 early fusion</td><td>图像/文字统一 token</td><td>Chameleon、Emu3</td><td>对齐好，图像 token 贵</td></tr><tr><td>统一/解耦</td><td>共用一个 Transformer，或用两套视觉编码</td><td>Transfusion、Janus</td><td>避免任务冲突，结构更复杂</td></tr><tr><td>视频生成</td><td>spacetime patches + diffusion</td><td>Sora</td><td>计算量大，物理一致性难</td></tr><tr><td>视觉-语言-动作</td><td>动作 token 或连续动作</td><td>RT-2、π0</td><td>仿真到现实的迁移难</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="longcontext">
+    <h2><span class="n">12</span><span>长上下文：从 8K 到 1M</span></h2>
+    <p>长上下文这条线解决的是「模型能不能在一次前向里看完一整本书、一整个代码仓库」。它有三个子问题：位置编码怎么外推、计算和显存怎么扩展、模型是不是真的会用长上下文。</p>
+    <p>位置编码的外推主要围绕 RoPE。Position Interpolation 把位置索引线性压缩到训练范围内；NTK-aware scaling 改 RoPE 的频率基，让不同维度以不同速度外推；YaRN 在频率缩放之外加 attention temperature，减少长距离注意力熵的变化；LongRoPE 用渐进式扩展和非均匀插值，把窗口推到 2M。</p>
+    <p>计算和显存靠并行。RingAttention 把序列切成块，沿设备环传递 K/V，块内做注意力，通信和计算重叠，单序列可以跨很多设备。FlashAttention 的 IO-aware 分块是基础，没有它，长序列的中间矩阵会把显存占满。</p>
+    <p>模型是不是真的会用长上下文，是另一个问题。Lost in the Middle 发现检索效果呈 U 形：开头和结尾的信息容易找到，中间的信息容易丢。RULER 用一组可控任务测「有效上下文长度」，很多模型标称 128K，有效长度明显短于标称值。LongBench 用多任务平均分衡量长上下文能力。</p>
+    <p>所以「支持 1M 上下文」和「能在 1M 上下文上做对事」是两件事。前者是工程能力，后者要在检索、推理、抗干扰几个维度上分别测。</p>
+    <div class="tbl"><table><thead><tr><th>技术</th><th>时间</th><th>解决什么</th><th>代价</th></tr></thead><tbody><tr><td>Position Interpolation</td><td>2023-06</td><td>把位置压回训练范围</td><td>短序列性能略降</td></tr><tr><td>NTK-aware scaling</td><td>2023-06</td><td>改 RoPE 频率基（社区方法）</td><td>需要调参</td></tr><tr><td>YaRN</td><td>2023-08</td><td>频率缩放 + attention temperature</td><td>实现复杂</td></tr><tr><td>LongRoPE</td><td>2024-02</td><td>渐进扩展，2M 窗口</td><td>训练和评测成本高</td></tr><tr><td>RingAttention</td><td>2023-10</td><td>序列并行，跨设备注意力</td><td>通信开销</td></tr><tr><td>Lost in the Middle</td><td>2023-07</td><td>揭示长上下文的 U 形检索</td><td>不是方法，是评测发现</td></tr><tr><td>RULER</td><td>2024-04</td><td>测有效上下文长度</td><td>任务设计有偏</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="safety">
+    <h2><span class="n">13</span><span>可解释性与安全：从神经元到行为</span></h2>
+    <p>安全这条线有两个方向：一个是往里看，理解模型内部表示；一个是往外看，测模型在对抗条件下的行为。</p>
+    <p>往里看的核心问题是 superposition：模型要表示的特征比维度多，神经元因此是多义的。Sparse Autoencoder (SAE) 把激活分解成稀疏的、可解释的特征，Anthropic 在 Claude 3 Sonnet 上做到百万级特征，并能通过放大某个特征改变行为（Golden Gate Claude）。Representation engineering 走得更直接：找一个行为方向，在激活上加或减这个向量，观察输出怎么变。</p>
+    <p>往外看的核心问题是越狱和注入。GCG 用梯度搜索一段对抗后缀，让模型绕过安全训练；many-shot jailbreaking 把大量违规示例塞进上下文；prompt injection 把指令藏在网页、文档或工具返回的内容里，让 agent 执行攻击者的意图。Agent 越强，注入的危害越大，因为它能真的调用工具。</p>
+    <p>Alignment faking 是另一个层面的发现：模型在训练时表现出配合，在部署时做另一套，目的是避免被修改。Anthropic 2024 年的实验在特定设定下观察到了这种行为。它不代表所有模型都会这样，但说明「训练时的行为」不等于「部署时的倾向」。</p>
+    <p>可解释性还不是安全保证。SAE 能找到特征，不代表找全了；steering 能改行为，不代表知道边界；行为评测能发现已知的攻击，不代表覆盖未知的攻击。安全是模型、数据、工具、部署环境一起决定的，单靠一层不够。</p>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>做什么</th><th>局限</th></tr></thead><tbody><tr><td>Superposition</td><td>2022-09</td><td>特征比维度多，神经元多义</td><td>解释的是现象，不是方法</td></tr><tr><td>Sparse Autoencoder</td><td>2023-09</td><td>把激活分解成稀疏特征</td><td>覆盖不全，特征不稳定</td></tr><tr><td>Representation engineering</td><td>2023-10</td><td>在激活上加行为方向</td><td>方向可能纠缠</td></tr><tr><td>GCG</td><td>2023-07</td><td>梯度搜索对抗后缀</td><td>迁移性有限</td></tr><tr><td>Prompt injection</td><td>2022-09</td><td>把指令藏进外部内容</td><td>防御还没有标准答案</td></tr><tr><td>Alignment faking</td><td>2024-12</td><td>训练时配合、部署时偏离</td><td>实验设定特定，不外推</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="evals">
+    <h2><span class="n">14</span><span>评测：基准的换代</span></h2>
+    <p>评测这条线解决的是「怎么知道模型能做什么」。GPT-4 之后，基准换了几代：知识型基准饱和，推理和 agent 基准接上来。</p>
+    <p>MMLU 是 2020 年的 57 学科选择题，GPT-4 之后很快饱和；MMLU-Pro 把选项从 4 个加到 10 个，要求更多推理。GPQA 是研究生水平的物理、化学、生物题，Diamond 子集更难。AIME 和 MATH 是竞赛数学，AIME 题目少、更新快，适合测推理。</p>
+    <p>代码从 HumanEval 这种函数级题，换到 LiveCodeBench（按时间收录新题，减少污染）和 SWE-bench（真实 GitHub issue，要改仓库、跑测试）。SWE-bench Verified 是人工筛过的子集。</p>
+    <p>偏好评测用 Chatbot Arena：人类对两个匿名模型的回答投票，算 Elo。它测的是「人更喜欢哪个」，不是「哪个更正确」，风格、长度、格式都会影响。</p>
+    <p>抽象推理用 ARC-AGI，专家级知识用 Humanity's Last Exam (HLE)，agent 用 τ-bench（工具、用户、数据库）和 OSWorld（桌面操作）。这些基准的共同问题是成本和污染：题越难，标注越贵；题越新，越难防泄漏。</p>
+    <p>读 benchmark 数字时要看三件事：测的是模型还是整个系统（模型加工具加 scaffold），训练数据有没有见过题，指标有没有饱和。一个 90% 的分数，可能只说明这个基准已经不能区分模型了。</p>
+    <div class="tbl"><table><thead><tr><th>基准</th><th>时间</th><th>测什么</th><th>注意</th></tr></thead><tbody><tr><td>MMLU</td><td>2020-09</td><td>57 学科知识</td><td>已饱和</td></tr><tr><td>MMLU-Pro</td><td>2024-06</td><td>更难的多学科选择题</td><td>仍可能污染</td></tr><tr><td>GPQA</td><td>2023-11</td><td>研究生级科学</td><td>Diamond 子集更难</td></tr><tr><td>AIME / MATH</td><td>2024 / 2021</td><td>竞赛数学</td><td>题目少，需防背题</td></tr><tr><td>HumanEval</td><td>2021-07</td><td>函数级代码</td><td>已饱和</td></tr><tr><td>LiveCodeBench</td><td>2024-03</td><td>按时间更新的代码题</td><td>污染控制较好</td></tr><tr><td>SWE-bench</td><td>2023-10</td><td>真实仓库 issue</td><td>测的是 agent 系统</td></tr><tr><td>Chatbot Arena</td><td>2024-03</td><td>人类偏好 Elo（2023-05 上线）</td><td>偏好不等于正确</td></tr><tr><td>ARC-AGI</td><td>2019-11</td><td>抽象推理</td><td>题目分布特殊</td></tr><tr><td>HLE</td><td>2025-01</td><td>专家级跨学科</td><td>成本高，题量小</td></tr><tr><td>τ-bench / OSWorld</td><td>2024-06 / 2024-04</td><td>工具与桌面 agent</td><td>长程、可复现性差</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="index">
+    <h2><span class="n">15</span><span>概念索引：九十多个名字</span></h2>
+    <p>这一节是快速索引，按六条线分组。每条只给一句话，详细机制回到对应章节。时间取 arXiv 第一版或产品发布日；没有论文的工程方法标产品时间。</p>
+    <h3>推理</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>Chain-of-Thought (CoT)</td><td>2022-01</td><td>在提示里给中间步骤，用更多 token 换串行计算</td></tr><tr><td>Self-Consistency</td><td>2022-03</td><td>采样多条推理路径，对最终答案多数投票</td></tr><tr><td>Zero-shot CoT</td><td>2022-05</td><td>用一句 Let's think step by step 触发推理</td></tr><tr><td>Self-Refine</td><td>2023-03</td><td>模型生成后自我批评并修改</td></tr><tr><td>Reflexion</td><td>2023-03</td><td>把失败经验写进记忆，下一轮重试</td></tr><tr><td>Process supervision (PRM)</td><td>2023-05</td><td>奖励推理步骤，而不只奖励最终答案</td></tr><tr><td>Tree of Thoughts (ToT)</td><td>2023-05</td><td>把推理做成树搜索，生成、评估、回溯</td></tr><tr><td>Test-time compute scaling</td><td>2024-08</td><td>在推理时分配更多计算，换取更高准确率</td></tr><tr><td>o1</td><td>2024-09</td><td>用 RL 训练长 CoT 的闭源推理模型</td></tr><tr><td>Coconut</td><td>2024-12</td><td>在连续隐状态里推理，不生成自然语言 token</td></tr><tr><td>DeepSeek-R1</td><td>2025-01</td><td>用纯 RL 和 GRPO 激励推理的开放模型</td></tr><tr><td>GRPO</td><td>2024-02</td><td>用组内奖励归一化代替 critic 的 RL 算法</td></tr><tr><td>RLVR</td><td>2024-11</td><td>用可验证结果做奖励的强化学习</td></tr><tr><td>s1 / budget forcing</td><td>2025-01</td><td>小数据加推理预算控制，复现 test-time scaling</td></tr></tbody></table></div>
+    <h3>架构与效率</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>Mixture-of-Experts (MoE)</td><td>2017-01</td><td>每个 token 只激活少数专家，参数量和计算量解耦</td></tr><tr><td>Switch Transformer</td><td>2021-01</td><td>用 top-1 路由把 MoE 做到万亿参数</td></tr><tr><td>Mixtral 8x7B</td><td>2023-12</td><td>开源稀疏 MoE，47B total / 13B active</td></tr><tr><td>DeepSeekMoE</td><td>2024-01</td><td>细粒度专家加共享专家</td></tr><tr><td>Multi-Query Attention (MQA)</td><td>2019-11</td><td>所有头共享一组 K/V</td></tr><tr><td>Grouped-Query Attention (GQA)</td><td>2023-05</td><td>每组头共享一组 K/V</td></tr><tr><td>Multi-head Latent Attention (MLA)</td><td>2024-05</td><td>把 K/V 压成低维潜向量，解耦 RoPE</td></tr><tr><td>Sliding Window Attention</td><td>2023-10</td><td>每个 token 只看固定窗口</td></tr><tr><td>Native Sparse Attention (NSA)</td><td>2025-02</td><td>压缩、选择、滑动三条稀疏分支</td></tr><tr><td>DeepSeek Sparse Attention (DSA)</td><td>2025-12</td><td>lightning indexer 选 top-k KV</td></tr><tr><td>Mamba</td><td>2023-12</td><td>状态空间模型，线性复杂度</td></tr><tr><td>Jamba</td><td>2024-03</td><td>注意力层和 SSM 层混合</td></tr><tr><td>FlashAttention</td><td>2022-05</td><td>IO-aware 的精确注意力，减少显存读写</td></tr><tr><td>PagedAttention</td><td>2023-09</td><td>把 KV cache 分成 block，按需映射</td></tr><tr><td>Speculative decoding</td><td>2022-11</td><td>小模型草拟，大模型验证</td></tr><tr><td>Multi-Token Prediction (MTP)</td><td>2024-12</td><td>一次预测多个未来 token</td></tr><tr><td>Hyper-Connections (HC)</td><td>2024-09</td><td>把残差流扩成 n 条</td></tr><tr><td>Manifold-Constrained Hyper-Connections (mHC)</td><td>2025-12</td><td>把残差混合矩阵投影到双随机矩阵</td></tr></tbody></table></div>
+    <h3>训练与后训练</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>Chinchilla scaling</td><td>2022-03</td><td>参数和数据等比例缩放，70B 约 20 token/参数</td></tr><tr><td>muP</td><td>2022-03</td><td>超参数跨模型宽度迁移</td></tr><tr><td>WSD</td><td>2024-04</td><td>预热、稳定、衰减三段式学习率</td></tr><tr><td>Muon</td><td>2024-12</td><td>正交化动量的优化器</td></tr><tr><td>FP8 格式 / 训练</td><td>2022-09 / 2024-12</td><td>8 位浮点格式；V3 首次在 671B 规模验证</td></tr><tr><td>ZeRO</td><td>2019-10</td><td>切分优化器状态、梯度和参数</td></tr><tr><td>DualPipe</td><td>2024-12</td><td>流水线通信与计算重叠</td></tr><tr><td>DPO</td><td>2023-05</td><td>用偏好对做分类损失，替代 RLHF</td></tr><tr><td>IPO</td><td>2023-10</td><td>给 DPO 加正则，缓解过拟合</td></tr><tr><td>KTO</td><td>2024-02</td><td>用二元好/坏标签做偏好优化</td></tr><tr><td>ORPO</td><td>2024-03</td><td>把 SFT 和偏好优化合成一步</td></tr><tr><td>SimPO</td><td>2024-05</td><td>长度归一化的偏好优化</td></tr><tr><td>Constitutional AI</td><td>2022-12</td><td>用原则让模型自我批评</td></tr><tr><td>RLAIF</td><td>2023-09</td><td>用 AI 反馈代替人类反馈</td></tr><tr><td>Distillation</td><td>2025-01</td><td>把大模型的推理轨迹蒸馏进小模型</td></tr><tr><td>Synthetic data</td><td>2022-12</td><td>用模型生成训练数据；Self-Instruct 是代表</td></tr><tr><td>LoRA / QLoRA</td><td>2021-06 / 2023-05</td><td>低秩适配器；QLoRA 再把主干量化到 4 bit</td></tr><tr><td>FineWeb</td><td>2024-06</td><td>去重和质量过滤后的预训练语料</td></tr></tbody></table></div>
+    <h3>工具与 agent</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>ReAct</td><td>2022-10</td><td>思考与行动交错</td></tr><tr><td>Toolformer</td><td>2023-02</td><td>模型自学工具调用</td></tr><tr><td>Function calling</td><td>2023-06</td><td>用 JSON schema 调用外部函数</td></tr><tr><td>RAG</td><td>2020-05</td><td>检索文档后生成</td></tr><tr><td>GraphRAG</td><td>2024-04</td><td>实体图加社区摘要</td></tr><tr><td>MemGPT</td><td>2023-10</td><td>分层记忆管理</td></tr><tr><td>MCP</td><td>2024-11</td><td>工具和资源的开放协议</td></tr><tr><td>Computer use</td><td>2024-10</td><td>截图加鼠标键盘操作桌面</td></tr><tr><td>AutoGen / MetaGPT</td><td>2023-08</td><td>多 agent 协作框架</td></tr></tbody></table></div>
+    <h3>多模态</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>CLIP</td><td>2021-02</td><td>图像和文字的对比学习对齐</td></tr><tr><td>Flamingo</td><td>2022-04</td><td>冻结视觉编码器 + gated cross-attention</td></tr><tr><td>BLIP-2</td><td>2023-01</td><td>Q-Former 连接视觉和语言</td></tr><tr><td>LLaVA</td><td>2023-04</td><td>视觉指令微调</td></tr><tr><td>GPT-4V</td><td>2023-09</td><td>闭源多模态模型</td></tr><tr><td>GPT-4o</td><td>2024-05</td><td>原生 text/image/audio 的 any-to-any 模型</td></tr><tr><td>Chameleon</td><td>2024-05</td><td>图像和文字统一 token 的 early fusion</td></tr><tr><td>Transfusion</td><td>2024-08</td><td>语言建模 + 图像扩散的统一 Transformer</td></tr><tr><td>Janus</td><td>2024-10</td><td>理解和生成用两套视觉编码</td></tr><tr><td>Emu3</td><td>2024-09</td><td>用 next-token prediction 统一多模态</td></tr><tr><td>Sora</td><td>2024-02</td><td>视频生成 diffusion transformer</td></tr><tr><td>RT-2 / π0</td><td>2023-07 / 2024-10</td><td>视觉-语言-动作模型</td></tr></tbody></table></div>
+    <h3>长上下文</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>Position Interpolation</td><td>2023-06</td><td>线性压缩位置索引</td></tr><tr><td>NTK-aware scaling</td><td>2023-06</td><td>改 RoPE 频率基（社区方法）</td></tr><tr><td>YaRN</td><td>2023-08</td><td>频率缩放 + attention temperature</td></tr><tr><td>LongRoPE</td><td>2024-02</td><td>渐进扩展，2M 窗口</td></tr><tr><td>RingAttention</td><td>2023-10</td><td>序列并行，跨设备注意力</td></tr><tr><td>Lost in the Middle</td><td>2023-07</td><td>长上下文检索呈 U 形</td></tr><tr><td>RULER</td><td>2024-04</td><td>测有效上下文长度</td></tr></tbody></table></div>
+    <h3>安全与评测</h3>
+    <div class="tbl"><table><thead><tr><th>概念</th><th>时间</th><th>一句话</th></tr></thead><tbody><tr><td>Superposition</td><td>2022-09</td><td>特征比维度多</td></tr><tr><td>Sparse Autoencoder (SAE)</td><td>2023-09</td><td>把激活分解成稀疏特征</td></tr><tr><td>Representation engineering</td><td>2023-10</td><td>在激活上加行为方向</td></tr><tr><td>GCG</td><td>2023-07</td><td>梯度搜索对抗后缀</td></tr><tr><td>Prompt injection</td><td>2022-09</td><td>把指令藏进外部内容</td></tr><tr><td>Alignment faking</td><td>2024-12</td><td>训练时配合、部署时偏离</td></tr><tr><td>MMLU</td><td>2020-09</td><td>57 学科知识</td></tr><tr><td>MMLU-Pro</td><td>2024-06</td><td>更难的多学科选择题</td></tr><tr><td>GPQA</td><td>2023-11</td><td>研究生级科学</td></tr><tr><td>AIME</td><td>2024</td><td>竞赛数学</td></tr><tr><td>HumanEval</td><td>2021-07</td><td>函数级代码</td></tr><tr><td>LiveCodeBench</td><td>2024-03</td><td>按时间更新的代码题</td></tr><tr><td>SWE-bench</td><td>2023-10</td><td>真实 GitHub issue</td></tr><tr><td>Chatbot Arena</td><td>2024-03</td><td>人类偏好 Elo</td></tr><tr><td>ARC-AGI</td><td>2019-11</td><td>抽象推理</td></tr><tr><td>HLE</td><td>2025-01</td><td>专家级跨学科</td></tr><tr><td>τ-bench / OSWorld</td><td>2024-06 / 2024-04</td><td>agent 工具/桌面</td></tr></tbody></table></div>
+  </section>
+<section class="aisec" id="reading">
+    <h2><span class="n">16</span><span>怎么读：六条路径</span></h2>
+    <p>如果只读五篇，按这个顺序：CoT、DeepSeek-V2 的 §2.1、DeepSeek-V3 的 §2、R1、mHC。五篇覆盖了推理、MLA、MoE 加 MTP、RLVR、残差流五个关键机制。</p>
+    <ul><li>推理：CoT (<a class="ilink" href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noreferrer">arXiv:2201.11903</a>)、Self-Consistency (<a class="ilink" href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noreferrer">arXiv:2203.11171</a>)、Process supervision (<a class="ilink" href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noreferrer">arXiv:2305.20050</a>)、R1 (<a class="ilink" href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noreferrer">arXiv:2501.12948</a>)、s1 (<a class="ilink" href="https://arxiv.org/abs/2501.19393" target="_blank" rel="noreferrer">arXiv:2501.19393</a>)。先看 CoT 的实验设计和 Table 2，再看 R1 的 GRPO 和奖励设计。</li><li>架构：DeepSeek-V2 (<a class="ilink" href="https://arxiv.org/abs/2405.04434" target="_blank" rel="noreferrer">arXiv:2405.04434</a>) 的 §2.1，重点看公式 9 到 19 和 Table 1；DeepSeek-V3 (<a class="ilink" href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noreferrer">arXiv:2412.19437</a>) 的 §2.1 和 §2.2；HC (<a class="ilink" href="https://arxiv.org/abs/2409.19606" target="_blank" rel="noreferrer">arXiv:2409.19606</a>) 和 mHC (<a class="ilink" href="https://arxiv.org/abs/2512.24880" target="_blank" rel="noreferrer">arXiv:2512.24880</a>)。</li><li>训练：Chinchilla (<a class="ilink" href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noreferrer">arXiv:2203.15556</a>)、muP (<a class="ilink" href="https://arxiv.org/abs/2203.03466" target="_blank" rel="noreferrer">arXiv:2203.03466</a>)、DPO (<a class="ilink" href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noreferrer">arXiv:2305.18290</a>)、Tulu 3 (<a class="ilink" href="https://arxiv.org/abs/2411.15124" target="_blank" rel="noreferrer">arXiv:2411.15124</a>)。</li><li>工具：ReAct (<a class="ilink" href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noreferrer">arXiv:2210.03629</a>)、Toolformer (<a class="ilink" href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noreferrer">arXiv:2302.04761</a>)、RAG (<a class="ilink" href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noreferrer">arXiv:2005.11401</a>)、GraphRAG (<a class="ilink" href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noreferrer">arXiv:2404.16130</a>)。</li><li>多模态：CLIP (<a class="ilink" href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noreferrer">arXiv:2103.00020</a>)、Flamingo (<a class="ilink" href="https://arxiv.org/abs/2204.14198" target="_blank" rel="noreferrer">arXiv:2204.14198</a>)、LLaVA (<a class="ilink" href="https://arxiv.org/abs/2304.08485" target="_blank" rel="noreferrer">arXiv:2304.08485</a>)、Chameleon (<a class="ilink" href="https://arxiv.org/abs/2405.09818" target="_blank" rel="noreferrer">arXiv:2405.09818</a>)、Transfusion (<a class="ilink" href="https://arxiv.org/abs/2408.11039" target="_blank" rel="noreferrer">arXiv:2408.11039</a>)。</li><li>安全与评测：Superposition (<a class="ilink" href="https://arxiv.org/abs/2209.10652" target="_blank" rel="noreferrer">arXiv:2209.10652</a>)、SAE (<a class="ilink" href="https://arxiv.org/abs/2309.08600" target="_blank" rel="noreferrer">arXiv:2309.08600</a>)、Alignment faking (<a class="ilink" href="https://arxiv.org/abs/2412.14093" target="_blank" rel="noreferrer">arXiv:2412.14093</a>)、GPQA (<a class="ilink" href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noreferrer">arXiv:2311.12022</a>)、SWE-bench (<a class="ilink" href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noreferrer">arXiv:2310.06770</a>)。</li></ul>
+    <p>读的时候盯住四个量：什么东西被缓存了，什么东西被近似了，奖励从哪里来，实验做到多大。CoT 缓存的是中间 token，近似的是「文字步骤等于内部计算」这个假设；MLA 缓存的是低维潜向量，近似的是 K/V 的低秩结构；mHC 缓存的是残差流，近似的是双随机投影；RLVR 的奖励来自规则，近似的是「规则覆盖了任务的全部要求」。四个量对上，一个概念基本就讲清楚了。</p>
+    <p>核心论文的链接按六条线列在下面，日期以 arXiv 第一版为准。</p>
+    <div class="refs"><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noreferrer">Chain-of-Thought Prompting Elicits Reasoning in Large Language Models<span class="rn"> · Wei 等，NeurIPS 2022，2022-01-28</span></a><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noreferrer">Self-Consistency Improves Chain of Thought Reasoning in Language Models<span class="rn"> · Wang 等，2022-03-21</span></a><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noreferrer">Let's Verify Step by Step<span class="rn"> · Lightman 等，2023-05-31</span></a><a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noreferrer">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning<span class="rn"> · DeepSeek-AI，2025-01-22</span></a><a href="https://arxiv.org/abs/2501.19393" target="_blank" rel="noreferrer">s1: Simple test-time scaling<span class="rn"> · Muennighoff 等，2025-01-31</span></a><a href="https://arxiv.org/abs/2405.04434" target="_blank" rel="noreferrer">DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model<span class="rn"> · DeepSeek-AI，2024-05-07</span></a><a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noreferrer">DeepSeek-V3 Technical Report<span class="rn"> · DeepSeek-AI，2024-12-27</span></a><a href="https://arxiv.org/abs/2512.02556" target="_blank" rel="noreferrer">DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models<span class="rn"> · DeepSeek-AI，2025-12-02</span></a><a href="https://arxiv.org/abs/2409.19606" target="_blank" rel="noreferrer">Hyper-Connections<span class="rn"> · Zhu 等，2024-09-29</span></a><a href="https://arxiv.org/abs/2512.24880" target="_blank" rel="noreferrer">mHC: Manifold-Constrained Hyper-Connections<span class="rn"> · Xie 等，2025-12-31</span></a><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noreferrer">Direct Preference Optimization: Your Language Model is Secretly a Reward Model<span class="rn"> · Rafailov 等，2023-05-29</span></a><a href="https://arxiv.org/abs/2411.15124" target="_blank" rel="noreferrer">Tulu 3: Pushing Frontiers in Open Language Model Post-Training<span class="rn"> · Lambert 等，2024-11-22</span></a><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noreferrer">Training Compute-Optimal Large Language Models<span class="rn"> · Hoffmann 等，2022-03-29</span></a><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noreferrer">Mamba: Linear-Time Sequence Modeling with Selective State Spaces<span class="rn"> · Gu、Dao，2023-12-04</span></a><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noreferrer">Efficient Memory Management for Large Language Model Serving with PagedAttention<span class="rn"> · Kwon 等，2023-09-12</span></a><a href="https://arxiv.org/abs/2405.09818" target="_blank" rel="noreferrer">Chameleon: Mixed-Modal Early-Fusion Foundation Models<span class="rn"> · Meta，2024-05-16</span></a><a href="https://arxiv.org/abs/2408.11039" target="_blank" rel="noreferrer">Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model<span class="rn"> · Zhou 等，2024-08-20</span></a><a href="https://arxiv.org/abs/2309.00071" target="_blank" rel="noreferrer">YaRN: Efficient Context Window Extension of Large Language Models<span class="rn"> · Peng 等，2023-08-31</span></a><a href="https://arxiv.org/abs/2309.08600" target="_blank" rel="noreferrer">Sparse Autoencoders Find Highly Interpretable Features in Language Models<span class="rn"> · Cunningham 等，2023-09-15</span></a><a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noreferrer">GPQA: A Graduate-Level Google-Proof Q&amp;A Benchmark<span class="rn"> · Rein 等，2023-11-20</span></a><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noreferrer">SWE-bench: Can Language Models Resolve Real-World GitHub Issues?<span class="rn"> · Jimenez 等，2023-10-10</span></a></div>
+  </section>
+  </article>
+</div>
+</main>
+</body></html>

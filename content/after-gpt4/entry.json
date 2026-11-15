@@ -1,0 +1,28 @@
+{
+  "id": "after-gpt4",
+  "kind": "paper",
+  "title": "GPT-4 之后：LLM 重要概念地图",
+  "subtitle": "从 CoT 到 mHC，按推理、架构、训练、工具、多模态、安全六条线，整理 2023 到 2026 年真正进入主流的概念",
+  "topics": [
+    "大模型",
+    "综述",
+    "论文"
+  ],
+  "date": "2023-03",
+  "studied": "2026-11",
+  "published": "2026-11-15",
+  "summary": "GPT-4 之后，LLM 的进展分成了六条线：推理、架构、训练、工具、多模态、安全与评测。这篇按六条线整理了九十多个概念，从 CoT、Self-Consistency 到 o1、R1、RLVR，从 MoE、GQA、MLA、NSA、Mamba 到 mHC，从 DPO、RLHF 到 distillation，从 ReAct、RAG、MCP 到多模态和长上下文。每个概念给时间、一句话定义和代表工作，CoT、MLA、mHC、MoE、后训练、agent 几条线单独展开；公式只保留理解机制必需的部分，数字回到原始论文核对。",
+  "page": "page.html",
+  "outputs": [
+    "<b>16</b> 节",
+    "<b>1.1</b> 万字",
+    "<b>8</b> 张图",
+    "<b>95</b> 个概念"
+  ],
+  "build": {
+    "note": "输入在 27_PostGPT4/ 下（content/article.mjs 正文、figures/gen.mjs 配图、research/ 核验记录），那个目录不进仓库。page.html 是提交进仓库的成品；27_PostGPT4/ 在时构建会先重新生成。",
+    "tool": "27_PostGPT4/build.mjs",
+    "requires": "27_PostGPT4/build.mjs",
+    "args": []
+  }
+}
