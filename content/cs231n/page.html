@@ -110,7 +110,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 @media(max-width:1099px){.tl{max-height:300px}}
 .tl li+li{border-top:1px solid var(--line-soft)}
 .tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
-.tl button b{flex:none;width:38px;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button b{flex:none;width:7ch;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
 .tl button:hover{background:var(--bg-hover);color:var(--text)}
 .tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
 .tl button.on b{color:var(--accent-ink)}
@@ -321,8 +321,6 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 .mats a{color:var(--text-2);border:1px solid var(--line);border-radius:var(--r-full);padding:1px 9px;background:var(--bg)}
 .mats a:hover{color:var(--accent-ink);border-color:var(--accent-line);background:var(--accent-soft)}
 .epmain .lede+.lede{margin-top:10px}
-/* 课都超过一小时，时间轴里有 1:04:27 这种七位时间码，基础概念页的 38px 放不下 */
-.tl button b{width:7ch}
 /* 从引用论文 tab 跳到笔记小节时，标题别被吸顶的 tab 栏挡住 */
 .sec{scroll-margin-top:calc(var(--bar-h) + 12px)}
 .intro ul{margin:4px 0 12px;padding-left:1.2em}.intro li{margin:4px 0}
