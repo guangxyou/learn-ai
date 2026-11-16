@@ -110,6 +110,7 @@ code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-
 @media(max-width:1099px){.tl{max-height:300px}}
 .tl li+li{border-top:1px solid var(--line-soft)}
 .tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+/* 时间列要放得下 1:04:27 这种七位时间码；按 ch 算宽，换字体也不会压到右边文字 */
 .tl button b{flex:none;width:7ch;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
 .tl button:hover{background:var(--bg-hover);color:var(--text)}
 .tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
@@ -274,12 +275,12 @@ pre.code code{background:none;padding:0;font-size:inherit}
 
 
 <h3>录像和资料</h3>
-<p>每集的播放器是 B 站搬运 <a href="https://www.bilibili.com/video/BV1m77Y6DEYP" target="_blank" rel="noreferrer">BV1m77Y6DEYP</a>，和 YouTube 官方播放列表逐集比过，时长一致，画面没有压制字幕；笔记里的时间码、截图都按这套录像，点时间码就在 B 站播放器里跳到那一秒。每集卡片上也有 YouTube 原视频的链接。代码和 notebook 链到 Karpathy 的 GitHub。</p>
+<p>每集的播放器是 B 站上的转载版（<a href="https://www.bilibili.com/video/BV1hTWm6jEcj" target="_blank" rel="noreferrer">第 1 集</a>，10 集各一条，加了中英字幕），时长和 YouTube 官方播放列表逐集一致，字幕走 CC 轨、没有压进画面；笔记里的时间码、截图也按这套录像，点时间码就在 B 站播放器里跳到那一秒。每集卡片上也有 YouTube 原视频的链接。代码和 notebook 链到 Karpathy 的 GitHub。</p>
 </div>
   <div class="eptools"><span>10 集 · 19 小时 21 分 · 点标题展开</span>
     <button type="button" data-all="open">全部展开</button><button type="button" data-all="close">全部收起</button></div>
   <h2 class="unit">反向传播<em>Backpropagation</em></h2>
-<details class="ep" id="e1" data-bv="BV1m77Y6DEYP" data-p="1">
+<details class="ep" id="e1" data-bv="BV1hTWm6jEcj">
   <summary>
     <span class="no">1</span>
     <span class="tt"><b>神经网络与反向传播：从零写 micrograd</b><em>The spelled-out intro to neural networks and backpropagation: building micrograd</em><span class="hook">从一个包住标量的 Value 类写起，一百行代码实现自动求导，再在上面搭一个多层感知机并训练它。看完能读懂 micrograd 的全部源码。</span></span>
@@ -290,7 +291,7 @@ pre.code code{background:none;padding:0;font-size:inherit}
       <p class="lede">micrograd 是 Karpathy 2020-04-13 放上 GitHub 的一个<b>自动求导引擎</b>（autograd），核心只有约 100 行 Python，外加 50 行左右的神经网络库。</p>
       <p class="lede">这一集从一个空白 notebook 开始把它重写一遍：先用数值方法弄清导数在测什么，再写 <code>Value</code> 类记录表达式图，手工做两遍反向传播，然后把每种运算的局部求导写进代码、用拓扑排序自动执行，最后搭一个多层感知机，用梯度下降训练它拟合四个样本。</p>
       <p class="lede">他反复强调的一句话：训练神经网络需要的就是 micrograd 这些东西，其余全是效率。真实框架把标量打包成张量（tensor），让大量运算并行，但数学一点没变。所以这里刻意只在标量上做，每一个加号、乘号都看得见。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=1" target="_blank" rel="noreferrer">B 站 P1 ↗</a><a href="https://www.youtube.com/watch?v=VMj-3S1tku0" target="_blank" rel="noreferrer">YouTube · 2022-08-16 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1hTWm6jEcj" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=VMj-3S1tku0" target="_blank" rel="noreferrer">YouTube · 2022-08-16 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/micrograd" target="_blank" rel="noreferrer">micrograd 仓库</a><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/micrograd/micrograd_lecture_first_half_roughly.ipynb" target="_blank" rel="noreferrer">notebook · 前半</a><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/micrograd/micrograd_lecture_second_half_roughly.ipynb" target="_blank" rel="noreferrer">notebook · 后半</a><a href="https://colab.research.google.com/drive/1FPTx1RXtBfc4MaTkf7viZZD4U2F9gtKN?usp=sharing" target="_blank" rel="noreferrer">练习 Colab</a></p>
       
       <section class="sec">
@@ -603,13 +604,13 @@ class MLP:
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep01.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=1" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1hTWm6jEcj" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：从空白 notebook 到训练一个神经网络</span></button></li><li><button type="button" data-t="25"><b>0:25</b><span>micrograd 是什么：标量自动求导引擎</span></button></li><li><button type="button" data-t="488"><b>8:08</b><span>单输入函数的导数：数值估计</span></button></li><li><button type="button" data-t="852"><b>14:12</b><span>多输入函数的导数：分别扰动 a、b、c</span></button></li><li><button type="button" data-t="1149"><b>19:09</b><span>写 Value 类：加法、乘法、记录子节点和运算</span></button></li><li><button type="button" data-t="1446"><b>24:06</b><span>用 graphviz 把表达式图画出来</span></button></li><li><button type="button" data-t="1759"><b>29:19</b><span>给每个节点加 grad：反向传播要算什么</span></button></li><li><button type="button" data-t="1930"><b>32:10</b><span>手工反向传播 1：L = (a·b + c)·f</span></button></li><li><button type="button" data-t="2257"><b>37:37</b><span>链式法则：加法节点把梯度原样分下去</span></button></li><li><button type="button" data-t="2827"><b>47:07</b><span>乘法节点：局部导数是另一个输入</span></button></li><li><button type="button" data-t="3027"><b>50:27</b><span>沿梯度方向走一步，L 变大了</span></button></li><li><button type="button" data-t="3172"><b>52:52</b><span>手工反向传播 2：一个 tanh 神经元</span></button></li><li><button type="button" data-t="4142"><b>1:09:02</b><span>把每种运算的 _backward 写进类里</span></button></li><li><button type="button" data-t="4652"><b>1:17:32</b><span>拓扑排序，自动对整张图做反向传播</span></button></li><li><button type="button" data-t="4948"><b>1:22:28</b><span>修 bug：一个节点被用了两次，梯度要累加</span></button></li><li><button type="button" data-t="5225"><b>1:27:05</b><span>把 tanh 拆开：exp、除法、幂、减法</span></button></li><li><button type="button" data-t="5971"><b>1:39:31</b><span>同样的事在 PyTorch 里怎么写</span></button></li><li><button type="button" data-t="6235"><b>1:43:55</b><span>搭神经网络库：<code>Neuron</code>、<code>Layer</code>、<code>MLP</code></span></button></li><li><button type="button" data-t="6664"><b>1:51:04</b><span>四个样本的小数据集和均方误差损失</span></button></li><li><button type="button" data-t="7076"><b>1:57:56</b><span>收集全部 41 个参数</span></button></li><li><button type="button" data-t="7272"><b>2:01:12</b><span>手动梯度下降，学习率太大会怎样</span></button></li><li><button type="button" data-t="7825"><b>2:10:25</b><span>最常见的 bug：忘了把梯度清零</span></button></li><li><button type="button" data-t="8014"><b>2:13:34</b><span>总结：神经网络就是数学表达式</span></button></li><li><button type="button" data-t="8206"><b>2:16:46</b><span>逐个文件看 GitHub 上的 micrograd</span></button></li><li><button type="button" data-t="8470"><b>2:21:10</b><span>在 PyTorch 源码里找 tanh 的反向传播</span></button></li><li><button type="button" data-t="8679"><b>2:24:39</b><span>结尾</span></button></li></ol>
     </aside>
   </div>
 </details>
 <h2 class="unit">makemore：字符级语言模型<em>makemore</em></h2>
-<details class="ep" id="e2" data-bv="BV1m77Y6DEYP" data-p="2">
+<details class="ep" id="e2" data-bv="BV1nwWY6WEyR">
   <summary>
     <span class="no">2</span>
     <span class="tt"><b>语言建模入门：makemore 之 bigram</b><em>The spelled-out intro to language modeling: building makemore</em><span class="hook">用 3.2 万个名字训练一个字符级 bigram 语言模型，先靠计数，再用一层神经网络加梯度下降，两种做法得到同一个模型。</span></span>
@@ -621,7 +622,7 @@ class MLP:
       <p class="lede">底层是<b>字符级语言模型</b>：把每个名字看成一串字符，学会根据前面的字符预测下一个。这个系列会一路从 bigram 做到多层感知机、循环神经网络，最后到相当于 GPT-2 的 Transformer。</p>
       <p class="lede">这一集只做最简单的 <b>bigram</b> 模型：只看前一个字符预测下一个。先用计数做出一张 27×27 的表，归一化成概率，用来采样，再用<b>负对数似然</b>评估它，平均损失约 2.45。</p>
       <p class="lede">然后把同一个问题改写成神经网络：one-hot 输入、一个 27×27 的线性层、softmax 输出概率，用梯度下降最小化同一个损失，结果收敛到几乎相同的数。神经网络这条路更灵活，后面几集只是把中间的网络换得越来越复杂，前后两头不变。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=2" target="_blank" rel="noreferrer">B 站 P2 ↗</a><a href="https://www.youtube.com/watch?v=PaCmpygFfXo" target="_blank" rel="noreferrer">YouTube · 2022-09-07 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1nwWY6WEyR" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=PaCmpygFfXo" target="_blank" rel="noreferrer">YouTube · 2022-09-07 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/makemore" target="_blank" rel="noreferrer">makemore 仓库</a><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part1_bigrams.ipynb" target="_blank" rel="noreferrer">notebook</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://cs231n.github.io/python-numpy-tutorial/" target="_blank" rel="noreferrer">CS231n Python + Numpy 教程</a><a href="https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html" target="_blank" rel="noreferrer">PyTorch Tensor 教程</a></p>
       <section class="sec">
@@ -816,12 +817,12 @@ W.data += -50 * W.grad</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep02.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=2" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1nwWY6WEyR" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>makemore 是什么：字符级语言模型</span></button></li><li><button type="button" data-t="183"><b>3:03</b><span>读入数据集：32033 个名字</span></button></li><li><button type="button" data-t="384"><b>6:24</b><span>每个名字里藏着多少个 bigram</span></button></li><li><button type="button" data-t="564"><b>9:24</b><span>用 Python 字典计数</span></button></li><li><button type="button" data-t="765"><b>12:45</b><span>改用 28×28 的 torch 张量计数</span></button></li><li><button type="button" data-t="1099"><b>18:19</b><span>把计数表画出来</span></button></li><li><button type="button" data-t="1254"><b>20:54</b><span>只留一个特殊字符「.」，表变成 27×27</span></button></li><li><button type="button" data-t="1442"><b>24:02</b><span>从模型采样：torch.multinomial</span></button></li><li><button type="button" data-t="2177"><b>36:17</b><span>预先归一化每一行，张量的广播规则</span></button></li><li><button type="button" data-t="2655"><b>44:15</b><span>keepdim 引出的广播 bug</span></button></li><li><button type="button" data-t="3014"><b>50:14</b><span>损失函数：似然、对数似然、负对数似然</span></button></li><li><button type="button" data-t="3650"><b>1:00:50</b><span>模型平滑：给每个计数加 1</span></button></li><li><button type="button" data-t="3777"><b>1:02:57</b><span>第二部分：换成神经网络</span></button></li><li><button type="button" data-t="3926"><b>1:05:26</b><span>构造训练集：输入字符和目标字符</span></button></li><li><button type="button" data-t="4201"><b>1:10:01</b><span>one-hot 编码</span></button></li><li><button type="button" data-t="4433"><b>1:13:53</b><span>一层线性神经元：矩阵乘法</span></button></li><li><button type="button" data-t="4726"><b>1:18:46</b><span>logits、exp、归一化：softmax</span></button></li><li><button type="button" data-t="5177"><b>1:26:17</b><span>逐个样本看概率和损失</span></button></li><li><button type="button" data-t="5749"><b>1:35:49</b><span>向量化的损失</span></button></li><li><button type="button" data-t="5916"><b>1:38:36</b><span>在 PyTorch 里反向传播和更新</span></button></li><li><button type="button" data-t="6175"><b>1:42:55</b><span>用全部 22.8 万个 bigram 训练</span></button></li><li><button type="button" data-t="6469"><b>1:47:49</b><span>one-hot 乘矩阵其实就是取一行</span></button></li><li><button type="button" data-t="6618"><b>1:50:18</b><span>平滑等价于正则化</span></button></li><li><button type="button" data-t="6871"><b>1:54:31</b><span>从神经网络采样</span></button></li><li><button type="button" data-t="6976"><b>1:56:16</b><span>总结</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e3" data-bv="BV1m77Y6DEYP" data-p="3">
+<details class="ep" id="e3" data-bv="BV1jbWC61ET5">
   <summary>
     <span class="no">3</span>
     <span class="tt"><b>makemore 第 2 部分：多层感知机</b><em>Building makemore Part 2: MLP</em><span class="hook">照 Bengio 等 2003 年的论文，用前三个字符的嵌入向量加一个隐藏层预测下一个字符；顺带讲小批量、找学习率、训练集验证集测试集和欠拟合。</span></span>
@@ -833,7 +834,7 @@ W.data += -50 * W.grad</code></pre>
       <p class="lede">这一集换成<b>多层感知机</b>，结构照 Bengio 等 2003 年的《A Neural Probabilistic Language Model》：每个字符查一张<b>嵌入表</b>得到一个低维向量，三个向量拼起来送进一个 tanh 隐藏层，再接输出层和 softmax。</p>
       <p class="lede">代码层面学了 PyTorch 的几样东西：用整数张量直接索引嵌入表、<code>view</code> 为什么几乎不花时间、<code>F.cross_entropy</code> 为什么比自己写更好。</p>
       <p class="lede">训练层面讲了一套基本流程：先在一个小批量上过拟合确认代码没错，用小批量加快迭代，扫一遍学习率找合适的值，后期衰减学习率，把数据分成训练、验证、测试三份，根据训练损失和验证损失判断是欠拟合还是过拟合。最后验证损失到了 2.17，bigram 是 2.45。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=3" target="_blank" rel="noreferrer">B 站 P3 ↗</a><a href="https://www.youtube.com/watch?v=TCH_1BHY58I" target="_blank" rel="noreferrer">YouTube · 2022-09-12 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1jbWC61ET5" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=TCH_1BHY58I" target="_blank" rel="noreferrer">YouTube · 2022-09-12 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part2_mlp.ipynb" target="_blank" rel="noreferrer">notebook</a><a href="https://colab.research.google.com/drive/1YIfmkftLrz6MPTOO9Vwqrop2Q5llHIGK?usp=sharing" target="_blank" rel="noreferrer">Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://www.jmlr.org/papers/volume3/bengio03a/bengio03a.pdf" target="_blank" rel="noreferrer">Bengio 等 2003《A Neural Probabilistic Language Model》</a><a href="http://blog.ezyang.com/2019/05/pytorch-internals/" target="_blank" rel="noreferrer">PyTorch internals（Edward Yang）</a></p>
       <section class="sec">
@@ -1010,12 +1011,12 @@ for w in words:
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep03.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=3" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1jbWC61ET5" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>为什么计数表撑不住更长的上下文</span></button></li><li><button type="button" data-t="108"><b>1:48</b><span>读 Bengio 等 2003 的论文</span></button></li><li><button type="button" data-t="543"><b>9:03</b><span>重建训练集：block<sub>size</sub> 个字符预测下一个</span></button></li><li><button type="button" data-t="739"><b>12:19</b><span>嵌入查找表 C</span></button></li><li><button type="button" data-t="1115"><b>18:35</b><span>隐藏层；张量的存储和 view</span></button></li><li><button type="button" data-t="1755"><b>29:15</b><span>输出层</span></button></li><li><button type="button" data-t="1793"><b>29:53</b><span>负对数似然损失</span></button></li><li><button type="button" data-t="1937"><b>32:17</b><span>整理整个网络</span></button></li><li><button type="button" data-t="1969"><b>32:49</b><span>改用 F.cross<sub>entropy</sub> 及原因</span></button></li><li><button type="button" data-t="2276"><b>37:56</b><span>训练循环，先过拟合一个小批量</span></button></li><li><button type="button" data-t="2485"><b>41:25</b><span>用全部数据训练，小批量</span></button></li><li><button type="button" data-t="2740"><b>45:40</b><span>找一个合适的初始学习率</span></button></li><li><button type="button" data-t="3200"><b>53:20</b><span>训练集、验证集、测试集及其用途</span></button></li><li><button type="button" data-t="3649"><b>1:00:49</b><span>实验：把隐藏层加大</span></button></li><li><button type="button" data-t="3927"><b>1:05:27</b><span>把二维的字符嵌入画出来</span></button></li><li><button type="button" data-t="4036"><b>1:07:16</b><span>实验：把嵌入维度加大</span></button></li><li><button type="button" data-t="4306"><b>1:11:46</b><span>最终代码和结论</span></button></li><li><button type="button" data-t="4404"><b>1:13:24</b><span>从模型采样</span></button></li><li><button type="button" data-t="4495"><b>1:14:55</b><span>Google Colab 版本</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e4" data-bv="BV1m77Y6DEYP" data-p="4">
+<details class="ep" id="e4" data-bv="BV1Gbs36JE8S">
   <summary>
     <span class="no">4</span>
     <span class="tt"><b>makemore 第 3 部分：激活值、梯度与 Batch Normalization</b><em>Building makemore Part 3: Activations &amp; Gradients, BatchNorm</em><span class="hook">盯着前向的激活值和反向的梯度看：修初始损失、修 tanh 饱和、讲 Kaiming 初始化，再手写 Batch Normalization，最后给出一套诊断图。</span></span>
@@ -1027,7 +1028,7 @@ for w in words:
       <p class="lede">前半集修上一集网络的两个初始化问题：初始损失是 27 而不是理论上的 3.29，因为输出层太自信；隐藏层的 tanh 大量饱和，梯度传不过去。</p>
       <p class="lede">然后讲怎么用 fan-in 和增益有原则地设定初始化尺度（Kaiming 初始化），再引出 2015 年的 <b>Batch Normalization</b>：直接把隐藏层的预激活标准化成单位高斯，加上可学习的缩放和平移，用滑动平均记下推理时要用的均值和方差。</p>
       <p class="lede">后半集是「附赠」的总结：把代码改写成和 <code>torch.nn</code> 同接口的 <code>Linear</code>、<code>BatchNorm1d</code>、<code>Tanh</code> 模块，搭一个 6 层网络，画出各层激活值、梯度、权重梯度的直方图，以及「更新量与参数值之比」随时间的曲线，看增益设错、忘了 fan-in 归一化时这些图会怎样，加上 Batch Normalization 后又怎样。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=4" target="_blank" rel="noreferrer">B 站 P4 ↗</a><a href="https://www.youtube.com/watch?v=P6sfmUTpUmc" target="_blank" rel="noreferrer">YouTube · 2022-10-04 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1Gbs36JE8S" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=P6sfmUTpUmc" target="_blank" rel="noreferrer">YouTube · 2022-10-04 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part3_bn.ipynb" target="_blank" rel="noreferrer">notebook</a><a href="https://colab.research.google.com/drive/1H5CSy-OnisagUgDUXhHwo1ng2pjKHYSN?usp=sharing" target="_blank" rel="noreferrer">Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noreferrer">Kaiming 初始化论文</a><a href="https://arxiv.org/abs/1502.03167" target="_blank" rel="noreferrer">Batch Normalization 论文</a><a href="https://arxiv.org/abs/2105.07576" target="_blank" rel="noreferrer">Rethinking &quot;Batch&quot; in BatchNorm</a></p>
       <section class="sec">
@@ -1261,12 +1262,12 @@ hpreact = bngain * (hpreact - bnmeani) / bnstdi + bnbias</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep04.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=4" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1Gbs36JE8S" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>为什么还要停在多层感知机</span></button></li><li><button type="button" data-t="82"><b>1:22</b><span>起始代码</span></button></li><li><button type="button" data-t="259"><b>4:19</b><span>修初始损失：输出层太自信</span></button></li><li><button type="button" data-t="779"><b>12:59</b><span>修饱和的 tanh</span></button></li><li><button type="button" data-t="1673"><b>27:53</b><span>算出初始化尺度：Kaiming 初始化</span></button></li><li><button type="button" data-t="2440"><b>40:40</b><span>Batch Normalization</span></button></li><li><button type="button" data-t="3787"><b>1:03:07</b><span>Batch Normalization 小结</span></button></li><li><button type="button" data-t="3890"><b>1:04:50</b><span>实例：ResNet-50 里的写法</span></button></li><li><button type="button" data-t="4450"><b>1:14:10</b><span>这一集小结</span></button></li><li><button type="button" data-t="4715"><b>1:18:35</b><span>附赠：把代码改写成 PyTorch 模块</span></button></li><li><button type="button" data-t="5211"><b>1:26:51</b><span>诊断图 1：前向激活值统计</span></button></li><li><button type="button" data-t="5454"><b>1:30:54</b><span>诊断图 2：反向梯度统计</span></button></li><li><button type="button" data-t="5527"><b>1:32:07</b><span>去掉非线性的纯线性情形</span></button></li><li><button type="button" data-t="5775"><b>1:36:15</b><span>诊断图 3：参数及其梯度统计</span></button></li><li><button type="button" data-t="5995"><b>1:39:55</b><span>诊断图 4：更新量与参数值之比</span></button></li><li><button type="button" data-t="6364"><b>1:46:04</b><span>加回 Batch Normalization 再看这些图</span></button></li><li><button type="button" data-t="6694"><b>1:51:34</b><span>真正的小结</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e5" data-bv="BV1m77Y6DEYP" data-p="5">
+<details class="ep" id="e5" data-bv="BV1misn6vEs7">
   <summary>
     <span class="no">5</span>
     <span class="tt"><b>makemore 第 4 部分：手推反向传播</b><em>Building makemore Part 4: Becoming a Backprop Ninja</em><span class="hook">去掉 loss.backward()，在张量层面手写整个网络的反向传播：交叉熵、线性层、tanh、Batch Normalization、嵌入表，最后用自己的梯度把网络训练出来。</span></span>
@@ -1278,7 +1279,7 @@ hpreact = bngain * (hpreact - bnmeani) / bnstdi + bnbias</code></pre>
       <p class="lede">Karpathy 有篇博客叫《Yes you should understand backprop》，他把反向传播称为<b>有漏洞的抽象</b>（leaky abstraction）：不是把可微的积木随便堆起来、反向一传就能工作，不懂内部就会掉进梯度消失、死神经元、梯度爆炸这类坑，而且出了问题没法调试。</p>
       <p class="lede">视频分四个练习。练习一把前向拆成二十多行的原子运算，逐行往回推，每算出一个梯度就和 PyTorch 的结果核对。练习二用纸笔推出交叉熵对 logits 的梯度，只有三行。练习三推出 Batch Normalization 的反向，一行。</p>
       <p class="lede">练习四把这些拼起来，完全不用 autograd 训练网络，得到和以前一样的损失。作者在视频描述里特别说明：这一集不是用来看的，要打开 Colab 自己先做，卡住了再看答案。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=5" target="_blank" rel="noreferrer">B 站 P5 ↗</a><a href="https://www.youtube.com/watch?v=q8SA3rM6ckI" target="_blank" rel="noreferrer">YouTube · 2022-10-11 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1misn6vEs7" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=q8SA3rM6ckI" target="_blank" rel="noreferrer">YouTube · 2022-10-11 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part4_backprop.ipynb" target="_blank" rel="noreferrer">notebook</a><a href="https://colab.research.google.com/drive/1WV2oi2fh9XXyldh02wupFQX0wh5ZC-z-?usp=sharing" target="_blank" rel="noreferrer">练习 Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://karpathy.medium.com/yes-you-should-understand-backprop-e2f06eab496b" target="_blank" rel="noreferrer">Yes you should understand backprop</a><a href="https://arxiv.org/abs/1502.03167" target="_blank" rel="noreferrer">Batch Normalization 论文</a><a href="http://math.oxford.emory.edu/site/math117/besselCorrection/" target="_blank" rel="noreferrer">Bessel 校正</a></p>
       <section class="sec">
@@ -1448,12 +1449,12 @@ dlogits /= n</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep05.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=5" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1misn6vEs7" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>为什么要手写反向传播，以及一点历史</span></button></li><li><button type="button" data-t="446"><b>7:26</b><span>起始代码：拆开的前向传播</span></button></li><li><button type="button" data-t="781"><b>13:01</b><span>练习一：逐个变量反向传播，从 logprobs 开始</span></button></li><li><button type="button" data-t="1245"><b>20:45</b><span>counts<sub>sum</sub><sub>inv</sub>：广播的反向是求和</span></button></li><li><button type="button" data-t="1943"><b>32:23</b><span>norm<sub>logits</sub>、logit<sub>maxes</sub></span></button></li><li><button type="button" data-t="2486"><b>41:26</b><span>线性层：矩阵乘法的反向</span></button></li><li><button type="button" data-t="3197"><b>53:17</b><span>tanh 和 Batch Normalization 的参数</span></button></li><li><button type="button" data-t="3589"><b>59:49</b><span>Batch Normalization 内部各步</span></button></li><li><button type="button" data-t="3917"><b>1:05:17</b><span>插曲：Bessel 校正</span></button></li><li><button type="button" data-t="4672"><b>1:17:52</b><span>第一个线性层、view、嵌入表</span></button></li><li><button type="button" data-t="5191"><b>1:26:31</b><span>练习二：交叉熵的反向</span></button></li><li><button type="button" data-t="5528"><b>1:32:08</b><span>dlogits 的直观含义：推和拉</span></button></li><li><button type="button" data-t="5797"><b>1:36:37</b><span>练习三：Batch Normalization 的反向</span></button></li><li><button type="button" data-t="6602"><b>1:50:02</b><span>练习四：用自己的梯度训练</span></button></li><li><button type="button" data-t="6864"><b>1:54:24</b><span>结尾</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e6" data-bv="BV1m77Y6DEYP" data-p="6">
+<details class="ep" id="e6" data-bv="BV13ysJ63EQg">
   <summary>
     <span class="no">6</span>
     <span class="tt"><b>makemore 第 5 部分：搭一个 WaveNet</b><em>Building makemore Part 5: Building a WaveNet</em><span class="hook">上下文从 3 个字符加到 8 个，并像 WaveNet 那样两两逐层融合；顺带把代码整理成 Embedding、FlattenConsecutive、Sequential 这些和 torch.nn 同名的模块，验证损失降到 1.993。</span></span>
@@ -1464,7 +1465,7 @@ dlogits /= n</code></pre>
       <p class="lede">这一集在京都的酒店里录。目标是两件事：多看几个字符，以及不要在第一层就把所有字符一下子压进一个隐藏层，而是让网络逐层地融合信息。照这个思路搭出来的结构很像 DeepMind 2016 年的 <b>WaveNet</b>：它也是自回归模型，只是预测的是音频序列，用的是树状的层级结构，两个相邻元素先融合，再两两融合，一层层往上。</p>
       <p class="lede">过程中继续把代码改造成 PyTorch 的样子：加了 <code>Embedding</code>、<code>FlattenConsecutive</code> 层和 <code>Sequential</code> 容器，用一个 <code>model</code> 代替裸的层列表；损失曲线按 1000 步取平均画得更清楚。</p>
       <p class="lede">还修了一个藏得很深的 bug：输入变成三维后，自己写的 <code>BatchNorm1d</code> 只沿第 0 维求统计量，等于给每个位置单独维护了一套均值方差。最后把网络加大到 7.6 万参数，验证损失 1.993。结尾说明了卷积和这里实现的东西是什么关系，以及他平时开发神经网络的流程。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=6" target="_blank" rel="noreferrer">B 站 P6 ↗</a><a href="https://www.youtube.com/watch?v=t3YJ5hKiMQ0" target="_blank" rel="noreferrer">YouTube · 2022-11-20 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV13ysJ63EQg" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=t3YJ5hKiMQ0" target="_blank" rel="noreferrer">YouTube · 2022-11-20 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part5_cnn1.ipynb" target="_blank" rel="noreferrer">notebook</a><a href="https://colab.research.google.com/drive/1CXVEmCO_7r7WYZGb5qnjfyxTvQa13g5X?usp=sharing" target="_blank" rel="noreferrer">Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://arxiv.org/abs/1609.03499" target="_blank" rel="noreferrer">WaveNet 论文（DeepMind 2016）</a></p>
       <section class="sec">
@@ -1643,13 +1644,13 @@ xvar = x.var(dim, keepdim=True)</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep06.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=6" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV13ysJ63EQg" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：在京都，这一集要做什么</span></button></li><li><button type="button" data-t="100"><b>1:40</b><span>起始代码</span></button></li><li><button type="button" data-t="416"><b>6:56</b><span>修一下损失曲线的画法</span></button></li><li><button type="button" data-t="556"><b>9:16</b><span>整理成模块：Embedding、Flatten、Sequential</span></button></li><li><button type="button" data-t="793"><b>13:13</b><span>Batch Normalization 处于训练模式引出的 bug</span></button></li><li><button type="button" data-t="1031"><b>17:11</b><span>WaveNet 的结构</span></button></li><li><button type="button" data-t="1173"><b>19:33</b><span>上下文长度加到 8</span></button></li><li><button type="button" data-t="1195"><b>19:55</b><span>直接扩大上下文的基线：2.02</span></button></li><li><button type="button" data-t="1296"><b>21:36</b><span>实现 WaveNet：逐层两两融合</span></button></li><li><button type="button" data-t="2261"><b>37:41</b><span>第一次训练</span></button></li><li><button type="button" data-t="2330"><b>38:50</b><span>修 <code>BatchNorm1d</code> 对三维输入的 bug</span></button></li><li><button type="button" data-t="2721"><b>45:21</b><span>修完重新训练</span></button></li><li><button type="button" data-t="2767"><b>46:07</b><span>把网络加大，1.993</span></button></li><li><button type="button" data-t="2818"><b>46:58</b><span>缺一套实验框架</span></button></li><li><button type="button" data-t="2864"><b>47:44</b><span>WaveNet 和膨胀因果卷积</span></button></li><li><button type="button" data-t="3094"><b>51:34</b><span>torch.nn</span></button></li><li><button type="button" data-t="3148"><b>52:28</b><span>开发深度网络的过程</span></button></li><li><button type="button" data-t="3257"><b>54:17</b><span>接下来可以做什么</span></button></li><li><button type="button" data-t="3326"><b>55:26</b><span>来超过这个损失</span></button></li></ol>
     </aside>
   </div>
 </details>
 <h2 class="unit">GPT<em>GPT</em></h2>
-<details class="ep" id="e7" data-bv="BV1m77Y6DEYP" data-p="7">
+<details class="ep" id="e7" data-bv="BV1qqsH69EmW">
   <summary>
     <span class="no">7</span>
     <span class="tt"><b>从零用代码写一个 GPT</b><em>Let's build GPT: from scratch, in code, spelled out.</em><span class="hook">在 tiny Shakespeare 上从零写一个字符级的 GPT：从 bigram 基线出发，推出自注意力，再加多头、前馈、残差、Layer Normalization 和 dropout，最后 1000 万参数的模型验证损失到 1.48。</span></span>
@@ -1662,7 +1663,7 @@ xvar = x.var(dim, keepdim=True)</code></pre>
       <p class="lede">先搭好数据管线和 bigram 基线（验证损失 2.5），然后用一个玩具例子讲清自注意力的核心技巧：用下三角矩阵做矩阵乘法实现「对过去加权平均」，权重由 softmax 归一化，再把权重换成由 query 和 key 点积算出的、和数据相关的亲和度。</p>
       <p class="lede">之后照论文一块块加上：缩放、多头、前馈层、残差连接、Layer Normalization（用 pre-norm 写法）、dropout，损失一路降到 2.06；放大到 6 层、384 维、上下文 256，在 A100 上训练约 15 分钟，验证损失 1.48，生成的文本有了莎士比亚剧本的样子。</p>
       <p class="lede">最后讲了解码器和编码器的区别、nanoGPT 的代码结构，以及要从这个预训练模型走到 ChatGPT 还差哪些阶段。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=7" target="_blank" rel="noreferrer">B 站 P7 ↗</a><a href="https://www.youtube.com/watch?v=kCc8FmEb1nY" target="_blank" rel="noreferrer">YouTube · 2023-01-17 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1qqsH69EmW" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=kCc8FmEb1nY" target="_blank" rel="noreferrer">YouTube · 2023-01-17 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/ng-video-lecture" target="_blank" rel="noreferrer">ng-video-lecture 仓库</a><a href="https://github.com/karpathy/nanoGPT" target="_blank" rel="noreferrer">nanoGPT 仓库</a><a href="https://colab.research.google.com/drive/1JMLa53HDuA-i7ZBmqV7ZnA3c_fvtXnx-?usp=sharing" target="_blank" rel="noreferrer">Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need</a><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noreferrer">GPT-3 论文</a></p>
       <section class="sec">
@@ -1912,12 +1913,12 @@ out = wei @ value(x)                     # (B, T, 16)</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep07.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=7" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1qqsH69EmW" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：ChatGPT、Transformer、nanoGPT、Shakespeare</span></button></li><li><button type="button" data-t="472"><b>7:52</b><span>读数据</span></button></li><li><button type="button" data-t="568"><b>9:28</b><span>分词，划分训练集和验证集</span></button></li><li><button type="button" data-t="867"><b>14:27</b><span>数据加载：按批取文本块</span></button></li><li><button type="button" data-t="1331"><b>22:11</b><span>最简单的基线：bigram 语言模型</span></button></li><li><button type="button" data-t="2093"><b>34:53</b><span>训练 bigram 模型</span></button></li><li><button type="button" data-t="2280"><b>38:00</b><span>把代码整理成脚本</span></button></li><li><button type="button" data-t="2533"><b>42:13</b><span>版本 1：用 for 循环对过去取平均</span></button></li><li><button type="button" data-t="2831"><b>47:11</b><span>自注意力的技巧：矩阵乘法做加权聚合</span></button></li><li><button type="button" data-t="3114"><b>51:54</b><span>版本 2：用矩阵乘法</span></button></li><li><button type="button" data-t="3282"><b>54:42</b><span>版本 3：加入 softmax</span></button></li><li><button type="button" data-t="3506"><b>58:26</b><span>小清理</span></button></li><li><button type="button" data-t="3618"><b>1:00:18</b><span>位置编码</span></button></li><li><button type="button" data-t="3720"><b>1:02:00</b><span>核心：版本 4，自注意力</span></button></li><li><button type="button" data-t="4298"><b>1:11:38</b><span>注 1：注意力是一种通信机制</span></button></li><li><button type="button" data-t="4366"><b>1:12:46</b><span>注 2：注意力没有空间概念，作用在集合上</span></button></li><li><button type="button" data-t="4420"><b>1:13:40</b><span>注 3：批次之间不通信</span></button></li><li><button type="button" data-t="4454"><b>1:14:14</b><span>注 4：编码器块和解码器块</span></button></li><li><button type="button" data-t="4539"><b>1:15:39</b><span>注 5：注意力、自注意力、交叉注意力</span></button></li><li><button type="button" data-t="4616"><b>1:16:56</b><span>注 6：为什么要除以 √head<sub>size</sub></span></button></li><li><button type="button" data-t="4751"><b>1:19:11</b><span>把一个自注意力头接进网络</span></button></li><li><button type="button" data-t="4919"><b>1:21:59</b><span>多头自注意力</span></button></li><li><button type="button" data-t="5065"><b>1:24:25</b><span>Transformer 块里的前馈层</span></button></li><li><button type="button" data-t="5208"><b>1:26:48</b><span>残差连接</span></button></li><li><button type="button" data-t="5571"><b>1:32:51</b><span>Layer Normalization，以及它和 Batch Normalization 的关系</span></button></li><li><button type="button" data-t="5869"><b>1:37:49</b><span>放大模型，加入 dropout</span></button></li><li><button type="button" data-t="6159"><b>1:42:39</b><span>编码器、解码器，还是两者都要</span></button></li><li><button type="button" data-t="6382"><b>1:46:22</b><span>快速浏览 nanoGPT，批量化的多头注意力</span></button></li><li><button type="button" data-t="6533"><b>1:48:53</b><span>回到 ChatGPT：预训练、微调、RLHF</span></button></li><li><button type="button" data-t="6872"><b>1:54:32</b><span>总结</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e8" data-bv="BV1m77Y6DEYP" data-p="8">
+<details class="ep" id="e8" data-bv="BV1uRsH6GEfn">
   <summary>
     <span class="no">8</span>
     <span class="tt"><b>GPT 的现状（Microsoft Build 2023 演讲）</b><em>State of GPT | BRK216HFS</em><span class="hook">Microsoft Build 2023 上的 42 分钟演讲：前半讲 GPT 助手怎么训练出来（预训练、监督微调、奖励模型、强化学习），后半讲怎么在应用里用好它。</span></span>
@@ -1930,7 +1931,7 @@ out = wei @ value(x)                     # (B, T, 16)</code></pre>
       <p class="lede">预训练占了 99% 的算力，用互联网规模的数据和数千张 GPU 训练数月；后三步只要少量 GPU 训练几小时到几天。</p>
       <p class="lede">后半部分讲怎么用：人写一句话时脑子里有大量内心独白、查资料、用计算器、反复修改，而 GPT 每个 token 只花同样多的计算、不知道自己不知道什么、不会回头检查，所以提示工程很大程度上是在弥补这种「认知差异」：让它一步步想、多采几次、让它自查、给它工具和检索、明确要求高质量的答案。</p>
       <p class="lede">最后给出建议：先用最强的模型和详细的提示把效果做到最好，再考虑微调和省成本；目前把它用在低风险场景、配合人工监督，当副驾驶而不是自主智能体。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=8" target="_blank" rel="noreferrer">B 站 P8 ↗</a><a href="https://www.youtube.com/watch?v=bZQun8Y4L2A" target="_blank" rel="noreferrer">YouTube · 2023-05-25 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1uRsH6GEfn" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=bZQun8Y4L2A" target="_blank" rel="noreferrer">YouTube · 2023-05-25 ↗</a></p>
       
       
       <section class="sec">
@@ -2121,12 +2122,12 @@ out = wei @ value(x)                     # (B, T, 16)</code></pre>
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep08.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=8" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1uRsH6GEfn" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：分两部分讲</span></button></li><li><button type="button" data-t="40"><b>0:40</b><span>GPT 助手的训练配方：四个阶段</span></button></li><li><button type="button" data-t="76"><b>1:16</b><span>预训练：数据混合</span></button></li><li><button type="button" data-t="151"><b>2:31</b><span>分词</span></button></li><li><button type="button" data-t="228"><b>3:48</b><span>规模：GPT-3 和 LLaMA 的超参数</span></button></li><li><button type="button" data-t="303"><b>5:03</b><span>预训练在做什么：预测下一个 token</span></button></li><li><button type="button" data-t="458"><b>7:38</b><span>基础模型学到了通用表示：从微调到提示</span></button></li><li><button type="button" data-t="540"><b>9:00</b><span>基础模型的谱系，基础模型不是助手</span></button></li><li><button type="button" data-t="689"><b>11:29</b><span>监督微调</span></button></li><li><button type="button" data-t="775"><b>12:55</b><span>奖励建模</span></button></li><li><button type="button" data-t="927"><b>15:27</b><span>强化学习</span></button></li><li><button type="button" data-t="1002"><b>16:42</b><span>为什么要做 RLHF</span></button></li><li><button type="button" data-t="1153"><b>19:13</b><span>可用助手模型的排名</span></button></li><li><button type="button" data-t="1230"><b>20:30</b><span>第二部分：一句话背后的思考过程</span></button></li><li><button type="button" data-t="1464"><b>24:24</b><span>让模型有更多 token 来思考</span></button></li><li><button type="button" data-t="1540"><b>25:40</b><span>自洽性、自我检查</span></button></li><li><button type="button" data-t="1616"><b>26:56</b><span>重建「系统 2」：Tree of Thoughts、ReAct、AutoGPT</span></button></li><li><button type="button" data-t="1791"><b>29:51</b><span>模型不想成功，只想模仿</span></button></li><li><button type="button" data-t="1890"><b>31:30</b><span>工具和检索增强</span></button></li><li><button type="button" data-t="2030"><b>33:50</b><span>约束采样</span></button></li><li><button type="button" data-t="2107"><b>35:07</b><span>微调</span></button></li><li><button type="button" data-t="2219"><b>36:59</b><span>默认建议</span></button></li><li><button type="button" data-t="2338"><b>38:58</b><span>适用场景和局限</span></button></li><li><button type="button" data-t="2400"><b>40:00</b><span>结尾：GPT-4 给观众的致辞</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e9" data-bv="BV1m77Y6DEYP" data-p="9">
+<details class="ep" id="e9" data-bv="BV1kVsP6jEUH">
   <summary>
     <span class="no">9</span>
     <span class="tt"><b>从零写 GPT 的分词器</b><em>Let's build the GPT Tokenizer</em><span class="hook">从 Unicode 和 UTF-8 讲起，手写字节级 BPE 的训练、编码和解码，再看 GPT-2/GPT-4 的正则切分、tiktoken、特殊 token 和 SentencePiece，最后用分词解释大模型的一串怪毛病。</span></span>
@@ -2139,7 +2140,7 @@ out = wei @ value(x)                     # (B, T, 16)</code></pre>
       <p class="lede">这一集先在 tiktokenizer 网页上看实际的切分，然后从 Python 字符串、Unicode 码位、UTF-8 讲起，手写 BPE 的训练、解码和编码。</p>
       <p class="lede">接着再看 GPT-2 用正则表达式强制某些字符不合并、tiktoken 里 GPT-4 的改动、OpenAI 的 encoder.py、特殊 token 和加入新 token 时要做的「模型手术」；接着用 SentencePiece 复现 LLaMA 2 的分词器设置，讨论词表大小怎么选；最后逐个解释开头那些怪现象。</p>
       <p class="lede">配套代码在 minbpe 仓库，exercise.md 分四步带你写出 GPT-4 的分词器。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=9" target="_blank" rel="noreferrer">B 站 P9 ↗</a><a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noreferrer">YouTube · 2024-02-20 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1kVsP6jEUH" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noreferrer">YouTube · 2024-02-20 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/minbpe" target="_blank" rel="noreferrer">minbpe 仓库</a><a href="https://github.com/karpathy/minbpe/blob/master/exercise.md" target="_blank" rel="noreferrer">练习说明 exercise.md</a><a href="https://colab.research.google.com/drive/1y0KnCFZvGVf_odSfcNAws6kcDD7HsI0L?usp=sharing" target="_blank" rel="noreferrer">Colab</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://tiktokenizer.vercel.app" target="_blank" rel="noreferrer">tiktokenizer</a><a href="https://github.com/openai/tiktoken" target="_blank" rel="noreferrer">tiktoken</a><a href="https://github.com/google/sentencepiece" target="_blank" rel="noreferrer">sentencepiece</a></p>
       <section class="sec">
@@ -2397,12 +2398,12 @@ def decode(ids):
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep09.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=9" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1kVsP6jEUH" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：分词是什么，GPT-2 论文，分词引起的问题</span></button></li><li><button type="button" data-t="350"><b>5:50</b><span>在 tiktokenizer 网页上看分词</span></button></li><li><button type="button" data-t="896"><b>14:56</b><span>Python 字符串和 Unicode 码位</span></button></li><li><button type="button" data-t="1095"><b>18:15</b><span>Unicode 的字节编码：UTF-8、UTF-16、UTF-32</span></button></li><li><button type="button" data-t="1367"><b>22:47</b><span>设想：彻底去掉分词</span></button></li><li><button type="button" data-t="1430"><b>23:50</b><span>字节对编码（BPE）算法</span></button></li><li><button type="button" data-t="1622"><b>27:02</b><span>开始实现</span></button></li><li><button type="button" data-t="1715"><b>28:35</b><span>统计相邻对，找出最常见的一对</span></button></li><li><button type="button" data-t="1836"><b>30:36</b><span>合并最常见的一对</span></button></li><li><button type="button" data-t="2098"><b>34:58</b><span>训练分词器：while 循环，压缩率</span></button></li><li><button type="button" data-t="2360"><b>39:20</b><span>分词器和大模型是完全分开的阶段</span></button></li><li><button type="button" data-t="2567"><b>42:47</b><span>解码：token 到字符串</span></button></li><li><button type="button" data-t="2901"><b>48:21</b><span>编码：字符串到 token</span></button></li><li><button type="button" data-t="3456"><b>57:36</b><span>用正则表达式强制按类别切分</span></button></li><li><button type="button" data-t="4298"><b>1:11:38</b><span>tiktoken，GPT-2 和 GPT-4 正则的区别</span></button></li><li><button type="button" data-t="4499"><b>1:14:59</b><span>OpenAI 发布的 GPT-2 encoder.py</span></button></li><li><button type="button" data-t="4706"><b>1:18:26</b><span>特殊 token</span></button></li><li><button type="button" data-t="5128"><b>1:25:28</b><span>minbpe 练习：写你自己的 GPT-4 分词器</span></button></li><li><button type="button" data-t="5322"><b>1:28:42</b><span>SentencePiece，LLaMA 2 的词表</span></button></li><li><button type="button" data-t="6207"><b>1:43:27</b><span>词表大小怎么定</span></button></li><li><button type="button" data-t="6491"><b>1:48:11</b><span>训练新 token，以 prompt 压缩为例</span></button></li><li><button type="button" data-t="6598"><b>1:49:58</b><span>多模态的分词：向量量化</span></button></li><li><button type="button" data-t="6701"><b>1:51:41</b><span>回头解释大模型分词的那些怪现象</span></button></li><li><button type="button" data-t="7820"><b>2:10:20</b><span>最后的建议</span></button></li></ol>
     </aside>
   </div>
 </details>
-<details class="ep" id="e10" data-bv="BV1m77Y6DEYP" data-p="10">
+<details class="ep" id="e10" data-bv="BV1AVsP67ED5">
   <summary>
     <span class="no">10</span>
     <span class="tt"><b>复现 GPT-2（124M）</b><em>Let's reproduce GPT-2 (124M)</em><span class="hook">4 小时从零复现 GPT-2 124M：先写出能加载 OpenAI 权重的模型，再把训练提速 11 倍，照 GPT-3 论文设超参数，最后用 8 张 A100 在 100 亿 token 上训练，验证损失和 HellaSwag 都超过了 GPT-2 124M。</span></span>
@@ -2414,7 +2415,7 @@ def decode(ids):
       <p class="lede">视频分四部分。第一部分写出 GPT-2 的 <code>nn.Module</code>，加载 Hugging Face 上的 OpenAI 权重验证正确性，再从随机初始化开始搭训练循环，补上权重共享和 GPT-2 的初始化方式。</p>
       <p class="lede">第二部分是提速：TF32、bfloat16 混合精度、<code>torch.compile</code>、FlashAttention、把词表补成 50304，每步从约 1000 毫秒降到 93 毫秒。</p>
       <p class="lede">第三部分是 GPT-3 的优化超参数：AdamW 的 β、梯度裁剪、余弦学习率、权重衰减、50 万 token 的批量（梯度累积）、8 卡分布式数据并行，以及 FineWeb-Edu 数据集。第四部分是训练结果、HellaSwag 评测和一次 4 倍时长的过夜训练，最后和用 C/CUDA 写的 llm.c 对比。</p>
-      <p class="links"><a href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=10" target="_blank" rel="noreferrer">B 站 P10 ↗</a><a href="https://www.youtube.com/watch?v=l8pRSuU81PU" target="_blank" rel="noreferrer">YouTube · 2024-06-09 ↗</a></p>
+      <p class="links"><a href="https://www.bilibili.com/video/BV1AVsP67ED5" target="_blank" rel="noreferrer">B 站 · 中英字幕 ↗</a><a href="https://www.youtube.com/watch?v=l8pRSuU81PU" target="_blank" rel="noreferrer">YouTube · 2024-06-09 ↗</a></p>
       <p class="mats"><span class="lbl">代码</span><a href="https://github.com/karpathy/build-nanogpt" target="_blank" rel="noreferrer">build-nanogpt 仓库（每一步一个提交）</a><a href="https://github.com/karpathy/nanoGPT" target="_blank" rel="noreferrer">nanoGPT 仓库</a><a href="https://github.com/karpathy/llm.c" target="_blank" rel="noreferrer">llm.c 仓库</a></p>
       <p class="mats"><span class="lbl">参考</span><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noreferrer">GPT-2 论文</a><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noreferrer">GPT-3 论文</a><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need</a></p>
       <section class="sec">
@@ -2753,7 +2754,7 @@ def decode(ids):
     </div>
     <aside class="epside">
       <div class="pl"><button class="plgo" type="button" aria-label="播放" style="background-image:url('__ASSETS__/posters/ep10.jpg')"><span class="tri"></span></button></div>
-      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1m77Y6DEYP?p=10" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
+      <p class="plsrc"><span class="plwhich">点封面或任一时间码开始播放（B 站播放器）</span><a class="plbili" href="https://www.bilibili.com/video/BV1AVsP67ED5" target="_blank" rel="noreferrer">B 站打开 ↗</a></p>
       <ol class="tl"><li><button type="button" data-t="0"><b>0:00</b><span>开场：复现 GPT-2 124M</span></button></li><li><button type="button" data-t="219"><b>3:39</b><span>看看 OpenAI 发布的 GPT-2 124M</span></button></li><li><button type="button" data-t="827"><b>13:47</b><span>第一部分：实现 GPT-2 的 nn.Module</span></button></li><li><button type="button" data-t="1688"><b>28:08</b><span>加载 Hugging Face 上的 GPT-2 参数</span></button></li><li><button type="button" data-t="1860"><b>31:00</b><span>前向传播，得到 logits</span></button></li><li><button type="button" data-t="2011"><b>33:31</b><span>采样：初始化、前缀 token、分词</span></button></li><li><button type="button" data-t="2222"><b>37:02</b><span>采样循环</span></button></li><li><button type="button" data-t="2507"><b>41:47</b><span>采样结果，自动检测设备</span></button></li><li><button type="button" data-t="2750"><b>45:50</b><span>开始训练：(B,T) 的数据批次到 (B,T,C) 的 logits</span></button></li><li><button type="button" data-t="3173"><b>52:53</b><span>交叉熵损失</span></button></li><li><button type="button" data-t="3402"><b>56:42</b><span>优化循环：过拟合一个批次</span></button></li><li><button type="button" data-t="3720"><b>1:02:00</b><span>简易数据加载器</span></button></li><li><button type="button" data-t="3974"><b>1:06:14</b><span>wte 和 lm<sub>head</sub> 共享参数</span></button></li><li><button type="button" data-t="4427"><b>1:13:47</b><span>初始化：标准差 0.02，残差层缩放</span></button></li><li><button type="button" data-t="4938"><b>1:22:18</b><span>第二部分：提速。GPU、混合精度，1000 毫秒</span></button></li><li><button type="button" data-t="5294"><b>1:28:14</b><span>Tensor Core，计时，TF32，333 毫秒</span></button></li><li><button type="button" data-t="5978"><b>1:39:38</b><span>float16、梯度缩放、bfloat16，300 毫秒</span></button></li><li><button type="button" data-t="6495"><b>1:48:15</b><span>torch.compile、Python 开销、kernel 融合，130 毫秒</span></button></li><li><button type="button" data-t="7218"><b>2:00:18</b><span>FlashAttention，96 毫秒</span></button></li><li><button type="button" data-t="7614"><b>2:06:54</b><span>好数和丑数：词表 50257 改成 50304，93 毫秒</span></button></li><li><button type="button" data-t="8095"><b>2:14:55</b><span>第三部分：超参数、AdamW、梯度裁剪</span></button></li><li><button type="button" data-t="8466"><b>2:21:06</b><span>学习率调度：预热加余弦衰减</span></button></li><li><button type="button" data-t="8781"><b>2:26:21</b><span>批量大小调度、权重衰减、fused AdamW，90 毫秒</span></button></li><li><button type="button" data-t="9249"><b>2:34:09</b><span>梯度累积</span></button></li><li><button type="button" data-t="10012"><b>2:46:52</b><span>分布式数据并行（DistributedDataParallel）</span></button></li><li><button type="button" data-t="11421"><b>3:10:21</b><span>GPT-2、GPT-3 用的数据集，FineWeb-Edu</span></button></li><li><button type="button" data-t="12190"><b>3:23:10</b><span>验证集、验证损失，恢复采样</span></button></li><li><button type="button" data-t="12503"><b>3:28:23</b><span>评测：HellaSwag，开始正式训练</span></button></li><li><button type="button" data-t="13385"><b>3:43:05</b><span>第四部分：第二天早上看结果，对比 GPT-2 和 GPT-3</span></button></li><li><button type="button" data-t="14181"><b>3:56:21</b><span>llm.c：用 C/CUDA 写的等价实现</span></button></li><li><button type="button" data-t="14379"><b>3:59:39</b><span>总结，build-nanogpt 仓库</span></button></li></ol>
     </aside>
   </div>
@@ -2765,7 +2766,7 @@ def decode(ids):
   document.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){
     var open=b.dataset.all==='open';document.querySelectorAll('.ep').forEach(function(d){d.open=open;});});});
 
-  /* ── 播放器：优先放本地 video/ 里的原片；文件不在（或站点版不写 data-src）就用 B 站播放器，t= 跳到那一秒 ── */
+  /* ── 播放器：优先放本地 video/ 里的原片；文件不在（或站点版不写 data-src）就用 B 站播放器（每集一条 bv），t= 跳到那一秒 ── */
   function player(ep){
     if(ep._pl)return ep._pl;
     var box=ep.querySelector('.pl'), which=ep.querySelector('.plwhich'), tl=[].slice.call(ep.querySelectorAll('.tl button'));
@@ -2774,7 +2775,7 @@ def decode(ids):
       var f=document.createElement('iframe');
       f.allow='autoplay;fullscreen;picture-in-picture';f.setAttribute('allowfullscreen','');
       f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('scrolling','no');
-      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&p='+ep.dataset.p+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
+      f.src='https://player.bilibili.com/player.html?bvid='+ep.dataset.bv+'&autoplay=1&high_quality=1&danmaku=0&t='+(t||0);
       box.innerHTML='';box.appendChild(f);st.mode='bili';st.el=f;
       which.textContent=ep.dataset.src?'B 站播放器（本地没找到视频文件）':'B 站播放器';
     }
