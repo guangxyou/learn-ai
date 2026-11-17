@@ -461,7 +461,7 @@ async function show(id){
   document.getElementById('tocbtn')?.addEventListener('click',()=>{
     document.querySelector('.toc')?.classList.toggle('on')});
   const r=await fetch(A+'/'+id+'.html');
-  document.getElementById('epwrap').innerHTML=await r.text();
+  document.getElementById('epwrap').innerHTML=(await r.text()).replaceAll('__ASS'+'ETS__',A);
   turns=$$('#epwrap .turn').map(el=>({el,t:+el.dataset.t}));
   heads=$$('#epwrap h2.sec');
   $$('#epwrap [data-seek]').forEach(b=>b.addEventListener('click',()=>seek(+b.dataset.seek)));
