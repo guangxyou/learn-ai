@@ -1,0 +1,28 @@
+{
+  "id": "podcasts",
+  "kind": "paper",
+  "title": "播客精校稿合集",
+  "subtitle": "12 期 AI 播客的逐段精校文字稿：DeepSeek 论文、注意力机制之争、Kimi 与杨植麟、多模态与世界模型",
+  "topics": [
+    "大模型",
+    "播客",
+    "文字稿"
+  ],
+  "date": "2024-03",
+  "studied": "2026-11",
+  "published": "2026-11-17",
+  "summary": "张小珺《商业访谈录》8 期、晚点聊 LateTalk 4 期，按专题分四组：何俊贤逐篇讲 DeepSeek 9 篇论文（EP91）；注意力机制之争，杨松琳、肖朝军与付天宇、钟怡然从 NSA、MoBA、Lightning Attention 讲到 DeltaNet、Kimi Linear 和 MiniMax 退回 full attention（EP94、晚点聊 103/104、EP119、晚点聊 143）；杨植麟两次访谈与 Kimi K3 技术报告的两期解读（EP59、EP113、EP152、晚点聊 177）；张祥雨谈多模态十年、谢赛宁谈世界模型（EP102、EP133）。转写后逐段精校，保留对话形式，编者补充单独标出；每段带时间码，点一下跳到音频对应位置播放。",
+  "page": "page.html",
+  "outputs": [
+    "<b>12</b> 期",
+    "<b>53.5</b> 万字",
+    "<b>28</b> 小时音频",
+    "<b>55</b> 张插图"
+  ],
+  "build": {
+    "note": "输入是 05_Podcast/ 下各期的 02-精校稿.md 和 figures/（那个目录不进仓库）。page.html 与 assets/ 是提交进仓库的成品：正文按期拆成 assets/<id>.html 片段，页面按 #<id> 路由 fetch。",
+    "tool": "28_Podcasts/build.mjs",
+    "requires": "28_Podcasts/build.mjs",
+    "args": []
+  }
+}

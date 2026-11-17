@@ -1,0 +1,1052 @@
+<nav class="toc" aria-label="章节目录"><div class="toc-h">目录 · 16 节</div><div class="toc-l"><button class="toc-i" data-s="0" data-seek="5"><span class="tt-t">00:00:05</span><span>开场</span></button><button class="toc-i" data-s="1" data-seek="472"><span class="tt-t">00:07:52</span><span>一、为什么是 DeepSeek</span></button><button class="toc-i" data-s="2" data-seek="1047"><span class="tt-t">00:17:27</span><span>二、要读的是哪几篇</span></button><div class="toc-part">第一部分　基座模型</div><button class="toc-i" data-s="3" data-seek="1247"><span class="tt-t">00:20:47</span><span>三、DeepSeek LLM：把复现做成科学</span></button><button class="toc-i" data-s="4" data-seek="2737"><span class="tt-t">00:45:37</span><span>四、DeepSeekMoE：把专家切细，再留两个通用的</span></button><button class="toc-i" data-s="5" data-seek="3986"><span class="tt-t">01:06:26</span><span>五、DeepSeek-V2：MLA，第一个真正属于自己的东西</span></button><button class="toc-i" data-s="6" data-seek="6012"><span class="tt-t">01:40:12</span><span>六、DeepSeek-V3：把创新压进工程里</span></button><div class="toc-part">第二部分　推理模型</div><button class="toc-i" data-s="7" data-seek="7516"><span class="tt-t">02:05:16</span><span>七、DeepSeek-Coder：国外最先认识的那个 DeepSeek</span></button><button class="toc-i" data-s="8" data-seek="7931"><span class="tt-t">02:12:11</span><span>八、DeepSeek-Coder-V2：那时候还离不开奖励模型</span></button><button class="toc-i" data-s="9" data-seek="8189"><span class="tt-t">02:16:29</span><span>九、Math-Shepherd：不用人标，也能监督每一步</span></button><button class="toc-i" data-s="10" data-seek="8681"><span class="tt-t">02:24:41</span><span>十、DeepSeekMath：GRPO 从这里来</span></button><button class="toc-i" data-s="11" data-seek="10039"><span class="tt-t">02:47:19</span><span>十一、DeepSeek-Prover：把「规则」交给 Lean</span></button><button class="toc-i" data-s="12" data-seek="10411"><span class="tt-t">02:53:31</span><span>十二、DeepSeek-R1：大道至简</span></button><div class="toc-part">最后：一起强化学习一下</div><button class="toc-i" data-s="13" data-seek="10901"><span class="tt-t">03:01:41</span><span>十三、论文之外的问题</span></button><button class="toc-i" data-s="14" data-seek="11271"><span class="tt-t">03:07:51</span><span>十四、为什么是它：一点一点攒出来的创新</span></button><button class="toc-i" data-s="15" data-seek="11549"><span class="tt-t">03:12:29</span><span>十五、下一个 Scaling Law</span></button></div></nav><article class="doc"><h2 class="sec" id="s0">开场</h2><div class="turn" data-t="5"><button class="ts" data-seek="5" title="跳到 00:00:05">00:00:05</button><div class="td"><span class="who">何俊贤</span><p>真正让我觉得尊重他们工作的，是他们第一篇论文放出来的时候——他们的第一个成果，DeepSeek 的第一个大模型，DeepSeek LLM。今天我也会讲到那篇。</p><p>我今天对他们论文的讲解主要分两条线：一条是基座模型的发展，另一条是他们在 reasoning（推理）方面的东西。</p><p>概括一下：我觉得从很早开始，DeepSeek 就有这样一种文化或者说追求——不是纯粹地跟着别人已有的做法走。因为像 Llama、Mistral 这些都很权威嘛，但 DeepSeek 从一开始就在探索自己的路，包括最早的 DeepSeekMoE 就开始尝试更多的专家。</p><p>也不是为了创新而创新。我觉得这种创新更多是因为他们真的想压低成本，想让整个东西更 efficient，就很勇敢地做了这些尝试，最后跟别人 diverge（分岔）了。所以 DeepSeek 到后面，就跟别人越来越不一样。</p></div></div><div class="turn" data-t="75"><button class="ts" data-seek="75" title="跳到 00:01:15">00:01:15</button><div class="td"><span class="who host">张小珺</span><p>哈喽大家好，欢迎收听《张小珺商业访谈录》，我是小珺。这是一档提供一手高密度信息的商业访谈节目。</p><p>2025 年这个春节，DeepSeek 一举改写了全球 AGI 的大叙事。在万般热闹之际，我们特别想沉下心来做一些基础的科普工作。</p><p>在《商业访谈录》第 89 期节目中，我邀请的是加州大学伯克利分校人工智能实验室在读博士潘家怡，为大家对照讲解了春节前发布的 DeepSeek-R1-Zero、R1，Kimi 发布的 K1.5，以及 OpenAI 更早之前发布的 o1 的技术报告。这些模型聚焦的都是大语言模型的最新技术范式——RL 强化学习，简单来说就是 o1 的路线。</p><p>今天这期节目，我邀请的是香港科技大学计算机系助理教授何俊贤。他的研究方向是大模型推理，并且从很早就开始关注 DeepSeek 的一系列研究。我们会 focus 在最近引发全球 AI 界关注的 DeepSeek 上。何老师将会带领大家从 DeepSeek 的第一篇论文开始，阅读经过挑选的这家公司历史上发布的 9 篇论文。</p><p>我们希望帮助大家从一个更延续、更长期，也更技术底层的视角来理解 DeepSeek，以及它所做的一系列复现与创新工作。与此同时，也希望能让更多人感受到技术之美。</p></div></div><div class="turn cont" data-t="195"><button class="ts" data-seek="195" title="跳到 00:03:15">00:03:15</button><div class="td"><p>何老师先给听众朋友们打个招呼，介绍一下你的研究方向，还有在 R1 发布之后你做的一些复现上的尝试。</p></div></div><div class="turn" data-t="204"><button class="ts" data-seek="204" title="跳到 00:03:24">00:03:24</button><div class="td"><span class="who">何俊贤</span><p>哈喽大家好，我是香港科技大学的助理教授何俊贤。</p><p>我自己的研究方向主要是大模型，最近主要在做大模型相关的推理，所以跟 DeepSeek-R1 也非常 match，最近也做过一些相关的工作。早期也做过大模型的 alignment（对齐）以及评测方面的东西。</p><p>最近确实在 DeepSeek-R1 发布之后几天，我们发布了一个东西，可以看成是它的复现——但实际上那个工作我们从差不多两个月前就开始在做了，跟 DeepSeek-R1 用的方法非常类似，当然我们是在更小的规模上。后来在 DeepSeek-R1 发布之后差不多五天，我们也发布了我们的工作，相当于是对它的一个复现。整体做下来还是比较顺利，效果也不错。我们现在也在对 R1 做更多的研究。</p></div></div><div class="turn" data-t="270"><button class="ts" data-seek="270" title="跳到 00:04:30">00:04:30</button><div class="td"><span class="who host">张小珺</span><p>所以你们的工作其实更早就已经开始了。那整个工作过程有没有一些积累的 know-how 可以跟大家分享？也不能叫复现 R1，就是个类 R1 的工作。</p></div></div><div class="turn" data-t="281"><button class="ts" data-seek="281" title="跳到 00:04:41">00:04:41</button><div class="td"><span class="who">何俊贤</span><p>我们的 know-how 可能更偏技术导向：<b>最后大家都收敛到了比较简单的东西上</b>。</p><p>这个不光是我们，我知道很多其他团队，包括 Kimi 之前发的 K1.5，基本上大家收敛到的、最后做 reasoning 强化学习的方式都是同一套。</p><p>具体的 know-how 就是——我们之前试过很多复杂的东西，其实都不太 work。我们可能在半年多以前就在做这个事，那时候会用奖励模型（reward model）之类的东西去做强化学习，发现效果一直都不太理想，后来也经过了很多挫折，反复尝试都不理想。最后发现：最简单的东西，就是不用这种奖励模型，只用 rule-based reward（基于规则的奖励），反而是最 work 的——也就是最后 R1 的这个方式。</p></div></div><div class="turn" data-t="338"><button class="ts" data-seek="338" title="跳到 00:05:38">00:05:38</button><div class="td"><span class="who host">张小珺</span><p>这个很有意思，最后收敛到了比较简单的工作。这个能具体展开一下吗？</p></div></div><div class="turn" data-t="343"><button class="ts" data-seek="343" title="跳到 00:05:43">00:05:43</button><div class="td"><span class="who">何俊贤</span><p>R1 在做强化学习的时候，只用所谓的规则。规则就是：比如做数学题，你只需要检测最后答案对不对；做 coding，可能就是有一些 unit test 去看它是不是能 pass。这就是所谓的规则导向——<b>没有另外一个模型来帮你判断、来给你奖励、来判断你的生成对不对</b>。</p><p>但是之前，在很长一段时间里，不光是我们，整个 community，包括 DeepSeek 自己——今天也会讲到相关的论文——大家其实都默认我们需要另一个模型，俗称奖励模型，来帮助判断我的模型生成对不对，然后用这一套来做强化学习。这一套差不多做了大半年，整个 community 都是这么在做。</p><p>但这条路我觉得是走了一些弯路。走这个弯路也跟 OpenAI 有很大关系：最早其实是 OpenAI 在很早的时候发了一篇论文，讲过程监督的奖励模型，从那之后整个 community 相当于跟着 OpenAI 这么做。但 turns out，OpenAI 自己最后做 o1 可能并不是这么做的。就是 OpenAI 发这样的论文，其实跟他们实际上做的事儿也不一样。但一开始大家会觉得，既然 OpenAI 都发这样的论文，说明 OpenAI 也是这么做的。所以我觉得也受到了一些 OpenAI 的误导吧。</p></div></div><div class="turn" data-t="431"><button class="ts" data-seek="431" title="跳到 00:07:11">00:07:11</button><div class="td"><span class="who host">张小珺</span><p>今天我们的节目形式，还是想请何老师来主讲 paper，和我们之前第 89 期的形式一样，他会带着我们读 paper。中间我如果遇到不懂或者有疑惑的地方，我会作为观众的视角来提问，提问可能穿插在中间，也可能在节目的最后。</p><p>我们的主要目的，是希望帮大家共同学习一遍 DeepSeek 最一手、最前沿的论文，让大家能够感知到最前沿的 AI 世界到底在发生着什么，并且能从一个更延续、更长期的视角来理解 DeepSeek 这家公司，理解它是怎么一步步成长、并且爆发成为今天的 DeepSeek 的。与此同时，也希望让更多人能够真正感受到技术之美。</p></div></div><h2 class="sec" id="s1">一、为什么是 DeepSeek</h2><div class="turn" data-t="472"><button class="ts" data-seek="472" title="跳到 00:07:52">00:07:52</button><div class="td"><span class="who host">张小珺</span><p>在正式开始之前，我还是想做一些简短的提问，来帮助大家做一个定位。何老师，我知道你关注 DeepSeek 非常早，并且你是 DeepSeek 铁粉。你是从什么时候开始关注这家公司的？是什么原因让你对它格外关注？</p></div></div><div class="turn" data-t="488"><button class="ts" data-seek="488" title="跳到 00:08:08">00:08:08</button><div class="td"><span class="who">何俊贤</span><p>我对 DeepSeek 的关注很早了，可能在 2022 年底的时候——那个时候 DeepSeek 还没有成立。因为 DeepSeek 是幻方下面的一家公司，那时候我对幻方就有一些了解。原因也是我那时候可能因为找工作接触过一些幻方的东西，虽然我之前对量化金融这个领域并不了解。</p><p>但那个时候幻方做了一件很特别的事：他们开始宣传自己有 5000 张英伟达 A100 的卡。但也不知道具体用来干嘛。5000 张在当时是很多的——因为当时还没有 ChatGPT，大家还没有大模型这个概念，5000 张 A100 可能花了很多钱。当时我一直觉得这个事情很奇怪。</p></div></div><div class="turn cont" data-t="538"><button class="ts" data-seek="538" title="跳到 00:08:58">00:08:58</button><div class="td"><p>然后幻方后来做了一件什么事呢？那时候也没有大模型，但这个算力他自己也用不了那么多，最后他搭了一个集群，做了一套调度软件的系统，免费开放给高校的科研工作者使用。</p><p>这个我一开始也没有用过，因为那时候我差不多已经回高校了，就接触了一下，后来也找幻方合作，尝试过使用这种算力。用下来的感受其实非常 impressive。因为一开始可能更多会觉得这是一种噱头——为什么一个量化公司搞这么多卡，来帮助高校老师做科研，还是免费的？感觉不知道目的具体是什么，那时候对幻方也不太了解，觉得可能更多是宣传、PR 这些噱头。</p><p>后来我去用了他们那个算力系统，说实话觉得非常 impressive。整个集群是他们自己搭建、维护，并且自己 develop 了一套独立的超算系统——算力的调度、分配，以及怎么去使用这个算力。他们那时候中文名应该叫<b>萤火</b>，萤火集群。我用了一下觉得非常 impressive，因为幻方本身是一个规模很小的公司，那时候可能就一百多人，不像其他的互联网大厂，但他用 5000 张卡做了一个非常成熟的超算系统。我当时就觉得，他们的人很厉害。</p><p>当时我也隐约知道，幻方招人跟美国的量化公司差不多：招人不多，但招人的 bar 很高，提供的报酬也比较丰厚。这是我对幻方一开始的了解。</p></div></div><div class="turn cont" data-t="658"><button class="ts" data-seek="658" title="跳到 00:10:58">00:10:58</button><div class="td"><p>后来 2023 年上半年，在 DeepSeek 成立之前，我大概就知道幻方要孵化这样一个公司了。那时候还不叫 DeepSeek，还没有这个名字。我从某些渠道知道幻方可能有打算做这个事情，看他们的定位是想孵化一个像 OpenAI 一样的、去探索 AGI 的公司，而且是他们自己孵化。</p><p>那时候说实话，包括我在内很多人也不是很看好。因为那时候国内其实已经有很多公司在做了，而且不乏很多大厂。幻方的起步其实是有点偏晚的——那时候国内大家都已经开始跟进了。而且幻方作为一个量化公司，跟其他互联网大厂不一样：那些大厂本来就是做 AI 的，有很多积累，但幻方本身并没有太做过 AI，突然出来说要做大模型。再加上那时候国内的大模型也是百模大战的阶段，不管大厂小厂反正都很多人在做。所以一开始包括我在内，大家也没有特别看好，就只是知道他们做这个事儿，反正国内又多来一家 startup。</p></div></div><div class="turn cont" data-t="741"><button class="ts" data-seek="741" title="跳到 00:12:21">00:12:21</button><div class="td"><p>后来他们就开始做了。第一次让我觉得非常尊重他们工作的，就是他们第一篇论文放出来的时候——他们的第一个成果，DeepSeek 的第一个大模型的论文，就是 DeepSeek LLM。那篇论文质量很高，而且开源。那时候本来质量高又开源的就不多，不管在国内，在世界上其实也不多。</p><p>而幻方是完全开源，还写非常详细的论文去公布他们的技术细节。这个在当时的世界上是很少见的：大部分厂商是不会写论文的，也不会开源；开源的很多也不写论文；写论文的可能写得非常敷衍，不太会写很多很具体的东西。但 DeepSeek 当时写论文和开源，整个都做得非常像学术界的风格。</p><p>他们也不太做铺天盖地的宣传，不太去做流量这样的事，好像就是很像在高校的实验室一样——做了一篇论文，然后开源，比较踏实。从那时候我就觉得他们很强，而且很喜欢他们的这种 style。后来他们一路都做得很好，只是直到最近才获得了他们值得的关注。因为他们之前一直做得很好，但在国内、尤其对广大普通用户来说，大家可能并没有太听说过他们——我觉得可能跟他们不太喜欢宣传有关系。</p></div></div><div class="turn" data-t="838"><button class="ts" data-seek="838" title="跳到 00:13:58">00:13:58</button><div class="td"><span class="who host">张小珺</span><p>所以他们产品发得非常晚。</p></div></div><div class="turn" data-t="839"><button class="ts" data-seek="839" title="跳到 00:13:59">00:13:59</button><div class="td"><span class="who">何俊贤</span><p>对，他们不太着重去做 to C 的产品。但他其实在学界、在我们眼里，影响力一直很大，一直做得很好。我觉得他们也值得这样的影响力。</p></div></div><div class="turn" data-t="854"><button class="ts" data-seek="854" title="跳到 00:14:14">00:14:14</button><div class="td"><span class="who host">张小珺</span><p>你刚才说第一篇让你尊重的论文，就是他们的第一篇论文，那个时候其实已经到 2024 年 1 月份了。你对 DeepSeek 做了很多 research，整体来说 DeepSeek 的研究工作有没有透露出这家公司一些底层的基因、一些非常有一致性的共同特性？</p></div></div><div class="turn" data-t="873"><button class="ts" data-seek="873" title="跳到 00:14:33">00:14:33</button><div class="td"><span class="who">何俊贤</span><p>有的。我觉得 DeepSeek 是一个非常 unique 的大模型公司。</p><p>首先它<b>非常开放</b>。不光是开源，他们写论文也非常 honest，会写很多技术细节，公开很多 detail。从这个角度我觉得非常像一个高校实验室，不太像一个所谓的商业化公司——虽然他们现在也没有真的很商业化，但跟一般公司不太一样。我觉得这一点他们很像一个纯做科研的实验室，这个风格是非常独特的。</p><p>第二点，在当时那样非常激烈的百模大战的 context 下面，他们其实<b>并没有非常浮躁</b>。特别是 2023 年下半年到 2024 年初那半年，国内的大模型是非常非常浮躁的，彼此竞争也很激烈，那时候大家会经常看到媒体宣传，突然又有什么 performance 又超过 GPT 了，又超过 ChatGPT、又超过 GPT-4，大家一直在超过 GPT-4，就这种感觉。</p><p>但在那个时候，其实非常鲜有报道 DeepSeek 的工作，非常非常少。尽管他们有这样的论文，但尤其是国内一些知名的公众号，其实非常非常少去报道 DeepSeek。虽然现在大家每天都在 DeepSeek、DeepSeek，但那时候真的非常少。我觉得这跟他们很低调很有关系。他们的风格就是很低调，然后又很开放。</p></div></div><div class="turn cont" data-t="973"><button class="ts" data-seek="973" title="跳到 00:16:13">00:16:13</button><div class="td"><p>他们好像也没有太多高压的环境——至少从我的感官来讲，他们不是在一个非常高压的环境下做大模型。因为今天我讲的论文也会提到，<b>我觉得他们的很多技术创新其实是非常勇敢的</b>。大模型的投入很大，你投入很多很多钱进去搞一个创新，如果最后失败了，这个钱相当于就白花了。我觉得这在很多其他团队的模式下是不被允许的：投资人或者公司领导给你这么多资源，其实是会有要求的——比如三个月之后我要做出一个什么东西，一定要超过谁谁谁，不然就不行。所以大模型团队在那一段时间，大家的压力都是很大的。</p><p>但 DeepSeek 给人感觉压力就会小一些。他们做得好了，好像也不会铺天盖地地去宣传，就是非常踏实地继续做下一个模型，整个一直保持一个很低调的态度。我觉得这是他们比较 unique 的地方。</p></div></div><h2 class="sec" id="s2">二、要读的是哪几篇</h2><div class="turn" data-t="1047"><button class="ts" data-seek="1047" title="跳到 00:17:27">00:17:27</button><div class="td"><span class="who host">张小珺</span><p>能不能先给我们讲讲，你会选择哪几篇 DeepSeek 的论文进行重点解读？</p></div></div><div class="turn" data-t="1052"><button class="ts" data-seek="1052" title="跳到 00:17:32">00:17:32</button><div class="td"><span class="who">何俊贤</span><p>我今天的讲解主要分为两个方面。</p><p>一方面是讲他们<b>基座模型</b>的发展，主要从最早的第一篇 DeepSeek LLM 开始，然后到后面的 MoE 模型 DeepSeekMoE，然后到 DeepSeek-V2——V2 就开始是一篇很重要的论文，因为他们开始做更多的创新。然后从 V2 到 V3，这个 gap 就很小了，V3 的很多创新主要是 V2 的时候做的。V3 就是最近的这个模型，其实就是 R1 这个模型的基座了。基座这一方面我主要就讲这几篇。</p><p>另一方面我今天想讲的，主要是他们在 <b>reasoning</b> 方面的东西。reasoning 方面最早是从 DeepSeek-Coder 开始，到 DeepSeekMath——DeepSeekMath 其实也是一篇很重要的论文，因为 <b>GRPO 是这篇论文提出来的</b>。然后 DeepSeekMath 到后面，我会非常简单地说一下 DeepSeek-Prover，就是他们做定理证明，但这个可能不是特别重要。然后到最近的 R1。</p><p>这也是我觉得 DeepSeek 的两条线：他们有一条基座的发展线，以及一条专注于推理的发展路线。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 766" width="1240" height="766" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .lane{fill:none;stroke:#C8C3BA;stroke-width:1.2;stroke-dasharray:2 4}
+  .link{fill:none;stroke:#0F766E;stroke-width:1.4;stroke-dasharray:5 4}
+  .linkw{fill:none;stroke:#B45309;stroke-width:1.4;stroke-dasharray:5 4}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.6}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .lane-t{font-size:12px;font-weight:700;fill:#868D98;letter-spacing:2px}
+  .nm{font-size:13px;font-weight:700;fill:#14161A;letter-spacing:-.2px}
+  .nmS{font-size:12px;font-weight:700;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:10px;fill:#4E5560}
+  .xxs{font-size:9.5px;fill:#868D98}
+  .date{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;fill:#868D98}
+  .plus{font-size:10px;fill:#0F766E;font-weight:650}
+  .lk{font-size:9.5px;fill:#0F766E;font-weight:650}
+  .lkw{font-size:9.5px;fill:#B45309;font-weight:650}
+</style>
+<defs>
+  <marker id="ep91-two-lines-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-two-lines-at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="ep91-two-lines-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="766" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">十一篇，两条线</text>
+<text class="sm" x="0" y="43">节目标题说「9 篇」，讲者实际走完的是 11 篇。每一篇只加一样新东西，加完就不再动 —— 最后在 R1 汇成一处。</text>
+
+<!-- ══════ 基座线 ══════ -->
+<path class="lane" d="M0 74 L1180 74"/>
+<text class="lane-t" x="0" y="94">基座线</text>
+
+<g transform="translate(0,106)">
+  <rect class="box" x="0" y="0" width="280" height="100" rx="8"/>
+  <text class="date" x="14" y="20">2024-01-05</text>
+  <text class="nm" x="14" y="40">DeepSeek LLM</text>
+  <text class="xs" x="14" y="58">7B / 67B 稠密，2T token，复现 Llama 2</text>
+  <text class="plus" x="14" y="76">＋ 超参数 Scaling Law、M 替代 N</text>
+  <text class="xxs" x="14" y="92">＋ 主动公开刷榜对照实验</text>
+</g>
+<path class="ink" d="M284 156 L296 156" marker-end="url(#ep91-two-lines-a)"/>
+<g transform="translate(300,106)">
+  <rect class="box" x="0" y="0" width="280" height="100" rx="8"/>
+  <text class="date" x="14" y="20">2024-01-11</text>
+  <text class="nm" x="14" y="40">DeepSeekMoE　16B</text>
+  <text class="xs" x="14" y="58">激活 2.8B，四成计算量打平 Llama 2 7B</text>
+  <text class="plus" x="14" y="76">＋ 细粒度专家（64 个）＋ 共享专家</text>
+  <text class="xxs" x="14" y="92">145B 那个只训了 245B token，是半成品</text>
+</g>
+<path class="ink" d="M584 156 L596 156" marker-end="url(#ep91-two-lines-a)"/>
+<g transform="translate(600,106)">
+  <rect class="box" x="0" y="0" width="280" height="100" rx="8"/>
+  <text class="date" x="14" y="20">2024-05-07</text>
+  <text class="nm" x="14" y="40">DeepSeek-V2　236B</text>
+  <text class="xs" x="14" y="58">激活 21B，8.1T token，128K 上下文</text>
+  <text class="plus" x="14" y="76">＋ MLA：KV cache 降 93.3%</text>
+  <text class="xxs" x="14" y="92">2 共享 + 160 路由；价格战从这里开始</text>
+</g>
+<path class="ink" d="M884 156 L896 156" marker-end="url(#ep91-two-lines-a)"/>
+<g transform="translate(900,106)">
+  <rect class="box" x="0" y="0" width="280" height="100" rx="8"/>
+  <text class="date" x="14" y="20">2024-12-27</text>
+  <text class="nm" x="14" y="40">DeepSeek-V3　671B</text>
+  <text class="xs" x="14" y="58">激活 37B，14.8T token，557.6 万美元</text>
+  <text class="plus" x="14" y="76">＋ MTP、无辅助损失均衡、FP8 训练</text>
+  <text class="xxs" x="14" y="92">1 共享 + 256 路由；全程无 loss spike</text>
+</g>
+
+<!-- ══════ 跨线连线 ══════ -->
+<!-- ① LLM → Coder -->
+<path class="link" d="M64 206 L64 262 L242 262 L242 346" marker-end="url(#ep91-two-lines-at)"/>
+<text class="lk" x="72" y="252">同一套架构，数据换成代码</text>
+<!-- ② V2 中间 checkpoint → Coder-V2 -->
+<path class="link" d="M700 206 L700 290 L754 290 L754 346" marker-end="url(#ep91-two-lines-at)"/>
+<text class="lk" x="708" y="250">拿 V2 的中间 checkpoint，</text>
+<text class="lk" x="708" y="264">再训 6T 代码 token</text>
+<!-- ③ V3 → R1 -->
+<path class="link" d="M1148 206 L1148 346" marker-end="url(#ep91-two-lines-at)"/>
+<text class="lk" x="1132" y="254" text-anchor="end">V3 就是 R1 的基座 ↓</text>
+<!-- ④ R1 → V3 chat -->
+<path class="linkw" d="M1170 346 L1170 212" marker-end="url(#ep91-two-lines-ab)"/>
+<text class="lkw" x="1132" y="288" text-anchor="end">↑ R1 又蒸馏回 V3 的 chat 版</text>
+
+<!-- ══════ 推理线 ══════ -->
+<path class="lane" d="M0 332 L1180 332"/>
+<text class="lane-t" x="0" y="326">推理线</text>
+
+<g transform="translate(0,346)">
+  <rect class="warm" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2023-12-14</text>
+  <text class="nmS" x="12" y="38">Math-Shepherd</text>
+  <text class="xxs" x="12" y="58">不用人标，让模型自己</text>
+  <text class="xxs" x="12" y="72">往下补完，倒推每一步。</text>
+  <text class="xxs" x="12" y="86">当时唯一公开的过程</text>
+  <text class="xxs" x="12" y="100">监督数学奖励模型。</text>
+  <text class="lkw" x="12" y="120">奖励模型</text>
+</g>
+<g transform="translate(170,346)">
+  <rect class="box" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2024-01-25</text>
+  <text class="nmS" x="12" y="38">DeepSeek-Coder</text>
+  <text class="xxs" x="12" y="58">1.3B–33B 全开源。</text>
+  <text class="xxs" x="12" y="72">V1.5 是在通用基座上</text>
+  <text class="xxs" x="12" y="86">继续训 2T，七成代码。</text>
+  <text class="xxs" x="12" y="106">国外最先记住的</text>
+  <text class="xxs" x="12" y="120">那个 DeepSeek。</text>
+</g>
+<g transform="translate(340,346)">
+  <rect class="warm" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2024-02-05</text>
+  <text class="nmS" x="12" y="38">DeepSeekMath</text>
+  <text class="xxs" x="12" y="58">在 Coder-V1.5 上继续训</text>
+  <text class="xxs" x="12" y="72">1200 亿数学 token。</text>
+  <text class="plus" x="12" y="92">＋ GRPO：去掉 value model</text>
+  <text class="xxs" x="12" y="110">§5.2.2 自己泼冷水：RL</text>
+  <text class="xxs" x="12" y="124">提的是排序，不是能力</text>
+</g>
+<g transform="translate(510,346)">
+  <rect class="acc" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2024-05-23</text>
+  <text class="nmS" x="12" y="38">DeepSeek-Prover</text>
+  <text class="xxs" x="12" y="58">自然语言题 → Lean 4</text>
+  <text class="xxs" x="12" y="72">形式化语句，验证器给</text>
+  <text class="xxs" x="12" y="86">0/1。迭代式自我更新。</text>
+  <text class="lk" x="12" y="106">规则，但不是人写的</text>
+  <text class="xxs" x="12" y="122">规则来自定理证明引擎</text>
+</g>
+<g transform="translate(680,346)">
+  <rect class="warm" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2024-06-17</text>
+  <text class="nmS" x="12" y="38">DeepSeek-Coder-V2</text>
+  <text class="xxs" x="12" y="58">从 V2 的中间 ckpt 出发，</text>
+  <text class="xxs" x="12" y="72">再训 6T token，也是 MoE。</text>
+  <text class="xxs" x="12" y="92">「unit test 覆盖不全，</text>
+  <text class="xxs" x="12" y="106">还是训个奖励模型吧」</text>
+  <text class="lkw" x="12" y="124">奖励模型（后被推翻）</text>
+</g>
+<g transform="translate(850,346)">
+  <rect class="acc" x="0" y="0" width="158" height="130" rx="8"/>
+  <text class="date" x="12" y="20">2024-08-15</text>
+  <text class="nmS" x="12" y="38">Prover-V1.5</text>
+  <text class="xxs" x="12" y="58">改成真正 online 的 GRPO，</text>
+  <text class="xxs" x="12" y="74">同样嫌 0/1 太稀疏，但</text>
+  <text class="xxs" x="12" y="88">这次没去训奖励模型，</text>
+  <text class="xxs" x="12" y="102">改成挑够得着的题。</text>
+  <text class="lk" x="12" y="124">规则</text>
+</g>
+<g transform="translate(1020,346)">
+  <rect x="0" y="0" width="160" height="130" rx="8" fill="#E6F4F1" stroke="#0F766E" stroke-width="2.4"/>
+  <text class="date" x="12" y="20">2025-01-22</text>
+  <text class="nmS" x="12" y="38">DeepSeek-R1</text>
+  <text class="xxs" x="12" y="58">基座 V3，算法 GRPO，</text>
+  <text class="xxs" x="12" y="72">奖励只剩两条规则。</text>
+  <text class="xxs" x="12" y="92">R1-Zero 不做前置 SFT，</text>
+  <text class="xxs" x="12" y="106">思维链自己越写越长。</text>
+  <text class="lk" x="12" y="124">规则，没有奖励模型</text>
+</g>
+
+<!-- ══════ 底部 ══════ -->
+<rect class="soft" x="0" y="512" width="700" height="170" rx="9"/>
+<text class="nm" x="20" y="540">上面是等距排的，真实间隔长这样</text>
+<text class="xxs" x="20" y="562">2024 年 1 月 20 天里连出三篇；然后 5–6 月一簇；再往后是半年空档 —— 那半年在训 V3。</text>
+<text class="xxs" x="20" y="578">五个月后的 R1，是这半年空档结出来的果子。</text>
+<path class="thin" d="M20 616 L676 616"/>
+<g class="date">
+  <text x="20" y="636">2023.12</text>
+  <text x="176" y="636">2024.04</text>
+  <text x="332" y="636">2024.08</text>
+  <text x="488" y="636">2024.12</text>
+  <text x="632" y="636">2025.02</text>
+</g>
+<g>
+  <circle cx="41" cy="616" r="3.6" fill="#B45309"/>
+  <circle cx="73" cy="616" r="3.6" fill="#14161A"/>
+  <circle cx="80" cy="616" r="3.6" fill="#14161A"/>
+  <circle cx="96" cy="616" r="3.6" fill="#14161A"/>
+  <circle cx="109" cy="616" r="3.6" fill="#B45309"/>
+  <circle cx="253" cy="616" r="3.6" fill="#14161A"/>
+  <circle cx="272" cy="616" r="3.6" fill="#0F766E"/>
+  <circle cx="302" cy="616" r="3.6" fill="#B45309"/>
+  <circle cx="372" cy="616" r="3.6" fill="#0F766E"/>
+  <circle cx="529" cy="616" r="3.6" fill="#14161A"/>
+  <circle cx="560" cy="616" r="5" fill="#0F766E"/>
+</g>
+<text class="xxs" x="20" y="662">● 基座　<tspan fill="#B45309">● 用奖励模型</tspan>　<tspan fill="#0F766E">● 用规则</tspan></text>
+
+<rect class="acc" x="720" y="512" width="460" height="170" rx="9"/>
+<text class="nm" x="742" y="540">讲者的总结</text>
+<text class="sm" x="742" y="570">「他们其实每一个阶段，可能每次都只有一个</text>
+<text class="sm" x="742" y="590">小东西跟别人不一样。」</text>
+<text class="sm" x="742" y="622">「今天讲了这么多工作，也可以看出来它不是</text>
+<text class="sm" x="742" y="642">凭空出现的 —— 它是集大成，集了他们之前</text>
+<text class="sm" x="742" y="662">不管是成功的还是失败的一些经历。」</text>
+</svg>
+<figcaption>十一篇论文，两条线：基座线与推理线，每一篇只加一样新东西<span class="fcite">图：本站重绘</span></figcaption></figure></div></div><div class="turn" data-t="1131"><button class="ts" data-seek="1131" title="跳到 00:18:51">00:18:51</button><div class="td"><span class="who host">张小珺</span><p>听起来它的技术路线其实有高度的一致性，有像线性外推一样的逻辑性和延续性。你觉得这些论文能多大程度帮我们理解 DeepSeek 这个公司、这个 lab？</p></div></div><div class="turn" data-t="1143"><button class="ts" data-seek="1143" title="跳到 00:19:03">00:19:03</button><div class="td"><span class="who">何俊贤</span><p>我觉得这些论文还是可以帮助我们理解很多的。因为他们的论文写得很详细，从论文里一步一步的创新来看，也可以看出他们是一个有很强创新氛围的 team。</p></div></div><div class="turn" data-t="1160"><button class="ts" data-seek="1160" title="跳到 00:19:20">00:19:20</button><div class="td"><span class="who host">张小珺</span><p>DeepSeek 被海外人士称作「一股来自东方的神秘力量」。在你看来，DeepSeek 神秘吗？</p></div></div><div class="turn" data-t="1166"><button class="ts" data-seek="1166" title="跳到 00:19:26">00:19:26</button><div class="td"><span class="who">何俊贤</span><p>其实我觉得也没有那么神秘。海外很多人可能是从最近才关注他们，觉得他们怎么突然就做出了一个很强的东西。但作为业内人士来说，他们的论文都是公开发表的，其实过去这一年他们也是踏踏实实地、慢慢走到了今天。</p></div></div><div class="turn" data-t="1191"><button class="ts" data-seek="1191" title="跳到 00:19:51">00:19:51</button><div class="td"><span class="who host">张小珺</span><p>那接下来我们就把主场交给何老师，我们一起进入论文的学习时间。</p></div></div><div class="turn" data-t="1198"><button class="ts" data-seek="1198" title="跳到 00:19:58">00:19:58</button><div class="td"><span class="who">何俊贤</span><p>好呀。就像刚刚说的，我主要从基座模型和推理两条线来分享 DeepSeek 的工作。今天主要还是科普的性质，所以挑一些比较重点的讲一下，尽可能让大家在 high level 上能明白。</p><p>今天的讲解主要关注<b>文本模态</b>。虽然 DeepSeek 在过去一年也有几篇做多模态的论文，但多模态至少不是过去这一年 DeepSeek 主要发力的方向，所以因为时间关系今天不会讲这些内容。我主要讲文本这一块，有些论文我会简单 share 一下屏幕，方便大家理解。</p></div></div><div class="part" id="p3">第一部分　基座模型</div><h2 class="sec" id="s3">三、DeepSeek LLM：把复现做成科学</h2><div class="turn" data-t="1247"><button class="ts" data-seek="1247" title="跳到 00:20:47">00:20:47</button><div class="td"><span class="who">何俊贤</span><p>我先从第一篇 DeepSeek LLM 开始，share 一下屏幕，应该可以看到我这个 PDF。</p></div></div><div class="turn" data-t="1258"><button class="ts" data-seek="1258" title="跳到 00:20:58">00:20:58</button><div class="td"><span class="who host">张小珺</span><p>可以看到。</p></div></div><div class="turn" data-t="1262"><button class="ts" data-seek="1262" title="跳到 00:21:02">00:21:02</button><div class="td"><span class="who">何俊贤</span><p>这个工作的定位很简单：<b>这是 DeepSeek 横空出世的第一个大模型，也是开源的</b>。</p><p>它其实没有太多特别的创新，大家可以看成这是<b>对 Llama 2 的一个复现</b>。那时候 Meta 的 Llama 2 刚出来，DeepSeek 作为一个初创公司，一开始——我觉得也非常合理——肯定是要先试一下：我第一次做这个事情，能不能 reproduce Llama 2 的 performance。</p><p>所以这个工作绝大部分内容都是 follow Llama 2 的，当然在 data 上不一样：DeepSeek 是一个中英双语的模型，数据准备上质量可能也更高。但整个模型的 architecture、包括一些训练方法，其实都跟 Llama 2 完全一样。</p><p>模型主要是两个 size，7B 和 67B，这也是对标 Llama 2 的 7B 和 70B。训练用了 2T token，基本上也和 Llama 2 align。后面做 SFT、DPO 这些我们叫后训练的东西。在 evaluation 上，最后是超过了 Llama 2 70B——这也很正常，因为 Llama 2 发布在前，后面的工作基本上就是把数据质量尽可能做高，当时国内其实也有不少模型都超过了 Llama 2 70B。</p><p>这篇论文我主要讲几个我觉得<b>体现出他们非常严谨的科学态度</b>的地方。具体的架构内容其实跟 Llama 2 一样，就不细讲了——也是 Transformer，模型 size 为了跟 Llama 2 相比也差不多。</p><h4 class="h4">一个很小的改动：multi-step 代替 cosine</h4></div></div><div class="turn cont" data-t="1399"><button class="ts" data-seek="1399" title="跳到 00:23:19">00:23:19</button><div class="td"><p>第一个比较细的区别是<b>学习率调度</b>（learning rate schedule）。当时大家训大模型一般都用 cosine learning rate schedule——模型的学习率按一个 cosine 函数慢慢变小。</p><p>但这样有一个问题：这个函数一开始就要指定，相当于我一开始就得说清楚我要训多少 token。可实际预训练过程中，训练的数据量很可能是动态变化的：我先训了一部分，然后突然准备了一份新数据想加进去——这时候 cosine 就不太好改了，因为你在开始训之前就把这个东西都指定好了。</p><p>所以这篇论文用了一个不一样的 scheduler，叫 <b>multi-step</b>：一开始是一个常数，训到某个时候突然把它降下来，再按一个常数走，不是一条 cosine 曲线。他们发现这样最后的 performance 跟 cosine 是一样的，所以就用了。这是一个非常非常小的改动。</p><blockquote class="ed"><span class="ed-l">编者注</span><p>编者注：Figure 1 画的并不是 schedule 本身，画的是训练 loss 曲线——1.6B 的模型、100B token，用来对比两种调度最后的效果。论文最终采用 80% / 10% / 10% 的三段分配。</p></blockquote><h4 class="h4">第一个大区别：超参数也有 Scaling Law</h4></div></div><div class="turn cont" data-t="1480"><button class="ts" data-seek="1480" title="跳到 00:24:40">00:24:40</button><div class="td"><p>第二点是这篇论文跟 Llama 2 一个很大的区别：<b>他们做了非常仔细的 Scaling Law 研究</b>。</p><p>我简单说一下 Scaling Law 是什么。Scaling Law 大概是说，我想要有一个预测函数，让我提前知道：我有多少算力，应该训多大的模型、用多少数据、用什么样的超参数，是最优的。因为大模型的实验代价非常大，所以大家会用 Scaling Law。在这之前有非常有名的，比如 Chinchilla 的 Scaling Law，那是 Google 做的——大意就是你有这么多算力，你要训 70B 的模型，最优就应该配多少 token 的数据量。</p><p>但这篇论文对 Scaling Law 做了一个非常非常严谨的 study。</p><p>第一，以前的 Scaling Law 更多是关于<b>模型大小和数据大小</b>的，而这篇论文先对<b>超参数</b>做了 scaling。比如 Figure 3 这个图就是说：我的算力逐渐增大，我的 batch size 和学习率应该怎么变。他们做了很严谨的 study，来 identify 那个大模型的超参数到底应该怎么设置。</p><p>这个东西某种程度上还挺像高校的：对业界来说，大家其实不是很 care 论文的发表——我如果想复现 Llama 2，我可能就是看 Llama 2 的设置，直接稍微调一下参数就结束了，实际上大部分人也是这么做的。但这篇论文不一样，它在超参数上就开始画这种图，开始做很严谨的科学实验：<b>他想知道背后的 science 是什么，比如这个函数形式是什么。</b></p></div></div><div class="turn" data-t="1635"><button class="ts" data-seek="1635" title="跳到 00:27:15">00:27:15</button><div class="td"><span class="who host">张小珺</span><p>何老师，你能不能稍微给我们解释一下，大概什么叫超参数的 Scaling Law？</p></div></div><div class="turn" data-t="1644"><button class="ts" data-seek="1644" title="跳到 00:27:24">00:27:24</button><div class="td"><span class="who">何俊贤</span><p>好。大模型的训练会涉及一些超参，所谓超参数就是：我训练这个模型，应该用多大的学习率、多大的 batch size。batch size 简单说就是我把数据往 GPU 上喂，一次要喂多少条。这些参数设置会影响你的训练效果。</p><p>一般的 practice 是大家有一些经验值：你看之前某篇论文用的什么，你就跟他用一样的。因为这个其实是经不起大规模实验的——你不可能训很多个大模型，每个都训一遍看哪个更好，训练非常昂贵，这是不现实的。</p><p>那么超参数 Scaling Law 的意义就是：我在小模型上——比如 1B、2B、3B——做了很多实验，我知道什么超参数好，那我可不可以<b>外推</b>到 70B，直接预测最佳设置应该是什么样？比如他这里发现，训练算力规模和 batch size 的设置差不多呈现一个 <b>power law（幂律）</b>关系。有了这个函数关系，我实际做实验只有比较小的模型的那些点，但我就可以知道：当我有很大的算力去训一个很大的模型时，参数应该怎么设置。</p><p>这就是 Scaling Law 的意义——<b>外推性质</b>。它帮助大家在小模型上做实验，然后外推大模型应该怎么设置。因为大模型我们的算力可能只够训一遍，不能尝试多次。</p><h4 class="h4">第二个大区别：用 M 代替 N</h4></div></div><div class="turn cont" data-t="1762"><button class="ts" data-seek="1762" title="跳到 00:29:22">00:29:22</button><div class="td"><p>这是关于超参数的。而之前的 Scaling Law 更多是关于 model 大小和 data 大小的——像 Chinchilla，包括 Llama 2 其实也是 follow Chinchilla 的 Scaling Law。</p><p>大概是说：假设我有这个算力，这个算力到底应该用来训多大的模型、用多少数据是最优的？比如我现在有 1000 张卡，假设只能用 3 个月，3 个月之后卡就被收回了——相当于你的算力是固定的。那在算力固定的情况下，必然存在一个最优配置：我应该训多大的模型、用多少数据，才能得到最好的效果。这是之前 Chinchilla Scaling Law 要解决的问题，他们拟合出了一个经验公式，比如指定 70B 的模型就应该配两万亿 token 的数据；假设你算力更多，那就应该训更大的模型，数据也跟着怎么变。</p><p>这个函数关系我不需要细讲，因为之前有人做过了。我这里主要想强调的是：<b>DeepSeek 这篇论文某种程度上 challenge 了 Chinchilla 的函数关系</b>。</p><p>他们觉得，之前对模型 scale 的考虑——就是只考虑模型有多少个 parameter——在把 parameter 转化成算力的时候，并没有考虑到（像我这里高亮的这句话）<b>注意力部分的计算开销</b>（computational overhead of attention）。所以他们觉得之前的估计非常粗糙、不精准。</p><p>最后他们搞了一个新的估计，就是下面这个公式。之前是：我这个模型有多少层，每一层有多大，去估算大概需要多少 FLOPs——就是一共需要多少次浮点运算，那是算力的估测单位。DeepSeek 觉得估得不准，要把这些都摊开、都考虑进去，最后就搞了一个新的公式。</p></div></div><div class="turn cont" data-t="1907"><button class="ts" data-seek="1907" title="跳到 00:31:47">00:31:47</button><div class="td"><p>这个 M 的公式跟上面那个长得也很像，第一项是一样的，但后面有一点不一样。这一点不一样，最后会造成一些微小的差别——而这个微小差别，对 Scaling Law 的理解是有区别的：对于我到底应该用什么样的函数、应该怎么外推，就会有区别。</p><blockquote class="ed"><span class="ed-l">编者注</span><p>编者注：论文的做法是用 <b>non-embedding FLOPs/token（记作 M）</b> 替代原来的模型参数量 N 来表示模型规模，把近似公式 C = 6ND 换成更精确的 <b>C = MD</b>。</p></blockquote><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 640" width="1240" height="640" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .axis{fill:none;stroke:#868D98;stroke-width:1.2}
+  .dash{fill:none;stroke:#0F766E;stroke-width:1.5;stroke-dasharray:5 4}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:14px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:10.5px;fill:#868D98}
+  .lbl{font-size:11px;fill:#14161A;font-weight:650}
+  .pn{font-size:11px;font-weight:700;fill:#fff}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;fill:#4E5560}
+  .mi{font-family:'Times New Roman',Times,serif;font-style:italic;font-size:13px;fill:#14161A}
+  .cTeal{fill:#0F766E}.cAmber{fill:#B45309}
+</style>
+<defs>
+  <marker id="ep91-scaling-law-three-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-scaling-law-three-am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#868D98"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="640" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">第一篇就不肯照抄：他们把 Scaling Law 重做了一遍</text>
+<text class="sm" x="0" y="43">DeepSeek LLM 整体是 Llama 2 的复现，唯独在这三处不肯沿用别人的结论。DeepSeek LLM, 2024-01, §3</text>
+
+<!-- ═══ ① 超参数也有幂律 ═══ -->
+<rect class="panel" x="0" y="70" width="376" height="348" rx="10"/>
+<circle cx="24" cy="96" r="10" fill="#0F766E"/><text class="pn" x="24" y="100" text-anchor="middle">1</text>
+<text class="ph" x="42" y="100">超参数也有 Scaling Law</text>
+<text class="xs" x="24" y="120">以前：抄上一篇论文的 batch size 和学习率</text>
+
+<g transform="translate(40,140)">
+  <path class="axis" d="M0 150 L0 0 M0 150 L300 150"/>
+  <text class="num" x="150" y="196" text-anchor="middle">算力预算 C（对数）</text>
+  <text class="num" x="-20" y="76" transform="rotate(-90,-20,76)" text-anchor="middle">最优取值</text>
+  <!-- batch size 上升 -->
+  <path class="dash" d="M14 128 L286 30"/>
+  <circle cx="40" cy="118" r="3.4" fill="#0F766E"/>
+  <circle cx="90" cy="100" r="3.4" fill="#0F766E"/>
+  <circle cx="140" cy="82" r="3.4" fill="#0F766E"/>
+  <text class="num" x="292" y="30" text-anchor="end" fill="#0F766E">batch size ↑</text>
+  <!-- learning rate 下降 -->
+  <path class="dash" d="M14 32 L286 124" stroke="#B45309"/>
+  <circle cx="40" cy="41" r="3.4" fill="#B45309"/>
+  <circle cx="90" cy="58" r="3.4" fill="#B45309"/>
+  <circle cx="140" cy="75" r="3.4" fill="#B45309"/>
+  <text class="num" x="292" y="140" text-anchor="end" fill="#B45309">learning rate ↓</text>
+  <!-- 实测范围 -->
+  <path class="thin" d="M14 150 L14 158 M160 150 L160 158"/>
+  <text class="xs" x="80" y="172" text-anchor="middle">实际跑过的小模型</text>
+  <text class="xs" x="228" y="172" text-anchor="middle" fill="#0F766E">外推出来的</text>
+</g>
+
+<rect class="acc" x="24" y="352" width="328" height="52" rx="6"/>
+<text class="xs" x="38" y="372">大模型只够训一遍，超参数不可能一个个试过来。</text>
+<text class="xs" x="38" y="390">先在 1B、2B 上拟出幂律，再外推到 67B。</text>
+
+<!-- ═══ ② M 替代 N ═══ -->
+<rect class="panel" x="402" y="70" width="376" height="348" rx="10"/>
+<circle cx="426" cy="96" r="10" fill="#0F766E"/><text class="pn" x="426" y="100" text-anchor="middle">2</text>
+<text class="ph" x="444" y="100">用 M 替代 N 来表示模型规模</text>
+<text class="xs" x="426" y="120">Chinchilla 只数参数量，没算注意力那部分开销</text>
+
+<g transform="translate(426,142)">
+  <rect class="soft" x="0" y="0" width="328" height="80" rx="7"/>
+  <text class="num" x="16" y="22">以前（Chinchilla、Llama 2 都在用）</text>
+  <text class="mi" x="16" y="50" style="font-size:17px">C ≈ 6 N D</text>
+  <text class="xs" x="130" y="50">N = 参数量　D = token 数</text>
+  <text class="xs" x="16" y="70">把「注意力的计算开销」当成不存在。</text>
+
+  <path class="ink" d="M164 88 L164 106" marker-end="url(#ep91-scaling-law-three-a)"/>
+  <text class="num" x="176" y="102" fill="#B45309">他们觉得估得不准</text>
+
+  <rect class="acc" x="0" y="110" width="328" height="86" rx="7"/>
+  <text class="num" x="16" y="132" fill="#0F766E">DeepSeek LLM 的改法</text>
+  <text class="mi" x="16" y="160" style="font-size:17px">C = M D</text>
+  <text class="xs" x="118" y="160">M = non-embedding FLOPs/token</text>
+  <text class="xs" x="16" y="182">直接数「每个 token 真正要算多少次浮点运算」。</text>
+</g>
+
+<rect class="warm" x="426" y="372" width="328" height="30" rx="6"/>
+<text class="xs" x="440" y="392">差别很小，但外推出的曲线不一样 —— 而外推正是它的全部用处。</text>
+
+<!-- ═══ ③ 数据质量 ═══ -->
+<rect class="panel" x="804" y="70" width="376" height="348" rx="10"/>
+<circle cx="828" cy="96" r="10" fill="#0F766E"/><text class="pn" x="828" y="100" text-anchor="middle">3</text>
+<text class="ph" x="846" y="100">数据质量会改变最优配比</text>
+<text class="xs" x="828" y="120">2023 年大家还把 Scaling Law 当暴力美学</text>
+
+<g transform="translate(846,146)">
+  <text class="num" x="0" y="12">同样一份算力预算，该分给模型还是分给数据？</text>
+
+  <text class="xs" x="0" y="42">数据质量低</text>
+  <rect class="soft" x="0" y="50" width="112" height="24" rx="4"/>
+  <text class="num" x="56" y="66" text-anchor="middle">模型</text>
+  <rect class="soft" x="114" y="50" width="176" height="24" rx="4"/>
+  <text class="num" x="202" y="66" text-anchor="middle">数据</text>
+
+  <text class="xs" x="0" y="104">数据质量高</text>
+  <rect class="acc" x="0" y="112" width="186" height="24" rx="4"/>
+  <text class="num" x="93" y="128" text-anchor="middle" fill="#0F766E">模型（更大）</text>
+  <rect class="soft" x="188" y="112" width="102" height="24" rx="4"/>
+  <text class="num" x="239" y="128" text-anchor="middle">数据</text>
+
+  <path class="thin" d="M0 150 L290 150"/>
+  <text class="xs" x="0" y="170">论文的结论：数据越好，增量算力越该往模型规模上放。</text>
+  <text class="xs" x="0" y="188">反过来，最优配比本身也能当成一把尺子，去量数据质量。</text>
+</g>
+
+<rect class="acc" x="828" y="372" width="328" height="30" rx="6"/>
+<text class="xs" x="842" y="392">「他们从一开始就很强调数据质量。」</text>
+
+<!-- ═══ 底部 ═══ -->
+<rect class="soft" x="0" y="440" width="700" height="116" rx="9"/>
+<text class="ph" x="24" y="468">还有一处更小的改动：learning rate 用 multi-step，不用 cosine</text>
+<text class="sm" x="24" y="494">cosine 曲线要求一开始就说死「总共训多少 token」。而实际预训练里，数据是一边训一边加的。</text>
+<text class="sm" x="24" y="514">multi-step 是几段常数：训到某处降一档，再走一段。效果与 cosine 持平，但第一阶段可以整段复用。</text>
+<text class="xs" x="24" y="538">论文最终采用 80% / 10% / 10% 的三段分配。Figure 1 画的是 loss 曲线，不是 schedule 本身。</text>
+
+<rect class="warm" x="720" y="440" width="460" height="116" rx="9"/>
+<text class="ph" x="744" y="468">这一篇最让讲者尊重的，其实是第 21 页</text>
+<text class="sm" x="744" y="494">论文主动做了刷榜的对照实验：加 2000 万条中文多选题，</text>
+<text class="sm" x="744" y="514">C-Eval 47.0 → 71.3、CMMLU 49.7 → 73.8，而不用多选题格式的</text>
+<text class="sm" x="744" y="534">TriviaQA 纹丝不动（57.9 → 57.9）。他们报的是刷之前的分。</text>
+</svg>
+<figcaption>DeepSeek LLM 在 Scaling Law 上不肯照抄的三处<span class="fcite">图：重绘自 DeepSeek LLM §3</span></figcaption></figure><p>所以 DeepSeek 在这里其实就开始做了一点创新。虽然这个创新并不大，但我觉得这是一个可以看出 DeepSeek 态度的点：<b>他们是把这个当成一门很严谨的 science 在做。</b></p><p>他们完全可以就 follow Llama 2、follow 当时世界上其他公司的 configuration，直接跟他们做一样，我把 data 弄好一点，训出来的模型也可以很好。但 DeepSeek 在做这件事的时候，会尝试真的去理解背后的 science；他觉得之前的工作有做得不够精细的地方，他希望尝试去 fix。</p><p>而且之前这些工作都来自很权威的地方——Chinchilla Scaling Law 是 Google DeepMind 做的，是非常非常权威的一篇论文；Llama 2 是 Meta 做的，大家知道也是标杆。但 DeepSeek 很务实，他会像一个学者一样去 review 这背后的 science，觉得别人做得粗糙的地方，希望把它做得更精细一些。他不是很盲目地 follow 别人、自己搞一个模型调出一个好效果就完了。我觉得这是一个能看出他们底层不一样的地方。</p></div></div><div class="turn" data-t="2011"><button class="ts" data-seek="2011" title="跳到 00:33:31">00:33:31</button><div class="td"><span class="who host">张小珺</span><p>其实这篇论文主要还是复现，但他修复了一些别人做得粗糙的地方，把它调得更精细了。</p></div></div><div class="turn" data-t="2018"><button class="ts" data-seek="2018" title="跳到 00:33:38">00:33:38</button><div class="td"><span class="who">何俊贤</span><p>对，可以这么理解。</p><h4 class="h4">Scaling Law 的意义：训练之前就知道结果</h4></div></div><div class="turn cont" data-t="2021"><button class="ts" data-seek="2021" title="跳到 00:33:41">00:33:41</button><div class="td"><p>Scaling Law 的意义体现在 Figure 5——其实 GPT-4 的技术报告里画过一张非常类似的图。</p><p>这个图的横坐标可以理解成算力，FLOPs 就是多少次浮点运算。大家可以想象成：1000 张卡，从左往右就是一个月、两个月、三个月。纵坐标是 performance，越低越好。</p><p>灰色的点是实际训过的一些点。灰色点都偏左，在左边就表示我只用了比较小的算力——比如比较小的模型，训完了，我知道 performance 是多少，就可以画到这个图上。</p><p>那这个 Scaling Law 有什么意义呢？它可以帮你<b>预测</b>。你画这个图，拟合出这条虚线，然后就可以预测：当你的算力到很右边的时候——比如 1000 张卡训半年——训出来的模型大概会是什么效果。</p><p>这个预测的意义非常非常大：你用很小的代价，根本没有做那个训练，就把「假设我训半年之后模型是什么效果」预测出来了。GPT-4 画过一个类似的图，展示他们相对精准地预测出了 GPT-4 的效果——在 train GPT-4 之前就预测出来了。DeepSeek 这个图相当于同等地展示了他们对 Scaling Law 的理解、拟合出来的东西，也精准地预测出了他们实际训的这个大模型。右边那个大五角星就是最后的 67B 模型，小五角星是 7B 模型，左边那些灰色的点都是只用少量算力训出来的东西。</p></div></div><div class="turn cont" data-t="2154"><button class="ts" data-seek="2154" title="跳到 00:35:54">00:35:54</button><div class="td"><p>其他部分基本上就跟 Llama 2 差不多了。这篇论文主要的其实就是对 Scaling Law 的理解，他们写了很大的篇幅——包括我这里高亮的，还在描述数据质量会怎么影响函数形式，这些问题之前并没有被很多讨论过。</p><p>这些部分从我们看来其实是非常偏高校实验室的 style：<b>他非常严谨地去分析这个问题到底怎么回事，而不是说我把资源堆上去，最后训一个模型效果不错，这个事情就结束了。</b></p></div></div><div class="turn" data-t="2199"><button class="ts" data-seek="2199" title="跳到 00:36:39">00:36:39</button><div class="td"><span class="who host">张小珺</span><p>在这里面有反映出什么对 Scaling Law 的洞察吗？比当时其他 lab 更深刻的一些洞察。</p></div></div><div class="turn" data-t="2207"><button class="ts" data-seek="2207" title="跳到 00:36:47">00:36:47</button><div class="td"><span class="who">何俊贤</span><p>比如刚刚提到的，他们觉得之前的估计太粗糙，propose 了一个新的估计。还包括这个洞察也是之前没有太被提到的：<b>不同的 data quality 会影响 Scaling Law</b>——我的数据质量高一点、低一点，最优的 model 和 data size 配置是不一样的。之前大家并没有太考虑这个问题；虽然大家知道 data quality 很重要，但会觉得它对最优配置的影响不会那么大，或者说大家也不知道这个影响具体是怎么回事。</p></div></div><div class="turn" data-t="2244"><button class="ts" data-seek="2244" title="跳到 00:37:24">00:37:24</button><div class="td"><span class="who host">张小珺</span><p>2023 年的时候，大家对于 Scaling Law 还是觉得它是一种暴力美学，没有很多人去强调数据的质量。但从 DeepSeek 最新的产品来看，他们的数据质量应该是从一开始就用得非常好。</p></div></div><div class="turn" data-t="2259"><button class="ts" data-seek="2259" title="跳到 00:37:39">00:37:39</button><div class="td"><span class="who">何俊贤</span><p>对的，他们从一开始就很强调数据质量。</p><p>从这篇论文我就可以看出，他们其实希望去 build 我们叫<b>理论模型</b>的东西，或者说这背后的科学，去更好地理解这件事，而不是把它当成一个经验上的事情。Scaling Law 本质上你可以认为就是一个理论模型——它有一个函数、有一个数学公式。</p><p>我觉得这是他们风格的一个体现：他在这个过程中用很严谨的态度去理解背后的科学，其实会帮助他们未来 develop 越来越好的东西，而不是纯经验地把什么东西搞到一起、资源堆上去，然后就开始暴力地弄。</p></div></div><div class="turn cont" data-t="2312"><button class="ts" data-seek="2312" title="跳到 00:38:32">00:38:32</button><div class="td"><p>这篇论文后面的 performance 就不说了，基本上是复现 Llama 2，主要跟 Llama 2 做对比。英文上跟 Llama 2 各有千秋，中文上肯定好很多——因为 Llama 2 本身并不强调中文，而 DeepSeek 从一开始就强调中文能力，所以这个 performance 也是意料之中。7B、67B 都是开源的，所以在当时这个东西开源出来，已经是国内最强的开源模型之一。尽管大家好像也不是很有名，但其实他们很强。</p><h4 class="h4">最让我尊重的：他们主动把刷榜写了出来</h4></div></div><div class="turn cont" data-t="2348"><button class="ts" data-seek="2348" title="跳到 00:39:08">00:39:08</button><div class="td"><p>这篇论文最后我想说一个点，是我当时觉得非常 respect 的：<b>他们非常开诚布公地讲了刷榜这件事。</b></p><p>我为什么对这件事很有感触呢？因为当时中文的一个榜单 <b>C-Eval</b> 其实是我们做的，2023 年 5 月份，相当于是中文大模型的第一个榜单。我们这个榜单做出来之后，在很短的时间里就开始有非常疯狂的刷榜。C-Eval 到现在依然是比较标准的，用的人很多。</p><p>大家做这种 evaluation 的目的，是希望帮助大家去评价大模型的表现——你分数高一点，说明你这个大模型能力强一点。这在刚开始的时候是非常标准、也非常正确的。但后来有了这个榜，虽然不是我们有意的，我们当时觉得自己直接或间接地加速了国内大模型的刷榜行为。因为当时 C-Eval 基本上是唯一的中文榜，大家就开始刷。后来我们就很苦恼，因为大家把榜刷得很高，开始出现一种<b>高分低能</b>的现象：很多大模型榜单分数很高，但实际上又不太行。</p><p>大家都有一些刷榜行为，但大家不讲。各个公司宣传时会说「我这个榜超过了谁谁谁」，到后面大家意识到这已经是一个不说的秘密——大家其实都或多或少做一些刷榜的事情，但没有人会讲他们刷榜，就算写论文也不会讲这个事。</p><p><b>但 DeepSeek 以一种非常科学的态度做了对照实验，把这件事讲了出来</b>，就是这个表。</p></div></div><div class="turn cont" data-t="2479"><button class="ts" data-seek="2479" title="跳到 00:41:19">00:41:19</button><div class="td"><p>这个表什么意思呢？这些榜其实基本上都是多选题——数学、物理、生物，高中、大学、考研，四选一，选对分就高，就是考试题。DeepSeek 做了一个对照实验，发现：<b>我如果要刷榜，只需要搞很多多选题去训练，榜单可以瞬间高 20 多分。</b>这个表很清楚：C-Eval 是我们做的中文考试题，本来这个模型只有 47 分，如果去刷一下，就可以到 71 分。这个 gap 是非常大的。</p><blockquote class="ed"><span class="ed-l">编者注</span><p>编者注：对应论文 Table 13 —— DeepSeek LLM 7B Chat 在 C-Eval 上 47.0 分，加了 2000 万条中文多选题数据后（+MC）变成 71.3 分，MMLU 从 49.4 到 60.9，CMMLU 从 49.7 到 73.8。而不用多选题格式的 TriviaQA 几乎不动（57.9 → 57.9）。</p></blockquote><p>当时这件事给我的感触很大，因为我觉得 DeepSeek 真的非常诚实：他明明可以把这个东西刷了，说我们分数很高很高，但他们不讲——他们报的是刷之前的效果，然后告诉你如果刷可以刷到多少，而且告诉大家刷榜是可以这么做的，当成一篇论文就把这个东西写出来了。在那个时候，是没有人写这件事的。所以我就觉得这个公司非常非常诚实，而且他们好像也不太追求宣传，就真的很像一个学术的人。</p></div></div><div class="turn" data-t="2558"><button class="ts" data-seek="2558" title="跳到 00:42:38">00:42:38</button><div class="td"><span class="who host">张小珺</span><p>学术圈一般会这么写吗？</p></div></div><div class="turn" data-t="2560"><button class="ts" data-seek="2560" title="跳到 00:42:40">00:42:40</button><div class="td"><span class="who">何俊贤</span><p>学术圈我们会写。比如我如果想专门探讨刷榜这件事，我可能就会做一些变量实验，把结论写出来。但对于公司来说，他可能不希望别人知道他是刷榜刷上去的，他希望别人知道「我模型就是这么强」。但 DeepSeek 会把这个东西写出来。</p><p>那时候其实还有另外一篇同期论文写了类似的事情，那两篇我都非常尊重，DeepSeek 是最早的这两篇之一。开诚布公地做对照实验，而且是一种很严谨的、对照实验的科学态度。</p><p>这就是为什么这第一篇论文——尽管当时复现 Llama 2 的工作有很多——但 DeepSeek 这篇至少让我觉得非常 respect。可能从那时候我就觉得 DeepSeek 这个公司非常好，就是因为这个地方。因为我自己很有感触，C-Eval 是我做的，那个榜单是我们在维护，所以我对刷榜这个行为有非常多的认识和感触。</p><p>后面我们其实在 2024 年上半年做了一些新的 evaluation，为了杜绝这种刷榜行为，去看到底哪些模型刷榜了、哪些没有。那篇论文我就不仔细讲，是我们的另外一个工作。但我们评测了国内的、包括国外的、包括 DeepSeek 的这些模型，最后发现 <b>DeepSeek release 出来的 base model 其实是没有刷榜的</b>。相比之下，国内不少模型看起来分数很高，其实是有刷榜行为的。</p><p>这是另一个让我对 DeepSeek 很 respect 的地方：在国内那么浮躁的、大家都刷榜的那半年，DeepSeek 坚持没有去做这件事，而且还把这件事写了出来，写到论文里做了一个对照实验。这个表虽然在论文很靠后的地方——都 21 页了——但其实是当时我们、包括其他人去理解刷榜行为的一个很重要的结果。</p></div></div><div class="turn" data-t="2692"><button class="ts" data-seek="2692" title="跳到 00:44:52">00:44:52</button><div class="td"><span class="who host">张小珺</span><p>by the way，你刚才说另一家写这个对照实验的公司是哪一家？</p></div></div><div class="turn" data-t="2697"><button class="ts" data-seek="2697" title="跳到 00:44:57">00:44:57</button><div class="td"><span class="who">何俊贤</span><p>是 Skywork，昆仑万维。那篇论文也很不错，他们也写了这件事，基本上跟 DeepSeek 是同期的。</p></div></div><div class="turn cont" data-t="2710"><button class="ts" data-seek="2710" title="跳到 00:45:10">00:45:10</button><div class="td"><p>其他的我就没有太多要讲的。这是第一篇工作：DeepSeek 的第一篇，Llama 2 的复现，在里面公开了刷榜行为，严谨地揭露了刷榜这件事，告诉大家你如果想刷榜应该怎么刷。我觉得这在当时那个环境下，是跟别人很不一样的地方。</p></div></div><h2 class="sec" id="s4">四、DeepSeekMoE：把专家切细，再留两个通用的</h2><div class="turn" data-t="2737"><button class="ts" data-seek="2737" title="跳到 00:45:37">00:45:37</button><div class="td"><span class="who">何俊贤</span><p>接下来讲第二篇工作，我重新 share 一下屏幕。</p></div></div><div class="turn" data-t="2758"><button class="ts" data-seek="2758" title="跳到 00:45:58">00:45:58</button><div class="td"><span class="who host">张小珺</span><p>这个是 MoE 对吧？</p></div></div><div class="turn" data-t="2759"><button class="ts" data-seek="2759" title="跳到 00:45:59">00:45:59</button><div class="td"><span class="who">何俊贤</span><p>第二篇，DeepSeekMoE。我这第一部分还是讲基座模型，这是它的第二个基座。</p><p><b>从第二个基座开始，DeepSeek 就变成了混合专家模型</b>，就是 MoE。它的第一个模型还是我们叫 dense model——稠密模型，因为它 follow 的是 Llama，而 Llama 一直都是做稠密的。</p></div></div><div class="turn" data-t="2792"><button class="ts" data-seek="2792" title="跳到 00:46:32">00:46:32</button><div class="td"><span class="who host">张小珺</span><p>能不能给大家解释一下 dense model 和 MoE 不一样的地方？</p><h4 class="h4">什么是混合专家</h4></div></div><div class="turn" data-t="2797"><button class="ts" data-seek="2797" title="跳到 00:46:37">00:46:37</button><div class="td"><span class="who">何俊贤</span><p>dense model 就是一个普通的 Transformer：每一层过一个普通的 feed-forward network，就是一个普通的神经网络，很普通。Llama 可能就是把它做得大一些。</p><p>MoE 的一个很大区别是什么呢？这篇论文有个图，我对着这个图说——Figure 2 里的 (a)(b)(c) 其实都是 MoE，只是讲了几种不一样的 MoE。</p><p>意思是：<b>我把 Transformer 里面这个神经网络分成了好几份，每一份通俗一点讲就是一个专家</b>，所以它叫混合专家。比如 Figure 2(a)，1 到 N，大家可以认为就是分成了 N 份。</p><p>现在有 data 进来、想要预测，我可能不会经过所有的专家。比如我有个专家擅长数学、有个擅长物理、有个擅长文学，过来的是一道数学题，我就只用第一个专家，其他专家不需要用。这就是所谓的混合专家模型。</p><p>混合专家模型又叫<b>稀疏模型</b>。为什么？因为尽管你有 N 个专家，但过来一道数学题你其实只用上了一个，其他专家都没有发挥作用，所以它是稀疏的。而稠密模型是：随便进来什么东西，所有的部分都在发挥作用，所以它是稠密的。</p></div></div><div class="turn cont" data-t="2902"><button class="ts" data-seek="2902" title="跳到 00:48:22">00:48:22</button><div class="td"><p>那为什么大家要做混合专家？它有什么意义？</p><p>其实 DeepSeek 做 MoE 并不是它第一个做。很早很早的时候——可能 ChatGPT 出来之前——Google 就有 MoE 的模型，那时候叫 <b>GShard</b>。后来在 DeepSeek 做 MoE 之前，其实已经有广泛的谣言说 GPT-4 和 GPT-3.5 都是 MoE 模型，所以他们才能做到那么便宜。因为如果 ChatGPT 真的是一个一两百 B 的稠密模型，在当时那个价格下大家会觉得是不可能的——太便宜了。这个谣言应该也是真的，后来各种各样的渠道都开始说：ChatGPT 是 MoE 模型，所以他们在 inference 的时候可以把成本降低。所以 DeepSeekMoE follow 这个也是很理所应当的事情。</p></div></div><div class="turn cont" data-t="2965"><button class="ts" data-seek="2965" title="跳到 00:49:25">00:49:25</button><div class="td"><p>为什么 MoE 很重要？因为从 DeepSeekMoE 开始，到 V2、V3，包括到 R1，其实都是 MoE。</p><p>因为它是混合专家，你在部署的时候，过来一个东西只用到其中少数的专家——通俗的理解就是<b>它没有用上所有的参数</b>。比如我这个模型虽然有 100B 那么大，但如果分成 10 个专家、你只用到一个，那每一条数据过来做预测，你只用到了 10B 的参数。术语叫<b>激活参数</b>：你的 MoE 模型虽然很大，但激活参数可能只是全部参数的 1/10。</p><p>这就会带来极大的训练和推理成本下降。本来看起来是一个 100B 的模型，推理很贵也很慢；但实际上这 100B 分成了 N 份，每次只过其中一两份，其他份根本没过——过其他份的那些计算，根本就不需要算。</p><p>所以 MoE 非常 promising：<b>它是一种让你可以 scale up——模型可以做得很大——但同时推理成本又可以很低的方法。</b>所以它是一个非常吸引人的架构。DeepSeek 从这个时候开始转向 MoE；不光是 DeepSeek，后来其他很多模型也开始 move 到 MoE 架构。</p></div></div><div class="turn" data-t="3063"><button class="ts" data-seek="3063" title="跳到 00:51:03">00:51:03</button><div class="td"><span class="who host">张小珺</span><p>他们是做 MoE 比较早的吗？</p></div></div><div class="turn" data-t="3065"><button class="ts" data-seek="3065" title="跳到 00:51:05">00:51:05</button><div class="td"><span class="who">何俊贤</span><p>算是比较早的。这篇论文是 2024 年 1 月份出的。而且他们在这里面有做一些很不一样的东西。</p><h4 class="h4">这篇更像一份 study，不是一个产品</h4></div></div><div class="turn cont" data-t="3080"><button class="ts" data-seek="3080" title="跳到 00:51:20">00:51:20</button><div class="td"><p>这篇论文其实不是一个非常 ready 的模型产品。它跟刚刚讲的那篇不一样：那篇是他们比较 serious 地把这个东西训完了，做出了模型，release 给大家。<b>这篇更像是一个 study</b>——study 他们的一些算法或者策略。我认为这篇论文其实是在为 DeepSeek-V2 铺路，他们把前期的一些实验结果写成一篇论文 release 了出来。</p><p>比如它做实验都是 2B 的，这是一个很小的模型；最终训了一个 16B 的。但 16B 的 MoE 其实是一个很小的 MoE——刚刚那篇论文就算是 dense 他们都训了 67B，现在做 MoE 只训了 16B，其实是很小的 scale。但他们做这个是为了验证一些观点和想法。</p><p>论文最后他们说了有一个 <b>preliminary efforts</b>：训了一个 145B 的，这个就比较大了，但其实没训完，只训了一小部分，最后发现效果还挺好，就写出来了——但这个东西其实并没有做完。后来的 DeepSeek-V2 沿着这个路线，继续把 V2 做了出来。</p><h4 class="h4">第一个创新：把专家切得更细</h4></div></div><div class="turn cont" data-t="3161"><button class="ts" data-seek="3161" title="跳到 00:52:41">00:52:41</button><div class="td"><p>关于 MoE，大家主要需要知道的是为什么要做 MoE，这个刚刚已经讲过了：分成多个 expert，每次只激活其中少数专家，训练和推理成本都会变低，但模型又很大。</p><p>相当于：模型本身还是很强，因为一两百 B 的参数把所有需要的能力和知识都存进去了；但你每次问问题——就像大家跟 ChatGPT 交互——其实只涉及这个模型所有知识里的一小部分。那我不需要激活模型里所有的东西，如果我可以针对你的 query 有选择地激活其中一小部分，成本就可以降低。这就是 MoE 的 high level 原理。</p><p>从这里也可以看到，最近很火的 DeepSeek-V3、R1，大家去说它成本很低、只用了多少钱就训出来——其实从这篇论文开始，<b>DeepSeek 就开始关注 efficiency 了</b>，非常关注效率。</p></div></div><div class="turn cont" data-t="3245"><button class="ts" data-seek="3245" title="跳到 00:54:05">00:54:05</button><div class="td"><p>主要看 Figure 1。它画了很多模型，纵坐标是效果，越高越好；横坐标就是刚刚说的<b>激活参数</b>（activated parameters）。dense model 的激活参数就是它的全部；MoE 模型看起来很大，但激活参数可能很小。</p><p>比如 Llama 2 7B 的激活参数在最右边；而 DeepSeekMoE 模型比 Llama 2 还大，它有 16B，但激活参数只有不到 3B。相当于<b>这个模型的推理成本跟两三 B 的模型差不多，但 performance 跟 7B 的模型差不多</b>。这是一个很漂亮的结果，是他们这篇论文的一个主要结果。</p></div></div><div class="turn cont" data-t="3293"><button class="ts" data-seek="3293" title="跳到 00:54:53">00:54:53</button><div class="td"><p>这篇论文的创新点就是两点。</p><p>第一点，他们叫 <b>knowledge hybridity（知识混杂）</b>——通俗讲就是：以前的工作里，大家用的专家数量比较少，一般就是 8 个、16 个。这篇论文觉得，分成 8 个或 16 个还是太笼统了，<b>希望分得更细</b>：分成 64 个、甚至 128 个专家。</p><p>这样有什么好处呢？可以更细粒度。比如我分成 128 个专家，每次从这 128 个里面选两个；而你如果本来是 8 个专家，选也要选两个——但 8 个选两个跟 128 个选两个不一样：总的模型 size 一样的话，8 个选两个相当于选了 1/4，128 个选两个只选了 1/64。所以它变得<b>更稀疏</b>。</p></div></div><div class="turn cont" data-t="3365"><button class="ts" data-seek="3365" title="跳到 00:56:05">00:56:05</button><div class="td"><p>还有一个他解决的问题是：以前专家分得少的时候，比如 8 个、16 个，会出现一个现象——<b>不同专家之间区分不明显</b>。因为专家太少，可能出现两三个专家都要学很多相似的东西。而我分成 128 个，就非常细粒度，每个专家会学到很不一样的东西。</p><p>这篇论文出来之后，当时在业内掀起了一股讨论：我做 MoE 是不是应该像 DeepSeek 一样用很多专家，而不是像之前都是 8 个、16 个。这是 DeepSeek 一个我觉得挺创新的地方。</p><h4 class="h4">第二个创新：留出永远激活的共享专家</h4></div></div><div class="turn cont" data-t="3417"><button class="ts" data-seek="3417" title="跳到 00:56:57">00:56:57</button><div class="td"><p>第二个就是：他们除了这种混合专家，也有 <b>shared（共享）专家</b>。</p><p>他觉得，如果这 128 个专家彼此都不一样，那有些东西——比如这个模型基本的理解能力、对语言的理解——其实对所有的 query 都是共享的。所以我应该也有一些共享的专家：这个专家所有的输入都要过；同时还有一些专有的专家。既有专有的，又有通用的。</p></div></div><div class="turn cont" data-t="3448"><button class="ts" data-seek="3448" title="跳到 00:57:28">00:57:28</button><div class="td"><p>这个图（Figure 2）什么意思呢？<b>从左到右就是 DeepSeek 做的创新。</b></p><p>最左边 (a) 可以认为就是以前的方法：我有 N 个专家，这个 N 不太大，就这样做混合专家。</p><p>从 (a) 到 (b) 是 DeepSeek 说的第一点：<b>他希望专家更多</b>。比如他这里把 N 变成了 2N，专家数量扩大了一倍。</p><p>从 (b) 到 (c) 也是 DeepSeek 做的：<b>他有一个 shared 专家</b>，就是绿色的那个。大家看图例，蓝色的叫 routed expert（路由专家），绿色的叫 shared expert。绿色的意思是：不管什么东西进来，我都要过这个绿色的；蓝色的才是选择性地过。</p><p>所以 DeepSeekMoE 主要有两点创新：一点是搞了一个 shared expert，第二点是把 expert 的数量变多。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 744" width="1240" height="744" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.2}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.4}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.6}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.6}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .pn{font-size:11px;font-weight:700;fill:#fff}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .lbl{font-size:10.5px;fill:#4E5560;font-weight:600}
+  .tealt{font-size:11.5px;fill:#0F766E;font-weight:650}
+  .ambt{font-size:11.5px;fill:#B45309;font-weight:650}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;fill:#4E5560}
+  .cInk{fill:#14161A}.cMut{fill:#4E5560}.cTeal{fill:#0F766E}.cAmber{fill:#B45309}
+</style>
+<defs>
+  <marker id="ep91-moe-three-steps-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-moe-three-steps-at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+  <marker id="ep91-moe-three-steps-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#B45309"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="744" fill="#fff"/>
+
+
+<text class="h1" x="0" y="26">MoE 的两次改造</text>
+<text class="sm" x="0" y="49">同一层 FFN 的参数总量始终不变，变的只是「切成几份」和「哪几份必过」。DeepSeekMoE, 2024-01</text>
+
+<!-- ══════ (a) ══════ -->
+<rect class="panel" x="0" y="76" width="352" height="392" rx="10"/>
+<circle cx="24" cy="102" r="10" fill="#868D98"/><text class="pn" x="24" y="106" text-anchor="middle">a</text>
+<text class="ph" x="42" y="106">以前：少量粗专家</text>
+<text class="xs" x="24" y="126">GShard 一路下来，8 个或 16 个专家，每次选 2 个</text>
+
+<!-- input -->
+<rect class="soft" x="130" y="146" width="92" height="26" rx="5"/>
+<text class="sm" x="176" y="164" text-anchor="middle">一个 token</text>
+<path class="ink" d="M176 172 L176 194" marker-end="url(#ep91-moe-three-steps-a)"/>
+<rect class="box" x="122" y="196" width="108" height="26" rx="5"/>
+<text class="sm" x="176" y="214" text-anchor="middle">路由 router</text>
+
+<!-- experts: 4 wide -->
+<path class="thin" d="M176 222 L176 240 M48 240 L304 240 M48 240 L48 258 M133 240 L133 258 M219 240 L219 258 M304 240 L304 258"/>
+<rect class="acc" x="24" y="258" width="48" height="86" rx="5"/>
+<rect class="soft" x="109" y="258" width="48" height="86" rx="5"/>
+<rect class="acc" x="195" y="258" width="48" height="86" rx="5"/>
+<rect class="soft" x="280" y="258" width="48" height="86" rx="5"/>
+<text x="48" y="306" text-anchor="middle" class="lbl cTeal">E1</text>
+<text class="lbl" x="133" y="306" text-anchor="middle">E2</text>
+<text x="219" y="306" text-anchor="middle" class="lbl cTeal">E3</text>
+<text class="lbl" x="304" y="306" text-anchor="middle">E4</text>
+<text class="xs" x="176" y="366" text-anchor="middle">4 个专家里选 2 个 —— 激活了一半</text>
+
+<rect class="soft" x="24" y="384" width="304" height="66" rx="6"/>
+<text class="lbl" x="38" y="404">问题｜知识混杂（knowledge hybridity）</text>
+<text class="xs" x="38" y="423">每个专家都得同时装下数学、代码、常识，</text>
+<text class="xs" x="38" y="440">彼此学到的东西很像，分化不出来。</text>
+
+<!-- ══════ (b) ══════ -->
+<rect class="panel" x="414" y="76" width="352" height="392" rx="10"/>
+<circle cx="438" cy="102" r="10" fill="#0F766E"/><text class="pn" x="438" y="106" text-anchor="middle">b</text>
+<text class="ph" x="456" y="106">改造一：把每个专家切细</text>
+<text class="xs" x="438" y="126">每个切成 4 份，选的份数也乘 4 —— 计算量不变</text>
+
+<rect class="soft" x="544" y="146" width="92" height="26" rx="5"/>
+<text class="sm" x="590" y="164" text-anchor="middle">一个 token</text>
+<path class="ink" d="M590 172 L590 194" marker-end="url(#ep91-moe-three-steps-a)"/>
+<rect class="box" x="536" y="196" width="108" height="26" rx="5"/>
+<text class="sm" x="590" y="214" text-anchor="middle">路由 router</text>
+<path class="thin" d="M590 222 L590 240 M446 240 L734 240 M446 240 L446 258 M734 240 L734 258"/>
+
+<g>
+  <rect class="acc" x="438" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="466" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc" x="494" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="522" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="550" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc" x="578" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="606" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="634" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc" x="662" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="690" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="718" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="746" y="258" width="22" height="86" rx="4" opacity="0"/>
+</g>
+<text class="num" x="590" y="360" text-anchor="middle">16 个细专家里选 4 个</text>
+<text class="tealt" x="590" y="378" text-anchor="middle">组合数从 C(4,2)=6 变成 C(16,4)=1820</text>
+
+<rect class="soft" x="438" y="396" width="304" height="54" rx="6"/>
+<text class="lbl" x="452" y="416">好处｜同样的算力，路由能表达的分工细了三个数量级</text>
+<text class="xs" x="452" y="435">DeepSeek 实际用了 64 个路由专家，而不是别人的 8 个。</text>
+
+<!-- ══════ (c) ══════ -->
+<rect class="panel" x="828" y="76" width="352" height="392" rx="10"/>
+<circle cx="852" cy="102" r="10" fill="#B45309"/><text class="pn" x="852" y="106" text-anchor="middle">c</text>
+<text class="ph" x="870" y="106">改造二：留出共享专家</text>
+<text class="xs" x="852" y="126">绿色那两条不参与路由，任何 token 都要过</text>
+
+<rect class="soft" x="958" y="146" width="92" height="26" rx="5"/>
+<text class="sm" x="1004" y="164" text-anchor="middle">一个 token</text>
+<path class="ink" d="M1004 172 L1004 194" marker-end="url(#ep91-moe-three-steps-a)"/>
+<rect class="box" x="950" y="196" width="108" height="26" rx="5"/>
+<text class="sm" x="1004" y="214" text-anchor="middle">路由 router</text>
+<path class="thin" d="M1004 222 L1004 240 M888 240 L1148 240 M888 240 L888 258 M1148 240 L1148 258"/>
+<path fill="none" stroke="#B45309" stroke-width="1.4" stroke-dasharray="4 4" stroke-linejoin="round"
+      d="M958 159 L840 159 L840 246 L877 246" marker-end="url(#ep91-moe-three-steps-ab)"/>
+<text class="ambt" x="844" y="152">不走路由，永远激活</text>
+
+<g>
+  <rect class="warm" x="852" y="258" width="22" height="86" rx="4"/>
+  <rect class="warm" x="880" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc"  x="920" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="948" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="976" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc"  x="1004" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="1032" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="1060" y="258" width="22" height="86" rx="4"/>
+  <rect class="acc"  x="1088" y="258" width="22" height="86" rx="4"/>
+  <rect class="soft" x="1116" y="258" width="22" height="86" rx="4"/>
+</g>
+<path class="thin" d="M852 352 L902 352 M920 352 L1138 352"/>
+<text class="ambt" x="877" y="370" text-anchor="middle">共享 2 个</text>
+<text class="tealt" x="1029" y="370" text-anchor="middle">路由专家里再选 2 个</text>
+
+<rect class="soft" x="852" y="396" width="304" height="54" rx="6"/>
+<text class="lbl" x="866" y="416">好处｜通用知识被抽走，路由专家不必重复学一遍</text>
+<text class="xs" x="866" y="435">「不管什么进来都要用」的那部分：语言、常识、格式。</text>
+
+<!-- ══════ 底部：这套配置一路沿用 ══════ -->
+<rect class="soft" x="0" y="500" width="1180" height="130" rx="10"/>
+<text class="ph" x="24" y="528">(c) 这套配置，后面三个模型一字未改地沿用</text>
+
+<g transform="translate(24,548)">
+  <rect class="box" x="0" y="0" width="250" height="62" rx="6"/>
+  <text class="lbl" x="14" y="21">DeepSeekMoE 16B · 2024-01</text>
+  <text class="num" x="14" y="40">2 共享 + 64 路由，激活 2.8B</text>
+  <text class="xs" x="14" y="56">40% 的计算量打平 Llama 2 7B</text>
+</g>
+<path class="ink" d="M286 579 L308 579" marker-end="url(#ep91-moe-three-steps-a)"/>
+<g transform="translate(318,548)">
+  <rect class="box" x="0" y="0" width="250" height="62" rx="6"/>
+  <text class="lbl" x="14" y="21">DeepSeek-V2 236B · 2024-05</text>
+  <text class="num" x="14" y="40">2 共享 + 160 路由，激活 21B</text>
+  <text class="xs" x="14" y="56">同期 Mixtral 还是 8 个专家</text>
+</g>
+<path class="ink" d="M580 579 L602 579" marker-end="url(#ep91-moe-three-steps-a)"/>
+<g transform="translate(612,548)">
+  <rect class="box" x="0" y="0" width="250" height="62" rx="6"/>
+  <text class="lbl" x="14" y="21">DeepSeek-V3 671B · 2024-12</text>
+  <text class="num" x="14" y="40">1 共享 + 256 路由，激活 37B</text>
+  <text class="xs" x="14" y="56">Llama 3.1 405B 激活的是全部 405B</text>
+</g>
+<path class="ink" d="M874 579 L896 579" marker-end="url(#ep91-moe-three-steps-a)"/>
+<g transform="translate(906,548)">
+  <rect class="acc" x="0" y="0" width="250" height="62" rx="6"/>
+  <text x="14" y="21" class="lbl cTeal">DeepSeek-R1 · 2025-01</text>
+  <text class="num" x="14" y="40">基座就是 V3，架构原样</text>
+  <text class="xs" x="14" y="56">R1 那篇论文里一个字都不用再写</text>
+</g>
+</svg>
+<figcaption>MoE 的两次改造：把专家切细，再留出永远激活的共享专家<span class="fcite">图：重绘自 DeepSeekMoE Figure 2</span></figcaption></figure></div></div><div class="turn" data-t="3502"><button class="ts" data-seek="3502" title="跳到 00:58:22">00:58:22</button><div class="td"><span class="who host">张小珺</span><p>shared expert 可以理解成它有一些更通用的知识吗？</p></div></div><div class="turn" data-t="3505"><button class="ts" data-seek="3505" title="跳到 00:58:25">00:58:25</button><div class="td"><span class="who">何俊贤</span><p>对，可以理解成是通用的：不管什么东西进来，这个知识都用得到。比如常识，或者说我对英语、中文这个语言的基本理解——不管什么进来它都要用。</p><h4 class="h4">想到不难，敢做才难</h4></div></div><div class="turn cont" data-t="3518"><button class="ts" data-seek="3518" title="跳到 00:58:38">00:58:38</button><div class="td"><p>这个设计其实也比较 intuitive。但这里我想强调一点：<b>虽然这个东西看起来没有那么难想，但要做这个尝试还是很勇敢。</b></p><p>因为你要在一个很大的规模上花很大的算力去探索。以前大家都没有这么做，MoE 以前有人已经做过了——8 个 expert、少量 expert、也不要 shared 的——做过了，效果也还行。那你直接照着做，其实最简单，风险也比较低。为什么非要自己去搞一些不一样的东西？</p><p>学校很多时候搞不一样的东西，是为了创新、为了发论文。但对 DeepSeek 来说，发论文、所谓的创新对他也没有那么重要，但他们依然敢于去做这样不一样的东西。而且这个思路等会讲到 V2、包括 V3 和 R1 的基座也会讲到——<b>他们的思路是一脉相承的</b>：到 V2、V3 其实都是用了 Figure 2(c) 这样一个设计。</p></div></div><div class="turn" data-t="3598"><button class="ts" data-seek="3598" title="跳到 00:59:58">00:59:58</button><div class="td"><span class="who host">张小珺</span><p>做一个这样的实验，成本大概有多高？</p></div></div><div class="turn" data-t="3602"><button class="ts" data-seek="3602" title="跳到 01:00:02">01:00:02</button><div class="td"><span class="who">何俊贤</span><p>他们这篇论文做的实验还行，做的是 2B 的，2B 到 16B，相当于在规模比较小的模型上验证了一下，发现还不错。然后最后就搞大的——像这个 145B，成本就很高了。</p><p>但这里有一个很 tricky 的地方：<b>小模型上验证可能还可以，但搞到大模型上不一定 work，不一定可以迁移。</b>2B 你可能很便宜就做出来、效果还不错；但你说我搞一个大的，用很多卡——包括像 V2 就已经 200 多 B 参数了——我去用这一套，而这一套没有人做过。你做一个没有人做过的东西，总是有可能有风险；你跟别人做的一样，风险总是很低。</p><p>所以如果你把这一套搞到 100 多 B、200 B 上面很大规模去做，万一做出来效果不行怎么办？比如可能还没有 (a) 好，怎么办？</p><p>我觉得这种尝试——DeepSeek 后面的论文今天会提到很多这样的尝试——都是非常非常勇敢的。作为一家投入很多的公司来说，在业界其实是很少见的。</p><h4 class="h4">结果：40% 的计算量，打平 7B</h4></div></div><div class="turn cont" data-t="3694"><button class="ts" data-seek="3694" title="跳到 01:01:34">01:01:34</button><div class="td"><p>这就是 DeepSeekMoE 的两点创新：一个是有 shared expert，一个是 expert 数量变多。数量变多带来的好处，就是刚刚说的那个好处。</p><p>他们这篇论文用了 64 个 expert——后面的 V2、V3 用得更多，甚至用到一两百个。这里的参数配置是：每一层有 2 个 shared expert，专有的（路由专家）是 64 个。他们对比的以前的工作一般都是 16 个或 8 个，相当于多了不少。</p></div></div><div class="turn cont" data-t="3765"><button class="ts" data-seek="3765" title="跳到 01:02:45">01:02:45</button><div class="td"><p>结果是跟他们自己比，也就是刚刚讲的第一篇论文里 DeepSeek 的 dense 模型 7B。这里比较重要的是第二行——<b>激活参数</b>。7B 的激活参数当然就是 7B，准确说是 6.9B；而 16B 这个因为做的是 MoE，激活参数只有 2.8B。效果跟之前差不多。</p><p>总结成一句话，就是高亮的这句：<b>with only about 40% of computations</b>，DeepSeekMoE 就达到了跟之前那个 7B 差不多的效果。40% 是什么概念？就是你去部署这个模型，成本降低到原来的 40%。</p></div></div><div class="turn" data-t="3815"><button class="ts" data-seek="3815" title="跳到 01:03:35">01:03:35</button><div class="td"><span class="who host">张小珺</span><p>降低到。</p></div></div><div class="turn" data-t="3816"><button class="ts" data-seek="3816" title="跳到 01:03:36">01:03:36</button><div class="td"><span class="who">何俊贤</span><p>降低到 40%，对。这是一个成本的考虑。大家看 DeepSeek 的论文会发现，<b>从这篇开始就不停地充斥着这种成本的考虑</b>。到 V3 就集大成了，变成大家看到的「我用五百多万美元就训出来了什么」。</p></div></div><div class="turn" data-t="3837"><button class="ts" data-seek="3837" title="跳到 01:03:57">01:03:57</button><div class="td"><span class="who host">张小珺</span><p>所以他是先做一些尝试，把原理搞清楚，在之前的复现上做一定的优化，然后再考虑怎么把成本降低、怎么提效。大概是这样一个思路。</p></div></div><div class="turn" data-t="3854"><button class="ts" data-seek="3854" title="跳到 01:04:14">01:04:14</button><div class="td"><span class="who">何俊贤</span><p>对的。</p></div></div><div class="turn cont" data-t="3855"><button class="ts" data-seek="3855" title="跳到 01:04:15">01:04:15</button><div class="td"><p>这篇论文最后有一个图，是他们起的一个大的模型，就是这个 100 多 B 的：<b>DeepSeekMoE 145B</b>。这个模型很大了，但其实没有训完——他们的 training token 这一行只有 200 多 B token，很小。因为第一篇论文里一般都是训 2T token，也就是两万亿；这里是 2450 亿，小了 10 倍。</p><p>所以这个没训完，但他们相当于是在做验证实验：没训完的情况下跟之前比，145B 的激活参数是 22.2B，只有第一篇论文里 67B 的三分之一，而下面这些 benchmark 效果基本上差不太多，有些好一点、有些差一点。</p><p>所以他们就觉得这条路很 promising、他们的设计很 promising——因为他们搞了一些创新的东西，比如增加 expert 的数量、搞 shared expert，这些都跟别人做的不太一样，最后训出来发现效果不错。我觉得这给了他们信心去做后面的 V2。<b>V2 就是沿着这条路，真的把 scale 做上去，做了一个比较完整的、训完的大 MoE 模型。</b></p></div></div><div class="turn" data-t="3949"><button class="ts" data-seek="3949" title="跳到 01:05:49">01:05:49</button><div class="td"><span class="who host">张小珺</span><p>这篇论文很有意思，他们其实在这篇论文上没有得到一个完整的结果，但也把论文发出来了。</p></div></div><div class="turn" data-t="3955"><button class="ts" data-seek="3955" title="跳到 01:05:55">01:05:55</button><div class="td"><span class="who">何俊贤</span><p>他们在小规模上有结果——比如 16B 有比较完整的结果，100 多 B 那个没训完。这篇论文就是告诉大家一件事：我这样来设计 expert，效果很好，我在不是特别大的规模上验证了它效果很好。接下来 V2 就是在真的大规模的情况下，依然验证了它很好。</p></div></div><h2 class="sec" id="s5">五、DeepSeek-V2：MLA，第一个真正属于自己的东西</h2><div class="turn" data-t="3986"><button class="ts" data-seek="3986" title="跳到 01:06:26">01:06:26</button><div class="td"><span class="who">何俊贤</span><p>接下来顺着基座这条线，下一个就非常顺理成章，变成了 DeepSeek-V2。我 share 一下。</p></div></div><div class="turn cont" data-t="4004"><button class="ts" data-seek="4004" title="跳到 01:06:44">01:06:44</button><div class="td"><p>这就是 DeepSeek-V2，大家可以看这个标题——<b>strong、economical、efficient</b>，非常经济，非常高效。</p><p>DeepSeek-V2 基本上就是刚刚那篇论文的 scale up。但 V2 有一件很重要的事：他们提出了一个新的、进一步降低成本的东西，叫 <b>Multi-head Latent Attention</b>。这就相当于又有新的创新了。</p><p>这是一篇非常非常重要的论文，因为后面的 DeepSeek-V3 也是直接用的 V2 这套架构。</p></div></div><div class="turn cont" data-t="4039"><button class="ts" data-seek="4039" title="跳到 01:07:19">01:07:19</button><div class="td"><p>先看 abstract。DeepSeek-V2 是一个 <b>236B 的 MoE 模型</b>，这个规模大家知道就很大了；而这 236B 实际上<b>激活参数只有 21B</b>，相当于部署的时候所需的成本和算力差不多相当于一个 21B 的模型。能力也很强，支持 128K 的上下文长度——不过这些算基本操作。</p><p>这篇论文非常重要的东西就是 Multi-head Latent Attention，这是 DeepSeekMoE 那篇里没有的，它进一步降低成本。</p></div></div><div class="turn cont" data-t="4080"><button class="ts" data-seek="4080" title="跳到 01:08:00">01:08:00</button><div class="td"><p>这里可以看到，跟 DeepSeek 67B——就是第一篇论文那个 67B——相比，他们的 performance 更好，<b>节约了 42.5% 的训练成本</b>，KV cache 降低了 90% 多。KV cache 减少带来的也是推理部署成本下降和速度变快：这里可以看到它的 generation throughput，平均每秒可以生成多少个 token，<b>比之前快了 5.76 倍</b>。</p><p>这是什么概念呢？它的模型有 200 多 B 参数，比第一版那个 67B 大了接近 4 倍；但训练算力比之前节约了 40% 多，部署时生成速度还比之前快了 5 倍多，而且 performance 还比之前好。</p></div></div><div class="turn cont" data-t="4140"><button class="ts" data-seek="4140" title="跳到 01:09:00">01:09:00</button><div class="td"><p>Figure 1(a) 跟刚刚看过的图类似：纵坐标是效果，横坐标是激活参数。DeepSeek-V2 这个五角星在这里，激活参数只有 20B 左右，performance 是最高的；它之前对标的、他们自己训的 DeepSeek 67B 在这个红点。相当于<b>它比它快、比它便宜，模型比它大很多，带来的效果也很好</b>。Figure 1(b) 就是关于成本的图：训练 cost 变小了，KV cache 压了 90% 多，生成速度还快了 5 倍。</p><p>所以大家可以看到，DeepSeek 对于成本、对于经济性的这种概念和 style，一直贯穿在他们这些论文里面。</p><h4 class="h4">架构：共享专家从 64 变成 160</h4></div></div><div class="turn cont" data-t="4204"><button class="ts" data-seek="4204" title="跳到 01:10:04">01:10:04</button><div class="td"><p>先说 Figure 2 上面这部分。上面这部分就是刚刚讲过的：shared expert 和 routed expert，跟刚刚那个 DeepSeekMoE 一模一样——有一些共享的专家，还有很多很细分的专有专家。</p></div></div><div class="turn" data-t="4223"><button class="ts" data-seek="4223" title="跳到 01:10:23">01:10:23</button><div class="td"><span class="who host">张小珺</span><p>这里的专家变多了。</p></div></div><div class="turn" data-t="4226"><button class="ts" data-seek="4226" title="跳到 01:10:26">01:10:26</button><div class="td"><span class="who">何俊贤</span><p>对，变多了，因为模型变大了。这个图画得有点多，但他们实际做的是 <b>2 个共享专家和 160 个专有专家</b>。刚刚那个 DeepSeekMoE 是 64 个专有专家，现在把 64 个变成了 160 个。</p><p>这里大家可以看到：他先在 DeepSeekMoE 那篇论文里，在比较小的范围内做了验证实验、做了很科学很严谨的 study，然后在这样一个大规模、投入比较多的情况下，才敢于去做这样的事情。因为他这个配置已经跟别人做的很不一样了——他上了 160 个专家，而之前大家做大模型都是 8 个、16 个，他这里突然比别人多了 10 倍。但这也不是一蹴而就的，是像刚刚讲的那篇论文一样一步一步走过来的。</p><h4 class="h4">MLA：只存一个低维向量</h4></div></div><div class="turn cont" data-t="4281"><button class="ts" data-seek="4281" title="跳到 01:11:21">01:11:21</button><div class="td"><p>这部分就不细讲了，跟刚刚一样。这篇论文有一个很重要的东西是另一个：<b>Multi-head Latent Attention</b>。这个东西最近在国外也很受关注，因为<b>它真的是 DeepSeek 第一个提出来的</b>。</p><p>刚刚说的 MoE 还是在前人的工作上做了一些改进——我加了一个 shared expert，或者把 expert 数量变多——但 MoE 这个东西并不是 DeepSeek 自己提出来的。而 Multi-head Latent Attention 是 DeepSeek 自己提出来的。</p></div></div><div class="turn" data-t="4319"><button class="ts" data-seek="4319" title="跳到 01:11:59">01:11:59</button><div class="td"><span class="who host">张小珺</span><p>它的中文是多头潜在注意力。</p></div></div><div class="turn" data-t="4322"><button class="ts" data-seek="4322" title="跳到 01:12:02">01:12:02</button><div class="td"><span class="who">何俊贤</span><p>对，谢谢翻译，我其实不太清楚中文怎么说。多头潜在注意力。</p><p>这个东西在最近 DeepSeek 火了之后，很多国外的朋友开始去读这些论文，也更多地关注它。尽管它刚出来的时候大家还没觉得那么 fundamental，但 DeepSeek 就坚持他自己这一套，一直往后面做。</p></div></div><div class="turn cont" data-t="4347"><button class="ts" data-seek="4347" title="跳到 01:12:27">01:12:27</button><div class="td"><p>我们看 Figure 3，我尝试简单讲一下这个东西。</p><p>最早的 Transformer 用的是普通的 <b>Multi-Head Attention（MHA，多头注意力）</b>：我有很多个 head，每个头里面都有自己的 key 和 value 来做 attention。attention 是一个三元组——query、key、value。这里为什么有很多列？因为有很多个头，每一列就是一个头，每个头里面都是独立的。</p><p>那这个做法有什么问题呢？在部署（inference）的时候，会有一个东西叫 <b>KV cache</b>。</p><p>KV cache 是什么呢？大家知道，你跟 ChatGPT 或者豆包对话，它生成的时候是一个 token 一个 token、一个词一个词往后蹦。它每生成一个词，都要去跟前面的每一个词做 attention。比如你前面很长——你输入了两篇文章，加起来 5000 个词，这时候要让它给你写一篇新文章，可能又要写 5000 个词，那新生成的这 5000 个词里的每一个，都要跟前面 5000 个词的每一个去做 attention。</p></div></div><div class="turn cont" data-t="4461"><button class="ts" data-seek="4461" title="跳到 01:14:21">01:14:21</button><div class="td"><p>具体实现上是怎么做的呢？前面这些词我们叫 history，每一个词在之前算的时候都会算出它的 key 和 value。大家肯定不想重复计算——你不可能每生成一个词就重新算一遍这些 key 和 value，因为它们是跟前面的词绑定的，跟你现在生成的这个词无关。</p><p>所以一般的做法是：前面 5000 个词的 key 和 value 都存下来。这样来一个新词，你只需要算 query 就可以，不需要重复计算，节约时间。但节约时间就要付出空间的代价——<b>空间换时间</b>。这里就出现了 KV cache：你前面存的那些 key 和 value 有多大。这会直接占到你 GPU 的 memory 上，带来部署的算力成本。</p><p>所以 abstract 里说「把 KV cache 降低了 93%」，说的就是这个东西。</p><h4 class="h4">从 MHA 到 GQA、MQA：一条省内存但掉效果的路</h4></div></div><div class="turn cont" data-t="4529"><button class="ts" data-seek="4529" title="跳到 01:15:29">01:15:29</button><div class="td"><p>后来大家为了减少 KV cache，其实有一些工作。</p><p>第二个是 <b>GQA</b>（group query attention，分组查询注意力）：虽然我有很多个头，但<b>多个头之间共享一套 key 和 value</b>。大家看这个图，列变少了——本来是 8 列变成 4 列，你可以认为每两个头共用一套 key 和 value，限制它们一直是一样的。这样 KV cache 就直接降低了 50%。DeepSeek 的第一篇论文以及 Llama 2 用的就是这个。</p><p>第三个东西就很激进，叫 <b>MQA</b>（multi-query attention）：<b>所有的头共用同一套 key 和 value</b>，我只有一套。相当于 KV cache 变得更少了。</p><p>但这里面是有 trade-off 的。intuitive 地理解：从 MHA 到 GQA 到 MQA，大家看这个图会发现 KV cache 越来越少，但<b>它的 performance 也会越来越差</b>。因为这个东西更多才更灵活——你如果说所有的头都变成一个了，那不就变成只有单头了吗？效果就会下降。虽然成本更低、更 efficient，但效果也下降了。所以这里面需要一个平衡。</p><h4 class="h4">MLA 怎么做的</h4></div></div><div class="turn cont" data-t="4632"><button class="ts" data-seek="4632" title="跳到 01:17:12">01:17:12</button><div class="td"><p>然后 DeepSeek 就搞了一个 <b>Multi-head Latent Attention</b>，多头隐式注意力。</p><p>先对着这个图讲。为什么这里有一个 latent（隐式）这个词？大家可以看右边那一小块，标的叫 <b>compressed latent KV</b>——就是一个低维的向量。DeepSeek 的做法是：上面那些 K 和 V 并不需要自己显式地算出来、存下来，而是<b>从这个低维的东西 map 到高维</b>。</p></div></div><div class="turn cont" data-t="4677"><button class="ts" data-seek="4677" title="跳到 01:17:57">01:17:57</button><div class="td"><p>用公式简单说一下。他们叫 <b>low-rank（低秩）</b>——它不光是 latent，它还是 low-rank。</p><p>low-rank 什么意思？在线性代数里，比如我本来这个向量是 1024 维，很高维；高维向量需要的计算也更多。现在 low-rank，比如变成只有 100 维——本来是 1024 维，变成 100 维；我在这 100 维上算完之后，再用一个矩阵把它 map 回去。这就是所谓的 <b>low-rank key-value joint compression（低秩键值联合压缩）</b>。</p><p>在论文的公式里：input 先算出这个 <b>c</b>，c 就是压缩之后的 latent；然后 K 和 V 是从 c 里面乘一个矩阵 map 回去算出来的，而 c 是低维的。</p></div></div><div class="turn cont" data-t="4737"><button class="ts" data-seek="4737" title="跳到 01:18:57">01:18:57</button><div class="td"><p>这样带来的好处是什么呢？</p><p>刚刚说到为什么这件事很 matter：部署的时候要存 K 和 value，要存很多。之前的方法就是想办法存得越来越少。而 <b>DeepSeek 的做法是：我依然要这么多个头，我不想把头的数量变少；但我想存的变少</b>。</p><p>那存什么呢？只存这个 compressed latent KV，只存这个 c。我在部署计算的时候，K 和 value 其实是可以从 c 算出来的。存 c 的好处是——c 是 low-rank 的：本来 K 和 value 是 1000 维，现在 c 变成 100 维，存储空间<b>直接变成以前的十分之一</b>。你存一个 100 维的向量跟存一个 1000 维的向量，存的东西直接小了 10 倍。所以你的 KV cache 就很小，部署需要的 memory 就少了很多。</p><p>所以这篇论文为什么可以压这么多——大家看前面 abstract，对 KV cache 的压缩很大，就是第二个图，KV cache for generation：比起普通的版本，<b>变成了以前的 1/10，降低了 93%</b>。这就带来了巨大的成本下降。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 706" width="1240" height="706" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .live{fill:#B45309;opacity:.9}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:14.5px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .lbl{font-size:10.5px;fill:#4E5560;font-weight:600}
+  .tag{font-size:10px;fill:#fff;font-weight:700}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .numB{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;fill:#14161A}
+  .cTeal{fill:#0F766E}.cAmber{fill:#B45309}.cMut{fill:#4E5560}
+</style>
+<defs>
+  <marker id="ep91-mla-kv-cache-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-mla-kv-cache-at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="706" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">四种注意力，存下来的东西不一样</text>
+<text class="sm" x="0" y="43">生成每一个新词都要跟前面每一个词做注意力。前面那些词的 K 和 V 必须留在显存里 —— 这就是 KV cache。</text>
+<text class="xs" x="0" y="62">橙色格子 = 每个词、每一层要长期占住的显存。DeepSeek-V2, 2024-05, Figure 3 / Table 1</text>
+
+<!-- ═══ 四联 ═══ -->
+<g transform="translate(0,86)">
+
+<!-- MHA -->
+<rect class="panel" x="0" y="0" width="278" height="300" rx="9"/>
+<text class="ph" x="18" y="28">MHA　多头注意力</text>
+<text class="xs" x="18" y="47">每个头一套自己的 K、V</text>
+<g transform="translate(18,64)">
+  <text class="lbl" x="0" y="10">4 个头</text>
+  <g>
+    <rect class="box" x="0" y="20" width="52" height="22" rx="4"/><text class="num" x="26" y="35" text-anchor="middle">Q₁</text>
+    <rect class="box" x="62" y="20" width="52" height="22" rx="4"/><text class="num" x="88" y="35" text-anchor="middle">Q₂</text>
+    <rect class="box" x="124" y="20" width="52" height="22" rx="4"/><text class="num" x="150" y="35" text-anchor="middle">Q₃</text>
+    <rect class="box" x="186" y="20" width="52" height="22" rx="4"/><text class="num" x="212" y="35" text-anchor="middle">Q₄</text>
+  </g>
+  <g>
+    <rect class="warm" x="0" y="52" width="52" height="22" rx="4"/><text class="num" x="26" y="67" text-anchor="middle">K₁</text>
+    <rect class="warm" x="62" y="52" width="52" height="22" rx="4"/><text class="num" x="88" y="67" text-anchor="middle">K₂</text>
+    <rect class="warm" x="124" y="52" width="52" height="22" rx="4"/><text class="num" x="150" y="67" text-anchor="middle">K₃</text>
+    <rect class="warm" x="186" y="52" width="52" height="22" rx="4"/><text class="num" x="212" y="67" text-anchor="middle">K₄</text>
+    <rect class="warm" x="0" y="80" width="52" height="22" rx="4"/><text class="num" x="26" y="95" text-anchor="middle">V₁</text>
+    <rect class="warm" x="62" y="80" width="52" height="22" rx="4"/><text class="num" x="88" y="95" text-anchor="middle">V₂</text>
+    <rect class="warm" x="124" y="80" width="52" height="22" rx="4"/><text class="num" x="150" y="95" text-anchor="middle">V₃</text>
+    <rect class="warm" x="186" y="80" width="52" height="22" rx="4"/><text class="num" x="212" y="95" text-anchor="middle">V₄</text>
+  </g>
+</g>
+<rect class="soft" x="18" y="196" width="242" height="42" rx="6"/>
+<text class="lbl" x="32" y="215">要存 <tspan class="numB cAmber">8</tspan> 个向量</text>
+<text class="xs" x="32" y="231">效果最好，显存最贵</text>
+<rect x="18" y="252" width="242" height="30" rx="6" fill="#FEF6E7"/>
+<text x="32" y="272" class="num cAmber">基准：100%</text>
+
+<!-- GQA -->
+<rect class="panel" x="300" y="0" width="278" height="300" rx="9"/>
+<text class="ph" x="318" y="28">GQA　分组共享</text>
+<text class="xs" x="318" y="47">每 2 个头共用一套（Llama 2 用的就是这个）</text>
+<g transform="translate(318,64)">
+  <g>
+    <rect class="box" x="0" y="20" width="52" height="22" rx="4"/><text class="num" x="26" y="35" text-anchor="middle">Q₁</text>
+    <rect class="box" x="62" y="20" width="52" height="22" rx="4"/><text class="num" x="88" y="35" text-anchor="middle">Q₂</text>
+    <rect class="box" x="124" y="20" width="52" height="22" rx="4"/><text class="num" x="150" y="35" text-anchor="middle">Q₃</text>
+    <rect class="box" x="186" y="20" width="52" height="22" rx="4"/><text class="num" x="212" y="35" text-anchor="middle">Q₄</text>
+  </g>
+  <path class="thin" d="M26 44 L26 50 L88 50 L88 44 M57 50 L57 54 M150 44 L150 50 L212 50 L212 44 M181 50 L181 54"/>
+  <g>
+    <rect class="warm" x="31" y="56" width="52" height="22" rx="4"/><text class="num" x="57" y="71" text-anchor="middle">K₁</text>
+    <rect class="warm" x="155" y="56" width="52" height="22" rx="4"/><text class="num" x="181" y="71" text-anchor="middle">K₂</text>
+    <rect class="warm" x="31" y="84" width="52" height="22" rx="4"/><text class="num" x="57" y="99" text-anchor="middle">V₁</text>
+    <rect class="warm" x="155" y="84" width="52" height="22" rx="4"/><text class="num" x="181" y="99" text-anchor="middle">V₂</text>
+  </g>
+</g>
+<rect class="soft" x="318" y="196" width="242" height="42" rx="6"/>
+<text class="lbl" x="332" y="215">要存 <tspan class="numB cAmber">4</tspan> 个向量</text>
+<text class="xs" x="332" y="231">省一半，效果掉一点</text>
+<rect x="318" y="252" width="121" height="30" rx="6" fill="#FEF6E7"/>
+<text x="332" y="272" class="num cAmber">50%</text>
+
+<!-- MQA -->
+<rect class="panel" x="600" y="0" width="278" height="300" rx="9"/>
+<text class="ph" x="618" y="28">MQA　全部共用一套</text>
+<text class="xs" x="618" y="47">最省，也最伤效果 —— 接近退回单头</text>
+<g transform="translate(618,64)">
+  <g>
+    <rect class="box" x="0" y="20" width="52" height="22" rx="4"/><text class="num" x="26" y="35" text-anchor="middle">Q₁</text>
+    <rect class="box" x="62" y="20" width="52" height="22" rx="4"/><text class="num" x="88" y="35" text-anchor="middle">Q₂</text>
+    <rect class="box" x="124" y="20" width="52" height="22" rx="4"/><text class="num" x="150" y="35" text-anchor="middle">Q₃</text>
+    <rect class="box" x="186" y="20" width="52" height="22" rx="4"/><text class="num" x="212" y="35" text-anchor="middle">Q₄</text>
+  </g>
+  <path class="thin" d="M26 44 L26 50 L212 50 L212 44 M119 50 L119 54"/>
+  <g>
+    <rect class="warm" x="93" y="56" width="52" height="22" rx="4"/><text class="num" x="119" y="71" text-anchor="middle">K</text>
+    <rect class="warm" x="93" y="84" width="52" height="22" rx="4"/><text class="num" x="119" y="99" text-anchor="middle">V</text>
+  </g>
+</g>
+<rect class="soft" x="618" y="196" width="242" height="42" rx="6"/>
+<text class="lbl" x="632" y="215">要存 <tspan class="numB cAmber">2</tspan> 个向量</text>
+<text class="xs" x="632" y="231">四个头看到的是同一份记忆</text>
+<rect x="618" y="252" width="61" height="30" rx="6" fill="#FEF6E7"/>
+<text x="632" y="272" class="num cAmber">25%</text>
+
+<!-- MLA -->
+<rect class="panel" x="900" y="0" width="280" height="300" rx="9" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="900" y="0" width="280" height="26" rx="9" fill="#0F766E"/>
+<rect x="900" y="16" width="280" height="10" fill="#0F766E"/>
+<text class="tag" x="918" y="18">DeepSeek-V2 自己提出</text>
+<text class="ph" x="918" y="50">MLA　多头潜在注意力</text>
+<text class="xs" x="918" y="69">头一个不减，改成只存一个压缩向量</text>
+<g transform="translate(918,80)">
+  <g>
+    <rect class="box" x="0" y="14" width="52" height="22" rx="4"/><text class="num" x="26" y="29" text-anchor="middle">Q₁</text>
+    <rect class="box" x="62" y="14" width="52" height="22" rx="4"/><text class="num" x="88" y="29" text-anchor="middle">Q₂</text>
+    <rect class="box" x="124" y="14" width="52" height="22" rx="4"/><text class="num" x="150" y="29" text-anchor="middle">Q₃</text>
+    <rect class="box" x="186" y="14" width="52" height="22" rx="4"/><text class="num" x="212" y="29" text-anchor="middle">Q₄</text>
+  </g>
+  <g opacity=".45">
+    <rect class="soft" x="0" y="46" width="52" height="18" rx="4"/><text class="num" x="26" y="59" text-anchor="middle">K₁V₁</text>
+    <rect class="soft" x="62" y="46" width="52" height="18" rx="4"/><text class="num" x="88" y="59" text-anchor="middle">K₂V₂</text>
+    <rect class="soft" x="124" y="46" width="52" height="18" rx="4"/><text class="num" x="150" y="59" text-anchor="middle">K₃V₃</text>
+    <rect class="soft" x="186" y="46" width="52" height="18" rx="4"/><text class="num" x="212" y="59" text-anchor="middle">K₄V₄</text>
+  </g>
+  <text class="xs" x="0" y="80" style="font-size:9.5px">这四份用时现算，不存</text>
+  <path class="ink" d="M119 88 L119 72" stroke="#0F766E" marker-end="url(#ep91-mla-kv-cache-at)"/>
+  <rect class="warm" x="66" y="88" width="106" height="24" rx="4"/>
+  <text class="num" x="119" y="105" text-anchor="middle">c（低秩 latent）</text>
+</g>
+<rect class="acc" x="918" y="196" width="244" height="42" rx="6"/>
+<text class="lbl" x="932" y="215">只存 <tspan class="numB cAmber">1</tspan> 个低维向量</text>
+<text class="xs" x="932" y="231">4 个头一个没少，效果比 MHA 还强</text>
+<rect x="918" y="252" width="30" height="30" rx="6" fill="#FEF6E7"/>
+<text x="956" y="272" class="num cAmber">6.7%（KV cache −93.3%）</text>
+</g>
+
+<!-- ═══ 底部：一句话 ═══ -->
+<rect class="soft" x="0" y="418" width="1180" height="106" rx="10"/>
+<text class="ph" x="24" y="446">GQA 和 MQA 是「少存几套」，MLA 是「换个东西存」</text>
+<text class="sm" x="24" y="472">前两条路都拿效果换显存：头之间被迫共用记忆，越少越退化。MLA 不动头数 —— 把每个词的 K、V 压成</text>
+<text class="sm" x="24" y="492">一个低维向量 c，只缓存 c；要用 K、V 时再从 c 乘个矩阵还原。掉的是维度，不是头。</text>
+<text class="sm" x="24" y="512">论文给的换算：<tspan class="cTeal" style="font-weight:650">MLA 的 KV cache 相当于只用 2.25 组的 GQA，效果却比 MHA 更强</tspan>。</text>
+
+<!-- 右侧成本对照 -->
+<g transform="translate(842,438)">
+  <text class="lbl" x="0" y="14">DeepSeek-V2 236B 对 DeepSeek 67B</text>
+  <text class="num" x="0" y="36">训练成本　　−42.5%</text>
+  <text class="num" x="0" y="56">KV cache 　　−93.3%</text>
+  <text class="num" x="0" y="76">生成吞吐　　×5.76</text>
+  <path class="thin" d="M-16 4 L-16 82"/>
+</g>
+</svg>
+<figcaption>MHA / GQA / MQA / MLA：四种注意力，存下来的东西不一样<span class="fcite">图：重绘自 DeepSeek-V2 Figure 3 与 Table 1</span></figcaption></figure></div></div><div class="turn cont" data-t="4846"><button class="ts" data-seek="4846" title="跳到 01:20:46">01:20:46</button><div class="td"><p>Multi-head Latent Attention 是一个很 novel、很创新的东西。DeepSeek-V2 发明这个当然也是基于成本的考虑：他们之前用的是 GQA，想进一步压缩成本，但觉得直接用 MQA 效果会受到损耗，所以想取一个折中，设计了这样一个方法。</p></div></div><div class="turn" data-t="4873"><button class="ts" data-seek="4873" title="跳到 01:21:13">01:21:13</button><div class="td"><span class="who host">张小珺</span><p>我能不能多问一句：这个多头潜在注意力，如果从一个人的角度，能不能做一个形象的比喻？怎么可以更形象地理解 values 和 keys？</p></div></div><div class="turn" data-t="4892"><button class="ts" data-seek="4892" title="跳到 01:21:32">01:21:32</button><div class="td"><span class="who">何俊贤</span><p>keys 和 values 本身可以很形象地理解。</p><p>比如 attention：我现在要说下一个词，很多时候我希望去理解它跟我之前说过的这些词之间的联系——之前的 context 里到底哪一块，对我现在说下一个词的影响最大。它们之间有一个依赖关系。</p><p>那么这个 <b>K 相当于一把钥匙</b>：之前的每一个词都有这样一把钥匙，你现在要说的这个词，通过这个 K 去计算它跟那个词到底有多大的依赖关系。</p><p>依赖关系计算出来之后——比如我发现我 90% 依赖上面说的那个词，只 10% 依赖这个词，另一个词根本不依赖——那么这个词里面具体是什么含义来影响你说下一个词呢？<b>那个含义就是它的 value</b>。</p><p>所以：K 帮你计算你们之间的依赖关系是什么，value 帮你计算它怎么样来影响你的生成。之前的每一个词都有自己的钥匙和 value，而且这把钥匙和这个 value 是要被存下来的——存下来就要占你 GPU 的空间。这就是所谓的 KV cache。</p></div></div><div class="turn cont" data-t="4991"><button class="ts" data-seek="4991" title="跳到 01:23:11">01:23:11</button><div class="td"><p>那 DeepSeek 做的 MLA 这件事，我觉得有点难形象地表达，intuitively 可能还是要从数学上说：<b>你可以认为他把之前代表每个词的 K 和 value——本来是用一个很长的向量来代表——现在用一个短很多的向量来代表。</b>因为这些都要被存到 GPU 上面，短了很多之后，存的就小了很多，所以 KV cache 就少了很多。</p><p>这是对 MLA 的一个通俗理解。这个东西本身我觉得是很 novel 的。</p><p>当然，设计这个东西还涉及到处理位置编码——这里叫 RoPE，rotary position embedding，旋转位置编码——有一些讲究，他们也有一些独特的方式来处理它。这个涉及到关于 RoPE 的很多很深的 technical 的东西，这里就不展开了。</p><h4 class="h4">效果：等价于只用 2.25 组的 GQA，但比 MHA 还强</h4></div></div><div class="turn cont" data-t="5072"><button class="ts" data-seek="5072" title="跳到 01:24:32">01:24:32</button><div class="td"><p>最终的效果就是这个表。这个表的 caption 那句话是关键：<b>他们提出的 MLA，KV cache 相当于 GQA 只用 2.25 个 group。</b></p><p>一般的 GQA 组很多。打个比方，你的 head 可能有 16 个，那 MHA 相当于 16 个组。现在大家想变得更高效，就把组变少，比如变成 4 个组；当你变成一个组的时候，就变成了第三个图（MQA）。但组越来越少，效果也越来越差——所以很多时候大家并不是组越少越好，可能变成 8 个组，减少一点，但保证效果不会掉太多。你如果减到两个组，效果可能就很差了。</p><p>而 MLA 的方式，实际的 KV cache <b>相当于 GQA 只用 2.25 个组</b>——压了很多。可是你如果真的只用 2.25 个组，效果会很差；MLA 相当于只用 2.25 个组的存储，但 performance 会好很多。所以他这里写了一个 <b>stronger</b>（比 MHA 还强）。</p><p>这是之前的论文没有的东西，DeepSeekMoE 里没有，<b>V2 第一次这样做</b>。</p><h4 class="h4">MoE 训练里的平衡问题</h4></div></div><div class="turn cont" data-t="5174"><button class="ts" data-seek="5174" title="跳到 01:26:14">01:26:14</button><div class="td"><p>这里稍微说一点技术细节。MoE 的训练涉及一些 technical 的东西：<b>它需要 balance 不同的专家。</b></p><p>因为你不希望训练到最后，所有的 data 都依赖其中两个专家，其他专家从来没被用过——那这个混合专家模型就等于没有，你只用两个专家，其他的相当于没用上。所以一般训练时需要 expert 的 balance（平衡）。</p><p>他们为了最大程度保证 efficiency，还要搞 <b>device 层面的平衡</b>——不同的 GPU 之间平衡，甚至不同 device 之间<b>通信</b>的平衡。他们希望不光专家被用得比较平衡，不同的 GPU 也被用得比较平衡，GPU 之间的通信也比较平衡。因为这样平衡，efficiency 才能被 maximize。</p></div></div><div class="turn cont" data-t="5235"><button class="ts" data-seek="5235" title="跳到 01:27:15">01:27:15</button><div class="td"><p>这些细节其实也比较容易理解。我刚刚可能忘了说，混合专家比起 dense model 还有一个优势：<b>它很容易做分布式的实现以及 scale up</b>。因为天然地你有多个专家，你可以把不同的专家放到不同的 GPU 上面，它就很天然地分开了。而本来的模型没有这种多个专家，你要用很多很多 GPU 去 train，中间分起来就没那么直接。</p><p>那平衡为什么很重要？打比方：你如果有 2000 张卡，而你一直都在用其中两个专家，这两个专家放在其中两张卡上面，那相当于 2000 张卡里只有几张卡不停地在使用、run 得很多，其他卡都没怎么用过。整个集群的训练效率就很低——这 2000 张卡都是要用来装这个模型的，装了之后利用率却很低，那就是对成本的一种浪费。</p><p>所以这种平衡就是：我怎么样从工程上设计，来充分利用我所有的 GPU、所有的卡，保证不造成金钱或者算力的浪费。这也是我觉得 DeepSeek 做得很好的地方。这些东西可能听起来没有那么创新，更像是一些经验上、工程上的优化或实现，但这对最后 DeepSeek-V3 的成本、对整体的成本控制起到了很大的作用。</p><h4 class="h4">同期的 Mixtral 还在做 8 个专家</h4></div></div><div class="turn cont" data-t="5349"><button class="ts" data-seek="5349" title="跳到 01:29:09">01:29:09</button><div class="td"><p>大家可以看一下它的配置：V2 是 200 多 B 参数、2 个 shared expert、160 个专有专家。160 这个数字是非常非常大的——刚刚讲 DeepSeekMoE 的时候还在说之前的工作一般都是 8 个、16 个，DeepSeek 这个直接搞了 160 个。它跟以前的配置就很不一样，而且还用了它自己搞的 MLA。</p><p>而且这个 MLA 是这篇论文第一次提出来的，之前的 DeepSeekMoE 也没有试验过。所以这也是一个很 bold、很勇敢的创新——因为这个训练代价就很大了，这是一个 236B 的模型，会用很多很多卡，他们训了 <b>8.1T token</b>。</p><p>这已经是一个很大规模的训练。他们在这么大的规模下，第一次用这样的配置、用他们自己发明的一个新的注意力机制来做训练，我觉得也是非常难得的。同期其他的大模型——公开的基本上没有人在训练上做这么大的创新。</p><p>我觉得这说明 DeepSeek 对 efficiency 的追求是非常非常坚定的，他们也比较 confident，有勇气去承受可能的失败，也很有勇气去做这种新的东西——他们坚信这个东西会更好。</p></div></div><div class="turn cont" data-t="5475"><button class="ts" data-seek="5475" title="跳到 01:31:15">01:31:15</button><div class="td"><p>当然，这里的 long context extension 就是常规操作，别人也会做，最后长度到 128K、12 万的 context。这基本上也是现有的技术——他们用了一个延长 RoPE 的技术，那篇论文也很有名，很多人也这么在做。</p><blockquote class="ed"><span class="ed-l">编者注</span><p>编者注：V2 用的是 <b>YaRN</b>，把默认 4K 的上下文窗口扩到 128K，并且只作用在承载 RoPE 的那个解耦出来的 shared key 上。</p></blockquote></div></div><div class="turn cont" data-t="5503"><button class="ts" data-seek="5503" title="跳到 01:31:43">01:31:43</button><div class="td"><p>效果大家可以看一下。DeepSeek-V2 是最右边这一列，中英文很多 benchmark。第二行这里 highlight 的很重要。</p><p>比如他们跟那时候的通义千问 1.5 72B、跟 <b>Mixtral</b> 比。Mixtral 也是一个 MoE，它是 8×22B，就是 8 个专家。Mixtral 是 Mistral 做的，很有名。但 Mixtral 在同期的时候还是在做 8 个专家，跟之前的工作差不多，每个专家 22B，所以总模型 100 多 B。</p><p>Mixtral 后来模型开源出来，大家发现一个问题：<b>这 8 个专家就很像，并没有真的分化</b>，没有达到 MoE 一开始想要的目的。而 DeepSeek-V2 设计这种多专家，exactly 就是为了让它更分化、让专家的细粒度更高。</p><p>Mixtral 和 DeepSeek-V2 基本上算是同期做的。大家可以看到：<b>尽管是国外这种非常 leading 的公司，其实并没有勇气去做那么大的创新。</b>在这样一个同期的工作上，DeepSeek-V2 用的是 160 个专家。所以同样是 MoE 模型，这两个就很不一样。</p></div></div><div class="turn cont" data-t="5588"><button class="ts" data-seek="5588" title="跳到 01:33:08">01:33:08</button><div class="td"><p>DeepSeek-V2 总的模型也更大，比 Mixtral 大了 90B，但<b>激活参数还比它少</b>。Mixtral 只有 8 个专家，激活一个就 22B，激活两个就是 39B 左右；而 DeepSeek-V2 这么大的模型，激活参数只有 21B，所以它的部署成本甚至比 Mixtral 还要小。</p><p>效果在当时，中文肯定是最好的；英文跟 Mixtral 差不太多，比通义千问 1.5 好很多，跟 Llama 3 也差不太多——不过 Llama 3 的训练 token 好像要多很多。总结下来就是这句话：<b>with only 21B 的激活参数，DeepSeek-V2 就达到了开源模型里比较 top 的 performance。</b></p></div></div><div class="turn" data-t="5653"><button class="ts" data-seek="5653" title="跳到 01:34:13">01:34:13</button><div class="td"><span class="who host">张小珺</span><p>这里有显示出它的多个专家之间是怎么设置的吗？就是不同的专家负责什么样的领域？</p></div></div><div class="turn" data-t="5659"><button class="ts" data-seek="5659" title="跳到 01:34:19">01:34:19</button><div class="td"><span class="who">何俊贤</span><p><b>这个是自动学出来的，并不是他们设置的。</b>具体什么领域，这篇论文没有讲太多分析。「数学专家、物理专家」只是大家 intuitive 的一个理解，不是人为设置的。</p><h4 class="h4">大模型界的拼多多</h4></div></div><div class="turn cont" data-t="5672"><button class="ts" data-seek="5672" title="跳到 01:34:32">01:34:32</button><div class="td"><p>他们专门讲了 training cost，这里可以看一下：在他们的 H800 集群上，每训练一万亿 token，之前的 DeepSeek 67B 需要 300.6K GPU 小时，而 V2 只需要 172.8K——这个模型虽然有 200 多 B，但 training cost 比他们之前那个 67B 的模型<b>节省了 42.5%</b>。推理成本上，比之前那个 67B 模型<b>快了 5.76 倍</b>。</p></div></div><div class="turn cont" data-t="5713"><button class="ts" data-seek="5713" title="跳到 01:35:13">01:35:13</button><div class="td"><p>当然他们还做了一些额外的优化：部署的时候会把参数变成 <b>FP8</b> 精度——表示小数的精度变低；KV cache 也会做一些量化，把精度变低。他们会做很多这样额外的优化来做部署。</p></div></div><div class="turn cont" data-t="5734"><button class="ts" data-seek="5734" title="跳到 01:35:34">01:35:34</button><div class="td"><p>我觉得这也是为什么 DeepSeek-V2 在当时国内引发了一个现象。如果我没记错的话，好像是从 V2 开始，国内的大模型就开始有 chat 产品了；而它的价格很低，从此国内有一些价格也都变低了。</p></div></div><div class="turn" data-t="5758"><button class="ts" data-seek="5758" title="跳到 01:35:58">01:35:58</button><div class="td"><span class="who host">张小珺</span><p>好像就是从这里开始价格战是吧？这个是 2024 年几月份发的？五月吗？我记得价格战好像是那个时候。</p></div></div><div class="turn" data-t="5767"><button class="ts" data-seek="5767" title="跳到 01:36:07">01:36:07</button><div class="td"><span class="who">何俊贤</span><p>对，这个是 5 月份。</p><p>因为大家可以看到，DeepSeek-V2 是一个巨大的模型，但激活参数低，再加上他们自己搞的 MLA、多头潜在注意力机制，部署成本就被压得很低。而且当时 DeepSeek 我听说还不是亏钱在做部署，其实还是赚钱的，只是赚得不多。我记得当时每百万 token 就一块钱还是几块钱，反正就很便宜——比 OpenAI 低很多，比当时国内其他厂商也要低好几倍，可能都不是一个数量级。而且他们还不是亏钱，是赚着钱在部署这个产品。</p><p>后来因为有这个价格战，可能有一些厂商也开始跟上，但跟的厂商有可能是亏着钱在跟。我记得当时很震惊：DeepSeek 用比较差的 GPU、用很便宜的价格部署一个很大的模型，结果还不亏钱，还有利润。</p></div></div><div class="turn" data-t="5842"><button class="ts" data-seek="5842" title="跳到 01:37:22">01:37:22</button><div class="td"><span class="who host">张小珺</span><p>我记得当时就开始有人叫他们是大模型界的拼多多。这个其实帮我们理解为什么他可以这么干，它的原理是什么。</p></div></div><div class="turn" data-t="5855"><button class="ts" data-seek="5855" title="跳到 01:37:35">01:37:35</button><div class="td"><span class="who">何俊贤</span><p>对，为什么可以这么干，其实就是这个模式。</p><p>但我觉得当时给我一种感觉：DeepSeek-V2、包括 DeepSeek 自己，当时可能也没有那么在乎这个产品，他其实就是部署了一下。<b>我一直觉得 DeepSeek 的模型、特别是早期的这些模型，在后训练上并没有做很精细的人类对齐</b>，或者说做得特别精细、比如去刷榜什么的。他们可能就是做得很像一个 research work，然后稍微部署了一下——因为部署成本也很低，可能也不是很在乎跟别人比价格、比用户什么的。反正给我是这种感觉。</p><p>所以我觉得还是比较低调。他们部署之后我感觉也没做什么宣传，后来因为价格很低，才开始有一些媒体报道他们。</p></div></div><div class="turn" data-t="5918"><button class="ts" data-seek="5918" title="跳到 01:38:38">01:38:38</button><div class="td"><span class="who host">张小珺</span><p>这个时候开始有一些关注度了。你觉得他是以一种什么样的目标在做刚才讲的那些工作？他自己心里的动机可能会是什么？</p></div></div><div class="turn" data-t="5927"><button class="ts" data-seek="5927" title="跳到 01:38:47">01:38:47</button><div class="td"><span class="who">何俊贤</span><p>说实话我不是很清楚。</p><p>平常有时候会看到一些采访，会觉得他们是不是真的想为 AGI 做努力。比如这些都开源，包括 V3 也是 MIT license 开源，也没有做很多商业化，也没有说「我不开源，我要保留自己商业化的护城河」。他们这些模型搞了半天、几百 B，最后可以免费开源给大家，而且别人也可以免费商用。</p><p>说实话我也不太理解——不是不理解，就是我非常尊重他们，因为我觉得这个非常了不起。但他们之后是不是真的想商业化、想赚钱，或者是不是他们真的觉得不需要赚钱，我就是做 AI，and that's it——比如他们有幻方可以赚钱就够了，其他的也不在乎——这个我就不是很清楚了，也很难揣测他们的动机。</p><p>但他们做的这些工作，就算是我们从业内、从学术界去看，包括刚刚讲的这个风格，都是极具创新性的，而且非常非常勇敢。</p></div></div><h2 class="sec" id="s6">六、DeepSeek-V3：把创新压进工程里</h2><div class="turn" data-t="6012"><button class="ts" data-seek="6012" title="跳到 01:40:12">01:40:12</button><div class="td"><span class="who">何俊贤</span><p>DeepSeek-V2 这篇就讲到这里。第一部分的最后一篇基座论文，就是最近的这一篇 <b>DeepSeek-V3</b>。</p></div></div><div class="turn cont" data-t="6038"><button class="ts" data-seek="6038" title="跳到 01:40:38">01:40:38</button><div class="td"><p>DeepSeek-V3 是 2024 年底、12 月份的工作，这个工作关注度就很高了。</p><p>先看 abstract 的一些基本情况。这个模型就很大了，<b>671B</b>，这也是后面非常出名的 R1 的基座模型。比 V2 还大了差不多接近 3 倍——V2 只有 200 多 B。</p><p>它大部分东西就是 follow V2 了，也有一些不一样的地方。比如 DeepSeekMoE 那套策略——很多专家——以及 MLA，其实都是沿用 DeepSeek-V2。但它的规模很大：<b>671B，训了 14.8 万亿 token</b>（DeepSeek-V2 好像只有 8.1 万亿），最后用了 <b>278.8 万 H800 GPU 小时</b>。他们在这里说了他们的钱，这也很引发大家关注，因为大家觉得它成本很低。</p></div></div><div class="turn cont" data-t="6102"><button class="ts" data-seek="6102" title="跳到 01:41:42">01:41:42</button><div class="td"><p>最后还有一个很 impressive 的地方，他们专门在摘要里写了这句话：<b>整个训练过程非常稳定，没有经历任何 loss spike，也没有做过任何 rollback。</b></p><p>简单解释一下：你训着训着，loss 突然出现一个尖峰、突然变得很大，这就是训练不正常。这在过去的预训练里是非常非常常见的——机器出现故障，或者因为什么不可知的原因 loss 又 spike 了，你就要停下来 rollback，重新训。但他们说他们的训练很稳定，整个一次就训完了。</p><p>这其实是很了不起的，背后肯定有他们很好的工程优化和工程团队。所以 <b>DeepSeek-V3 有大量篇幅在写他们的工程</b>，这跟之前的论文风格不一样，之前没有那么大篇幅写这个事情。我觉得这也相当于秀一下肌肉——大家发现 DeepSeek 的 Infra 做得特别特别好。</p><h4 class="h4">五百多万美元</h4></div></div><div class="turn cont" data-t="6170"><button class="ts" data-seek="6170" title="跳到 01:42:50">01:42:50</button><div class="td"><p>这篇论文比较受关注的是 Table 1：它花了多少钱。</p><p>DeepSeek-V3 只用了 <b>2048 张 H800</b>。2048 张 H800 其实并不多，特别是对于一个 600 多 B 的模型。大家今天也知道，不管国内国外，超过上万张卡的公司都有好多家，国外可能都是数十万甚至更多张 H100 甚至更好的卡；国内肯定也有不少大厂的卡远远多于这个数字。</p><p>DeepSeek 早期的时候，5000 张、1 万张 A100 在国内还算体量很大，但到后来跟很多公司比起来，DeepSeek 的卡我觉得并不算很多。</p><p>这篇论文他们也开诚布公地讲了：<b>2048 张 H800 训的，最后等价的价格是 5.576 million US dollars——500 多万美金。</b></p></div></div><div class="turn cont" data-t="6238"><button class="ts" data-seek="6238" title="跳到 01:43:58">01:43:58</button><div class="td"><p>这在当时是很让人震惊的。我记得大家对比过 Llama 3.1 的 405B 模型，训练应该花了 3000 万美金——差不多有 6 倍的差距，而且可能还不止 3000 万美金，应该不止。</p><p>这就让人很震惊，后来也开始引起美国很多公司的关注：大家发现它训练成本为什么这么低，而这个 V3 模型又很强。</p><p>我觉得也是从 V3 开始，真的越来越多的人开始 seriously 关注 DeepSeekMoE 和 DeepSeek-V2 里那些他们自己 invent 的技术——比如 DeepSeekMoE 开始尝试搞很多专家，比如 DeepSeek-V2 发明的 MLA 多头隐式注意力机制。在那个时候，特别是对国外的开发人员、主要的大模型团队来说，这些可能并没有那么主流。V3 出来之后，大家发现这个 V3 很强、成本又很低，就开始好奇怎么做的，才会 trace back 到 DeepSeek 之前的一些论文。</p><p>但从今天讲的这些论文来看，大家也看得出来：<b>过去这一年他们是一步一步走到 V3 的，并不是突然出来的。</b>V3 其实就是 V2 直接的一个 scale up。</p><h4 class="h4">不一样的地方之一：无辅助损失的负载均衡</h4></div></div><div class="turn cont" data-t="6338"><button class="ts" data-seek="6338" title="跳到 01:45:38">01:45:38</button><div class="td"><p>他们的架构图画得跟 V2 一样：上面是多专家、专家很多、还有 shared 专家；下面是他们自己的 latent 隐式注意力。这些跟刚刚是一样的。</p><p>说一点不一样的。他们在搞 balance 的时候——刚刚提到多个 GPU、多个专家之间要平衡——之前大家平衡一般都是搞一个新的 loss、一个新的目标函数，训练的时候一起训来做平衡。而他这里搞了一个他们叫 <b>loss-free 的 balance</b>（无辅助损失的负载均衡）：</p><p>他会给每个专家搞一个常数（偏置项），监控这个专家到底被使用了多少次；如果使用得很频繁，就去改这个常数，让未来大家少使用这个专家一点。类似于这种非常符合直觉的 heuristic 方式，就不需要显式地拿一个损失去训。这个比较简单，是一个比较小的地方。</p><h4 class="h4">不一样的地方之二：多 token 预测（MTP）</h4></div></div><div class="turn cont" data-t="6404"><button class="ts" data-seek="6404" title="跳到 01:46:44">01:46:44</button><div class="td"><p>比较主要的地方是 <b>multi-token prediction（MTP，多 token 预测）</b>。这也是被大家讨论比较多的，这是第一次在 DeepSeek 出现。</p><p>这个东西不是 DeepSeek-V3 自己提出来的，来源于另一篇论文——大家看到那也是一篇很新的论文。它提出了一个 multi-token prediction 的 loss。</p><p>这个 loss 干什么呢？大家知道 language model 就是预测下一个词。但训练的时候我不止预测下一个词，我<b>一次预测下面三个词或者更多的词</b>，把这个作为训练目标：我给这个 context，同时希望它预测下面三个词。</p></div></div><div class="turn cont" data-t="6452"><button class="ts" data-seek="6452" title="跳到 01:47:32">01:47:32</button><div class="td"><p>这样有一个很直观的好处：<b>你的训练信号更 dense、更密集</b>。或者说你给了它一个新任务——它本来只需要预测一个词，现在不光预测第一个，还要预测后面两个——那模型可能就会学到怎么样更好地预测更远的地方。论文里也提到，模型可能会在内部提前 plan 好，怎么样更好地预测未来更多的 token。</p><p>这听起来也很直觉，但<b>这个东西的尝试我觉得依然是一个很勇敢的行为</b>。因为它虽然被那篇论文提出来，但其实没有人真的在很大规模上用过——那篇论文可能只是在不太大的规模上验证了一下，发现还不错。你要真的在这么大的规模上去用一个新东西，我觉得还是有风险的。或者说我觉得一般的团队可能也不太有这个氛围去做这件事，因为你说不定弄这个东西就让训练不稳定，或者出现很多 unexpected issue，整个东西就变了。</p></div></div><div class="turn" data-t="6519"><button class="ts" data-seek="6519" title="跳到 01:48:39">01:48:39</button><div class="td"><span class="who host">张小珺</span><p>因为他引用的这篇论文也不是一个特别有名的论文，对吧？</p></div></div><div class="turn" data-t="6524"><button class="ts" data-seek="6524" title="跳到 01:48:44">01:48:44</button><div class="td"><span class="who">何俊贤</span><p>对，也不是特别有名，就是一个正常的、还不错的论文，可能不是那种特别特别有名的。但这个技术并没有人真的在这么大规模上用过。</p><p>包括 DeepSeek 自己，V2 也没用过——他完全可以 follow V2，照着做 V3。他为什么还要搞一个新的东西？我觉得这又是 DeepSeek 很 unique 的地方：明明发了 V2，成本也很低，把它 scale up 就好，MLA 也是 V2 做出来的，为什么这里又要搞一个新的东西加进去？</p><p>我觉得这也是 DeepSeek 自己文化的一些体现：<b>他不停地希望去尝试新的东西，也很勇敢地这样尝试</b>——觉得有可能会 work，就真的去把它做进去。他们从一开始就有这个氛围，这也是我为什么觉得他们很好、很 respect 他们的一个地方。</p><h4 class="h4">MTP 的副产品：投机解码</h4></div></div><div class="turn cont" data-t="6598"><button class="ts" data-seek="6598" title="跳到 01:49:58">01:49:58</button><div class="td"><p>他们最后做了 ablation，incorporate 这个东西确实会让效果变好。</p><p>这个 MTP 还有一个好处：因为训练的时候就可以一次预测多个 token，那意味着这个模型训完之后天然就可以一次预测多个 token——<b>它不需要一个 token 一个 token 地预测，可以一次性把后面三个 token 全部预测出来。</b></p><p>在这篇论文里，主要体现的还是「这样训了之后效果会更好」。因为你这样训了之后，实际做推理、做部署时，你还是可以选择一个 token 一个 token 地做——它一次可以预测三个，但后面两个你也可以不要，还是跟以前一样一次预测一个。</p><p>但这个技术给了他们一种选择：<b>我可以选择一次预测多个</b>。论文里就说了：we can repurpose these MTP modules for speculative decoding to further improve generation latency。</p><p>Speculative Decoding（投机解码）就相当于我这个模型可以一次往后猜 5 个 token，然后另一个模型来选择拒绝或者接受这 5 个 token。这是一个很 unique 的东西。因为 language model 之所以部署比较慢、预测比较慢，就是因为它是 <b>autoregressive（自回归）</b>的：你必须要一个 token 出来之后，才能出下一个 token，不能一起出来——这是它的 nature 决定的。而 MTP 意味着这个模型未来三个 token 可以一起出来，不需要先出第一个再出第二个。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 686" width="1240" height="686" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:14.5px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .lbl{font-size:11px;fill:#14161A;font-weight:650}
+  .tok{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;fill:#14161A}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;fill:#4E5560}
+  .cTeal{fill:#0F766E}.cAmber{fill:#B45309}
+</style>
+<defs>
+  <marker id="ep91-mtp-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-mtp-at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="686" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">MTP：一个位置，同时押三步</text>
+<text class="sm" x="0" y="43">同样的一批数据，训练信号密了三倍；而模型一旦学会一次押多步，推理时就能一次吐多个 token。DeepSeek-V3, 2024-12, Figure 3</text>
+
+<!-- ═══ 左：普通 ═══ -->
+<rect class="panel" x="0" y="70" width="560" height="332" rx="10"/>
+<text class="ph" x="22" y="100">普通的 next-token prediction</text>
+<text class="xs" x="22" y="119">每个位置只有一个监督信号</text>
+
+<g transform="translate(22,136)">
+  <text class="num" x="0" y="12">输入</text>
+  <rect class="soft" x="0" y="20" width="66" height="28" rx="5"/><text class="tok" x="33" y="39" text-anchor="middle">强化</text>
+  <rect class="soft" x="72" y="20" width="66" height="28" rx="5"/><text class="tok" x="105" y="39" text-anchor="middle">学习</text>
+  <rect class="soft" x="144" y="20" width="66" height="28" rx="5"/><text class="tok" x="177" y="39" text-anchor="middle">的</text>
+  <rect class="soft" x="216" y="20" width="66" height="28" rx="5"/><text class="tok" x="249" y="39" text-anchor="middle">奖励</text>
+
+  <path class="ink" d="M249 48 L249 76" marker-end="url(#ep91-mtp-a)"/>
+  <rect class="box" x="180" y="78" width="138" height="26" rx="5"/>
+  <text class="lbl" x="249" y="96" text-anchor="middle">主干 Transformer</text>
+  <path class="ink" d="M249 104 L249 132" marker-end="url(#ep91-mtp-a)"/>
+
+  <rect class="acc" x="216" y="134" width="66" height="28" rx="5"/>
+  <text class="tok" x="249" y="153" text-anchor="middle">来自</text>
+  <text class="num" x="292" y="153">← 唯一要预测的词</text>
+  <text class="num" x="249" y="180" text-anchor="middle">t+1</text>
+</g>
+
+<rect class="soft" x="22" y="352" width="516" height="30" rx="6"/>
+<text class="xs" x="36" y="372">一条序列有多少个位置，就有多少个训练信号 —— 一比一。</text>
+
+<!-- 箭头 -->
+<path class="ink" d="M574 236 L606 236" stroke="#0F766E" stroke-width="2" marker-end="url(#ep91-mtp-at)"/>
+
+<!-- ═══ 右：MTP ═══ -->
+<rect class="panel" x="620" y="70" width="560" height="332" rx="10" stroke="#0F766E" stroke-width="1.8"/>
+<text class="ph" x="642" y="100">MTP　multi-token prediction</text>
+<text class="xs" x="642" y="119">同一个位置，串起几个小模块，各押后面一步</text>
+
+<g transform="translate(642,136)">
+  <text class="num" x="0" y="12">输入</text>
+  <rect class="soft" x="0" y="20" width="66" height="28" rx="5"/><text class="tok" x="33" y="39" text-anchor="middle">强化</text>
+  <rect class="soft" x="72" y="20" width="66" height="28" rx="5"/><text class="tok" x="105" y="39" text-anchor="middle">学习</text>
+  <rect class="soft" x="144" y="20" width="66" height="28" rx="5"/><text class="tok" x="177" y="39" text-anchor="middle">的</text>
+  <rect class="soft" x="216" y="20" width="66" height="28" rx="5"/><text class="tok" x="249" y="39" text-anchor="middle">奖励</text>
+
+  <path class="ink" d="M249 48 L249 66" marker-end="url(#ep91-mtp-a)"/>
+  <rect class="box" x="180" y="68" width="138" height="26" rx="5"/>
+  <text class="lbl" x="249" y="86" text-anchor="middle">主干 Transformer</text>
+
+  <path class="thin" d="M249 94 L249 104 M60 104 L438 104 M60 104 L60 112 M249 104 L249 112 M438 104 L438 112"/>
+  <rect class="box" x="8" y="112" width="104" height="24" rx="5"/><text class="num" x="60" y="128" text-anchor="middle">主输出头</text>
+  <rect class="acc" x="197" y="112" width="104" height="24" rx="5"/><text class="num" x="249" y="128" text-anchor="middle">MTP 模块 1</text>
+  <rect class="acc" x="386" y="112" width="104" height="24" rx="5"/><text class="num" x="438" y="128" text-anchor="middle">MTP 模块 2</text>
+
+  <path class="ink" d="M60 136 L60 152" marker-end="url(#ep91-mtp-a)"/>
+  <path class="ink" d="M249 136 L249 152" marker-end="url(#ep91-mtp-at)" stroke="#0F766E"/>
+  <path class="ink" d="M438 136 L438 152" marker-end="url(#ep91-mtp-at)" stroke="#0F766E"/>
+  <rect class="soft" x="27" y="154" width="66" height="28" rx="5"/><text class="tok" x="60" y="173" text-anchor="middle">来自</text>
+  <rect class="acc"  x="216" y="154" width="66" height="28" rx="5"/><text class="tok" x="249" y="173" text-anchor="middle">规则</text>
+  <rect class="acc"  x="405" y="154" width="66" height="28" rx="5"/><text class="tok" x="438" y="173" text-anchor="middle">而不是</text>
+  <text class="num" x="60" y="200" text-anchor="middle">t+1</text>
+  <text class="num" x="249" y="200" text-anchor="middle">t+2</text>
+  <text class="num" x="438" y="200" text-anchor="middle">t+3</text>
+</g>
+
+<rect class="acc" x="642" y="352" width="516" height="30" rx="6"/>
+<text class="xs" x="656" y="372" fill="#0F766E">同一个位置给出 3 个信号 —— 模型被逼着在内部提前 plan 好后面几步。</text>
+
+<!-- ═══ 底部：副产品 ═══ -->
+<rect class="soft" x="0" y="428" width="1180" height="152" rx="10"/>
+<text class="ph" x="24" y="456">副产品：推理时可以一次吐多个 token</text>
+<text class="sm" x="24" y="482">语言模型部署慢，是因为它是自回归的 —— 必须等第一个 token 出来，才能算第二个。而训过 MTP 的模型天然</text>
+<text class="sm" x="24" y="502">能一次给出后面几个候选，交给投机解码（speculative decoding）去批量接受或拒绝。</text>
+
+<g transform="translate(24,518)">
+  <rect class="box" x="0" y="0" width="700" height="46" rx="6"/>
+  <text class="num" x="16" y="20">论文原话</text>
+  <text class="xs" x="16" y="38" style="font-style:italic">we can repurpose these MTP modules for speculative decoding to further improve generation latency</text>
+</g>
+<g transform="translate(752,518)">
+  <rect class="warm" x="0" y="0" width="404" height="46" rx="6"/>
+  <text class="num" x="16" y="20" fill="#B45309">讲者的判断</text>
+  <text class="xs" x="16" y="38">这篇论文不是 DeepSeek 发的，之前没人在这个量级用过。</text>
+</g>
+</svg>
+<figcaption>MTP：一个位置同时押三步，训练信号密了三倍<span class="fcite">图：重绘自 DeepSeek-V3 Figure 3</span></figcaption></figure></div></div><div class="turn" data-t="6719"><button class="ts" data-seek="6719" title="跳到 01:51:59">01:51:59</button><div class="td"><span class="who host">张小珺</span><p>这是不是让我们在用 DeepSeek 产品的时候，它输出得比其他产品更长更快？是因为这个吗？</p></div></div><div class="turn" data-t="6726"><button class="ts" data-seek="6726" title="跳到 01:52:06">01:52:06</button><div class="td"><span class="who">何俊贤</span><p>他们具体部署到底有没有真的这样做，我不是很清楚。但是 V3 让他们<b>可以</b>这样做。因为虽然有这个可能，你还是需要严谨的 study 去研究这种方式是不是会影响它的效果。</p><h4 class="h4">FP8：第一次有人在这个规模上把低精度训练做成</h4></div></div><div class="turn cont" data-t="6748"><button class="ts" data-seek="6748" title="跳到 01:52:28">01:52:28</button><div class="td"><p>说一下它的算力：<b>2048 张卡，而且是 H800，不是 H100。</b>说实话，V3 用的算力 2000 张卡，这个规模对于这个模型 scale 来说并不大，而且他们能用的卡也不是那种最好的卡。但他们做了非常非常极致的工程优化，来让训练很快、成本很低。</p><p>所以从第 3.2 节开始，他们就开始写他们的 Infra。这个我不细讲，也不是我的专业领域，而且比较深入，讲的是具体的工程实现。而且写了好几页——之前的论文他们也不会写这些。</p><p>这里说一个比较特别的东西：他们用了 <b>FP8 training</b>，就是低精度训练。我在 training 的时候，很多中间的向量都不用 32 位精度的浮点数或者 16 位去表示，用更小的。这显然会让整个训练变得很快、很 efficient。</p><p>但这里有一个问题：这样做其实有很大的 challenge——<b>你的训练可能就不 work 了</b>，比如训练不稳定，或者效果没有以前好，因为所有小数的表示都没有以前精确了。</p><p>所以他们写了这样一句话：虽然之前部署的时候很多人做这种量化、做低精度来让部署变快，但<b>几乎没有人在真的大规模训练上比较成功地做过这件事</b>。相当于 DeepSeek-V3 至少是公开的里面，非常可能是第一个、或者说最早的之一，真的在大规模 language model 训练上验证并且成功做了混合精度训练。</p></div></div><div class="turn cont" data-t="6874"><button class="ts" data-seek="6874" title="跳到 01:54:34">01:54:34</button><div class="td"><p>这个对成本降低有很大的好处。虽然这不是所谓算法上的创新，但我觉得也是一个很 novel 的东西。V3 这篇论文里，从 multi-token prediction 到 FP8 训练，其实他们依然在勇敢地做很多新的东西，来降低成本——说白了就是降本增效。</p><p>他们觉得这对于降低成本很重要，应该攻克，就真的付出了很大的努力。比如专门去讨论：在混合精度的情况下应该怎么样让训练稳定。他们说，虽然用 FP8，但 after careful investigation——他们做了很仔细的对照实验——发现有一些中间变量还是应该用原来的精度，这样训练才能行，不然训练就不行了。他们做了很精细的 study、很多的努力，最后真的做成功了，确实收获了很低的成本。</p><p>这又是一个很 unique 的地方，因为之前大家也不是这么干的。</p></div></div><div class="turn cont" data-t="6945"><button class="ts" data-seek="6945" title="跳到 01:55:45">01:55:45</button><div class="td"><p>他们这几页写了好多 Infra，包括通信、精度怎么解决。V3 这篇论文跟之前的论文真的不太一样，可能有十来页都在写这个。这是工程上的实现，今天就不细讲了。</p><h4 class="h4">专家数量：64 → 160 → 256</h4></div></div><div class="turn cont" data-t="6969"><button class="ts" data-seek="6969" title="跳到 01:56:09">01:56:09</button><div class="td"><p>看一下设置。他们的 MoE 每一层只有 <b>1 个 shared 专家和 256 个专有专家</b>。</p><p>这跟 V2 又不一样——V2 是 2 个 shared 专家和 160 个专有专家。因为模型变大了，专家数量变多也是显而易见的，但他们用了 256 个。所以大家可以看到，从 DeepSeekMoE 到 DeepSeek-V2 到 DeepSeek-V3，<b>他们一直坚持一开始的想法：我的专家数量要多。</b>这跟别人做的不一样。</p></div></div><div class="turn" data-t="7011"><button class="ts" data-seek="7011" title="跳到 01:56:51">01:56:51</button><div class="td"><span class="who host">张小珺</span><p>又回到了一个 shared expert。</p></div></div><div class="turn" data-t="7014"><button class="ts" data-seek="7014" title="跳到 01:56:54">01:56:54</button><div class="td"><span class="who">何俊贤</span><p>对，他们之前 V2 用的是两个 shared，可能觉得两个没必要，又用回一个。其他基本上跟 V2 一样，比如 long context extension 这些都是一样的。</p><h4 class="h4">跟 Llama 3.1 405B 比</h4></div></div><div class="turn cont" data-t="7030"><button class="ts" data-seek="7030" title="跳到 01:57:10">01:57:10</button><div class="td"><p>主要的结果在这里，跟 Llama 3.1 的 405B 比。大家可以看到 Llama 3 的模型是非常非常昂贵的。这里就可以看到技术路线的不一样：</p><p><b>DeepSeek 做 MoE 做得很早</b>——除了第一版那个大模型不是 MoE，其他全是 MoE，从 DeepSeekMoE 到 V2 到 V3 早就在做 MoE。但 Llama 从 Llama 1 做到 Llama 2 做到 Llama 3，而且 Llama 3 出这么大的 dense model——400B 的 dense model——依然还不是 MoE 的模式。</p><p>这就会造成 Llama 3 的训练成本特别高，激活参数特别多：它激活参数有 405B，而 DeepSeek-V3 的激活参数只有 37B。这什么概念？<b>意味着 DeepSeek-V3 的部署成本比 Llama 3 的 405B 模型要少 10 倍多。</b></p><p>而且效果上，DeepSeek 在英文上跟 Llama 3 各有千秋，在 reasoning——比如 code 和 math——上，包括中文上，其实都是大幅超过 Llama 3 的 405B base。</p><p>再比如当时的通义千问 2.5 72B base，也是一个很好的模型，现在也是大家用得最多的模型之一，但它也是 dense model。DeepSeek 一直坚持做 MoE 模型，部署成本其实很低，作为他自己去部署这个产品来说是有优势的。</p></div></div><div class="turn cont" data-t="7130"><button class="ts" data-seek="7130" title="跳到 01:58:50">01:58:50</button><div class="td"><p>结果很好，训练只花了 500 万美金，部署成本又低，所以我觉得这是 V3 在当时引起了很大反响的原因。</p></div></div><div class="turn cont" data-t="7140"><button class="ts" data-seek="7140" title="跳到 01:59:00">01:59:00</button><div class="td"><p>当然这里也有一些看起来很像学术界写论文会做的事情：我 design 一个东西，要去验证它是不是真的有用。他们就做了 ablation——也不算小规模，后面那个 MoE 也有 200 多 B 了——验证了加多 token 预测和不加，发现加了确实要好一些，说明 MTP 是有用的。</p><p>我相信 DeepSeek 自己用这个的时候，肯定也是在小规模上先验证了一下，做了这样的表、发现确实有用，才敢把这个东西用到最后那个大模型上面。但我觉得这也是一种创新，因为<b>他们也是第一个真的把这个东西用到大规模训练上面去的 team</b>。</p><h4 class="h4">后训练做得很浅，但 R1 已经在内部了</h4></div></div><div class="turn cont" data-t="7191"><button class="ts" data-seek="7191" title="跳到 01:59:51">01:59:51</button><div class="td"><p>DeepSeek-V3 我最后想说的是它的后训练。刚刚讲基座我主要着重在讲基座，没有太讲后训练，因为后训练可能没有太多值得讲的。但 V3 值得讲一下。</p><p><b>他们其实没有做很多的后训练。</b>比如他们的 SFT 只做了 150 万条，这个数据量非常小——对于这个 scale 来说是非常小的。我记得像 Llama 3 后训练 SFT 都是 1000 万还是 2000 万。但 V3 的 SFT 只用了 150 万条，这个数据量对于 600B 的模型来说是很小的。</p><p>比较有意思的是，他们的 <b>reasoning data 用 DeepSeek-R1 去蒸馏</b>——但这个时候 R1 那篇论文还没有出来，相当于是 internal 的 R1，蒸馏了一下。</p><p>这个事情也很神奇：<b>他们是基于 DeepSeek-V3 的基座 develop 了 R1，R1 反过来又蒸馏，帮着 develop 出 DeepSeek-V3 的 chat 版本。</b>差不多是这个逻辑。</p></div></div><div class="turn" data-t="7260"><button class="ts" data-seek="7260" title="跳到 02:01:00">02:01:00</button><div class="td"><span class="who host">张小珺</span><p>R1 那个时候在内部就已经有了。</p></div></div><div class="turn" data-t="7263"><button class="ts" data-seek="7263" title="跳到 02:01:03">02:01:03</button><div class="td"><span class="who">何俊贤</span><p>那个时候已经有了，只是论文还没出来。</p></div></div><div class="turn cont" data-t="7266"><button class="ts" data-seek="7266" title="跳到 02:01:06">02:01:06</button><div class="td"><p>后面的 non-reasoning data 是用 2.5 生成的。这里的 2.5 大家可以认为就是刚刚讲的 DeepSeek-V2——DeepSeek-V2.5 跟 V2 几乎一模一样，可能在 data 或者一些方面训得更多、做了一些优化，2.5 会比 2 要好一些。他们用 2.5 做了蒸馏，生成那些数据。</p><h4 class="h4">从这里开始，奖励模型被规则替换掉了</h4></div></div><div class="turn cont" data-t="7291"><button class="ts" data-seek="7291" title="跳到 02:01:31">02:01:31</button><div class="td"><p>当然还做了强化学习。这里的强化学习也有一些值得说的，因为我等会会讲 reasoning，大家可以看出区别。</p><p>这就是我们今天一开始说到的所谓<b>基于规则的奖励</b>。在 V3 他们做的时候就发现：对于数学和 coding 这种<b>可 verify 的问题</b>，他们就用规则去给 feedback——规则就是你做没做对——<b>没有奖励模型</b>；奖励模型只用在那种开放式问答上。</p><p>这跟 DeepSeek 之前是不一样的。DeepSeek 之前——等会大家会看到很多论文——都不是规则的奖励过程，都是用 model-based reward model。但从这个时候开始，他就已经抛弃了这个，开始用规则。当然这个时候因为 R1 也出来了，可能他们已经发现用规则的才是更好的。所以 V3 其实也就是在用规则，加上 GRPO——GRPO 等会儿会单独讲，那是 reasoning 的问题。</p></div></div><div class="turn cont" data-t="7368"><button class="ts" data-seek="7368" title="跳到 02:02:48">02:02:48</button><div class="td"><p>这里我想说明一下：刚刚我说的那个表是 base model，而这个是最后所谓部署的这个产品。他们蒸馏了 R1，蒸完之后确实变好了。</p></div></div><div class="turn cont" data-t="7389"><button class="ts" data-seek="7389" title="跳到 02:03:09">02:03:09</button><div class="td"><p>DeepSeek-V3 差不多讲到这里。最后我想说的一点是：我对 DeepSeek 的感觉是，他们写这些论文、包括写 post-training，其实没有做太多针对刷榜的事情——<b>他们的 post-training 其实做得很浅</b>：SFT data 也少，然后做 RL。</p><p>相比之下，我知道很多公开的论文也好，国内很多公司、包括国外很多公司做大模型，其实对刷榜是很执着的。就像 DeepSeek 最早的第一篇论文就开始揭露刷榜这个行为、以及怎么刷这件事情，但到今天为止，很多人还是会刻意优化榜单的数据，甚至加到基座模型里面去，来让基座模型的分数看起来尽可能高。</p><p>但 DeepSeek-V3 据我所知这方面做得没有那么极端。当然这个也不是很好说，我也不是百分百知道，但至少从论文的态度上看起来，好像对这方面并不是很执着。我觉得这可能也跟他们短期没有那么在乎这个产品的使用有关系——当然 R1 到现在大家用得很多了，R1 是另外一个东西。</p></div></div><div class="turn cont" data-t="7492"><button class="ts" data-seek="7492" title="跳到 02:04:52">02:04:52</button><div class="td"><p>这就是 DeepSeek-V3，也是我今天要分享的第一部分。接下来大概一个小时，我讲一下 reasoning。</p><p>第一部分就是从基座——从第一个大模型到 MoE 到 V2 到 V3——这是 DeepSeek 整个基座的发展路线。</p></div></div><div class="part" id="p7">第二部分　推理模型</div><h2 class="sec" id="s7">七、DeepSeek-Coder：国外最先认识的那个 DeepSeek</h2><div class="turn" data-t="7516"><button class="ts" data-seek="7516" title="跳到 02:05:16">02:05:16</button><div class="td"><span class="who">何俊贤</span><p>R1 最近很受关注。DeepSeek 其实有另外一条很重要的线，是 focus 在 reasoning 上面，也是从很早的时候就开始了，到最近 R1 出来之后引起大家很多关注。</p></div></div><div class="turn cont" data-t="7544"><button class="ts" data-seek="7544" title="跳到 02:05:44">02:05:44</button><div class="td"><p>最早的 reasoning 是 2024 年初，也是 2024 年 1 月份——<b>DeepSeek-Coder</b>。</p><p>DeepSeek-Coder 是一个专门做代码的模型。这个很常见，像 Mistral、Llama、包括千问，其实都有 code 的版本；基本上大家做大模型的都会有 code 版本，因为 coding 模型可以帮大家写代码，本身是一个很有用的专有模型。<b>而 coding 也是 reasoning 的一部分。</b>所以这是我觉得最早的 DeepSeek 开始弄 coding 的东西。</p><p>DeepSeek-Coder 本身没有太多需要讲的。第一版是一个<b>稠密模型</b>，基本上跟 DeepSeek 第一版那个大模型一模一样，跟 Llama 2 差不多，只不过训练数据是代码数据，不是纯文本。1.3B 到 33B 全部开源。</p><p>后面还有一个 <b>DeepSeek-Coder V1.5</b>。V1.5 的区别是 <b>continue pre-training（继续预训练）</b>：他们拿之前那个通用基座 DeepSeek LLM 7B，在那个基础上继续训 2T token 的代码。这就叫 continue pre-training；而普通的 pre-training 是 from scratch，我从头 train 一个 code 模型。这就是两者的区别。</p><p>从头 train 的那个叫 DeepSeek-Coder；continue pre-training 的那个是从他自己第一版的基座上继续拿 2T 走——也不是纯代码，下面有一个表，这 2T 里 70% 是代码，还有一些其他的比例。这样做出来叫 V1.5。这两版都开源了。</p><h4 class="h4">为什么国外先记住的是 Coder</h4></div></div><div class="turn cont" data-t="7672"><button class="ts" data-seek="7672" title="跳到 02:07:52">02:07:52</button><div class="td"><p>这篇本身其实没有太多可讲的，但 <b>DeepSeek-Coder 是 DeepSeek 一个很重要的系列</b>——我觉得 DeepSeek 早期在国外有知名度，很大程度上是源于这个 Coder 模型。</p><p>因为 DeepSeek LLM 那个 dense model 有很多平替：它跟 Llama 2 差不多，还有很多中文，但国外大家不是很 care 中文；英文也有很多平替，比如 Mistral 也做得很好。所以 DeepSeek 那个普通的英文模型并没有真的被广泛使用。</p><p>而 DeepSeekMoE、V2 又搞得很大——V2 一上来就是 200B，V3 又是 600B。V2 虽然我们刚刚看论文说效果很好、激活参数低、部署成本很低，但<b>200B 的模型一般人是部署不动的</b>：你需要很好的 Infra 才能把这个 200B 模型搞过来；开发者要做自己的训练，200B 模型很难搞得动。所以大家还是倾向于用 7B、10B 左右的模型。</p><p>但 DeepSeek 从第一版之后就没有 7B、10B 这个 scale 的模型了。所以后面的 DeepSeek-V2 虽然做得很好，实际上并没有很多开发者去用，因为模型太大了。</p><p>而 DeepSeek-Coder 有从 1 点几 B 一直到 33B 的各种规模，效果也很好，所以一直被用得很多。我之前一直感觉，特别是国外的人对 DeepSeek 的感觉就是：<b>DeepSeek-Coder 很强，代码模型做得很好</b>，但其他的可能大家没有太多感觉。</p></div></div><div class="turn" data-t="7785"><button class="ts" data-seek="7785" title="跳到 02:09:45">02:09:45</button><div class="td"><span class="who host">张小珺</span><p>我问你个问题。这个时候他就已经开始做 reasoning 了——这是 2024 年初，但国内对 reasoning 讨论比较多的时候已经到了 2024 年 Q3。那时候做 reasoning 是一件比较 unique 的事情吗？还是大家其实都在同一条线上做这件事？</p></div></div><div class="turn" data-t="7803"><button class="ts" data-seek="7803" title="跳到 02:10:03">02:10:03</button><div class="td"><span class="who">何俊贤</span><p>我觉得那个时候没有很 unique。</p><p>我看一下时间线：那个时候已经有 <b>CodeLlama</b> 了，Llama 2 已经有官方的 code 模型；开源社区已经有 <b>StarCoder</b>；国内也有一些开始做专有的 coding 模型。我觉得在当时不是很稀奇。但 DeepSeek-Coder 效果确实做得比较好，所以大家用得也很多。</p></div></div><div class="turn" data-t="7838"><button class="ts" data-seek="7838" title="跳到 02:10:38">02:10:38</button><div class="td"><span class="who host">张小珺</span><p>大模型在 coding 领域能运用得比较好，是因为 coding 相对来说比较容易设置规则，所以这是大模型落地的一个非常早期的领域，是这个逻辑吗？</p></div></div><div class="turn" data-t="7850"><button class="ts" data-seek="7850" title="跳到 02:10:50">02:10:50</button><div class="td"><span class="who">何俊贤</span><p>我觉得那个时候主要是大家觉得 coding 可以帮助开发人员。</p><p>coding 跟 math 不一样：你如果做一个数学模型，它可能只能帮很少的人做题——比如帮中小学生做作业——这不是一个非常广泛的需求。而 coding model 大家觉得应用更广，因为它可以帮助各种各样的程序员、开发人员写代码。</p><p>而且我觉得 <b>coding 是早期大模型真正落地、提高生产力的一个很典型的应用</b>。现在很多程序员写代码的时候都已经离不开大模型的辅助了。而在那个时候，chat model 更多时候还只是聊聊天，可能并没有真的落到实际的东西上去。</p></div></div><div class="turn" data-t="7906"><button class="ts" data-seek="7906" title="跳到 02:11:46">02:11:46</button><div class="td"><span class="who host">张小珺</span><p>对工作效率没有提升。</p></div></div><div class="turn" data-t="7907"><button class="ts" data-seek="7907" title="跳到 02:11:47">02:11:47</button><div class="td"><span class="who">何俊贤</span><p>对，它可能只是好玩、聊聊天，像最早的 ChatGPT 就是这样。但 coding 模型我觉得一直很受关注，包括到今天也是。</p><p>而且当时还有一个说法：<b>用很多代码数据训练，对于提高模型比较通用的 reasoning 能力也会有很多帮助。</b></p></div></div><h2 class="sec" id="s8">八、DeepSeek-Coder-V2：那时候还离不开奖励模型</h2><div class="turn cont" data-t="7931"><button class="ts" data-seek="7931" title="跳到 02:12:11">02:12:11</button><div class="td"><p>沿着讲，这两篇我不会讲很多。接下来是 <b>DeepSeek-Coder-V2</b>。</p><p>刚刚说的是 V1、V1.5，这个是 V2。V2 就开始 MoE 了——这也很正常，因为它是基于 DeepSeek 自己的模型。他们这里说了：DeepSeek-Coder-V2 is further pre-trained ——<b>从 DeepSeek-V2 那个通用 MoE 模型的中间 checkpoint 继续训了 6T token</b> 做出来的 coder。所以可以认为 DeepSeek-Coder-V2 基本上就是用的 DeepSeek-V2 当基座，它就是一个 MoE 模型了。这也很理所当然。</p><h4 class="h4">唯一想讲的：这时候他们还在训奖励模型</h4></div></div><div class="turn cont" data-t="7985"><button class="ts" data-seek="7985" title="跳到 02:13:05">02:13:05</button><div class="td"><p>这里唯一一个我想讲的东西是 <b>reward model</b>。因为等会要讲到 R1，包括刚刚讲的规则的 reward。</p><p>大家可以看到，DeepSeek 在这个时候做 coding 的时候，<b>依然还是要用 reward model 的</b>。</p><p>比如他这里会说：reward model 很重要。虽然我们有 ground truth、code 有 0/1 的 feedback——就是规则——但他们会觉得，有一些 code prompt 的 unit test 不够，这个 0/1 不太准、太 noisy 了，所以 we still decide to train a reward model on the data。</p></div></div><div class="turn" data-t="8032"><button class="ts" data-seek="8032" title="跳到 02:13:52">02:13:52</button><div class="td"><span class="who host">张小珺</span><p>但这是一条弯路。</p></div></div><div class="turn" data-t="8038"><button class="ts" data-seek="8038" title="跳到 02:13:58">02:13:58</button><div class="td"><span class="who">何俊贤</span><p>对。但在这个时候，整个 community 都是这么在做的，大家都是这么做。那时候 DeepSeek 做 coding 还是在做这个，而且他们还做了对照实验，发现确实这样做更好。</p></div></div><div class="turn cont" data-t="8043"><button class="ts" data-seek="8043" title="跳到 02:14:03">02:14:03</button><div class="td"><p>这个图：纵坐标可以认为是 performance，越高越好；横坐标是 training steps，从左往右就是训得越来越长。绿色的线是不做强化学习，就 SFT；蓝色的线是用规则，可以看到它好像不太稳定；而橙色的线是用了他们这个 reward model，发现很好。</p></div></div><div class="turn cont" data-t="8076"><button class="ts" data-seek="8076" title="跳到 02:14:36">02:14:36</button><div class="td"><p>但是，虽然这个实验看起来是橙色的线更好，我觉得这里主要有两个因素。</p><p>一个因素是像他们这里说的：<b>unit test 覆盖不全</b>。代码需要很多 test case 去测它对不对，你需要 cover 得很全；比如这段代码本来写错了，但你给的那个 test case 碰巧过了，你就认为它是对的。这种 feedback 就非常 noisy、不太准。我觉得这是导致他们这个图里「只用 rule 不太行」的一个原因。</p><p>但实际上这个不太准是有办法解决的——你可以想办法搞更多的 unit test，它可能就准了。只是他们没试过。</p><p>另外我觉得可能这个也没有做得特别 scale up。<b>当你 scale up 的时候，reward model 就会有自己的弊端</b>，这个等会会讲到。rule-based reward 是非常 robust 的：就算你 data 很多、就算 scale up，用这种规则形式它永远都是准的。但你如果用一个额外的模型，它可能就会有很多问题——data 多了之后，它对有些 data 效果好、有些 data 效果不好，那这个东西就不是很好。</p><p>所以在这篇论文里、或者说在当时整个 community，大家依然觉得要用 reward model。</p></div></div><h2 class="sec" id="s9">九、Math-Shepherd：不用人标，也能监督每一步</h2><div class="turn" data-t="8189"><button class="ts" data-seek="8189" title="跳到 02:16:29">02:16:29</button><div class="td"><span class="who">何俊贤</span><p>接下来要讲 math 这条线，有几篇很重要的论文。一篇是 <b>Math-Shepherd</b>。</p><p>Math-Shepherd 这篇论文也是 DeepSeek 的，但并不太常被大家提到。我觉得就是因为它很像一个学术的小论文——不像刚刚说的那些论文，一上来就搞一个大模型然后开源，那些论文可能就很有名。</p></div></div><div class="turn" data-t="8212"><button class="ts" data-seek="8212" title="跳到 02:16:52">02:16:52</button><div class="td"><span class="who host">张小珺</span><p>为什么连着在 2024 年 1 月、2 月发这么多论文？</p></div></div><div class="turn" data-t="8217"><button class="ts" data-seek="8217" title="跳到 02:16:57">02:16:57</button><div class="td"><span class="who">何俊贤</span><p>这个应该是更早的，应该也是 24 年初。我也很难追溯这个时间线，这个时间线我可能也没有捋得特别清楚。</p><blockquote class="ed"><span class="ed-l">编者注</span><p>编者注：Math-Shepherd 的 arXiv v1 是 <b>2023 年 12 月 14 日</b>（arXiv:2312.08935），确实早于本节讲的其他几篇。</p></blockquote></div></div><div class="turn cont" data-t="8234"><button class="ts" data-seek="8234" title="跳到 02:17:14">02:17:14</button><div class="td"><p>这个工作更像是一个学术论文：它不是那种纯大模型出来、release 模型的工作，更像是学校做的论文，做一些对照实验，规模也没那么大。</p><p><b>但这篇论文很重要</b>，因为它是当时公开的第一篇 follow OpenAI 那篇论文的工作。OpenAI 当时发了一篇叫 <b>Let's Verify Step by Step</b>，我觉得那篇论文引导大家走上了 reward model 这条路。从 OpenAI 发了那篇之后，「基于过程监督的 reward model」就变得很火，很多人做。而 Math-Shepherd 是公开的第一篇——相当于<b>不用人类标注，把 OpenAI 那套流程复现了一遍</b>。</p><h4 class="h4">过程监督是什么</h4></div></div><div class="turn cont" data-t="8318"><button class="ts" data-seek="8318" title="跳到 02:18:38">02:18:38</button><div class="td"><p>OpenAI 那篇 Let's Verify Step by Step 的结论是：我们要用奖励模型，要用<b>过程监督</b>的奖励模型，对我 decoding 的时候有帮助。大家就很信这个。</p><p>先说一下过程监督是什么意思。数学有一个多步的推理过程，有很多步骤，大家希望有一个模型可以告诉我每一步对不对。这就是<b>过程监督</b>——比起<b>结果监督</b>：结果监督只监督最后结果对不对，而过程监督还希望监督每一步对不对。</p><p>但 OpenAI 是怎么做这件事的呢？<b>他是找人标的。</b>有一个很有名的数据集：OpenAI 找了一些真的是数学专业的人，花了大价钱，标了 80 万条数据，而且那个数据还开源了，到今天还是很多人在用——叫 <b>PRM800K</b>。有数学题，去标每一步对不对。标完之后，就可以训练一个模型来预测每一步对不对。</p><h4 class="h4">DeepSeek 的做法：让模型自己往下写完</h4></div></div><div class="turn cont" data-t="8390"><button class="ts" data-seek="8390" title="跳到 02:19:50">02:19:50</button><div class="td"><p>那 DeepSeek 做了什么事情呢？DeepSeek 说：<b>我不要人标，我要自动构建「这一步对不对」的 label</b>，然后来训一个基于过程监督的奖励模型。</p><p>intuitively 怎么理解呢？假设你这个数学解题步骤生成到了第二步，现在我要怎么知道第二步对不对？<b>我就让一个模型基于这个第二步往下继续写完</b>——第二步固定不动，你继续往后面写，模型不停地 sample，可以写出很多不同的 solution。</p><p>如果我发现这个第二步很多时候可以引导出正确答案，我就认为<b>第二步是对的</b>；如果基于第二步继续往后写，不管怎么写最后都是错的、得不到正确答案，我就认为<b>第二步是错的</b>。</p><p>大概就是这样一个 intuition。基于这个思路 design 出一个方法：通过让模型自己往后面完成，看最后结果对不对，来反过来推我这一步对不对。</p><p>这样就完全不需要人去标，就能构建出这样的数据集——对于数学解题过程，每一步可以知道对不对。接下来他们做的事情就跟 OpenAI 一样：有了这个数据集，就可以训练一个基于过程的奖励模型，判断每一步对不对。</p><p>跟 OpenAI 唯一不一样的地方就是：OpenAI 用人标，DeepSeek 没有用人标。而且 DeepSeek 后面还做了对照实验，发现<b>用人标和不用人标最后效果差不多</b>——用人标好像也没有好很多。</p><h4 class="h4">早期的 test-time scaling</h4></div></div><div class="turn cont" data-t="8505"><button class="ts" data-seek="8505" title="跳到 02:21:45">02:21:45</button><div class="td"><p>这个图是什么呢？横坐标是：我在部署的时候，每一个问题要 sample 多少个 solution。</p><p>reward model 有什么好处呢？你有一个奖励模型去判断它对不对，就可以从里面选：部署的时候我一次不生成一个，一次生成 64 个；奖励模型从里面挑它觉得最对的那个给用户，错的就不要了。这样准确率就会高。</p><p>但这里有一个问题：成本也变高了。你本来只需要生成一个，现在生成 64 个，还让一个奖励模型来选，生成成本就高了，就变得更昂贵。</p></div></div><div class="turn cont" data-t="8562"><button class="ts" data-seek="8562" title="跳到 02:22:42">02:22:42</button><div class="td"><p>这个图 OpenAI 是画过的。</p><ul><li><b>SC</b>（红色线）是 self-consistency：我没有奖励模型，自己生成 64 个，投票——64 个答案里有 32 个都是「1」、20 个是「2」，那我就认为最终答案是「1」。这就是 majority voting（多数投票）。</li><li><b>ORM</b> 是结果监督的奖励模型，不是过程监督。</li><li><b>Shepherd</b>（绿色线）就是他们这篇论文的方法——论文名字叫牧羊犬，Math-Shepherd——是过程监督模型。</li></ul><p>让这三种方法 sample 很多，就发现绿色的是最高的。</p></div></div><div class="turn cont" data-t="8602"><button class="ts" data-seek="8602" title="跳到 02:23:22">02:23:22</button><div class="td"><p>这个图很像什么呢？<b>这就是早期的 test-time scaling</b>：部署阶段 compute 增加，效果变好。这个图到今天大家觉得很常见，像 o1、R1 都会画这样的图——测试的时候算力增加，performance 越来越好。但在早期、在没有 long CoT（长思维链）的时候，早期的 test-time scaling 就是这个图。而且这篇论文非常早。</p></div></div><div class="turn cont" data-t="8637"><button class="ts" data-seek="8637" title="跳到 02:23:57">02:23:57</button><div class="td"><p>这篇论文在学界地位还不错，在这个方向上算是一个 milestone。因为 Math-Shepherd 这个方法、这个模型是开源的，所以后面很多学界的人做 research 都会直接用 DeepSeek 这个数学奖励模型——因为在那个时候，<b>这是唯一一个公开的、基于过程监督的数学奖励模型</b>。OpenAI 虽然也做了，但没有开源。</p><p>这个方法后面其实也有很多人在用，因为大家很多时候都没有让人标数据的成本，都是在用跟这篇论文类似的方法。</p></div></div><h2 class="sec" id="s10">十、DeepSeekMath：GRPO 从这里来</h2><div class="turn" data-t="8681"><button class="ts" data-seek="8681" title="跳到 02:24:41">02:24:41</button><div class="td"><span class="who">何俊贤</span><p>Math-Shepherd 之后，我想讲一篇更重要的论文，就是 <b>DeepSeekMath</b>。这个必须按顺序讲，因为 DeepSeekMath 用到了 Math-Shepherd 的东西。</p><p>这篇论文很重要，因为<b>著名的 GRPO 就是这篇论文提出来的</b>。</p><p>它可能也没有太被大家经常提到，因为它也不是那种标准的、像刚刚讲基座那样很大一个模型训完发表出来，这也是一个专有的 math 模型。</p><p>这个东西做得很简单：就是一个 7B 的模型，做 <b>continue pre-training</b>——在 DeepSeek-Coder-Base-v1.5 7B 上继续预训练 <b>1200 亿（120B）个 math token</b>，得到 DeepSeekMath 7B。而 DeepSeek-Coder-Base-v1.5 我们刚刚已经讲过了，就是在第一版 DeepSeek 大模型上面做 code continue pre-training 得到的模型。所以他是在那个模型上继续做 math continue pre-training，做得不多，只做了 120B，而且只做了 7B，没有做更大的模型。</p></div></div><div class="turn cont" data-t="8752"><button class="ts" data-seek="8752" title="跳到 02:25:52">02:25:52</button><div class="td"><p>当时有很多人在刷这种 math accuracy，DeepSeekMath 7B 在当时其实是 SOTA。<b>很长一段时间里，DeepSeekMath 7B 都是最好的开源数学基座模型</b>，在 7B 这个 scale 上。</p><p>训练策略没什么稀奇的：他们自己从互联网上找了 120B 的 token，做 continue pre-training。data 也很多，但没开源，主要开源的是模型。</p><p>Table 2 比较了模型效果，他们这个基座比之前的数学专业模型——比 Mistral，或者像 Llemma 之类的，甚至比 34B 的 Llemma——都要好不少。</p><p>这些都是常规操作。<b>这篇论文非常值得拿出来讲的，是他们发明的 GRPO</b>，也就是讲强化学习的那部分。</p><h4 class="h4">GRPO：把 value model 拿掉</h4></div></div><div class="turn cont" data-t="8832"><button class="ts" data-seek="8832" title="跳到 02:27:12">02:27:12</button><div class="td"><p>我们知道，从这篇论文开始，后面所有 DeepSeek 的 post-training 做强化学习——V2、V3 到 R1——其实全是用的 GRPO。而 GRPO 是从这篇论文出来的。</p><p>这又涉及到降本增效。</p><p><b>PPO 本身并没有什么问题。</b>PPO 是 OpenAI 最早弄的，作为一个经典的强化学习方法，它唯一的问题是 DeepSeek 觉得它成本太高、跑起来占的资源比较多。</p><p>intuitively 理解：PPO 的公式里有一个 A，是当前 sample 出来的数据的 <b>advantage（优势）</b>；而 advantage 的计算需要一个额外的 <b>value model</b>。</p><p>所以 PPO 里面有四个模型——这个图很清晰：</p><ul><li><b>policy model</b>：我在训的这个模型；</li><li><b>reward model</b>：奖励模型；</li><li><b>reference model</b>：用来算 KL penalty 的，这个不是很重要；</li><li><b>value model</b>。</li></ul><p>而且每一个模型都很大：reward model、value model 基本上都跟 policy model 一样大——policy model 如果是 100B，后面这些基本上也是 100B。训练的时候这些东西都要放到机器上，整个占的资源就很大，所以 <b>PPO 的训练比一般的 SFT 要昂贵不少</b>。</p></div></div><div class="turn cont" data-t="8949"><button class="ts" data-seek="8949" title="跳到 02:29:09">02:29:09</button><div class="td"><p>他们可能觉得这个东西太昂贵——这里又体现了 DeepSeek 非常想把成本压下去——所以又开始做降本增效的事情，搞了一个新东西叫 <b>GRPO</b>。</p><p><b>GRPO 就没有 value model 了。</b>没有 value model 它怎么算 advantage 呢？<b>它一次 sample 很多，每一个都打一个 reward，然后用它们的平均作为 baseline，去算每一个相对于这个 baseline 的 advantage。</b></p><p>high level 上就是：他把 value model 拿走了。拿走之后，GPU 上就少存了一个模型，而这个模型可能很大——比如是一个 100B 的模型。相当于训练的时候空出来的这些 memory 可以用来做其他事情，整个训练效率就更高。</p></div></div><div class="turn cont" data-t="8999"><button class="ts" data-seek="8999" title="跳到 02:29:59">02:29:59</button><div class="td"><p>GRPO 一直被他们沿用，包括到后面的 R1。到今天，GRPO 也被广泛实现在各种开源的 RL 框架里——因为 DeepSeek-R1 把它带火了。GRPO 提出来之后，包括后面做 V2、V3，其实用的人也不多，大家可能还是用 PPO 或者其他的比较多；但现在 R1 火了之后，用的人就开始变多了。而 DeepSeek 他们自己一直是在用这个。</p><p>他们的出发点也是为了降本增效，让训练瞬间变得更 efficient。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 660" width="1240" height="660" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .ink{fill:none;stroke:#14161A;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .dash{fill:none;stroke:#868D98;stroke-width:1.2;stroke-dasharray:4 4}
+  .box{fill:#fff;stroke:#14161A;stroke-width:1.3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.4}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.4}
+  .gone{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.2;stroke-dasharray:5 4}
+  .panel{fill:#fff;stroke:#C8C3BA;stroke-width:1.2}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:15px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:11px;fill:#868D98}
+  .lbl{font-size:11px;fill:#14161A;font-weight:650}
+  .tag{font-size:10px;fill:#fff;font-weight:700}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#4E5560}
+  .cTeal{fill:#0F766E}.cAmber{fill:#B45309}.cMut{fill:#4E5560}
+</style>
+<defs>
+  <marker id="ep91-ppo-vs-grpo-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#14161A"/></marker>
+  <marker id="ep91-ppo-vs-grpo-at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="#0F766E"/></marker>
+</defs>
+<rect x="-30" y="-42" width="1240" height="660" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">GRPO：把最贵的那个模型拿掉</text>
+<text class="sm" x="0" y="43">PPO 训练时四个模型同时占着显存，其中 value model 跟被训的模型一样大。DeepSeekMath, 2024-02, Figure 4</text>
+
+<!-- ═══ 左：PPO ═══ -->
+<rect class="panel" x="0" y="66" width="560" height="330" rx="10"/>
+<text class="ph" x="22" y="96">PPO　显存里同时住着 4 个模型</text>
+<text class="xs" x="22" y="115">优势 A 由一个额外的 value model 估出来</text>
+
+<g transform="translate(22,132)">
+  <rect class="box" x="0" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="59" y="22" text-anchor="middle">policy</text>
+  <text class="xs" x="59" y="39" text-anchor="middle">正在训的模型</text>
+
+  <rect class="box" x="132" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="191" y="22" text-anchor="middle">reference</text>
+  <text class="xs" x="191" y="39" text-anchor="middle">算 KL 用</text>
+
+  <rect class="box" x="264" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="323" y="22" text-anchor="middle">reward</text>
+  <text class="xs" x="323" y="39" text-anchor="middle">奖励模型</text>
+
+  <rect class="warm" x="396" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="455" y="22" text-anchor="middle">value</text>
+  <text class="xs" x="455" y="39" text-anchor="middle">估优势 A</text>
+</g>
+
+<!-- 体量条 -->
+<g transform="translate(22,204)">
+  <text class="xs" x="0" y="12">每个都跟 policy 一个量级 —— policy 是 100B，后面三个基本也是 100B</text>
+  <rect class="soft" x="0" y="22" width="118" height="14" rx="3"/>
+  <rect class="soft" x="132" y="22" width="118" height="14" rx="3"/>
+  <rect class="soft" x="264" y="22" width="118" height="14" rx="3"/>
+  <rect x="396" y="22" width="118" height="14" rx="3" fill="#FEF6E7" stroke="#B45309" stroke-width="1.2"/>
+  <path class="thin" d="M0 46 L514 46"/>
+  <text class="num" x="257" y="66" text-anchor="middle">总显存 ≈ 4 份模型权重 + 各自的优化器状态</text>
+</g>
+
+<rect class="warm" x="22" y="296" width="514" height="78" rx="7"/>
+<text class="lbl" x="38" y="318">DeepSeek 的意见：PPO 本身没问题，就是太贵</text>
+<text class="sm" x="38" y="340">「PPO 作为一个经典的强化学习方法，本身并没有什么问题。它唯一的问题就是</text>
+<text class="sm" x="38" y="360">DeepSeek 觉得它成本太高，跑起来占的资源比较多。」</text>
+
+<!-- 箭头 -->
+<path class="ink" d="M572 230 L606 230" stroke="#0F766E" stroke-width="2" marker-end="url(#ep91-ppo-vs-grpo-at)"/>
+<text x="589" y="220" text-anchor="middle" class="xs cTeal">拿掉</text>
+
+<!-- ═══ 右：GRPO ═══ -->
+<rect class="panel" x="620" y="66" width="560" height="330" rx="10" stroke="#0F766E" stroke-width="1.8"/>
+<rect x="620" y="66" width="560" height="26" rx="10" fill="#0F766E"/>
+<rect x="620" y="82" width="560" height="10" fill="#0F766E"/>
+<text class="tag" x="640" y="84">Group Relative Policy Optimization</text>
+<text class="ph" x="642" y="120">GRPO　只剩 3 个</text>
+<text class="xs" x="642" y="139">优势改成「跟同一批答案的平均分比」</text>
+
+<g transform="translate(642,156)">
+  <rect class="box" x="0" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="59" y="22" text-anchor="middle">policy</text>
+  <text class="xs" x="59" y="39" text-anchor="middle">正在训的模型</text>
+
+  <rect class="box" x="132" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="191" y="22" text-anchor="middle">reference</text>
+  <text class="xs" x="191" y="39" text-anchor="middle">算 KL 用</text>
+
+  <rect class="box" x="264" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="323" y="22" text-anchor="middle">reward</text>
+  <text class="xs" x="323" y="39" text-anchor="middle">奖励模型</text>
+
+  <rect class="gone" x="396" y="0" width="118" height="52" rx="6"/>
+  <text class="lbl" x="455" y="22" text-anchor="middle" fill="#868D98">value</text>
+  <path class="dash" d="M406 44 L504 8 M406 8 L504 44"/>
+</g>
+
+<!-- 组内相对 -->
+<g transform="translate(642,224)">
+  <text class="xs" x="0" y="12">同一道题采样一组答案，各自打分，减掉这一组的平均分</text>
+  <g transform="translate(0,20)">
+    <rect class="acc" x="0" y="0" width="60" height="22" rx="4"/><text class="num" x="30" y="15" text-anchor="middle">o₁ 0.9</text>
+    <rect class="soft" x="68" y="0" width="60" height="22" rx="4"/><text class="num" x="98" y="15" text-anchor="middle">o₂ 0.2</text>
+    <rect class="acc" x="136" y="0" width="60" height="22" rx="4"/><text class="num" x="166" y="15" text-anchor="middle">o₃ 0.8</text>
+    <rect class="soft" x="204" y="0" width="60" height="22" rx="4"/><text class="num" x="234" y="15" text-anchor="middle">o₄ 0.1</text>
+    <rect class="soft" x="272" y="0" width="60" height="22" rx="4"/><text class="num" x="302" y="15" text-anchor="middle">o₅ 0.5</text>
+    <path class="thin" d="M340 11 L356 11"/>
+    <rect class="warm" x="364" y="0" width="126" height="22" rx="4"/>
+    <text class="num" x="427" y="15" text-anchor="middle">平均 0.5 → baseline</text>
+  </g>
+  <text class="num" x="0" y="62">优势 A₁ = 0.9 − 0.5 = +0.4　　A₂ = 0.2 − 0.5 = −0.3　……</text>
+</g>
+
+<rect class="acc" x="642" y="316" width="516" height="58" rx="7"/>
+<text class="lbl" x="658" y="338">省下来的那块显存，直接变成更大的 batch 和更快的迭代</text>
+<text class="sm" x="658" y="360">此后 DeepSeek 所有后训练都用 GRPO：V2、V3、Prover-V1.5、R1。</text>
+
+<!-- ═══ 底部时间线 ═══ -->
+<rect class="soft" x="0" y="424" width="1180" height="152" rx="10"/>
+<text class="ph" x="24" y="452">但 GRPO 只解决了「贵」，没解决「难」</text>
+<text class="sm" x="24" y="476">DeepSeekMath 这篇一边发明 GRPO，一边给自己泼了盆冷水 —— §5.2.2「Why RL Works?」：</text>
+
+<g transform="translate(24,492)">
+  <rect class="box" x="0" y="0" width="700" height="66" rx="7"/>
+  <text class="sm" x="18" y="24">RL 之后 <tspan class="cTeal" style="font-weight:650">Maj@1 涨了好几个点</tspan>，但 <tspan class="cAmber" style="font-weight:650">Pass@K 在 K 变大时反而追平甚至落后</tspan>。</text>
+  <text class="sm" x="18" y="48">论文原话：提升来自「把已有的正确答案排到前面」，而不是「真的提高了模型的根本能力」。</text>
+</g>
+<g transform="translate(752,492)">
+  <rect class="warm" x="0" y="0" width="404" height="66" rx="7"/>
+  <text class="lbl" x="18" y="24">一年后 R1 给出的答案不是换算法</text>
+  <text class="sm" x="18" y="48">是换掉奖励来源：不要奖励模型，只用规则。</text>
+</g>
+</svg>
+<figcaption>GRPO 把 PPO 的 value model 拿掉，改用组内相对优势<span class="fcite">图：重绘自 DeepSeekMath Figure 4</span></figcaption></figure><h4 class="h4">这篇论文我很喜欢：那时候没人做 online RL</h4></div></div><div class="turn cont" data-t="9038"><button class="ts" data-seek="9038" title="跳到 02:30:38">02:30:38</button><div class="td"><p>但这篇论文里有一些很有意思的实验。这是我自己很喜欢的一篇论文——因为我很早就开始关注强化学习，我觉得这是在 math 里面做强化学习非常有 insight 的一篇。<b>那个时候 DeepSeek 是做得有点超前的。</b></p><p>因为在那个时候做这种 <b>online 的强化学习</b>，整个 community 并没有广泛这么做——大家广泛还是在做<b>蒸馏</b>、做 SFT。强化学习不是一种蒸馏，它更像一种自我提升，你可以叫它自我蒸馏，但它更像自我提升。而那时候 community 觉得做 SFT、做蒸馏效果就已经很好了。</p><p>包括 DeepSeekMath 出来之后好几个月，强化学习依然没有成为主流——至少在开源社区、在学界里没有。我觉得一个是训练代价还是有点大、需要的卡稍微多一点；然后大家做 SFT 效果也不错。这篇论文应该是 2024 年年中就有了，然后好几个月都没成为主流。</p><p>但这篇论文就在做强化学习，而且做了很多实验。很多公司可能也在做这些，但公司不会公开、不会发表、也不会去说他的结论。而 DeepSeekMath 这篇论文说了很多我觉得在当时看起来非常 unique 的结论。</p></div></div><div class="turn cont" data-t="9131"><button class="ts" data-seek="9131" title="跳到 02:32:11">02:32:11</button><div class="td"><p>说一下它的强化学习：<b>它还是用 reward model 的。</b>可以看出 DeepSeek 在这个时候还是没有采用最近那种只用规则的 reward。他这里写着 construct training set reward model following ——following 的就是刚刚那篇 Math-Shepherd，他们自己的论文。相当于他们用同样的方式搞了训练数据集，训了一个基于过程监督的奖励模型，然后用这个奖励模型来做 GRPO。</p><p>可以看出，在很长一段时间里，大家的思路都是要做奖励模型的。</p><h4 class="h4">online 比 offline 好，这篇论文很早就发现了</h4></div></div><div class="turn cont" data-t="9169"><button class="ts" data-seek="9169" title="跳到 02:32:49">02:32:49</button><div class="td"><p>这篇论文做了一些很有意思的实验，我主要挑强化学习这个图（Figure 5）来讲。</p><p>它比较了 <b>RFT</b>——rejection fine-tuning，中文我不知道怎么说，拒绝采样微调。这篇论文出来之后还很长一段时间，这个领域在做的事情就是 RFT。包括 Llama 3 那篇论文，他们的后训练做 math、做 coding、做推理，基本上都还是在做 SFT，在做 rejection fine-tuning。</p><p>rejection fine-tuning 是什么意思呢？<b>我这个模型自己生成了很多数据，然后去看答案对不对——答案错的扔掉，答案对的留下来；把留下来的这些数据拿回来继续让模型做 SFT。</b></p></div></div><div class="turn cont" data-t="9224"><button class="ts" data-seek="9224" title="跳到 02:33:44">02:33:44</button><div class="td"><p>但这里面有一个 <b>online 和 offline</b> 的问题。这个问题很重要——在很长一段时间里，community 做 reasoning 都是做 offline 的。</p><p>online 是什么意思？做 RL 的时候，模型的数据是自己生成的。做 online 就是：我一边生成数据，生成数据的这个模型又在变——因为你在训它嘛。模型自己生成数据、训练之后模型就变了，变了之后我要生成新的数据继续训。这就是 online，而且这个频率非常高。</p><p>offline 是什么意思？<b>我用现在的模型生成一个很大的数据集，拿回来训一把，然后就结束了。</b>你的数据并没有跟着模型更新而更新——这就是为什么一个叫在线、一个叫离线。</p></div></div><div class="turn cont" data-t="9276"><button class="ts" data-seek="9276" title="跳到 02:34:36">02:34:36</button><div class="td"><p>community 很多时候都在做 offline，或者做一些所谓的 <b>iterative（迭代式）</b>——迭代式有点像介于 online 和 offline 中间：我搞一个大数据集，训一遍；为了让数据可以更新，我再做一代——用变好了的新模型再搞一个大数据集，然后回来再训自己，它可能又会变好，这样做几代。但一般大家可能做三代、五代，这个东西就做不下去了，或者就收敛了。</p><p>但这不是完全的 online。完全的 online——像最早的 PPO——是需要做很多很多代的。比如现在大家做 R1，或者像我们之前训的那种类 R1 的，我们可能都要做一两百代。这跟之前不太一样：之前大家要么做一代，要么做三代、五代，没有人做十几二十代，更没有人做一两百代。</p><p><b>所以在 reasoning 里面做 online RL 的人很少</b>，大家还是做 SFT、做 RFT，包括 Llama 3 也主要在做 RFT。</p></div></div><div class="turn cont" data-t="9335"><button class="ts" data-seek="9335" title="跳到 02:35:35">02:35:35</button><div class="td"><p>即便这篇论文很早就指出来 online 更好。比如他们发现：GRPO+PS 是这个蓝色的线（PS 就是 process，基于过程监督的奖励模型），OS 就是基于结果监督的奖励模型；RFT 就是刚刚说的那种，online RFT 就是把那种变成 online 的——比如 500 条数据我生成、训了自己，马上更新，然后再训下面 500 条、再生成下面 500 条。</p><p>这篇论文很早就发现：<b>绿色的线比紫色的线高，online 比 offline 好。</b>当然他们做出来还是觉得 process 比 outcome 好，还是坚持要用基于过程监督的奖励模型。</p><p>但这篇论文没有对比<b>基于规则的</b>奖励——他们只对比了基于过程的和基于结果的，发现基于过程的好一点。</p></div></div><div class="turn cont" data-t="9396"><button class="ts" data-seek="9396" title="跳到 02:36:36">02:36:36</button><div class="td"><p>所以可以看到 DeepSeekMath 很早就开始做 online 了。但实际上到最后大家做的还是什么呢？还是 DPO。DPO 当然也可以做成 online 的，但大家更多时候就做 offline 的、做 rejection sampling 这种。</p><p>online 这个东西没有成为主流，我觉得某种程度上跟它不太稳定、不太好调，以及比较昂贵有关系。你去做这种 online 的，不管是 PPO 还是 GRPO，需要的卡会更多、计算资源会更多，相对来说没那么稳定——特别是你把 reward model 搞进去之后。包括我们之前做也发现特别难调：各种参数很难 work。而你如果做普通的 SFT、RFT，随便一训效果就不错。</p><p>再加上第三方面的原因：<b>当时开源社区没有太成熟的 Infra code base。</b>code base 通俗理解就是有没有这样一套代码可以直接拿来用、可以做得很 efficient。DeepSeek 有自己的 code base、有自己的 Infra，但 DeepSeek 不会开源它自己的训练代码；其他很多公司也都有自己的一套训练代码，但大家都不会开源。所以对开源社区、对学界来说，当时可用的、比较 efficient 的、能做 online RL 的 code base 很少，而且也很难调，可能也没有人广泛验证过。</p><p>种种原因，导致在公开的 community 里，尽管这篇论文出来得很早、也零星地有一些工作做过这种 RL，但这种东西并没有成为主流，好几个月都没有。</p><p>我们其实在最开始提到过：我们在超过半年之前就试过 online 的 PPO，结合过程监督奖励模型做强化学习。但我们觉得很难做 work，非常难做出理想的效果，最后就失败了。我觉得可能很多其他同学也试过，可能也没有成功，这就导致它并没有成为主流。</p><h4 class="h4">我最喜欢的一节：为什么 RL 能 work</h4></div></div><div class="turn cont" data-t="9525"><button class="ts" data-seek="9525" title="跳到 02:38:45">02:38:45</button><div class="td"><p>DeepSeekMath 还有一个我很喜欢的章节，就是 5.2.2「<b>Why RL Works?</b>」和 5.2.3「<b>How to Achieve More Effective RL?</b>」。我觉得这跟后面 R1 的 develop 有很直接的关联，也说明 <b>DeepSeek 的 team 很早就开始思考这个问题</b>——这已经是超过半年以前的东西了。</p><p>因为当时有 Figure 7 这个图，是大家看得很多的一个图。</p><p>横坐标是 K。绿线和蓝线是 <b>Pass@K</b>（下面两条 Maj@K 我们可以不用看）。Pass@K 什么意思？就是我 sample K 个 response——比如 8 个或 16 个——这里面有没有对的、有多少比例的题里面是有对的。比如对于所有的 question 各 sample 16 个 response，如果到了 90%，就意味着 90% 的题里面都包含正确答案。</p></div></div><div class="turn cont" data-t="9601"><button class="ts" data-seek="9601" title="跳到 02:40:01">02:40:01</button><div class="td"><p>这个指标为什么很重要？<b>因为它衡量你这个模型有没有能力 sample 出正确答案。</b>我们知道做 RL 模型要自己探索，这个能力本质上标志着模型有没有能力探索出正确答案。假设你模型没有能力探索出正确答案，那做强化学习可能就没什么帮助。</p></div></div><div class="turn cont" data-t="9621"><button class="ts" data-seek="9621" title="跳到 02:40:21">02:40:21</button><div class="td"><p>而这篇论文当时其实给了一个 <b>negative 的信号</b>，告诉大家：RL 可能没有想象中那么 work。</p><p>因为这里面有一个非常 counter-intuitive 的事情。你看榜单上的结果：Pass@K 的 RL（蓝色线）和 Pass@K 的 Instruct（没做 RL 之前，绿色线），<b>在 K=1 的时候</b>——K=1 就是大家平常报的榜单，我 decode 出最有可能的那一个，看对的多不多——<b>蓝线高很多，高了好几个点，看起来 RL 很 work。</b></p><p><b>但当 K 增大的时候</b>，你 sample 多个，比如在 GSM8K 这种简单的数学题上，甚至绿色的线到后面还要高一点。就说明你这个 RL 做了半天，模型的探索能力——sample 8 个、16 个——好像反而下降了。在 MATH 上也是类似的，到后面两条线就重合了。</p><p>这跟大家想的不一样。大家想的是：我做强化学习，应该可规模化、自我迭代、让模型自我提升，越提升越多。但这个图给了一个 negative 信号。他们自己也说——这是他们自己加粗的那句话——<b>the improvement is attributed to boosting the correct response ... rather than enhancement of fundamental ability</b>：本来这个模型就已经有能力生成正确答案，你只是把那个正确答案 rank 到更前面去了，而并没有真的 fundamental 地提高模型的能力。</p></div></div><div class="turn cont" data-t="9726"><button class="ts" data-seek="9726" title="跳到 02:42:06">02:42:06</button><div class="td"><p>这是一个很有意思的观察，因为当时没有人做这个观察。</p><p>而且我觉得大家也可以看到 <b>DeepSeek 写论文很诚实</b>：他明明是自己做的，自己报的结果又好很多，他反过来还给自己泼一盆冷水，还要写在后面。这个我觉得非常科学、非常严谨——不是说搞了半天就开始宣传「我这个很好很好」，他反过来还研究这到底是不是真的 work，观察到这种现象还汇报给大家说「这可能不是真的在 work」。</p></div></div><div class="turn cont" data-t="9761"><button class="ts" data-seek="9761" title="跳到 02:42:41">02:42:41</button><div class="td"><p>那第二个问题就是：如果看起来不是真的 work，我们要怎么实现真的 work？怎么实现 more effective RL？他们就开始探讨。当然他们没有做这个实验，但开始说一些假设，比如 data 要更好；这里面包括 algorithm——但 algorithm 我觉得并没那么重要，比如他们用 GRPO，可能 PPO 也差不多。</p></div></div><div class="turn cont" data-t="9789"><button class="ts" data-seek="9789" title="跳到 02:43:09">02:43:09</button><div class="td"><p>但这里提到一个很有意思的东西：<b>reward function</b>。因为他们这里还是用的奖励模型。他们提到的第一个点就是：<b>怎么样提高奖励模型的泛化能力。</b></p><p>到今天来看这个结论——当然这是两个 separate 的方向：你当然可以关注用更好的方式去训奖励模型，提高它的泛化能力，让这个东西更 work；<b>但另一个方式，从今天来看，就是不要这个奖励模型。</b>不要奖励模型，只用规则，它就最泛化。</p></div></div><div class="turn" data-t="9828"><button class="ts" data-seek="9828" title="跳到 02:43:48">02:43:48</button><div class="td"><span class="who host">张小珺</span><p>那为什么不用奖励模型、用规则会更泛化？因为规则符合直觉吗？</p></div></div><div class="turn" data-t="9834"><button class="ts" data-seek="9834" title="跳到 02:43:54">02:43:54</button><div class="td"><span class="who">何俊贤</span><p>符合直觉。比如 math，你认为最终答案对，你就认为这基本上是对的——这样一个规则是<b>普世</b>的。不管你是高中的、小学的、初中的、大学的数学题，最后有个标准答案，标准答案做对了，我就认为这个 response 基本上应该是对的、问题不大。尽管不总是这样——你可能碰巧答案对了但过程错了——但这个规则很朴实，它不会因为你是小学的、大学的、研究生的、博士的而不一样。</p><p>但 reward model 不一样。<b>你如果是在小学和初中的数据上训练的奖励模型，判断小学初中的数学题做没做对判断得很准，但我突然给你大学的数学题，你可能就判断得不准。</b>这就是所谓的泛化能力：模型它总是很敏感，但规则就很 robust。</p></div></div><div class="turn" data-t="9890"><button class="ts" data-seek="9890" title="跳到 02:44:50">02:44:50</button><div class="td"><span class="who host">张小珺</span><p>那除了 coding 和 math 这些领域，其他的还是需要奖励模型，对吧？</p></div></div><div class="turn" data-t="9895"><button class="ts" data-seek="9895" title="跳到 02:44:55">02:44:55</button><div class="td"><span class="who">何俊贤</span><p>对，有很多开放式的领域还是需要奖励模型，因为你很难设计规则来判断正确和错误。</p></div></div><div class="turn" data-t="9903"><button class="ts" data-seek="9903" title="跳到 02:45:03">02:45:03</button><div class="td"><span class="who host">张小珺</span><p>大概在理工科的领域好像都是规则驱动。</p></div></div><div class="turn" data-t="9906"><button class="ts" data-seek="9906" title="跳到 02:45:06">02:45:06</button><div class="td"><span class="who">何俊贤</span><p>对，很多理工科可以。其实也不光是 math、coding，有一些 domain 都可能可以设计规则去判断最后的正误。但对有一些不行，而且对有一些问题可能就没有正误的概念——比如开放式的写作，开放式的问题不存在所谓的正确和错误。</p></div></div><div class="turn" data-t="9930"><button class="ts" data-seek="9930" title="跳到 02:45:30">02:45:30</button><div class="td"><span class="who host">张小珺</span><p>那像自动驾驶这个领域呢？</p></div></div><div class="turn" data-t="9933"><button class="ts" data-seek="9933" title="跳到 02:45:33">02:45:33</button><div class="td"><span class="who">何俊贤</span><p>自动驾驶是有可能可以设计出一些规则的。比如我如果撞到人了、撞到什么东西了，就是错的；没撞到，我在这个道里面、没有闯红绿灯，可能这些就是正确的。依然可以有很多这样的规则。</p><p>但是规则的奖励应用到自动驾驶这么复杂的领域，也会有自己的问题。因为<b>规则奖励有一个缺点——它的奖励特别稀疏</b>，这个在 math、coding 上没有体现。比如自动驾驶或者一些领域，你可能要生成一大堆东西、做很多动作，最后才能得到一个奖励：正确、错误。但很多时候大家希望有更<b>密集</b>的奖励，希望能告诉我下一步、这一步做没做对。</p><p>其实 math 也是一样的，math 和 coding 只对结果有规则，对过程有没有做对是没有规则的。但基于现在的过程奖励模型还不完美、很难做到那么好，所以规则奖励在现在——包括在 R1 上——促进了 R1 的成功。但未来如果过程奖励模型可以做得很好，其实上限应该还是更高的。只是这个很难。</p></div></div><div class="turn cont" data-t="10016"><button class="ts" data-seek="10016" title="跳到 02:46:56">02:46:56</button><div class="td"><p>反正这里可以看到，DeepSeekMath 其实还是在用奖励模型，而且他们也说到了：<b>奖励模型的泛化是一个很大的问题</b>，对 RL 真正的有效性来说。</p></div></div><h2 class="sec" id="s11">十一、DeepSeek-Prover：把「规则」交给 Lean</h2><div class="turn" data-t="10039"><button class="ts" data-seek="10039" title="跳到 02:47:19">02:47:19</button><div class="td"><span class="who">何俊贤</span><p>在讲最后的 R1 之前，我简单过一个中间的工作——R1 其实不用讲很多，因为它比较简单。</p><p>DeepSeek 在中间的 reasoning 上还差了两个工作，可能也不太多人知道：<b>他们其实还做了一些定理证明，DeepSeek-Prover</b>。这个有两个版本，一个是 DeepSeek-Prover，一个是 DeepSeek-Prover-V1.5。</p><p>这个也很有意思，而且我觉得跟后面他们做 reasoning 都很相关。第一篇这里还没有强化学习，做的是<b>自我提升</b>。</p><h4 class="h4">什么是形式化定理证明</h4></div></div><div class="turn cont" data-t="10093"><button class="ts" data-seek="10093" title="跳到 02:48:13">02:48:13</button><div class="td"><p>先说一下 Prover 这个概念。数学定理证明这个任务跟一般的数学有什么不一样呢？<b>它有一个额外的引擎，叫定理证明的 verifier</b>——这个东西叫 <b>Lean</b>，可以认为是一个定理证明的推理引擎、一个工具。</p><p>打个比方：假设你有一套形式化的数学语言，你把这些 statement 给 Lean——它有点像一个 Python 的执行器——它就可以告诉你这个证不证得出来，会给你一个很标准的反馈。这就很像数学的可验证性：<b>形式化语言可验证。</b></p><p>那 DeepSeek-Prover 做什么事情呢？就是<b>把非形式化的东西——natural language、informal 的 math problem——变成形式化的语言</b>。它其实就做这么一件事。</p></div></div><div class="turn cont" data-t="10149"><button class="ts" data-seek="10149" title="跳到 02:49:09">02:49:09</button><div class="td"><p>但这件事有一个很 unique 的地方：你变成形式化语言之后，可以给外面的一个工具（比如 Lean）来告诉你变得对不对。而且这个工具<b>不依赖于一个奖励模型</b>。</p><p>这里又扯到刚刚那个问题：这件事很像一个规则化的东西。我们刚刚说的规则是人定义的——数学是最终答案对不对，coding 是 unit test 过不过。但现在我们依然是规则化的，只是<b>这个规则不是人定义的，而是来源于一个额外的定理证明引擎</b>：我把这个证明给 Lean，它就可以告诉我对不对。它依然是个规则，不依赖一个额外的神经网络做奖励模型。</p><p>所以它是一脉相承的。但这个地方没有做 RL，它是在做<b>迭代式的自我更新</b>：我生成数据，用 Lean 看一下对不对，错的扔掉、对的留下来，然后回来继续训自己，再生成新的数据，就是这样一个迭代过程。</p><p>而这个迭代过程，刚刚我们已经提到——对 DeepSeekMath 来说已经发现一定要做 online 的，迭代式的其实没有在线的好。</p><h4 class="h4">Prover-V1.5：开始不训奖励模型了</h4></div></div><div class="turn cont" data-t="10226"><button class="ts" data-seek="10226" title="跳到 02:50:26">02:50:26</button><div class="td"><p>所以很自然，马上就有了 <b>DeepSeek-Prover-V1.5</b>，这是 2024 年 8 月份的工作。</p><p>这个基本上跟刚刚那个比起来，就是<b>开始做强化学习了</b>——我不是用迭代式做自我更新，而是直接做非常 online 的强化学习。他们也是用 GRPO，但这里有一些改变。</p><p>这个地方又开始讨论 reward。他们说：讲强化学习的时候，如果有一个奖励模型一般会更好；in contrast，他们这个定理证明虽然有 0/1 的反馈，但他们觉得这个非常 <b>sparse（稀疏）</b>。</p><p>但可以看出他们这里有转变：<b>他们没有再训一个奖励模型。</b>他们说这个 binary 的 reward signal 虽然 sparse，但不是通过训奖励模型来改变它，而是把那些特别特别难的、生成不出来正确答案的题目 remove 掉——<b>选训练题的时候就挑那些有挑战但够得着的</b>。</p><p>相当于从 DeepSeek-Prover 开始，他们好像就开始尝试不做奖励模型了，因为 Lean 就可以提供 0/1 的反馈。</p></div></div><div class="turn" data-t="10327"><button class="ts" data-seek="10327" title="跳到 02:52:07">02:52:07</button><div class="td"><span class="who host">张小珺</span><p>相当于那个弯路绕回来了。</p></div></div><div class="turn" data-t="10330"><button class="ts" data-seek="10330" title="跳到 02:52:10">02:52:10</button><div class="td"><span class="who">何俊贤</span><p>对，有点这种感觉，就有点开始不做这个了。</p></div></div><div class="turn cont" data-t="10334"><button class="ts" data-seek="10334" title="跳到 02:52:14">02:52:14</button><div class="td"><p>但他们后面在 inference、在部署的时候，也尝试了一些当时大家讨论 reasoning 很火的东西，比如 <b>MCTS</b>（蒙特卡洛树搜索）：我有一棵树，不是一步一步生成，而是生成一步之后往下展开多步，再往下展开，这样搞一棵树，搞得很复杂。所以最后他们报结果的时候有 DeepSeek-Prover-V1.5 + <b>RMaxTS</b>，那是他们发明的一个 MCTS variant。</p><p>这个也非常有意思。因为曾经有一度，特别是在 o1 出来之后，大家讨论 MCTS 是不是 OpenAI 就是这么做的、是不是达成 o1 的一种很重要的技术——因为 MCTS 很复杂，需要你在生成的时候搞一个像树一样的 decoding。但实际上，到最后我们今天看到像 R1 也是<b>大道至简</b>，这些东西什么都没要。</p><p>这两个工作其实比较小众，因为是专门做定理证明的。但我觉得它比较特别，因为它也是专门挑这种规则可 verify 的场景在做。</p></div></div><h2 class="sec" id="s12">十二、DeepSeek-R1：大道至简</h2><div class="turn" data-t="10411"><button class="ts" data-seek="10411" title="跳到 02:53:31">02:53:31</button><div class="td"><span class="who">何俊贤</span><p>今天最后分享的一个就是 <b>R1</b>。</p></div></div><div class="turn cont" data-t="10428"><button class="ts" data-seek="10428" title="跳到 02:53:48">02:53:48</button><div class="td"><p>这个之前上两期应该有朋友已经讲过了。而且这个东西也很简单，本身并没有太多需要讲的。在今天讲了刚刚那些前置工作之后，我觉得它也比较好理解。</p><p>大家可以看到，<b>DeepSeek-R1 就是大道至简</b>：前面所有的东西——不管是走的弯路，还是积极的探索——全部汇集到了这样一个 pipeline。</p><h4 class="h4">两条规则，没有奖励模型</h4></div></div><div class="turn cont" data-t="10455"><button class="ts" data-seek="10455" title="跳到 02:54:15">02:54:15</button><div class="td"><p>它的 reward 就是两个：</p><ul><li><b>accuracy reward</b>：比较对不对；</li><li><b>format reward</b>：看这个模型的输出有没有按我想要的 format。</li></ul><p>format reward 的原因主要是：你做 RL 的时候没有那种 explicit signal，模型万一不按你的格式，自己就会跑得越来越偏。至少让它按我的格式生成——比如先 think，有这个 think token，后面再输出答案。</p><p><b>这两个都是规则的，没有奖励模型。</b></p><p>大家可以看到：最早的 Math-Shepherd、DeepSeek-Coder-V2 其实都做了奖励模型，包括到 DeepSeekMath 还在用奖励模型，DeepSeek-Prover 开始不用了，<b>到 R1 奖励模型就没有了</b>。就是非常简单的规则：直接看最后那个答案对不对，代码就看 LeetCode 的编译器。</p></div></div><div class="turn cont" data-t="10508"><button class="ts" data-seek="10508" title="跳到 02:55:08">02:55:08</button><div class="td"><p>但我们可以看到，<b>这里其实跟前面的结果是矛盾的</b>。DeepSeek-Coder-V2 的时候，他们还有结果在说：对于 code，用 reward model 更好——我们看过那个图，说 compiler 更差。但 R1 这里，LeetCode 就只用 compiler，就不用 reward model 了。这跟他们 DeepSeek-Coder-V2 那个图本身是矛盾的。</p><figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -42 1240 700" width="1240" height="700" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',system-ui,sans-serif" data-padded="30">
+<style>
+  .thin{fill:none;stroke:#C8C3BA;stroke-width:1.1}
+  .drop{fill:none;stroke:#C8C3BA;stroke-width:1.1;stroke-dasharray:3 3}
+  .soft{fill:#F3F1ED;stroke:#C8C3BA;stroke-width:1.1}
+  .acc{fill:#E6F4F1;stroke:#0F766E;stroke-width:1.5}
+  .warm{fill:#FEF6E7;stroke:#B45309;stroke-width:1.5}
+  .h1{font-size:25px;font-weight:700;fill:#14161A;letter-spacing:-.4px}
+  .ph{font-size:14px;font-weight:650;fill:#14161A;letter-spacing:-.2px}
+  .sm{font-size:12.5px;fill:#4E5560}
+  .xs{font-size:10px;fill:#868D98}
+  .lbl{font-size:11.5px;fill:#14161A;font-weight:700}
+  .date{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;fill:#868D98}
+  .num{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:#4E5560}
+  .band{font-size:11.5px;font-weight:700;letter-spacing:.4px}
+  .cTeal{fill:#0F766E}.cAmber{fill:#B45309}
+</style>
+<rect x="-30" y="-42" width="1240" height="700" fill="#fff"/>
+
+
+<text class="h1" x="0" y="20">奖励从哪儿来：一条走了 13 个月的弯路</text>
+<text class="sm" x="0" y="43">「什么东西来告诉模型这次答得对不对」—— DeepSeek 在六篇论文里换了三次立场，最后回到了最朴素的那一种。</text>
+
+<!-- 两条泳道 -->
+<rect x="0" y="66" width="1180" height="118" rx="8" fill="#FEF6E7" opacity=".5"/>
+<rect x="0" y="196" width="1180" height="118" rx="8" fill="#E6F4F1" opacity=".5"/>
+<text class="band cAmber" x="14" y="102">训一个奖励模型</text>
+<text class="band cAmber" x="14" y="120">来打分</text>
+<text class="band cTeal" x="14" y="232">用规则</text>
+<text class="band cTeal" x="14" y="250">直接判对错</text>
+
+<!-- ① Math-Shepherd（上） -->
+<g transform="translate(106,80)">
+  <rect class="warm" x="0" y="0" width="172" height="90" rx="7"/>
+  <text class="lbl" x="12" y="20">Math-Shepherd</text>
+  <text class="xs" x="12" y="38">训过程奖励模型（PRM），</text>
+  <text class="xs" x="12" y="52">但标注不用人 —— 让模型</text>
+  <text class="xs" x="12" y="66">自己往下补完，倒推每一步。</text>
+  <text class="num" x="12" y="84" fill="#B45309">奖励模型 ✓</text>
+</g>
+<path class="drop" d="M192 170 L192 322"/>
+<circle cx="192" cy="322" r="4.5" fill="#B45309"/>
+<text class="date" x="192" y="342" text-anchor="middle">2023-12</text>
+
+<!-- ② DeepSeekMath（上） -->
+<g transform="translate(296,80)">
+  <rect class="warm" x="0" y="0" width="172" height="90" rx="7"/>
+  <text class="lbl" x="12" y="20">DeepSeekMath</text>
+  <text class="xs" x="12" y="38">发明 GRPO，但奖励仍然</text>
+  <text class="xs" x="12" y="52">沿用 Math-Shepherd 的 PRM。</text>
+  <text class="xs" x="12" y="66">自己写下：泛化是个大问题。</text>
+  <text class="num" x="12" y="84" fill="#B45309">奖励模型 ✓</text>
+</g>
+<path class="drop" d="M382 170 L382 322"/>
+<circle cx="382" cy="322" r="4.5" fill="#B45309"/>
+<text class="date" x="382" y="342" text-anchor="middle">2024-02</text>
+
+<!-- ③ Prover（下） -->
+<g transform="translate(486,210)">
+  <rect class="acc" x="0" y="0" width="172" height="90" rx="7"/>
+  <text class="lbl" x="12" y="20">DeepSeek-Prover</text>
+  <text class="xs" x="12" y="38">规则不再由人写，交给</text>
+  <text class="xs" x="12" y="52">Lean 的验证器：证得出来</text>
+  <text class="xs" x="12" y="66">就是 1，证不出来就是 0。</text>
+  <text class="num" x="12" y="84" fill="#0F766E">规则 ✓（外部引擎）</text>
+</g>
+<path class="drop" d="M572 300 L572 322"/>
+<circle cx="572" cy="322" r="4.5" fill="#0F766E"/>
+<text class="date" x="572" y="342" text-anchor="middle">2024-05</text>
+
+<!-- ④ Coder-V2（上，退回去了） -->
+<g transform="translate(676,80)">
+  <rect class="warm" x="0" y="0" width="172" height="90" rx="7"/>
+  <text class="lbl" x="12" y="20">DeepSeek-Coder-V2</text>
+  <text class="xs" x="12" y="38">「unit test 覆盖不全，0/1</text>
+  <text class="xs" x="12" y="52">太 noisy」—— 于是还是</text>
+  <text class="xs" x="12" y="66">决定训一个奖励模型。</text>
+  <text class="num" x="12" y="84" fill="#B45309">奖励模型 ✓</text>
+</g>
+<path class="drop" d="M762 170 L762 322"/>
+<circle cx="762" cy="322" r="4.5" fill="#B45309"/>
+<text class="date" x="762" y="342" text-anchor="middle">2024-06</text>
+
+<!-- ⑤ Prover-V1.5（下） -->
+<g transform="translate(866,210)">
+  <rect class="acc" x="0" y="0" width="172" height="90" rx="7"/>
+  <text class="lbl" x="12" y="20">Prover-V1.5</text>
+  <text class="xs" x="12" y="38">同样嫌 0/1 太稀疏，这次</text>
+  <text class="xs" x="12" y="52">没有去训奖励模型，改成</text>
+  <text class="xs" x="12" y="66">挑「有挑战但够得着」的题。</text>
+  <text class="num" x="12" y="84" fill="#0F766E">规则 ✓</text>
+</g>
+<path class="drop" d="M952 300 L952 322"/>
+<circle cx="952" cy="322" r="4.5" fill="#0F766E"/>
+<text class="date" x="952" y="342" text-anchor="middle">2024-08</text>
+
+<!-- ⑥ R1（下） -->
+<g transform="translate(1006,210)">
+  <rect x="0" y="0" width="172" height="90" rx="7" fill="#E6F4F1" stroke="#0F766E" stroke-width="2.4"/>
+  <text class="lbl" x="12" y="20">DeepSeek-R1</text>
+  <text class="xs" x="12" y="38">只剩两条规则：答案对</text>
+  <text class="xs" x="12" y="52">不对、格式对不对。</text>
+  <text class="xs" x="12" y="66">MCTS、蒸馏也一并不要。</text>
+  <text class="num" x="12" y="84" fill="#0F766E">奖励模型 ✗</text>
+</g>
+<path class="drop" d="M1092 300 L1092 322"/>
+<circle cx="1092" cy="322" r="6" fill="#0F766E"/>
+<text class="date" x="1092" y="342" text-anchor="middle">2025-01</text>
+
+<!-- 时间轴 -->
+<path class="thin" d="M60 322 L1160 322"/>
+
+<!-- 底部三块 -->
+<g transform="translate(0,376)">
+  <rect class="soft" x="0" y="0" width="380" height="146" rx="9"/>
+  <text class="ph" x="20" y="28">这条弯路是怎么开始的</text>
+  <text class="sm" x="20" y="56">OpenAI 2023 年那篇 Let's Verify Step</text>
+  <text class="sm" x="20" y="76">by Step，把整个 community 引向了</text>
+  <text class="sm" x="20" y="96">「过程监督的奖励模型」。</text>
+  <text class="xs" x="20" y="120">「但 turns out，OpenAI 自己做 o1 可能并不是这么</text>
+  <text class="xs" x="20" y="136">做的。所以我觉得也受到了一些误导。」</text>
+
+  <rect class="soft" x="400" y="0" width="380" height="146" rx="9"/>
+  <text class="ph" x="420" y="28">规则赢在哪</text>
+  <text class="sm" x="420" y="56">规则是普世的：小学题和博士题，都是</text>
+  <text class="sm" x="420" y="76">「最后答案对不对」这一条。</text>
+  <text class="sm" x="420" y="96">奖励模型不是 —— 在小学题上训出来的，</text>
+  <text class="sm" x="420" y="116">拿去判大学题就判不准了。</text>
+  <text class="xs" x="420" y="136">这正是 DeepSeekMath 自己点出的「泛化」问题。</text>
+
+  <rect class="warm" x="800" y="0" width="380" height="146" rx="9"/>
+  <text class="ph" x="820" y="28">规则也有代价：太稀疏</text>
+  <text class="sm" x="820" y="56">规则只对最终结果有话说，对中间每一步</text>
+  <text class="sm" x="820" y="76">没有。数学、代码还撑得住；换成动作长、</text>
+  <text class="sm" x="820" y="96">反馈远的场景（比如自动驾驶）就不够用。</text>
+  <text class="xs" x="820" y="120">「未来如果过程奖励模型可以做得很好，上限应该还</text>
+  <text class="xs" x="820" y="136">是更高。只是这个很难。」</text>
+</g>
+</svg>
+<figcaption>奖励从哪儿来：六篇论文里换了三次立场<span class="fcite">图：本站重绘</span></figcaption></figure><h4 class="h4">Zero：直接从基座开始 RL</h4></div></div><div class="turn cont" data-t="10533"><button class="ts" data-seek="10533" title="跳到 02:55:33">02:55:33</button><div class="td"><p><b>Zero</b> 我觉得是一个让大家非常 impressive 的东西。</p><p>它之所以叫 Zero，就是因为<b>前面没有做前置的 SFT</b>：base model 基座拿过来直接做 RL。这跟大家一般的做法不一样——不管是 Llama，还是 DeepSeek 自己之前做的，还是之前所有的工作，其实都是要先做 SFT 的。</p></div></div><div class="turn" data-t="10557"><button class="ts" data-seek="10557" title="跳到 02:55:57">02:55:57</button><div class="td"><span class="who host">张小珺</span><p>这也是一个创新点。</p></div></div><div class="turn" data-t="10559"><button class="ts" data-seek="10559" title="跳到 02:55:59">02:55:59</button><div class="td"><span class="who">何俊贤</span><p>对。或者说，其实这个东西试起来也很简单，但之前可能没有很多人这样去尝试。大家天然就觉得没必要——「我做了 SFT 效果会更好、会让 RL 更简单，我为什么不做？」或者觉得没必要，也就不会尝试。</p></div></div><div class="turn cont" data-t="10577"><button class="ts" data-seek="10577" title="跳到 02:56:17">02:56:17</button><div class="td"><p>然后他们就从 Zero 开始做。而且因为这个时候有所谓 long CoT 的概念了——o1 那个时候已经出来了——所以大家也开始去监控训练时模型生成的长度。</p><p>这里面就有一些非常 impressive 的结果：<b>尽管只用 Zero、没有 SFT 直接开始做</b>，像 AIME 这种很难的数学，效果就一直在涨。而且这里面也<b>没有蒸馏</b>——它不是从一个更强的模型蒸馏，就是靠自己在那个数据集上做强化学习；也没有额外的奖励模型。AIME 从前面的 0.2、0.3 一直往后涨，涨到 0.7、0.8。</p></div></div><div class="turn cont" data-t="10625"><button class="ts" data-seek="10625" title="跳到 02:57:05">02:57:05</button><div class="td"><p>而且还有一个很神奇的：<b>它的长度也是一直在涨。</b>（Figure 3）</p><p>我觉得这里基本上就盖棺定论了——<b>o1 的一系列 replication 工作就盖棺定论了</b>。而且后来 OpenAI 的技术人员也发推特承认，DeepSeek 用的技术跟他们 o1 用的差不多。</p><p>因为 o1 出来之后很多人想复现 o1：有人做蒸馏，有人做 MCTS，做这样做那样，做得也比较复杂，但就没有人这么做。而他就这样做——没有 MCTS 那种很复杂的 decoding，也没有奖励模型，也没有蒸馏，很简单，就从 Zero 开始做，<b>他自己就把自己的思维链撑成了一个长思维链</b>。</p><p>我觉得基本上 o1 也就是这么做的。之前大家做的那些所谓复现 o1 的，可能都不是 o1 真正的思路。</p></div></div><div class="turn cont" data-t="10685"><button class="ts" data-seek="10685" title="跳到 02:58:05">02:58:05</button><div class="td"><p>他们也提到一些 <b>aha moment</b>——模型开始自我反思。当然这个自我反思最近也有些争议，也有人觉得前面的 base model 可能就有这个能力了，只是被激发出来，这个还在更多的研究中间。</p><h4 class="h4">R1：加一段冷启动</h4></div></div><div class="turn cont" data-t="10700"><button class="ts" data-seek="10700" title="跳到 02:58:20">02:58:20</button><div class="td"><p>R1 并不是只用了数学数据，他们也有其他的 data，他们叫 <b>Reinforcement Learning for all Scenarios</b>。对于其他的 data 可能就没有规则了；没有规则的话，他们这里说了，还是要用奖励模型的——就是刚刚我们讨论的那个问题：<b>你这种没有规则的，还是要用奖励模型，这个是避不开的。</b>然后 helpfulness、harmlessness 这些也加进去。</p></div></div><div class="turn cont" data-t="10738"><button class="ts" data-seek="10738" title="跳到 02:58:58">02:58:58</button><div class="td"><p>刚刚说的是 <b>DeepSeek-R1-Zero</b>。而 <b>DeepSeek-R1</b> 呢，前面就跟之前的人做的一样：前面要做一个 SFT，他们叫 <b>cold start（冷启动）</b>——做一个长序列的、有点像蒸馏的东西，训练一下。这个数据是他们自己来的，没有具体写怎么来的，规模也不大。做完之后再做 RL，最后效果会更好。今天大家用的 DeepSeek-R1 就是这样一个模型，效果很好。</p></div></div><div class="turn cont" data-t="10771"><button class="ts" data-seek="10771" title="跳到 02:59:31">02:59:31</button><div class="td"><p>但这篇论文其实是刚刚讲的这么多论文里面，<b>DeepSeek 写得最简单的一篇</b>。</p></div></div><div class="turn" data-t="10778"><button class="ts" data-seek="10778" title="跳到 02:59:38">02:59:38</button><div class="td"><span class="who host">张小珺</span><p>为什么变简单了？因为它的路径本身都变简单了吗？</p></div></div><div class="turn" data-t="10785"><button class="ts" data-seek="10785" title="跳到 02:59:45">02:59:45</button><div class="td"><span class="who">何俊贤</span><p>我觉得就是路径变简单了。</p><p>因为它的基座是 V3，V3 是他自己前面已经弄出来的。V3 本身当然不简单——从 V2 到 V3 有 MLA、多头潜在注意力，有很多专家，还有 shared 专家——但这些东西前面的论文已经写了。所以 R1 就基于 V3 开始做 RL，做的是 GRPO，而 GRPO 也是 DeepSeekMath 那篇论文他们自己弄出来的，也不需要怎么写，而且那篇论文也是半年之前就有了。</p><p>然后 reward 上，他们抛弃了之前很复杂的各种东西——MCTS、奖励模型都没有——就用规则，就这样做，效果就很好。然后 scale up，效果就很好，就突然火了。</p><p>所以这篇论文其实我感觉是今天讲的这么多论文里最简单的一篇，也没有太多技术细节要讲，反正效果很好。我觉得主要是结果确实让大家觉得很 impressive。</p></div></div><div class="turn" data-t="10857"><button class="ts" data-seek="10857" title="跳到 03:00:57">03:00:57</button><div class="td"><span class="who host">张小珺</span><p>难的工作前面可能都做完了。</p></div></div><div class="turn" data-t="10860"><button class="ts" data-seek="10860" title="跳到 03:01:00">03:01:00</button><div class="td"><span class="who">何俊贤</span><p>对。前面难的工作——积极的，就像刚刚说的 V3 这些；GRPO 这些都用到了；然后走的弯路前面也走够了。</p></div></div><div class="turn cont" data-t="10867"><button class="ts" data-seek="10867" title="跳到 03:01:07">03:01:07</button><div class="td"><p>其实在我看来还是比较 surprising 的这个结果，因为 Zero 的训练我之前也没有想到可以 work 这么好。但今天讲了这么多工作，也可以看出来<b>它不是凭空出现的</b>——它是集大成，集了他们之前不管是成功的还是失败的一些经历，最后得到 R1。</p><p>行，我今天差不多就讲这些。</p></div></div><div class="part" id="p13">最后：一起强化学习一下</div><h2 class="sec" id="s13">十三、论文之外的问题</h2><div class="turn" data-t="10901"><button class="ts" data-seek="10901" title="跳到 03:01:41">03:01:41</button><div class="td"><span class="who host">张小珺</span><p>我还有一些问题。他的论文发布时间基本上都集中在 2024 年初到 2025 年初，这个发论文的频率对于学术界是不是也非常高？</p></div></div><div class="turn" data-t="10914"><button class="ts" data-seek="10914" title="跳到 03:01:54">03:01:54</button><div class="td"><span class="who">何俊贤</span><p>对于学术界当然是很高。但他们是一个公司，我觉得也还行，因为他们资源多、人也多，不是只有一个实验室那么多人。</p></div></div><div class="turn" data-t="10925"><button class="ts" data-seek="10925" title="跳到 03:02:05">03:02:05</button><div class="td"><span class="who host">张小珺</span><p>像 DeepSeek 这样，以公司的形式存在，但做了很多 science 的工作，对学术界冲击大吗？对你们科研有影响吗？</p></div></div><div class="turn" data-t="10935"><button class="ts" data-seek="10935" title="跳到 03:02:15">03:02:15</button><div class="td"><span class="who">何俊贤</span><p>影响当然是有，但我觉得还是<b>帮助大于影响</b>。因为很多公司发模型，背后的 science 也不讲；而 DeepSeek 的很多工作其实帮助我们理解了很多东西，有点像学术界发论文一样。</p></div></div><div class="turn" data-t="10956"><button class="ts" data-seek="10956" title="跳到 03:02:36">03:02:36</button><div class="td"><span class="who host">张小珺</span><p>DeepSeek 这次它的产品让人非常 impressive 的，还不是 math 或者 coding，而是它生成文本真的像人一样，文字非常优美，有很多很感性的表达。这是为什么呢？因为回顾他的论文，他做的更多的还是理工科的工作，但出来的文本又非常文科生。</p></div></div><div class="turn" data-t="10984"><button class="ts" data-seek="10984" title="跳到 03:03:04">03:03:04</button><div class="td"><span class="who">何俊贤</span><p>这个问题我之前也跟别人讨论过，我觉得主要有两个猜测。</p><p><b>第一个猜测</b>：DeepSeek 的基座是 V3，V3 前面的 data，包括 R1——我们看到 R1 做强化学习也不止做了 math 和 coding，也做了 general 通用的部分，通用的他们也有数据、也有相应的奖励模型，但这些 data 的来源并没有说得很详细。我觉得他们在文科这方面的 data 上可能有比较好的积累。之前也有传闻说 DeepSeek 也有中文系的学生。可能有这样的人帮他们做一些标注，让他们的文学功底更强——不管是在基座还是在 R1 的 alignment 阶段。这是第一个猜想，当然也不知道实际上是不是这个造成了主要的效果。</p><p><b>第二个猜测</b>：R1 的训练、长推理的训练，可能对文科会有一些<b>泛化</b>的帮助。你虽然是做 math 做题和 coding，但你让这个模型的各种推理变得很有逻辑、懂得不停地反思、进行很长的推理，这个能力可能一定程度迁移到了其他任务上——包括文科的，相当于有了更多的思考，可能会有更多的提升。</p><p>这两个到底哪一个作用更大，我们实际上也不是很清楚，但这是大家平常会讨论到的两个假设。</p></div></div><div class="turn" data-t="11096"><button class="ts" data-seek="11096" title="跳到 03:04:56">03:04:56</button><div class="td"><span class="who host">张小珺</span><p>在你们看来，你觉得模型已经有意识了吗？</p></div></div><div class="turn" data-t="11099"><button class="ts" data-seek="11099" title="跳到 03:04:59">03:04:59</button><div class="td"><span class="who">何俊贤</span><p>说实话，本着一个严谨的科学态度，我们一般不说这样的 statement。我们一般不觉得模型有意识，或者说我们也不会讨论这个问题。我觉得应该没有吧。</p></div></div><div class="turn" data-t="11111"><button class="ts" data-seek="11111" title="跳到 03:05:11">03:05:11</button><div class="td"><span class="who host">张小珺</span><p>为什么一般你们不讨论这个问题？但这跟对意识的定义其实是有关系的。</p></div></div><div class="turn" data-t="11120"><button class="ts" data-seek="11120" title="跳到 03:05:20">03:05:20</button><div class="td"><span class="who">何俊贤</span><p>对，我觉得这可能跟意识的定义有关系。</p><p>有些人跟这个模型聊天，觉得它就像一个人一样，就觉得它有意识；有些人可能会觉得，这个模型不过是把你的训练数据拿出来排列组合了一下，本身还是一个机器的事情，并不像人的大脑真的有那种意识。</p><p>但实际上模型是不是真的拿训练数据在排列组合，其实我们也不是很清楚——因为可以看到它在很多场景下肯定也不是简单地对训练数据排列组合，尤其是今天这样的模型。但它背后这个泛化，到底还是很机械的、像一个程序式生成的东西，还是真的像人一样有这种所谓的智能——当然这个对智能的定义也不一样——我觉得很难去验证。</p><p>我觉得我们不讨论，可能也是因为理工科的同学不太喜欢讨论「什么是意识、什么是智能」这种感觉有点哲学的问题。业内的人我觉得大家不太会讨论这种问题。</p></div></div><div class="turn" data-t="11190"><button class="ts" data-seek="11190" title="跳到 03:06:30">03:06:30</button><div class="td"><span class="who host">张小珺</span><p>我听你讲完，感觉 DeepSeek 在过去一年走得相对还是挺顺的——基本原理搞懂了以后，后面的复现或者做一些创新都还比较顺畅。</p></div></div><div class="turn" data-t="11204"><button class="ts" data-seek="11204" title="跳到 03:06:44">03:06:44</button><div class="td"><span class="who">何俊贤</span><p>从论文发表看起来我觉得是的。至于他们背后，我觉得肯定也会有不少失败的尝试，只是失败了他们也不会写出来，发表出来的都是比较成功的。但相对来说确实也是比较顺的——一年多时间内发表了很多，这些大模型最后也都很成功。</p></div></div><div class="turn" data-t="11229"><button class="ts" data-seek="11229" title="跳到 03:07:09">03:07:09</button><div class="td"><span class="who host">张小珺</span><p>能不能看得出来他们一共花了多少钱和多少卡？</p></div></div><div class="turn" data-t="11234"><button class="ts" data-seek="11234" title="跳到 03:07:14">03:07:14</button><div class="td"><span class="who">何俊贤</span><p>多少钱我觉得可能要仔细算一算，我没有算过。</p><p>但卡的资源，从公开信息来看，其实没有很多卡。这个也不是什么秘密，DeepSeek 自己也说过：<b>他们有 1 万张比较老的 A100</b>，那个 A100 比较老、不是后来比较新的那种，而且是很早就有了。然后新的，比如 V3 的训练就是 2000 张 H800。好像也就这么多卡。</p></div></div><h2 class="sec" id="s14">十四、为什么是它：一点一点攒出来的创新</h2><div class="turn" data-t="11271"><button class="ts" data-seek="11271" title="跳到 03:07:51">03:07:51</button><div class="td"><span class="who host">张小珺</span><p>能不能总结一下，为什么 DeepSeek 可以追得这么快，以及为什么它的成本可以这么低？我理解成本低跟它的很多工程优化有关，比如 MoE、MLA、GRPO 等等。</p></div></div><div class="turn" data-t="11289"><button class="ts" data-seek="11289" title="跳到 03:08:09">03:08:09</button><div class="td"><span class="who">何俊贤</span><p>总结一下：我觉得从很早的时候开始，DeepSeek 就有这样一种文化或者追求——<b>不是纯粹地 follow 之前别人做的 practice</b>。</p><p>因为像 Llama、Mistral 这些都很权威，你如果就 follow 他们做，可能也很难完全超过他们，你得跟他们做得不一样。</p><p>我觉得 DeepSeek 从一开始就有这个。包括最早从 DeepSeekMoE 开始就探索更多的 expert，开始探索很多创新的东西。但这种创新也不是为了创新而创新——<b>更多是他们真的想压低成本、想让整个东西更 efficient</b>，所以就很勇敢地做了这些尝试，最后跟别人 diverge 了。所以 DeepSeek 到后面就跟别人越来越不一样，他自己有一套。</p><p>比如 GRPO，在出名之前其实别人也没用，但 DeepSeek 一直用他自己发明的这一套。包括 MLA，可能到现在他们火了、越来越多人会用，但之前 MLA 发明出来之后，后面很多人也没有用。所以他们自己有自己一套东西，而且<b>很坚信自己的东西</b>——真的很好，而且降低了成本。</p><p>所以到后来我们会觉得 DeepSeek 是一个很有创新精神的公司。他们的创新其实是一点一点积累到后面的：我们今天看 R1、看 V3 的时候，会发现 V3 有很多东西都跟别的模型不一样；但他们其实每一个阶段，可能每次都只有一个小东西跟别人不一样。</p><p>这样就让他们到了今天——包括像美国——大家是真的认识到 DeepSeek 做了很多创新，所以还是很 respect 他们。（如果你只是 follow 他们做，做得跟他们一样好，大家不会觉得你很创新。）</p></div></div><div class="turn" data-t="11416"><button class="ts" data-seek="11416" title="跳到 03:10:16">03:10:16</button><div class="td"><span class="who host">张小珺</span><p>如果说纯原创的话，一个是 MLA，一个是 GRPO，还有别的吗？</p></div></div><div class="turn" data-t="11422"><button class="ts" data-seek="11422" title="跳到 03:10:22">03:10:22</button><div class="td"><span class="who">何俊贤</span><p>如果说从算法上的纯原创，我觉得主要是这两个。</p><p>但当然很多东西我也倾向于认为算是创新。比如他们第一次在 MoE 里面尝试做很多 expert、加上 shared expert 的机制——这个相对创新，你可以认为没有 GRPO 或者 MLA 那么明显，但依然是很新的。</p><p>包括他们在 V3 里面第一次把 multi-token prediction 做进去。虽然那篇论文是别人发的、不是他们原创的，但<b>他第一次大规模把这个东西做进去，而且做成功</b>。包括第一次在 FP8 的训练上——也是为了降本增效——做到这样大规模而且做成功。虽然这个东西也不是他们发明的，但之前也没有人真的成功在大规模训练里面做过，而他们把它做成功了，还把这些经验一定程度告诉了大家。其实这些我觉得也是挺创新的。</p></div></div><div class="turn" data-t="11482"><button class="ts" data-seek="11482" title="跳到 03:11:22">03:11:22</button><div class="td"><span class="who host">张小珺</span><p>你觉得他们是纯原创的成分多，还是组合式创新多？一系列的小创新比较多？</p></div></div><div class="turn" data-t="11490"><button class="ts" data-seek="11490" title="跳到 03:11:30">03:11:30</button><div class="td"><span class="who">何俊贤</span><p>我觉得也不能叫小创新。</p><p>当然你可以认为「你不用 Transformer 了、做一个完全不一样的架构」才叫大创新，但这样看的话，OpenAI 也没有这么大的创新——OpenAI 的模型应该还是基于 Transformer 的。因为这些很基本的东西你很难改：language model 预训练大家都是 Transformer，然后用 predict next token，这些都是既定的，你很难说完全去革命它。那么在这个框架下，我觉得你能做的创新也就是这些。</p></div></div><div class="turn" data-t="11531"><button class="ts" data-seek="11531" title="跳到 03:12:11">03:12:11</button><div class="td"><span class="who host">张小珺</span><p>或者叫工程化创新，可以这么总结吗？</p></div></div><div class="turn" data-t="11534"><button class="ts" data-seek="11534" title="跳到 03:12:14">03:12:14</button><div class="td"><span class="who">何俊贤</span><p>有很多工程化创新。但我觉得 <b>GRPO 和 MLA 不算工程化创新，也算是一种算法创新</b>。</p></div></div><div class="turn" data-t="11542"><button class="ts" data-seek="11542" title="跳到 03:12:22">03:12:22</button><div class="td"><span class="who host">张小珺</span><p>就是两个原创的算法创新，加上很多的工程化创新。</p></div></div><div class="turn" data-t="11548"><button class="ts" data-seek="11548" title="跳到 03:12:28">03:12:28</button><div class="td"><span class="who">何俊贤</span><p>对，可以这么说。</p></div></div><h2 class="sec" id="s15">十五、下一个 Scaling Law</h2><div class="turn" data-t="11549"><button class="ts" data-seek="11549" title="跳到 03:12:29">03:12:29</button><div class="td"><span class="who host">张小珺</span><p>基座模型现在走到 V3 了，你觉得再往后走，智能水平提升的空间还有多大？还需要训更大的模型吗？</p></div></div><div class="turn" data-t="11557"><button class="ts" data-seek="11557" title="跳到 03:12:37">03:12:37</button><div class="td"><span class="who">何俊贤</span><p>我觉得 Scaling Law 应该还是有的。</p><p>当然现在基座模型比起之前是稍微有一点饱和了。因为大家用的 token 越来越多、模型越来越大，而高质量的数据本身可能很难有那么多——这也是之前大家讨论的问题，数据已经有点饱和了。互联网数据当然很多，但大部分数据没有那么好、没那么 clean，你能拿到的高质量数据可能也很难特别多。而这个时候你的模型还在变得更大，所以我觉得基座模型是相对有一点收敛的。</p><p>Ilya 之前在 NeurIPS 上也讲过，他觉得 data 已经逐渐开始走到极限，那我们可能要想怎么 scale data，比如 synthetic data（合成数据）或者别的方式，可能是一条路。</p><p>但基座模型的发展我觉得肯定还有空间，不是说现在没有空间——你做得更大、再用更多的数据，肯定还是会更好，只是相比一年之前，这个趋势会要饱和很多了。</p></div></div><div class="turn cont" data-t="11632"><button class="ts" data-seek="11632" title="跳到 03:13:52">03:13:52</button><div class="td"><p>现在大家很多关注点在于：<b>怎么样把这个基座模型在一些关键能力上有大幅提升。</b>比如 DeepSeek-R1 就是一个例子，他们是可规模化的强化学习，那就相当于是<b>另一个 Scaling Law</b>。</p><p>之前大家 scale up 的是预训练的算力，现在大家讨论：其他维度的 scaling 是什么？有人说是 test-time 的 scaling，现在也有人觉得是强化学习的 scaling——强化学习是不是可以继续 scale 下去，给模型带来更多的提升。我觉得这是接下来比较热门的一些 topic。</p></div></div><div class="turn" data-t="11676"><button class="ts" data-seek="11676" title="跳到 03:14:36">03:14:36</button><div class="td"><span class="who host">张小珺</span><p>你是从什么时候开始研究强化学习的？我其实是去年 Q3、o1 发之前才知道它的。我不知道在学界，强化学习是不是一直是一个非常主流的分支？</p></div></div><div class="turn" data-t="11687"><button class="ts" data-seek="11687" title="跳到 03:14:47">03:14:47</button><div class="td"><span class="who">何俊贤</span><p>强化学习有自己的主流分支，但在语言模型这边、自然语言处理这边，其实<b>一直不是太主流</b>。</p><p>在过去很长一段时间——特别是在大模型出来之前——有很多人在自然语言处理里面做强化学习，但都没有特别 work。强化学习一直给人一种感觉：它很难有效，或者说在自然语言处理任务里面很难有效。所以有很多传统做 NLP 的人，包括我自己早期，是不信强化学习的。</p></div></div><div class="turn cont" data-t="11733"><button class="ts" data-seek="11733" title="跳到 03:15:33">03:15:33</button><div class="td"><p>强化学习在自然语言处理里面逐渐成为主流、得到更多关注，其实是<b>从 OpenAI 做 InstructGPT 开始</b>——就是人类反馈强化学习（RLHF）。因为大家知道 ChatGPT 是这样做的，就开始有越来越多的人研究怎么样在大模型里面做强化学习，来对齐人类的价值观之类的问题。我觉得那是一个分界点。</p><p>在那之前，强化学习在 NLP 里面一直不太受这个方向科研人员的待见，因为有很多失败的尝试。但 OpenAI 开始宣传人类反馈强化学习，这个东西很火，后来就开始成为一个主流方向。</p></div></div><div class="turn cont" data-t="11791"><button class="ts" data-seek="11791" title="跳到 03:16:31">03:16:31</button><div class="td"><p>不过那时候强化学习还是<b>主要做价值对齐</b>，并不太用来做 reasoning。做 reasoning 大家可能还是没有发现它很 work，还是做价值对齐、做社会价值观。真正做 reasoning 的强化学习一直没有很主流。</p><p>我自己是在 2023 年底最早做强化学习，那时候我也是做价值对齐、做 alignment，但那时候我们做的是 <b>DPO</b>——离线的 DPO。那时候 DPO 很火，因为它很简单、算力要求也不高、跑起来也容易；你去做 PPO 这种在线的也很复杂、很难调。DPO 确实效果也很好，在跟用户对齐这方面效果也很好，所以很多人用。</p></div></div><div class="turn cont" data-t="11849"><button class="ts" data-seek="11849" title="跳到 03:17:29">03:17:29</button><div class="td"><p>后来做 reasoning，我们第一次尝试做强化学习 reasoning，刚刚也提到过，是大半年之前。那时候就有点像 DeepSeekMath，用过程监督的奖励模型——我们甚至是直接用的 Math-Shepherd，就是 DeepSeek 公开开源的那个过程监督奖励模型。我们拿过来就开始做 online 的 PPO，那时候就做不 work，最后以失败告终。就是发现在数学上弄这个奖励模型做 PPO，怎么做都不 work。我们做了很长时间，可能调了两三个月，效果都不是很好。</p><p>后来我们就放弃那个强化学习了，改做刚刚说过的那种 <b>iterative 的自我进化</b>——迭代式自我进化，那个挺 work 的，那个项目最后也做完了。但那个项目做完之后，我们觉得不行，还是要做在线的。所以去年底、2024 年底我们又开始做 PPO。</p><p>相当于我们一开始失败了，搞了两三个月；然后做了一个更容易 work、也是当时 community 主要在做的，就是有点像 rejection sampling 的那种 SFT；那个项目做得比较顺利。做出来之后我们觉得，在自我进化这条路上还是应该做 online 的才比较有前途、才是未来的方向。</p></div></div><div class="turn cont" data-t="11944"><button class="ts" data-seek="11944" title="跳到 03:19:04">03:19:04</button><div class="td"><p>所以去年底又开始做 PPO，这次就做 work 了。<b>跟之前的区别就是：我们不用奖励模型了。</b></p><p>这跟大家收敛的路线也是一样的——大家用奖励模型发现做起来有点困难，后来就不用奖励模型，像 DeepSeek-R1、Kimi 最后都收敛到了这个地方。然后发现不用奖励模型之后，这个东西就很容易 work。</p></div></div><div class="turn" data-t="11967"><button class="ts" data-seek="11967" title="跳到 03:19:27">03:19:27</button><div class="td"><span class="who host">张小珺</span><p>整体你怎么看 DeepSeek 这些论文的 style？它有自己的 style 吗？</p></div></div><div class="turn" data-t="11972"><button class="ts" data-seek="11972" title="跳到 03:19:32">03:19:32</button><div class="td"><span class="who">何俊贤</span><p>我觉得有。<b>他们的论文很像学校的论文</b>——他们资源当然很多，学校一般做不了这么大的模型，但他们是拿着公司、业界这种 level 的资源，写出这些东西；整个风格又很低调，不太浮夸、不到处宣传。我觉得他们整个的风格都很像高校的 style，跟其他的业界是很不一样的。</p><p>当然他们的团队模式可能也天然比较 unique，因为是自己孵化的，可能也有这方面的原因，决定了他们天然就是一个有点特别的团队。</p></div></div><div class="turn" data-t="12014"><button class="ts" data-seek="12014" title="跳到 03:20:14">03:20:14</button><div class="td"><span class="who host">张小珺</span><p>好啦，这期节目就是这样。如果你喜欢我的节目，欢迎前往小宇宙、苹果 Podcast、腾讯新闻、喜马拉雅、QQ 音乐订阅《张小珺商业访谈录》。如果你有其他想邀请的嘉宾、想听的内容，或者有任何想探讨的话题，都欢迎各位听众朋友们在评论区留言。我们下集再见，拜拜。</p></div></div></article>

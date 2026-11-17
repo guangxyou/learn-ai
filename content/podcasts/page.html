@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>播客精校稿合集 · 12 期 AI 播客的逐段精校文字稿：DeepSeek 论文、注意力机制之争、Kimi 与杨植麟、多模态与世界模型</title>
+<meta name="description" content="张小珺《商业访谈录》8 期、晚点聊 LateTalk 4 期，按专题分四组：何俊贤逐篇讲 DeepSeek 9 篇论文（EP91）；注意力机制之争，杨松琳、肖朝军与付天宇、钟怡然从 NSA、MoBA、Lightning Attention 讲到 DeltaNet、Kimi Linear 和 MiniMax 退回 full attention（EP94、晚点聊 103/104、EP119、晚点聊 143）；杨植麟两次访谈与 Kimi K3 技术报告的两期解读（EP59、EP113、EP152、晚点聊 177）；张祥雨谈多模态十年、谢赛宁谈世界模型（EP102、EP133）。转写后逐段精校，保留对话形式，编者补充单独标出；每段带时间码，点一下跳到音频对应位置播放。">
+<link rel="canonical" href="__CANONICAL__">
+<style>:root{--accent:#0F766E;--accent-soft:#E6F4F1;--accent-line:#B8DED8;--accent-ink:#0B5750;
+--bg:#FBFAF8;--bg-elev:#FFF;--bg-sunken:#F3F1ED;--bg-hover:#F1EFEA;
+--text:#14161A;--text-2:#4E5560;--text-3:#868D98;--line:#E4E1DA;--line-soft:#EFEDE7;
+--warn:#B45309;--warn-soft:#FEF6E7;
+--shadow-sm:0 1px 2px rgba(20,22,26,.05);--r-sm:6px;--r-md:10px;--r-full:999px;--bar-h:52px;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC",system-ui,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+--math:"Times New Roman",Times,Georgia,serif;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+/* 和视频里一样：î 绿、ĵ 红、k̂ 蓝 */
+--ih:#4F9A3A;--jh:#C0463E;--kh:#2F7FB8}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;padding:0}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+.back{display:inline-block;margin-top:16px;color:var(--text-2);font-size:13px}
+.ep-head{padding:30px 0 8px;max-width:900px}
+.ep-kicker{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3)}
+.ep-kicker .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.ep-head h1{font-size:29px;line-height:1.25;margin:12px 0 0}
+
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:var(--bar-h)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-size:13px;color:var(--text-2);background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-full);padding:5px 14px;white-space:nowrap}
+.tb:hover{background:var(--bg-hover);color:var(--text)}
+.tb.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.view{display:none;padding-top:22px}.view.on{display:block}
+
+/* ── 公式、矩阵 ── */
+.m{font-family:var(--math);font-size:1.08em;white-space:nowrap;font-variant-numeric:lining-nums}
+.m i,.mx i{font-style:italic}
+sup,sub{font-size:.72em;line-height:0}.m sup{vertical-align:.5em}
+.ih{color:var(--ih)}.jh{color:var(--jh)}.kh{color:var(--kh)}
+/* 矩阵：两侧方括号用边框画，元素网格排 */
+.mx{display:inline-grid;gap:0 .7em;vertical-align:middle;margin:2px .2em;padding:1px .45em;position:relative;
+  font-family:var(--math);font-size:1.02em;line-height:1.25;text-align:center;font-variant-numeric:lining-nums}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:.32em;border:1.2px solid currentColor}
+.mx::before{left:0;border-right:0}.mx::after{right:0;border-left:0}
+code{font:12.5px var(--mono);background:var(--bg-sunken);padding:1px 5px;border-radius:4px}
+
+/* ── tab 开头 ── */
+.intro{max-width:860px;color:var(--text-2);font-size:15px;line-height:1.75}
+.intro h2{font-size:20px;color:var(--text);margin:0 0 8px}
+.intro h3{font-size:15.5px;color:var(--text);margin:26px 0 6px}
+.intro p{margin:0 0 12px}
+.intro b{color:var(--text);font-weight:600}
+.intro a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.intro svg{display:block;width:100%;height:auto;margin:10px 0 4px}
+.intro .fcap{font-size:12.5px;color:var(--text-3);margin:4px 0 0}
+.check{margin:18px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);font-size:14px}
+.check h3{margin:0 0 6px;font-size:14.5px}
+.check ul{margin:6px 0 0;padding-left:1.2em}.check li{margin:3px 0}
+.eptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 12px;font-size:12.5px;color:var(--text-3)}
+.eptools span{margin-right:auto}
+.eptools button{font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:3px 11px;border-radius:var(--r-full)}
+.eptools button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* ── 每集一张卡，默认收起 ── */
+.ep{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);margin-bottom:10px;scroll-margin-top:calc(var(--bar-h) + 10px)}
+.ep>summary{list-style:none;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:start;
+  padding:14px 18px;cursor:pointer;border-radius:var(--r-md)}
+.ep>summary::-webkit-details-marker{display:none}
+.ep>summary:hover{background:var(--bg-hover)}
+.ep[open]>summary{border-bottom:1px solid var(--line-soft);border-radius:var(--r-md) var(--r-md) 0 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 13px/30px var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.no.mk{font-size:14px;font-weight:600}
+/* 正文里的链接：跨 tab 的锚点（#ch3、#ai-attention）和外链 */
+.ilink{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.ilink:hover{color:var(--accent)}
+.tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tt b{font-size:16px;font-weight:650;line-height:1.4}
+.tt em{font-style:normal;font-size:12.5px;color:var(--text-3)}
+.tt .hook{font-size:13.5px;color:var(--text-2);margin-top:5px;line-height:1.6}
+.side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px}
+.chip{font-size:12px;color:var(--text-2);border:1px solid var(--line);padding:1px 8px;border-radius:var(--r-full);white-space:nowrap}
+.len{font:12px var(--mono);color:var(--text-3)}
+@media(max-width:720px){
+  .ep>summary{grid-template-columns:30px minmax(0,1fr);padding:12px 14px}
+  .side{grid-column:2;justify-content:flex-start;padding-top:2px}
+}
+
+/* 展开后：左边摘要，右边播放器 + 时间轴，宽屏时右栏吸顶，读到哪都能点时间码看 */
+.epb{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;padding:18px 18px 26px}
+@media(min-width:1100px){.epb{grid-template-columns:minmax(0,1fr) 420px;gap:32px;padding:20px 22px 30px}}
+.epside{order:-1}
+@media(min-width:1100px){.epside{order:0;position:sticky;top:calc(var(--bar-h) + 14px);align-self:start;
+  max-height:calc(100vh - var(--bar-h) - 28px);display:flex;flex-direction:column}}
+.pl{position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden;background:#111;flex:none}
+.pl video,.pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.plgo{position:absolute;inset:0;width:100%;height:100%;background:#111 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.plgo::before{content:"";position:absolute;inset:0;background:rgba(20,22,26,.4)}
+.plgo:hover::before{background:rgba(20,22,26,.28)}
+.tri{position:relative;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.94)}
+.tri::after{content:"";position:absolute;top:50%;left:53%;transform:translate(-50%,-50%);border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #14161A}
+.plsrc{display:flex;gap:10px;align-items:baseline;margin:7px 0 8px;font-size:12px;color:var(--text-3)}
+.plsrc .plwhich{margin-right:auto}
+.plsrc a{color:var(--text-2);border-bottom:1px solid var(--line)}
+.plsrc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.tl{margin:0;padding:0;list-style:none;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:auto;overscroll-behavior:contain;min-height:0}
+@media(max-width:1099px){.tl{max-height:300px}}
+.tl li+li{border-top:1px solid var(--line-soft)}
+.tl button{display:flex;gap:10px;width:100%;padding:6px 11px;font-size:13px;color:var(--text-2);line-height:1.5}
+/* 时间列要放得下 1:04:27 这种七位时间码；按 ch 算宽，换字体也不会压到右边文字 */
+.tl button b{flex:none;width:7ch;font:12px/1.6 var(--mono);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.tl button:hover{background:var(--bg-hover);color:var(--text)}
+.tl button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.tl button.on b{color:var(--accent-ink)}
+
+/* ── 摘要正文 ── */
+.epmain{min-width:0;color:var(--text-2);font-size:15px;line-height:1.8}
+.epmain .lede{margin:0 0 6px;color:var(--text);font-size:15.5px;line-height:1.8}
+.epmain .lede.todo{color:var(--text-3)}
+.links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 4px;font-size:12.5px}
+.links a{color:var(--text-3);border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--accent);border-color:var(--accent-line)}
+.sec{margin-top:26px}
+.sec h4{display:flex;align-items:baseline;gap:9px;font-size:16.5px;color:var(--text);margin-bottom:6px;line-height:1.45}
+.sec p{margin:0 0 11px}
+.sec b{color:var(--text);font-weight:600}
+.sec ul{margin:4px 0 0;padding-left:1.2em}.sec li{margin:5px 0}
+.keys{padding:14px 18px 10px;background:var(--bg-sunken);border-radius:var(--r-md)}
+.keys h4{font-size:14.5px}
+/* 时间码：正文里是小药丸，点了跳视频 */
+.ts{display:inline-block;font:600 11.5px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec h4 .ts{flex:none;font-size:12px;vertical-align:0}
+.note{margin:14px 0 4px;padding:11px 14px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#6B3A0E}
+.note p{margin:0}.note p+p{margin-top:8px}
+.note .lbl{font-size:11.5px;font-weight:700;color:var(--warn);margin-right:8px;letter-spacing:.04em}
+.pz{margin:14px 0 4px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:#fff}
+.pz summary{cursor:pointer;padding:10px 14px;font-size:14px;color:var(--text);list-style:none}
+.pz summary::-webkit-details-marker{display:none}
+.pz summary>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.pz summary::after{content:"看答案";float:right;font-size:12px;color:var(--text-3)}
+.pz[open] summary::after{content:"收起"}
+.pz p{margin:0;padding:0 14px 12px;font-size:14px}
+.tbl{margin:10px 0 6px;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+.tbl tr:last-child td{border-bottom:0}
+.tnote{font-size:12.5px;color:var(--text-3);margin:6px 0 0 !important;line-height:1.7}
+.ex{margin:16px 0 6px;padding:12px 16px 10px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.ex p{font-size:14.5px;line-height:1.85;margin:0 0 8px}
+.ex .ex-h{font-weight:600;color:var(--accent-ink)}
+.ex-h>.lbl{font-size:11.5px;font-weight:700;color:var(--accent);margin-right:8px;letter-spacing:.04em}
+.ex .tbl td,.ex .tbl th,.ex .tbl .m{white-space:nowrap}
+.fig{margin:14px 0 8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:4px}
+
+/* 截图：两列，点开大图 */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:14px 0 4px}
+.shot{margin:0}
+.shot img{display:block;width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line);cursor:zoom-in;background:#000}
+.shot img:hover{border-color:var(--accent-line)}
+.shot figcaption{margin-top:6px;font-size:12.5px;color:var(--text-3);line-height:1.55}
+.shot figcaption .ts{margin:0 6px 0 0}
+
+.lb{position:fixed;inset:0;z-index:70;background:rgba(20,22,26,.88);display:none;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb figure{margin:0;max-width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lb img{max-width:100%;max-height:calc(100vh - 100px);object-fit:contain;border-radius:var(--r-sm)}
+.lb figcaption{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+.lb-nav:hover{background:rgba(255,255,255,.3)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:16px}.lb-next{right:16px}
+/* 窄屏上长公式（叉积展开、克莱姆法则那几行）一行放不下，允许在空格处折行 */
+@media(max-width:640px){.m{white-space:normal}.epb{padding:14px 14px 22px}}
+
+/* ── AI 中的线性代数：左目录，右正文 ── */
+.aiwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+@media(min-width:1000px){.aiwrap{grid-template-columns:200px minmax(0,1fr)}}
+.aitoc{display:none}
+@media(min-width:1000px){.aitoc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);align-self:start;font-size:13px}}
+.aitoc p{margin:0 0 6px;font-size:12px;color:var(--text-3);font-weight:600}
+.aitoc ol{margin:0;padding:0 0 0 1.3em;color:var(--text-3)}
+.aitoc li{margin:4px 0;line-height:1.45}
+.aitoc a{color:var(--text-2)}
+.aitoc a:hover{color:var(--accent)}
+.aidoc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.85}
+.aidoc .aih{font-size:21px;color:var(--text);margin:0 0 10px}
+.aidoc .lede{color:var(--text);margin:0 0 10px}
+.aidoc p{margin:0 0 11px}
+.aidoc b{color:var(--text);font-weight:600}
+.aisec{margin-top:40px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.aisec h2{display:flex;gap:10px;align-items:baseline;font-size:18.5px;line-height:1.45;color:var(--text);margin-bottom:4px}
+.aisec h2 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:600 12px/24px var(--sans);text-align:center;transform:translateY(-2px)}
+.chs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--text-3);margin:0 0 12px !important}
+.chref{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-line);padding:0 8px;border-radius:var(--r-full);white-space:nowrap}
+.chref:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.refs{display:flex;flex-direction:column;gap:3px;margin-top:12px !important;font-size:12.5px}
+.refs a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.refs a:hover{color:var(--accent);border-color:var(--accent-line)}
+.aidoc .tbl td .chref{margin:0 4px 4px 0;display:inline-block}
+
+/* ── 延伸资料 ── */
+.exdoc{max-width:820px;color:var(--text-2);font-size:15px;line-height:1.8}
+.exgrp{margin-bottom:44px;scroll-margin-top:calc(var(--bar-h) + 14px)}
+.exgrp>h2{font-size:21px;color:var(--text);margin:0 0 10px}
+.exgrp>.lede{margin:0 0 10px;color:var(--text)}
+.excard{border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg-elev);padding:16px 18px 12px;margin-top:16px}
+.excard h3{font-size:16px;line-height:1.45}
+.excard h3 a{color:var(--text)}
+.excard h3 a:hover{color:var(--accent)}
+.excard p{margin:0 0 9px}
+.exmeta{font-size:12.5px;color:var(--text-3);margin:4px 0 10px !important}
+.exrefs{font-size:12.5px;color:var(--text-3)}
+.xref{display:inline-flex;flex-wrap:wrap;gap:5px;vertical-align:middle;margin-left:4px}
+.chref.ai{background:var(--warn-soft);border-color:#EBCB95;color:#7A3A06}
+.chref.ai:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+.expick{margin:4px 0 10px;padding-left:1.1em;font-size:14px}
+.expick li{margin:6px 0}
+.expick b{color:var(--text);font-weight:600;margin-right:8px}
+.expick span{color:var(--text-2);margin-right:4px}
+.exseries{margin:6px 0 10px;padding-left:1.4em;font-size:14px}
+.exseries li{margin:0 0 12px}
+.exseries li>a{color:var(--text);font-weight:600}
+.exseries li>a:hover{color:var(--accent)}
+.exseries time{margin-left:8px;font:12px var(--mono);color:var(--text-3)}
+.exseries p{margin:3px 0 4px !important;color:var(--text-2)}
+.exseries .xref{margin-left:0}
+.exlinks{display:flex;flex-direction:column;gap:3px;font-size:12.5px;margin-top:6px !important}
+.exlinks a{color:var(--text-3);border-bottom:1px solid var(--line);align-self:flex-start}
+.exlinks a:hover{color:var(--accent);border-color:var(--accent-line)}
+/* 五个 tab 在手机上会折成三行，吸顶栏占掉一大块屏幕；窄屏改成一行横向滑动 */
+@media(max-width:720px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tb{flex:none}
+}
+
+:root{--bar-h:0px}
+body{padding-bottom:0}
+main.wrap{padding-top:8px;padding-bottom:120px}
+.ep-head h1+p{margin:8px 0 0;color:var(--text-3);font-size:14.5px}
+
+/* ── 首页分组卡片 ── */
+.grp{margin-top:30px}
+.grp>h2{font-size:17px;color:var(--text);margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.pc{display:flex;flex-direction:column;gap:5px;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--bg-elev);padding:15px 17px;transition:border-color .15s,background .15s}
+.pc:hover{border-color:var(--accent-line);background:var(--bg-hover)}
+.pc-k{font-size:12px;color:var(--text-3)}
+.pc-k b{color:var(--accent-ink);font-weight:600}
+.pc-t{font-size:15.5px;line-height:1.5;color:var(--text);font-weight:650}
+.pc-s{font-size:13px;color:var(--text-2);line-height:1.6}
+.pc-m{margin-top:auto;padding-top:6px;font-size:12px;color:var(--text-3)}
+.pc.ext{border-style:dashed}
+
+/* ── 单期页头 ── */
+#view-ep{display:none}
+.eph{max-width:900px;padding:6px 0 4px}
+.eback{display:inline-block;color:var(--text-2);font-size:13px;margin-bottom:14px}
+.eback:hover{color:var(--accent)}
+.eph-k{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--text-3);flex-wrap:wrap}
+.eph-k .topic{flex:none;white-space:nowrap;background:var(--accent-soft);color:var(--accent-ink);padding:2px 9px;border-radius:var(--r-full);font-weight:600}
+.eph h1{font-size:26px;line-height:1.3;margin:10px 0 0}
+.eph-sub{margin:8px 0 0;color:var(--text-2);font-size:15px;line-height:1.7;font-weight:600}
+.eph-g{margin:10px 0 0;font-size:13.5px;color:var(--text-2)}
+.eph-l{margin:8px 0 0;display:flex;gap:16px;font-size:13px}
+.eph-l a{color:var(--accent-ink);border-bottom:1px solid var(--accent-line)}
+.eph-l a:hover{color:var(--accent)}
+.tocbtn{display:none;margin-top:10px;font-size:12.5px;color:var(--text-2);border:1px solid var(--line);background:var(--bg-elev);padding:4px 13px;border-radius:var(--r-full)}
+
+/* ── 正文：左目录右文稿 ── */
+.epwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:34px;margin-top:22px}
+@media(min-width:1000px){.epwrap{grid-template-columns:210px minmax(0,1fr)}}
+.toc{display:none}
+@media(min-width:1000px){.toc{display:block;position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;overscroll-behavior:contain;font-size:13px}}
+.toc.on{display:block;position:fixed;z-index:80;top:0;left:0;bottom:0;width:min(320px,86vw);background:var(--bg-elev);box-shadow:0 8px 40px rgba(20,22,26,.25);padding:16px;overflow:auto}
+.toc-h{font-size:12px;color:var(--text-3);font-weight:600;margin-bottom:8px}
+.toc-part{font-size:12px;color:var(--text-3);margin:12px 0 4px;font-weight:600}
+.toc-i{display:flex;gap:8px;width:100%;padding:4px 0;color:var(--text-2);line-height:1.5;font-size:13px}
+.toc-i:hover{color:var(--accent)}
+.toc-i.cur{color:var(--accent-ink);font-weight:600}
+.toc-i .tt-t{flex:none;width:7ch;font:11.5px/1.8 var(--mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.toc-i.cur .tt-t{color:var(--accent-ink)}
+
+.doc{max-width:780px;color:var(--text-2);font-size:15px;line-height:1.9;min-width:0}
+.doc .part{margin:34px 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:19px;font-weight:650;color:var(--text)}
+.doc h2.sec{margin:30px 0 8px;font-size:17.5px;line-height:1.5;color:var(--text);scroll-margin-top:20px}
+.doc .part+h2.sec{margin-top:14px}
+.doc h4.h4{margin:22px 0 4px;font-size:15.5px;color:var(--text)}
+.turn{display:grid;grid-template-columns:7.4ch minmax(0,1fr);gap:0 12px;margin:14px 0;scroll-margin-top:80px}
+.turn .ts{align-self:start;font:600 11px/1.6 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 5px;margin-top:4px;font-variant-numeric:tabular-nums;text-align:center}
+.turn .ts:empty{visibility:hidden}
+.turn .ts:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.turn.cur .td{background:var(--accent-soft);border-radius:var(--r-sm);box-shadow:0 0 0 6px var(--accent-soft)}
+.turn.cur .ts{background:var(--accent);color:#fff;border-color:var(--accent)}
+.td{min-width:0}
+.td p{margin:0 0 10px}
+.td p:last-child{margin-bottom:0}
+.td b{color:var(--text);font-weight:600}
+.who{display:inline-block;font-weight:650;color:var(--text);margin-right:8px;font-size:14px}
+.who::after{content:"：";color:var(--text-3);font-weight:400}
+.who.host{color:var(--accent-ink)}
+.td ul,.td ol{margin:4px 0 10px;padding-left:1.3em}
+.td li{margin:4px 0}
+.tsi{display:inline-block;font:600 11px/1.5 var(--mono);color:var(--accent-ink);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);padding:0 6px;margin:0 1px;vertical-align:1px;font-variant-numeric:tabular-nums}
+.tsi:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+blockquote.ed{margin:12px 0;padding:10px 14px;background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:13.5px;line-height:1.75;color:#6B3A0E}
+blockquote.ed p{margin:0}
+blockquote.ed p+p{margin-top:6px}
+.ed-l{display:block;font-size:11.5px;font-weight:700;color:var(--warn);letter-spacing:.05em;margin-bottom:4px}
+.tbl{margin:12px 0;overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+.tbl th{text-align:left;font-weight:600;color:var(--text-3);font-size:12px;padding:0 14px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--text)}
+pre.code{margin:12px 0;padding:12px 16px;background:var(--bg-sunken);border-radius:var(--r-sm);overflow-x:auto;font:12.5px/1.7 var(--mono);color:var(--text-2)}
+.fig{margin:18px 0 10px}
+.fig svg{display:block;width:100%;height:auto}
+.fig img{display:block;max-width:100%;height:auto;border-radius:var(--r-sm);border:1px solid var(--line-soft)}
+.fig figcaption{font-size:12.5px;color:var(--text-3);margin-top:5px;line-height:1.6}
+.fig .fcite{margin-left:8px;color:var(--text-3);opacity:.8}
+.doc a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
+.loading{padding:40px 0;color:var(--text-3);font-size:14px}
+
+/* ── 吸底播放器 ── */
+.pbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
+  background:color-mix(in srgb,var(--bg-elev) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+.pbar.on{display:block}
+.pbar .wrap{display:flex;align-items:center;gap:14px;padding:8px 24px;flex-wrap:nowrap}
+.pbar .pn{font-size:12.5px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28vw}
+.pbar audio{flex:1;min-width:0;height:36px}
+.pbar label{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-3);white-space:nowrap;cursor:pointer}
+body.playing #view-ep{padding-bottom:64px}
+@media(max-width:999px){.tocbtn{display:inline-block}}
+@media(max-width:640px){
+  .pbar .wrap{padding:7px 12px;gap:8px}
+  .pbar .pn{display:none}
+  .turn{grid-template-columns:1fr}
+  .turn .ts{justify-self:start;margin:0 0 3px}
+  .doc h2.sec{font-size:16.5px}
+}
+</style></head><body>
+<div class="wrap"><a class="back" href="__HOME__">‹ 全部条目</a></div>
+<div class="wrap" id="colhead"><header class="ep-head">
+  <div class="ep-kicker"><span class="topic">播客</span><span>12 期 · 53.5 万 字 · 28 小时 17 分 · 55 张插图</span></div>
+  <h1>播客精校稿合集</h1>
+  <p>12 期 AI 播客的逐段精校文字稿：DeepSeek 论文、注意力机制之争、Kimi 与杨植麟、多模态与世界模型。点时间码跳播对应音频。</p>
+</header></div>
+<main class="wrap">
+  <div id="view-home">
+<section class="grp"><h2>DeepSeek</h2><div class="cards"><a class="pc" href="#ep91">
+    <span class="pc-k"><b>商业访谈录</b> · EP91 · 2025-02-11</span>
+    <b class="pc-t">逐篇讲解 DeepSeek 关键 9 篇论文及创新点——「勇敢者的游戏」</b>
+    
+    <span class="pc-m">何俊贤 ｜ 3 小时 21 分 · 6.0 万 字 · 7 图</span>
+  </a></div></section>
+<section class="grp"><h2>注意力机制</h2><div class="cards"><a class="pc" href="#ep94">
+    <span class="pc-k"><b>商业访谈录</b> · EP94 · 2025-02-24</span>
+    <b class="pc-t">硬件上的暴力美学</b>
+    <span class="pc-s">逐篇讲解 DeepSeek NSA、Kimi MoBA、MiniMax Lightning Attention 三篇注意力机制新论文</span>
+    <span class="pc-m">杨松琳 ｜ 2 小时 36 分 · 3.6 万 字 · 13 图</span>
+  </a><a class="pc" href="#lt103">
+    <span class="pc-k"><b>晚点聊 LateTalk</b> · EP103 · 2025-02-26</span>
+    <b class="pc-t">用 Attention 串起大模型优化史</b>
+    <span class="pc-s">详解 DeepSeek、Kimi 最新注意力机制改进——从 RNN 的遗忘，到 NSA 与 MoBA 把稀疏做进预训练</span>
+    <span class="pc-m">肖朝军、付天宇 ｜ 1 小时 28 分 · 3.4 万 字 · 5 图</span>
+  </a><a class="pc" href="#lt104">
+    <span class="pc-k"><b>晚点聊 LateTalk</b> · EP104 · 2025-03-03</span>
+    <b class="pc-t">我给线性注意力找「金主」</b>
+    <span class="pc-s">字节 say No，MiniMax say Yes——从 2021 年的「美好泡泡」，到 4560 亿参数上的线性架构</span>
+    <span class="pc-m">钟怡然 ｜ 1 小时 27 分 · 3.1 万 字 · 5 图</span>
+  </a><a class="pc" href="#ep119">
+    <span class="pc-k"><b>商业访谈录</b> · EP119 · 2025-11-04</span>
+    <b class="pc-t">雕架构的人</b>
+    <span class="pc-s">Kimi Linear 与 KDA、各家在注意力上的不同押注，以及一场从 Transformer 开始的算法变种考古</span>
+    <span class="pc-m">杨松琳 ｜ 1 小时 43 分 · 2.6 万 字 · 9 图</span>
+  </a><a class="pc" href="#lt143">
+    <span class="pc-k"><b>晚点聊 LateTalk</b> · EP143 · 2025-11-30</span>
+    <b class="pc-t">阿里、Kimi 都在用的 DeltaNet 是什么？</b>
+    <span class="pc-s">与杨松琳聊线性注意力新改进——从 2021 年被忽视的一篇论文，到旗舰模型上的架构选择</span>
+    <span class="pc-m">杨松琳 ｜ 1 小时 27 分 · 3.2 万 字 · 5 图</span>
+  </a></div></section>
+<section class="grp"><h2>Kimi 与杨植麟</h2><div class="cards"><a class="pc" href="#ep59">
+    <span class="pc-k"><b>商业访谈录</b> · EP59 · 2024-03-01</span>
+    <b class="pc-t">站在雪山脚下</b>
+    <span class="pc-s">创业第一年：融资窗口、AGI 组织、长文本登月第一步，以及 Sora 之后的世界</span>
+    <span class="pc-m">杨植麟 ｜ 1 小时 20 分 · 2.3 万 字</span>
+  </a><a class="pc" href="#ep113">
+    <span class="pc-k"><b>商业访谈录</b> · EP113 · 2025-08-27</span>
+    <b class="pc-t">一座无限的山</b>
+    <span class="pc-s">Kimi K2 的研发、Agentic 模型的泛化挑战，以及创始人的心态</span>
+    <span class="pc-m">杨植麟 ｜ 1 小时 41 分 · 2.7 万 字</span>
+  </a><a class="pc" href="#ep152">
+    <span class="pc-k"><b>商业访谈录</b> · EP152 · 2026-08-26</span>
+    <b class="pc-t">领读 Kimi K3 技术报告：从架构创新聊起，注意力美学、多教师蒸馏和开源 MoE</b>
+    
+    <span class="pc-m">孙宇涛 ｜ 2 小时 4 分 · 4.9 万 字 · 6 图</span>
+  </a><a class="pc" href="#lt177">
+    <span class="pc-k"><b>晚点聊 LateTalk</b> · EP177 · 2026-08-03</span>
+    <b class="pc-t">详解 Kimi K3</b>
+    <span class="pc-s">强到冲击 Anthropic 估值的模型什么样？——从 Infra 与算法两条线拆解 47 页技术报告</span>
+    <span class="pc-m">赵晨阳、曾致远 ｜ 1 小时 55 分 · 4.6 万 字 · 5 图</span>
+  </a></div></section>
+<section class="grp"><h2>多模态与世界模型</h2><div class="cards"><a class="pc" href="#ep102">
+    <span class="pc-k"><b>商业访谈录</b> · EP102 · 2025-06-03</span>
+    <b class="pc-t">还在为视觉挣扎</b>
+    <span class="pc-s">多模态研究的十年挣扎史，next token prediction 的本质缺陷，以及未来两年的两个「GPT-4 时刻」</span>
+    <span class="pc-m">张祥雨 ｜ 2 小时 29 分 · 4.4 万 字</span>
+  </a><a class="pc" href="#ep133">
+    <span class="pc-k"><b>商业访谈录</b> · EP133 · 2026-03-16</span>
+    <b class="pc-t">对谢赛宁的 7 小时马拉松访谈：世界模型、逃出硅谷、AMI Labs、两次拒绝 Ilya、杨立昆、李飞飞和 42</b>
+    
+    <span class="pc-m">谢赛宁 ｜ 6 小时 45 分 · 12.7 万 字</span>
+  </a></div></section><section class="grp"><h2>站内另有</h2><div class="cards">
+    <a class="pc ext" href="__HOME__ep117-paper-journey/">
+      <span class="pc-k"><b>本站条目</b> · 商业访谈录 EP117</span>
+      <b class="pc-t">开源一段论文探索之旅</b>
+      <span class="pc-s">一篇论文从提出到复现、讲解、开源的完整过程，站内独立条目</span>
+      <span class="pc-m">前往条目 →</span>
+    </a>
+    <a class="pc ext" href="__HOME__history-of-diffusion/">
+      <span class="pc-k"><b>本站条目</b> · History of Diffusion</span>
+      <b class="pc-t">History of Diffusion</b>
+      <span class="pc-s">扩散模型史访谈，站内独立条目</span>
+      <span class="pc-m">前往条目 →</span>
+    </a>
+  </div></section>
+  </div>
+  <div id="view-ep"></div>
+</main>
+<div class="pbar" id="pbar"><div class="wrap">
+  <span class="pn" id="pn"></span>
+  <audio id="aud" controls preload="none"></audio>
+  <label><input type="checkbox" id="follow" checked> 跟随播放</label>
+</div></div>
+<script>
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const EPS={"ep91":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lpHslH0xLNHJTbSqJa84E90CHAEI.m4a","title":"商业访谈录 EP91 · 逐篇讲解 DeepSeek 关键 9 篇论文及创新点——「勇敢者的游戏」"},"ep94":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lqyo-JyWn3Mw0yr1x6rq86eePyXk.m4a","title":"商业访谈录 EP94 · 硬件上的暴力美学"},"lt103":{"audio":"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lpkafF4Bf5V0qATTO8MLKIXjqPIo.mp3","title":"晚点聊 LateTalk EP103 · 用 Attention 串起大模型优化史"},"lt104":{"audio":"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lpHrFZ1qQSpSCPJ0vV2tFA6WPiPa.mp3","title":"晚点聊 LateTalk EP104 · 我给线性注意力找「金主」"},"ep119":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lhtjpe2wxQ9y6YAKuwKxTMVg1Jyn.m4a","title":"商业访谈录 EP119 · 雕架构的人"},"lt143":{"audio":"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lplkUeeeoir9spfn0jawEluO-17q.mp3","title":"晚点聊 LateTalk EP143 · 阿里、Kimi 都在用的 DeltaNet 是什么？"},"ep59":{"audio":"https://media.xyzcdn.net/lj3fXihFWxKxzOkccvxwXWMvr1Fz.m4a","title":"商业访谈录 EP59 · 站在雪山脚下"},"ep113":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/liW7qgxAt8UFB4_sEptGTXmH1NAe.m4a","title":"商业访谈录 EP113 · 一座无限的山"},"ep152":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lrVnGxoafcZ7vzH8HywULkwNb6n6.m4a","title":"商业访谈录 EP152 · 领读 Kimi K3 技术报告：从架构创新聊起，注意力美学、多教师蒸馏和开源 MoE"},"lt177":{"audio":"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lul7nzosngMJS55BfpzsGRTIeQZj.mp3","title":"晚点聊 LateTalk EP177 · 详解 Kimi K3"},"ep102":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lolv3lRcJ-DA99B-OjQBvG7qvaj-.m4a","title":"商业访谈录 EP102 · 还在为视觉挣扎"},"ep133":{"audio":"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lqXBPXddXfukbdlAP-NDrFNp-2wn.m4a","title":"商业访谈录 EP133 · 对谢赛宁的 7 小时马拉松访谈：世界模型、逃出硅谷、AMI Labs、两次拒绝 Ilya、杨立昆、李飞飞和 42"}};
+const A="__ASSETS__";
+const $ep=document.getElementById('view-ep'),$home=document.getElementById('view-home');
+const $ch=document.getElementById('colhead');
+const audio=document.getElementById('aud'),pbar=document.getElementById('pbar'),pn=document.getElementById('pn');
+const follow=document.getElementById('follow');
+const shells={"ep91":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP91</span><span>2025-02-11 · 3 小时 21 分 · 6.0 万 字 · 16 节</span></div>\n    <h1>逐篇讲解 DeepSeek 关键 9 篇论文及创新点——「勇敢者的游戏」</h1>\n    \n    <p class=\"eph-g\"><b>何俊贤</b>（香港科技大学计算机系助理教授）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/67aacd6b247d51713cedbeda\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://www.bilibili.com/video/BV1xuK5eREJi/\" target=\"_blank\" rel=\"noreferrer\">B 站视频版 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lpHslH0xLNHJTbSqJa84E90CHAEI.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep94":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP94</span><span>2025-02-24 · 2 小时 36 分 · 3.6 万 字 · 28 节</span></div>\n    <h1>硬件上的暴力美学</h1>\n    <p class=\"eph-sub\">逐篇讲解 DeepSeek NSA、Kimi MoBA、MiniMax Lightning Attention 三篇注意力机制新论文</p>\n    <p class=\"eph-g\"><b>杨松琳</b>（MIT CSAIL 博士生，研究方向：硬件高效的序列建模 / 线性注意力）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/67bb3696606e5c5940533ef4\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://www.bilibili.com/video/BV1ZmAQekEMc/\" target=\"_blank\" rel=\"noreferrer\">B 站视频版 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lqyo-JyWn3Mw0yr1x6rq86eePyXk.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","lt103":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">晚点聊 LateTalk · EP103</span><span>2025-02-26 · 1 小时 28 分 · 3.4 万 字 · 26 节</span></div>\n    <h1>用 Attention 串起大模型优化史</h1>\n    <p class=\"eph-sub\">详解 DeepSeek、Kimi 最新注意力机制改进——从 RNN 的遗忘，到 NSA 与 MoBA 把稀疏做进预训练</p>\n    <p class=\"eph-g\"><b>肖朝军、付天宇</b>（清华 THUNLP 博士生 / 清华 NICS-EFC 博士生）× 曼祺（主播（程曼祺））</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/67bf356952a6af799c558399\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lpkafF4Bf5V0qATTO8MLKIXjqPIo.mp3\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","lt104":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">晚点聊 LateTalk · EP104</span><span>2025-03-03 · 1 小时 27 分 · 3.1 万 字 · 20 节</span></div>\n    <h1>我给线性注意力找「金主」</h1>\n    <p class=\"eph-sub\">字节 say No，MiniMax say Yes——从 2021 年的「美好泡泡」，到 4560 亿参数上的线性架构</p>\n    <p class=\"eph-g\"><b>钟怡然</b>（MiniMax 高级研究总监，MiniMax-01 网络架构负责人）× 曼祺（主播（程曼祺））</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/67c63718e24b741ee8e2ee63\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lpHrFZ1qQSpSCPJ0vV2tFA6WPiPa.mp3\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep119":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP119</span><span>2025-11-04 · 1 小时 43 分 · 2.6 万 字 · 38 节</span></div>\n    <h1>雕架构的人</h1>\n    <p class=\"eph-sub\">Kimi Linear 与 KDA、各家在注意力上的不同押注，以及一场从 Transformer 开始的算法变种考古</p>\n    <p class=\"eph-g\"><b>杨松琳</b>（MIT 在读博士，Kimi Linear 论文作者之一）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/6908b9c80ceab2a71c48668c\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lhtjpe2wxQ9y6YAKuwKxTMVg1Jyn.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","lt143":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">晚点聊 LateTalk · EP143</span><span>2025-11-30 · 1 小时 27 分 · 3.2 万 字 · 20 节</span></div>\n    <h1>阿里、Kimi 都在用的 DeltaNet 是什么？</h1>\n    <p class=\"eph-sub\">与杨松琳聊线性注意力新改进——从 2021 年被忽视的一篇论文，到旗舰模型上的架构选择</p>\n    <p class=\"eph-g\"><b>杨松琳</b>（MIT CSAIL 博士生，DeltaNet 并行算法 / GLA / Gated DeltaNet 作者）× 曼祺（主播（程曼祺））</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/692cd86fe4244f7e3d3ad135\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lplkUeeeoir9spfn0jawEluO-17q.mp3\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep59":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP59</span><span>2024-03-01 · 1 小时 20 分 · 2.3 万 字 · 19 节</span></div>\n    <h1>站在雪山脚下</h1>\n    <p class=\"eph-sub\">创业第一年：融资窗口、AGI 组织、长文本登月第一步，以及 Sora 之后的世界</p>\n    <p class=\"eph-g\"><b>杨植麟</b>（月之暗面创始人兼 CEO）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/65e16b5b6144a933b1d968b5\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/lj3fXihFWxKxzOkccvxwXWMvr1Fz.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep113":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP113</span><span>2025-08-27 · 1 小时 41 分 · 2.7 万 字 · 5 节</span></div>\n    <h1>一座无限的山</h1>\n    <p class=\"eph-sub\">Kimi K2 的研发、Agentic 模型的泛化挑战，以及创始人的心态</p>\n    <p class=\"eph-g\"><b>杨植麟</b>（月之暗面创始人兼 CEO）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/68ae86d18ce45d46d49c4d50\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/liW7qgxAt8UFB4_sEptGTXmH1NAe.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep152":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP152</span><span>2026-08-26 · 2 小时 4 分 · 4.9 万 字 · 26 节</span></div>\n    <h1>领读 Kimi K3 技术报告：从架构创新聊起，注意力美学、多教师蒸馏和开源 MoE</h1>\n    \n    <p class=\"eph-g\"><b>孙宇涛</b>（清华大学计算机系博士候选人，上海创智学院璞锐学者）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/6a8eadd61352af56ff3c6017\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://www.bilibili.com/video/BV1KZ8X6uEPL/\" target=\"_blank\" rel=\"noreferrer\">B 站视频版 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lrVnGxoafcZ7vzH8HywULkwNb6n6.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","lt177":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">晚点聊 LateTalk · EP177</span><span>2026-08-03 · 1 小时 55 分 · 4.6 万 字 · 24 节</span></div>\n    <h1>详解 Kimi K3</h1>\n    <p class=\"eph-sub\">强到冲击 Anthropic 估值的模型什么样？——从 Infra 与算法两条线拆解 47 页技术报告</p>\n    <p class=\"eph-g\"><b>赵晨阳、曾致远</b>（RadixArk 创始成员、SGLang 核心贡献者 / 华盛顿大学 CS 博士生）× 曼祺（主播（程曼祺））</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/6a711ae922cfdb7e07bae339\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/61933ace1b4320461e91fd55/lul7nzosngMJS55BfpzsGRTIeQZj.mp3\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep102":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP102</span><span>2025-06-03 · 2 小时 29 分 · 4.4 万 字 · 57 节</span></div>\n    <h1>还在为视觉挣扎</h1>\n    <p class=\"eph-sub\">多模态研究的十年挣扎史，next token prediction 的本质缺陷，以及未来两年的两个「GPT-4 时刻」</p>\n    <p class=\"eph-g\"><b>张祥雨</b>（阶跃星辰首席科学家，ResNet / ShuffleNet 作者；本期 co-host：李广密（拾象科技创始人））× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/683d2ceb38dcc57c641a7d0f\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lolv3lRcJ-DA99B-OjQBvG7qvaj-.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>","ep133":"<div class=\"eph\">\n    <a class=\"eback\" href=\"#\">‹ 返回合集</a>\n    <div class=\"eph-k\"><span class=\"topic\">商业访谈录 · EP133</span><span>2026-03-16 · 6 小时 45 分 · 12.7 万 字 · 17 节</span></div>\n    <h1>对谢赛宁的 7 小时马拉松访谈：世界模型、逃出硅谷、AMI Labs、两次拒绝 Ilya、杨立昆、李飞飞和 42</h1>\n    \n    <p class=\"eph-g\"><b>谢赛宁</b>（AMI Labs 联合创始人兼首席科学官、纽约大学助理教授）× 张小珺（主播）</p>\n    <p class=\"eph-l\"><a href=\"https://www.xiaoyuzhoufm.com/episode/69b77577f8b8079bfa8eb837\" target=\"_blank\" rel=\"noreferrer\">小宇宙 ↗</a><a href=\"https://www.bilibili.com/video/BV1tew5zVEDf/\" target=\"_blank\" rel=\"noreferrer\">B 站视频版 ↗</a><a href=\"https://media.xyzcdn.net/626b46ea9cbbf0451cf5a962/lqXBPXddXfukbdlAP-NDrFNp-2wn.m4a\" target=\"_blank\" rel=\"noreferrer\">音频直链 ↗</a></p>\n    <button class=\"tocbtn\" id=\"tocbtn\">目录</button>\n  </div>\n  <div class=\"epwrap\" id=\"epwrap\"><div class=\"loading\">加载中……</div></div>"};
+let cur=null,turns=[],heads=[];
+
+function route(){
+  const id=location.hash.replace('#','');
+  if(EPS[id]){ show(id); }else{ home_(); }
+}
+function home_(){
+  cur=null;$ep.style.display='none';$ep.innerHTML='';$home.style.display='';
+  $ch.style.display='';scrollTo(0,0);
+  pbar.classList.remove('on');audio.pause();document.body.classList.remove('playing');
+  document.title="播客精校稿合集 · 12 期 AI 播客的逐段精校文字稿：DeepSeek 论文、注意力机制之争、Kimi 与杨植麟、多模态与世界模型";
+}
+async function show(id){
+  if(cur===id){$ep.scrollIntoView();return}
+  cur=id;$home.style.display='none';$ep.style.display='block';
+  $ch.style.display='none';scrollTo(0,0);
+  pbar.classList.add('on');pn.textContent=EPS[id].title;
+  if(audio.getAttribute('src')!==EPS[id].audio){audio.src=EPS[id].audio}
+  document.title=EPS[id].title+' · 播客精校稿合集';
+  $ep.innerHTML=shells[id];
+  document.getElementById('tocbtn')?.addEventListener('click',()=>{
+    document.querySelector('.toc')?.classList.toggle('on')});
+  const r=await fetch(A+'/'+id+'.html');
+  document.getElementById('epwrap').innerHTML=await r.text();
+  turns=$$('#epwrap .turn').map(el=>({el,t:+el.dataset.t}));
+  heads=$$('#epwrap h2.sec');
+  $$('#epwrap [data-seek]').forEach(b=>b.addEventListener('click',()=>seek(+b.dataset.seek)));
+  $$('#epwrap .toc-i').forEach(b=>b.addEventListener('click',()=>{
+    document.getElementById('s'+b.dataset.s)?.scrollIntoView({block:'start',behavior:'smooth'})}));
+  document.body.classList.add('playing');
+  sync();
+}
+function seek(t){audio.currentTime=Math.max(0,t);audio.play().catch(()=>{})}
+let idx=-1;
+function sync(){
+  const t=audio.currentTime;let lo=0,hi=turns.length-1,k=-1;
+  while(lo<=hi){const m=lo+hi>>1;if(turns[m].t<=t){k=m;lo=m+1}else hi=m-1}
+  if(k===idx||k<0)return;
+  turns[idx]?.el.classList.remove('cur');idx=k;
+  const el=turns[k].el;el.classList.add('cur');
+  const h=heads.filter(x=>x.compareDocumentPosition(el)&4).pop();
+  if(h)$$('#epwrap .toc-i').forEach(b=>b.classList.toggle('cur','s'+b.dataset.s===h.id));
+  if(follow.checked&&!audio.paused){
+    const r=el.getBoundingClientRect();
+    if(r.top<90||r.bottom>innerHeight-100)el.scrollIntoView({block:'center',behavior:'smooth'});
+  }
+}
+audio.addEventListener('timeupdate',sync);
+addEventListener('hashchange',route);
+addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea')||!cur)return;
+  if(e.key===' '){e.preventDefault();audio.paused?audio.play():audio.pause()}
+  if(e.key==='ArrowLeft'){e.preventDefault();audio.currentTime-=15}
+  if(e.key==='ArrowRight'){e.preventDefault();audio.currentTime+=30}
+  if(e.key==='Escape')document.querySelector('.toc.on')?.classList.remove('on');
+});
+route();
+</script>
+</body></html>
