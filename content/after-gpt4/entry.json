@@ -20,9 +20,9 @@
     "<b>60</b> 多个概念"
   ],
   "build": {
-    "note": "输入在 27_PostGPT4/ 下（content/*.txt 正文、figures/gen.mjs 全部配图、research/ 论文日期和摘要的核对记录，package.json 里的 katex 用来把 LaTeX 渲染成 MathML），那个目录不进仓库。page.html 是提交进仓库的成品；27_PostGPT4/ 在时构建会先重新生成。",
-    "tool": "27_PostGPT4/build.mjs",
-    "requires": "27_PostGPT4/build.mjs",
+    "note": "输入在 16_PostGPT4/ 下（content/*.txt 正文、figures/gen.mjs 全部配图、research/ 论文日期和摘要的核对记录，package.json 里的 katex 用来把 LaTeX 渲染成 MathML），那个目录不进仓库。page.html 是提交进仓库的成品；16_PostGPT4/ 在时构建会先重新生成。",
+    "tool": "16_PostGPT4/build.mjs",
+    "requires": "16_PostGPT4/build.mjs",
     "args": []
   }
 }
